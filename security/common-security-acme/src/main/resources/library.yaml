@@ -1,0 +1,10 @@
+dq:
+  acme-ssl:
+    user-key-size: 2048
+    connect-url: acme://letsencrypt.org
+    domain: $link(dq.application.fqdn)
+    persistence:
+      engine: mapdb
+      mapdb:
+        file: acme-ssl.db
+        transactional: true
