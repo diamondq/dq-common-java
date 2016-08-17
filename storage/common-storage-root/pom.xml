@@ -12,7 +12,7 @@
 	<packaging>pom</packaging>
 	<name>DiamondQ Common: Storage: Root</name>
 	<modules>
-		<module>../common-storage-siena</module>
 		<module>../common-storage-hibernate-ogm</module>
+		<module>../common-storage-jdo-datanucleus</module>
 	</modules>
 </project>

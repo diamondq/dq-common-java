@@ -1,17 +1,12 @@
 package com.diamondq.common.security.acme.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
 
-import org.hibernate.annotations.GenericGenerator;
-
-@Entity
+@PersistenceCapable
 public class PersistedState {
 
-	@Id
-	@GeneratedValue(generator = "uuid")
-	@GenericGenerator(name = "uuid", strategy = "uuid2")
+	@Persistent(primaryKey = "true")
 	private String	id;
 
 	private String	acmeServer;

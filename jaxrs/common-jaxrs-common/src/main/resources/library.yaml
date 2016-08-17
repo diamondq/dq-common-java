@@ -1,0 +1,13 @@
+web:
+  http:
+    enabled: true
+    port: 80
+    host: ${application.fqdn}
+    bindhost: 0.0.0.0
+    
+  https:
+    enabled: true
+    port: 443
+    host: ${application.fqdn}
+    bindhost: 0.0.0.0
+    

@@ -1,12 +1,12 @@
 package com.diamondq.common.security.acme.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
 
-@Entity
+@PersistenceCapable
 public class ChallengeState {
 
-	@Id
+	@Persistent(primaryKey = "true")
 	private String	token;
 
 	private String	response;

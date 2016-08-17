@@ -12,6 +12,7 @@
 	<packaging>pom</packaging>
 	<name>DiamondQ Common: Servers: Root</name>
 	<modules>
-		<module>../common-servers-payara-micro</module>
+		<module>../common-servers-undertow</module>
+		<module>../common-servers-undertow-resteasy-weld</module>
 	</modules>
 </project>

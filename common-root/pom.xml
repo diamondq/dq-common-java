@@ -10,9 +10,13 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<jackson.version>2.5.1</jackson.version>
 		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
 		<siena.version></siena.version>
+		<datanucleus.version>5.0.0-release</datanucleus.version>
+		<common-config.version>0.1.0-SNAPSHOT</common-config.version>
+		<undertow.version>1.3.23.Final</undertow.version>
+		<resteasy.version>3.0.19.Final</resteasy.version>
+		<weld.version>2.3.5.Final</weld.version>
 	</properties>
 	<repositories>
 	</repositories>
@@ -20,6 +24,97 @@
 	</pluginRepositories>
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.diamondq.common.java</groupId>
+				<artifactId>common-bom</artifactId>
+				<version>0.1.0-SNAPSHOT</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-bom</artifactId>
+				<version>${resteasy.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-cdi</artifactId>
+				<version>${resteasy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.weld.servlet</groupId>
+				<artifactId>weld-servlet</artifactId>
+				<version>${weld.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.undertow</groupId>
+				<artifactId>undertow-core</artifactId>
+				<version>${undertow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.undertow</groupId>
+				<artifactId>undertow-servlet</artifactId>
+				<version>${undertow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.diamondq.common.java.thirdparty</groupId>
+				<artifactId>common-jackson-bom</artifactId>
+				<version>2.8.1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax</groupId>
+				<artifactId>javaee-api</artifactId>
+				<version>7.0</version>
+			</dependency>
+			<dependency>
+				<groupId>io.swagger</groupId>
+				<artifactId>swagger-annotations</artifactId>
+				<version>1.5.9</version>
+			</dependency>
+			<dependency>
+				<groupId>com.diamondq.common.java.config</groupId>
+				<artifactId>common-config-bom</artifactId>
+				<version>${common-config.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>javax.jdo</artifactId>
+				<version>[3.2.0-m4, 3.9)</version>
+			</dependency>
+			<dependency>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>datanucleus-jdo-query</artifactId>
+				<version>${datanucleus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>datanucleus-core</artifactId>
+				<version>${datanucleus.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>datanucleus-api-jdo</artifactId>
+				<version>${datanucleus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>datanucleus-rdbms</artifactId>
+				<version>${datanucleus.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>datanucleus-odf</artifactId>
+				<version>${datanucleus.version}</version>
+				<scope>runtime</scope>
+			</dependency>
 			<dependency>
 				<groupId>com.google.code.findbugs</groupId>
 				<artifactId>jsr305</artifactId>
@@ -74,31 +169,6 @@
 			</dependency>
 			<!-- Other dependencies -->
 			<dependency>
-				<groupId>com.fasterxml.jackson.datatype</groupId>
-				<artifactId>jackson-datatype-guava</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.datatype</groupId>
-				<artifactId>jackson-datatype-jdk8</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-annotations</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.jaxrs</groupId>
-				<artifactId>jackson-jaxrs-json-provider</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.bitbucket.b_c</groupId>
 				<artifactId>jose4j</artifactId>
 				<version>0.5.1</version>
@@ -136,11 +206,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.7.21</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-simple</artifactId>
 				<version>1.7.21</version>
 			</dependency>
@@ -154,71 +219,15 @@
 				<artifactId>logback-classic</artifactId>
 				<version>1.1.7</version>
 			</dependency>
-			<!-- Internal Libraries -->
-			<!-- Config -->
-			<dependency>
-				<groupId>com.diamondq.common.java.config</groupId>
-				<artifactId>common-config-api</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.config</groupId>
-				<artifactId>common-config-core</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.config</groupId>
-				<artifactId>common-config-docs</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.config</groupId>
-				<artifactId>common-config-format-snake-yaml</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.config</groupId>
-				<artifactId>common-config-tests</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<!-- Common -->
-			<dependency>
-				<groupId>com.diamondq.common.java</groupId>
-				<artifactId>common-lambda</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.security</groupId>
-				<artifactId>common-security-jwt</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.security</groupId>
-				<artifactId>common-security-acme</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.storage</groupId>
-				<artifactId>common-storage-siena</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.servers</groupId>
-				<artifactId>common-servers-payara-micro</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.diamondq.common.java.storage</groupId>
-				<artifactId>common-storage-hibernate-ogm</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<modules>
-		<module>../config/common-config-root</module>
+		<module>../common-bom</module>
 		<module>../security/common-security-root</module>
 		<module>../storage/common-storage-root</module>
 		<module>../servers/common-servers-root</module>
+		<module>../servers/common-injection-root</module>
+		<module>../servers/common-jaxrs-root</module>
 		<module>../common-lambda</module>
 	</modules>
 	<build>

@@ -39,11 +39,6 @@
 			<artifactId>common-config-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.diamondq.common.java.config</groupId>
-			<artifactId>common-config-cfg4j</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>

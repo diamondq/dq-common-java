@@ -4,6 +4,7 @@ import com.diamondq.common.security.acme.model.ACMEConfig;
 import com.diamondq.common.security.acme.model.ActivateResponse;
 import com.diamondq.common.security.acme.model.ChallengeState;
 import com.diamondq.common.security.acme.model.PersistedState;
+import com.diamondq.common.security.acme.model.QPersistedState;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -30,9 +31,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.jdo.JDOQLTypedQuery;
+import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -57,26 +61,24 @@ import org.shredzone.acme4j.util.KeyPairUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+@Singleton
 @Path("/acme-authorization")
-@ApplicationScoped
+@Api(tags = {"SSL"})
 public class AcmeAuthorizationController {
 
-	private static final Logger	sLogger	= LoggerFactory.getLogger(AcmeAuthorizationController.class);
-
-	private final ACMEConfig	mConfig;
-
-	private final EntityManager	mEntityManager;
-
-	public AcmeAuthorizationController() {
-		mConfig = null;
-		mEntityManager = null;
-	}
+	private static final Logger			sLogger	= LoggerFactory.getLogger(AcmeAuthorizationController.class);
 
 	@Inject
-	public AcmeAuthorizationController(ACMEConfig pConfig, EntityManager pPersistenceManager) {
-		sLogger.debug("Created");
-		mConfig = pConfig;
-		mEntityManager = pPersistenceManager;
+	private ACMEConfig					mConfig;
+
+	@Inject
+	@Named("acme")
+	private PersistenceManagerFactory	mPMF;
+
+	public AcmeAuthorizationController() {
 	}
 
 	/**
@@ -86,17 +88,21 @@ public class AcmeAuthorizationController {
 	 * @throws IOException
 	 * @throws AcmeException
 	 */
-	private void getRegistration(State pState) throws IOException, AcmeException {
+	private void getRegistration(PersistenceManager pManager, State pState) throws IOException, AcmeException {
 
 		/* Get the state information */
 
-		pState.savedState = mEntityManager.find(PersistedState.class, mConfig.getDomain());
+		try (JDOQLTypedQuery<PersistedState> query = pManager.newJDOQLTypedQuery(PersistedState.class)) {
+			// TODO: Temporary holder
+			query.getFetchPlan();
+			pState.savedState = query.filter(QPersistedState.candidate().id.eq(mConfig.getDomain())).executeUnique();
+		}
 		if ((pState.savedState != null)
 			&& (mConfig.getConnectUrl().equals(pState.savedState.getAcmeServer()) == false)) {
 
 			/* The server URI's have changed. We'll need to fully restart this process */
 
-			mEntityManager.remove(pState.savedState);
+			pManager.deletePersistent(pState.savedState);
 			pState.savedState = null;
 		}
 
@@ -104,7 +110,7 @@ public class AcmeAuthorizationController {
 			pState.savedState = new PersistedState();
 			pState.savedState.setId(mConfig.getDomain());
 			pState.savedState.setAcmeServer(mConfig.getConnectUrl());
-			mEntityManager.persist(pState.savedState);
+			pManager.makePersistent(pState.savedState);
 		}
 
 		/* First, if the user key file exists, then read it in */
@@ -118,7 +124,7 @@ public class AcmeAuthorizationController {
 		}
 		else {
 
-			String configUserKeyPairStr = mConfig.getUserKeyPair();
+			String configUserKeyPairStr = mConfig.getUserKeyPair().orElse(null);
 			if ((configUserKeyPairStr != null) && (configUserKeyPairStr.isEmpty() == false)) {
 				pState.savedState.setUserKeyPair(configUserKeyPairStr);
 				try (StringReader sr = new StringReader(pState.savedState.getUserKeyPair())) {
@@ -214,8 +220,8 @@ public class AcmeAuthorizationController {
 					sLogger.warn("User not authorized. Likely terms of agreement changed or not read: {}",
 						pState.registration.getAgreement().toString());
 
-					pState.response =
-						ActivateResponse.builder().agreementAck(pState.registration.getAgreement().toString()).build();
+					pState.response = ActivateResponse.builder()
+						.requiresAgreementAck(pState.registration.getAgreement().toString()).build();
 					return;
 				}
 				else
@@ -272,7 +278,12 @@ public class AcmeAuthorizationController {
 		ChallengeState challengeState = new ChallengeState();
 		challengeState.setToken(challenge.getToken());
 		challengeState.setResponse(challenge.getAuthorization());
-		mEntityManager.persist(challengeState);
+
+		try (PersistenceManager manager = mPMF.getPersistenceManager()) {
+			manager.currentTransaction().begin();
+			manager.makePersistent(challengeState);
+			manager.currentTransaction().commit();
+		}
 
 		sLogger.debug("Triggering challenge");
 
@@ -533,52 +544,76 @@ public class AcmeAuthorizationController {
 
 		sLogger.debug("Starting authorization processs...");
 
-		State state = new State();
+		try (PersistenceManager manager = mPMF.getPersistenceManager()) {
+			boolean persistenceSuccess = false;
+			manager.currentTransaction().begin();
+			try {
+				State state = new State();
 
-		/* Attempt the registration */
+				/* Attempt the registration */
 
-		getRegistration(state);
-		if (state.response != null)
-			return state.response;
+				getRegistration(manager, state);
+				if (state.response != null) {
+					persistenceSuccess = true;
+					return state.response;
+				}
 
-		if (pState == WorkflowEventState.AFTER_REGISTRATION)
-			pFunction.accept(state);
+				if (pState == WorkflowEventState.AFTER_REGISTRATION)
+					pFunction.accept(state);
 
-		/* Now start the authorization */
+				/* Now start the authorization */
 
-		getAuthorization(state);
-		if (state.response != null)
-			return state.response;
+				getAuthorization(state);
+				if (state.response != null) {
+					persistenceSuccess = true;
+					return state.response;
+				}
 
-		if (pState == WorkflowEventState.NEW_AUTHORIZATION)
-			pFunction.accept(state);
+				if (pState == WorkflowEventState.NEW_AUTHORIZATION)
+					pFunction.accept(state);
 
-		/* Challenge */
+				/* Challenge */
 
-		getChallenge(state);
-		if (state.response != null)
-			return state.response;
+				getChallenge(state);
+				if (state.response != null) {
+					persistenceSuccess = true;
+					return state.response;
+				}
 
-		/* Request Certificate */
+				/* Request Certificate */
 
-		getCert(state);
-		if (state.response != null)
-			return state.response;
+				getCert(state);
+				if (state.response != null) {
+					persistenceSuccess = true;
+					return state.response;
+				}
 
-		/* Store the certificates into the keystore */
+				/* Store the certificates into the keystore */
 
-		storeCerts(state);
-		if (state.response != null)
-			return state.response;
+				storeCerts(state);
+				if (state.response != null) {
+					persistenceSuccess = true;
+					return state.response;
+				}
 
-		state.response = ActivateResponse.builder().build();
+				state.response = ActivateResponse.builder().build();
 
-		return state.response;
+				persistenceSuccess = true;
+				return state.response;
+			}
+			finally {
+				if (persistenceSuccess == true)
+					manager.currentTransaction().commit();
+				else
+					manager.currentTransaction().rollback();
+			}
+		}
+
 	}
 
 	@Path("acceptAgreement")
 	@POST
-	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_XML})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Consumes(MediaType.TEXT_PLAIN)
 	public ActivateResponse acceptAgreement(String pAgreementURI) throws IOException, AcmeException, URISyntaxException,
 		CertificateException, KeyStoreException, NoSuchAlgorithmException {
@@ -600,7 +635,8 @@ public class AcmeAuthorizationController {
 
 	@Path("activate")
 	@GET
-	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_XML})
+	@Produces({MediaType.APPLICATION_JSON})
+	@ApiOperation(value = "Checks and generates the SSL certificate for this server")
 	public ActivateResponse activate() throws AcmeException, IOException, URISyntaxException, CertificateException,
 		KeyStoreException, NoSuchAlgorithmException {
 
