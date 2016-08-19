@@ -226,8 +226,9 @@
 		<module>../security/common-security-root</module>
 		<module>../storage/common-storage-root</module>
 		<module>../servers/common-servers-root</module>
-		<module>../servers/common-injection-root</module>
-		<module>../servers/common-jaxrs-root</module>
+		<module>../injection/common-injection-root</module>
+		<module>../jaxrs/common-jaxrs-root</module>
+		<module>../thirdparty/common-jackson-bom</module>
 		<module>../common-lambda</module>
 	</modules>
 	<build>
