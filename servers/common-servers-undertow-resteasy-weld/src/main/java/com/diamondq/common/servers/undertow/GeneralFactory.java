@@ -20,7 +20,8 @@ public class GeneralFactory {
 
 		URI unsecuredURI;
 		URI securedURI;
-
+		String fqdn;
+		
 		try {
 			Boolean httpEnabled = pConfig.bind("web.http.enabled", Boolean.class);
 			if ((httpEnabled != null) && (httpEnabled == true)) {
@@ -42,13 +43,14 @@ public class GeneralFactory {
 			else
 				securedURI = null;
 
+			fqdn = pConfig.bind("application.fqdn", String.class);
 		}
 		catch (URISyntaxException ex) {
 			throw new RuntimeException(ex);
 		}
 
 		return ApplicationInfo.builder().securedURI(Optional.ofNullable(securedURI))
-			.unsecuredURI(Optional.ofNullable(unsecuredURI)).build();
+			.unsecuredURI(Optional.ofNullable(unsecuredURI)).fQDN(fqdn).build();
 	}
 
 }

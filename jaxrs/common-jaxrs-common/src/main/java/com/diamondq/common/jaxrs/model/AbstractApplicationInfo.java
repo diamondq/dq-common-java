@@ -17,4 +17,5 @@ public abstract class AbstractApplicationInfo {
 
 	public abstract Optional<URI> getUnsecuredURI();
 
+	public abstract String getFQDN();
 }
