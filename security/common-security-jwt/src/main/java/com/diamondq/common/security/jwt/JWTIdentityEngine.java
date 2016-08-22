@@ -1,8 +1,8 @@
 package com.diamondq.common.security.jwt;
 
 import com.diamondq.common.config.Config;
+import com.diamondq.common.security.acl.api.IdentityEngine;
 import com.diamondq.common.security.acl.model.UserInfo;
-import com.diamondq.common.security.acl.spi.IdentityEngine;
 import com.diamondq.common.security.jwt.model.JWTConfigProperties;
 
 import javax.inject.Inject;
@@ -60,7 +60,7 @@ public class JWTIdentityEngine implements IdentityEngine {
 	}
 
 	/**
-	 * @see com.diamondq.common.security.acl.spi.IdentityEngine#getIdentity(javax.servlet.http.HttpServletRequest)
+	 * @see com.diamondq.common.security.acl.api.IdentityEngine#getIdentity(javax.servlet.http.HttpServletRequest)
 	 */
 	@Override
 	public UserInfo getIdentity(HttpServletRequest pRequest) {

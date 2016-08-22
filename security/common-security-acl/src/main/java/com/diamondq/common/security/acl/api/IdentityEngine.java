@@ -1,4 +1,4 @@
-package com.diamondq.common.security.acl.spi;
+package com.diamondq.common.security.acl.api;
 
 import com.diamondq.common.security.acl.model.UserInfo;
 

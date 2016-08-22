@@ -1,0 +1,4 @@
+identity:
+  jwt:
+    header: Authorization
+    bearer-prefix: true

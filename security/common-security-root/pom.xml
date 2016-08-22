@@ -15,5 +15,6 @@
 		<module>../common-security-jwt</module>
 		<module>../common-security-acme</module>
 		<module>../common-security-acl</module>
+		<module>../common-security-openaz</module>
 	</modules>
 </project>
