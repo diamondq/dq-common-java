@@ -1,5 +1,7 @@
 package com.diamondq.common.security.acl.model;
 
+import java.util.Set;
+
 public interface UserInfo {
 
 	public String getEmail();
@@ -8,4 +10,5 @@ public interface UserInfo {
 	
 	public String getAuthId();
 	
+	public Set<String> getRoles();
 }

@@ -1,9 +1,8 @@
 package com.diamondq.common.security.jwt;
 
-import com.diamondq.common.config.Config;
-import com.diamondq.common.security.acl.api.IdentityEngine;
-import com.diamondq.common.security.acl.model.UserInfo;
-import com.diamondq.common.security.jwt.model.JWTConfigProperties;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,6 +15,11 @@ import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.lang.JoseException;
+
+import com.diamondq.common.config.Config;
+import com.diamondq.common.security.acl.api.IdentityEngine;
+import com.diamondq.common.security.acl.model.UserInfo;
+import com.diamondq.common.security.jwt.model.JWTConfigProperties;
 
 @Singleton
 public class JWTIdentityEngine implements IdentityEngine {
@@ -88,7 +92,10 @@ public class JWTIdentityEngine implements IdentityEngine {
 			String nameClaim = jwtClaims.getClaimValue("name", String.class);
 			String emailClaim = jwtClaims.getClaimValue("email", String.class);
 
-			return new UserInfoImpl(emailClaim, nameClaim, subjectId);
+			Set<String> roles = new HashSet<>();
+			List<String> list = jwtClaims.getStringListClaimValue("roles");
+			roles.addAll(list);
+			return new UserInfoImpl(emailClaim, nameClaim, subjectId, roles);
 		}
 		catch (InvalidJwtException | MalformedClaimException ex) {
 			throw new RuntimeException(ex);
