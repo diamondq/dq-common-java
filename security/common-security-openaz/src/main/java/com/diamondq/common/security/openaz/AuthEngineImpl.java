@@ -1,17 +1,14 @@
 package com.diamondq.common.security.openaz;
 
-import com.diamondq.common.config.Config;
-import com.diamondq.common.security.acl.api.AuthenticationEngine;
-
-import java.util.Properties;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.openaz.pepapi.PepAgent;
-import org.apache.openaz.pepapi.PepAgentFactory;
 import org.apache.openaz.pepapi.PepResponse;
-import org.apache.openaz.pepapi.std.StdPepAgentFactory;
+
+import com.diamondq.common.security.acl.api.AuthenticationEngine;
 
 @Singleton
 public class AuthEngineImpl implements AuthenticationEngine {
@@ -19,10 +16,8 @@ public class AuthEngineImpl implements AuthenticationEngine {
 	private final PepAgent mPepAgent;
 
 	@Inject
-	public AuthEngineImpl(Config pConfig) {
-		Properties props = pConfig.bind("openaz", Properties.class);
-		PepAgentFactory agentFactory = new StdPepAgentFactory(props);
-		mPepAgent = agentFactory.getPepAgent();
+	public AuthEngineImpl(PepAgent pAgent) {
+		mPepAgent = pAgent;
 	}
 
 	/**
@@ -32,5 +27,14 @@ public class AuthEngineImpl implements AuthenticationEngine {
 	public boolean decide(Object... pObjects) {
 		PepResponse response = mPepAgent.decide(pObjects);
 		return response.allowed() == true;
+	}
+
+	@Override
+	public boolean[] bulkDecide(List<?> pAssociations, Object... pCommonObjects) {
+		List<PepResponse> responses = mPepAgent.bulkDecide(pAssociations, pCommonObjects);
+		boolean[] results = new boolean[responses.size()];
+		for (int i = 0; i < responses.size(); i++)
+			results[i] = responses.get(i).allowed() == true;
+		return results;
 	}
 }

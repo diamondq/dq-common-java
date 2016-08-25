@@ -17,7 +17,7 @@ public class UserInfoMapper extends AbstractObjectMapper {
 		UserInfo c = (UserInfo) pO;
 		PepRequestAttributes resAttributes = pPepRequest
 				.getPepRequestAttributes(XACML3.ID_SUBJECT_CATEGORY_ACCESS_SUBJECT);
-		resAttributes.addAttribute("dq:subject:authid", c.getAuthId());
+		resAttributes.addAttribute("urn:roadassistant.diamondq.com:xacml:3.0:subject:auth-id", c.getAuthId());
 		resAttributes.addAttribute("dq:subject:email", c.getEmail());
 		resAttributes.addAttribute("dq:subject:name", c.getName());
 		for (String role : c.getRoles()) {
