@@ -1,5 +1,6 @@
 openaz:
   pep.mapper.classes:
     - com.diamondq.common.security.openaz.mappers.UserInfoMapper
+    - com.diamondq.common.security.openaz.mappers.CodeMapper
     - com.diamondq.common.security.openaz.mappers.ActionMapper
     - com.diamondq.common.security.openaz.mappers.SimpleResourceMapper
