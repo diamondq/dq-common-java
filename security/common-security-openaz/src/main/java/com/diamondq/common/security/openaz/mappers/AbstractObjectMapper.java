@@ -39,5 +39,5 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
 	public void setPepConfig(PepConfig pPepConfig) {
 		mConfig = pPepConfig;
 	}
-	
+
 }

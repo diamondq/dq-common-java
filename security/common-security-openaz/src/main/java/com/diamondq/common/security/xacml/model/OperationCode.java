@@ -1,0 +1,270 @@
+package com.diamondq.common.security.xacml.model;
+
+public enum OperationCode {
+
+	/* Equality */
+
+	STRING_EQUAL(2, true), STRING_EQUAL_IGNORE_CASE(2, true), BOOLEAN_EQUAL(2, true), INTEGER_EQUAL(2,
+		true), DOUBLE_EQUAL(2, true), DATE_EQUAL(2, true), TIME_EQUAL(2, true), DATETIME_EQUAL(2,
+			true), DAYTIMEDURATION_EQUAL(2, true), YEARMONTHDURATION_EQUAL(2, true), ANYURI_EQUAL(2,
+				true), X500NAME_EQUAL(2,
+					true), RFC822NAME_EQUAL(2, true), HEXBINARY_EQUAL(2, true), BASE64BINARY_EQUAL(2, true),
+
+	/* Arithmetic */
+
+	INTEGER_ADD(2, false), DOUBLE_ADD(2, false), INTEGER_SUBTRACT(2, false), DOUBLE_SUBTRACT(2,
+		false), INTEGER_MULTIPLY(2, false), DOUBLE_MULTIPLY(2, false), INTEGER_DIVIDE(2, false), DOUBLE_DIVIDE(2,
+			false), INTEGER_MOD(2,
+				false), INTEGER_ABS(1, false), DOUBLE_ABS(1, false), ROUND(1, false), FLOOR(1, false),
+
+	/* String Conversion */
+
+	STRING_NORMALIZE_SPACE(1, false), STRING_NORMALIZE_TO_LOWER_CASE(1, false),
+
+	/* Numeric Data-type Conversion */
+
+	DOUBLE_TO_INTEGER(1, false), INTEGER_TO_DOUBLE(1, false),
+
+	/* Logical */
+
+	OR(-1, true), AND(-1, true), N_OF(-1, true), NOT(-1, true),
+
+	/* Numeric Comparison */
+
+	INTEGER_GREATER_THAN(2, true), INTEGER_GREATER_THAN_OR_EQUAL(2, true), INTEGER_LESS_THAN(2,
+		true), INTEGER_LESS_THAN_OR_EQUAL(2, true), DOUBLE_GREATER_THAN(2,
+			true), DOUBLE_GREATER_THAN_OR_EQUAL(2, true), DOUBLE_LESS_THAN(2, true), DOUBLE_LESS_THAN_OR_EQUAL(2, true),
+
+	/* Date and time arithmetic */
+
+	DATETIME_ADD_DAYTIMEDURATION(2, false), DATETIME_ADD_YEARMONTHDURATION(2, false), DATETIME_SUBTRACT_DAYTIMEDURATION(
+		2, false), DATETIME_SUBTRACT_YEARMONTHDURATION(2,
+			false), DATE_ADD_YEARMONTHDURATION(2, false), DATE_SUBTRACT_YEARMONTHDURATION(2, false),
+
+	/* Non-numeric comparison */
+
+	STRING_GREATER_THAN(2, true), STRING_GREATER_THAN_OR_EQUAL(2, true), STRING_LESS_THAN(2,
+		true), STRING_LESS_THAN_OR_EQUAL(2, true), TIME_GREATER_THAN(2, true), TIME_GREATER_THAN_OR_EQUAL(2,
+			true), TIME_LESS_THAN(2, true), TIME_LESS_THAN_OR_EQUAL(2, true), TIME_IN_RANGE(2,
+				true), DATETIME_GREATER_THAN(2, true), DATETIME_GREATER_THAN_OR_EQUAL(2, true), DATETIME_LESS_THAN(2,
+					true), DATETIME_LESS_THAN_OR_EQUAL(2, true), DATE_GREATER_THAN(2, true), DATE_GREATER_THAN_OR_EQUAL(
+						2, true), DATE_LESS_THAN(2, true), DATE_LESS_THAN_OR_EQUAL(2, true),
+
+	/* String */
+
+	STRING_CONCATENATE(-1, false), BOOLEAN_FROM_STRING(1, false), STRING_FROM_BOOLEAN(1, false), INTEGER_FROM_STRING(1,
+		false), STRING_FROM_INTEGER(1, false), DOUBLE_FROM_STRING(1, false), STRING_FROM_DOUBLE(1,
+			false), TIME_FROM_STRING(1, false), STRING_FROM_TIME(1, false), DATE_FROM_STRING(1,
+				false), STRING_FROM_DATE(1, false), DATETIME_FROM_STRING(1, false), STRING_FROM_DATETIME(1,
+					false), ANYURI_FROM_STRING(1, false), STRING_FROM_ANYURI(1, false), DAYTIMEDURATION_FROM_STRING(1,
+						false), STRING_FROM_DAYTIMEDURATION(1, false), YEARMONTHDURATION_FROM_STRING(1,
+							false), STRING_FROM_YEARMONTHDURATION(1, false), X500NAME_FROM_STRING(1,
+								false), STRING_FROM_X500NAME(1, false), RFC822NAME_FROM_STRING(1,
+									false), STRING_FROM_RFC822NAME(1, false), IPADDRESS_FROM_STRING(1,
+										false), STRING_FROM_IPADDRESS(1, false), DNSNAME_FROM_STRING(1,
+											false), STRING_FROM_DNSNAME(1, false), STRING_STARTS_WITH(2,
+												true), ANYURI_STARTS_WITH(2, true), STRING_ENDS_WITH(2,
+													true), ANYURI_ENDS_WITH(2, true), STRING_CONTAINS(2,
+														true), ANYURI_CONTAINS(2, true), STRING_SUBSTRING(3,
+															false), ANYURI_SUBSTRING(3, false),
+
+	/* X500NAME Bag */
+
+	X500NAME_ONE_AND_ONLY(-1, false), X500NAME_BAG_SIZE(-1, false), X500NAME_IS_IN(-1, true), X500NAME_BAG(-1, false),
+
+	/* X500NAME Set */
+
+	X500NAME_INTERSECTION(2, false), X500NAME_AT_LEAST_ONE_MEMBER_OF(2, true), X500NAME_UNION(-1,
+		false), X500NAME_SUBSET(2, true), X500NAME_SET_EQUALS(2, true),
+
+	/* RFC822NAME Bag */
+
+	RFC822NAME_ONE_AND_ONLY(-1, false), RFC822NAME_BAG_SIZE(-1, false), RFC822NAME_IS_IN(-1, true), RFC822NAME_BAG(-1,
+		false),
+
+	/* RFC822NAME Set */
+
+	RFC822NAME_INTERSECTION(2, false), RFC822NAME_AT_LEAST_ONE_MEMBER_OF(2, true), RFC822NAME_UNION(-1,
+		false), RFC822NAME_SUBSET(2, true), RFC822NAME_SET_EQUALS(2, true),
+
+	/* IPADDRESS Bag */
+
+	IPADDRESS_ONE_AND_ONLY(-1, false), IPADDRESS_BAG_SIZE(-1, false), IPADDRESS_IS_IN(-1, true), IPADDRESS_BAG(-1,
+		false),
+
+	/* IPADDRESS Set */
+
+	IPADDRESS_INTERSECTION(2, false), IPADDRESS_AT_LEAST_ONE_MEMBER_OF(2, true), IPADDRESS_UNION(-1,
+		false), IPADDRESS_SUBSET(2, true), IPADDRESS_SET_EQUALS(2, true),
+
+	/* DNSNAME Bag */
+
+	DNSNAME_ONE_AND_ONLY(-1, false), DNSNAME_BAG_SIZE(-1, false), DNSNAME_IS_IN(-1, true), DNSNAME_BAG(-1, false),
+
+	/* DNSNAME Set */
+
+	DNSNAME_INTERSECTION(2, false), DNSNAME_AT_LEAST_ONE_MEMBER_OF(2, true), DNSNAME_UNION(-1, false), DNSNAME_SUBSET(2,
+		true), DNSNAME_SET_EQUALS(2, true),
+
+	/* XPATHEXPRESSION Bag */
+
+	XPATHEXPRESSION_ONE_AND_ONLY(-1, false), XPATHEXPRESSION_BAG_SIZE(-1, false), XPATHEXPRESSION_IS_IN(-1,
+		true), XPATHEXPRESSION_BAG(-1, false),
+
+	/* XPATHEXPRESSION Set */
+
+	XPATHEXPRESSION_INTERSECTION(2, false), XPATHEXPRESSION_AT_LEAST_ONE_MEMBER_OF(2, true), XPATHEXPRESSION_UNION(-1,
+		false), XPATHEXPRESSION_SUBSET(2, true), XPATHEXPRESSION_SET_EQUALS(2, true),
+
+	/* STRING Bag */
+
+	STRING_ONE_AND_ONLY(-1, false), STRING_BAG_SIZE(-1, false), STRING_IS_IN(-1, true), STRING_BAG(-1, false),
+
+	/* STRING Set */
+
+	STRING_INTERSECTION(2, false), STRING_AT_LEAST_ONE_MEMBER_OF(2, true), STRING_UNION(-1, false), STRING_SUBSET(2,
+		true), STRING_SET_EQUALS(2, true),
+
+	/* BOOLEAN Bag */
+
+	BOOLEAN_ONE_AND_ONLY(-1, false), BOOLEAN_BAG_SIZE(-1, false), BOOLEAN_IS_IN(-1, true), BOOLEAN_BAG(-1, false),
+
+	/* BOOLEAN Set */
+
+	BOOLEAN_INTERSECTION(2, false), BOOLEAN_AT_LEAST_ONE_MEMBER_OF(2, true), BOOLEAN_UNION(-1, false), BOOLEAN_SUBSET(2,
+		true), BOOLEAN_SET_EQUALS(2, true),
+
+	/* INTEGER Bag */
+
+	INTEGER_ONE_AND_ONLY(-1, false), INTEGER_BAG_SIZE(-1, false), INTEGER_IS_IN(-1, true), INTEGER_BAG(-1, false),
+
+	/* INTEGER Set */
+
+	INTEGER_INTERSECTION(2, false), INTEGER_AT_LEAST_ONE_MEMBER_OF(2, true), INTEGER_UNION(-1, false), INTEGER_SUBSET(2,
+		true), INTEGER_SET_EQUALS(2, true),
+
+	/* DOUBLE Bag */
+
+	DOUBLE_ONE_AND_ONLY(-1, false), DOUBLE_BAG_SIZE(-1, false), DOUBLE_IS_IN(-1, true), DOUBLE_BAG(-1, false),
+
+	/* DOUBLE Set */
+
+	DOUBLE_INTERSECTION(2, false), DOUBLE_AT_LEAST_ONE_MEMBER_OF(2, true), DOUBLE_UNION(-1, false), DOUBLE_SUBSET(2,
+		true), DOUBLE_SET_EQUALS(2, true),
+
+	/* TIME Bag */
+
+	TIME_ONE_AND_ONLY(-1, false), TIME_BAG_SIZE(-1, false), TIME_IS_IN(-1, true), TIME_BAG(-1, false),
+
+	/* TIME Set */
+
+	TIME_INTERSECTION(2, false), TIME_AT_LEAST_ONE_MEMBER_OF(2, true), TIME_UNION(-1, false), TIME_SUBSET(2,
+		true), TIME_SET_EQUALS(2, true),
+
+	/* DATE Bag */
+
+	DATE_ONE_AND_ONLY(-1, false), DATE_BAG_SIZE(-1, false), DATE_IS_IN(-1, true), DATE_BAG(-1, false),
+
+	/* DATE Set */
+
+	DATE_INTERSECTION(2, false), DATE_AT_LEAST_ONE_MEMBER_OF(2, true), DATE_UNION(-1, false), DATE_SUBSET(2,
+		true), DATE_SET_EQUALS(2, true),
+
+	/* DATETIME Bag */
+
+	DATETIME_ONE_AND_ONLY(-1, false), DATETIME_BAG_SIZE(-1, false), DATETIME_IS_IN(-1, true), DATETIME_BAG(-1, false),
+
+	/* DATETIME Set */
+
+	DATETIME_INTERSECTION(2, false), DATETIME_AT_LEAST_ONE_MEMBER_OF(2, true), DATETIME_UNION(-1,
+		false), DATETIME_SUBSET(2, true), DATETIME_SET_EQUALS(2, true),
+
+	/* ANYURI Bag */
+
+	ANYURI_ONE_AND_ONLY(-1, false), ANYURI_BAG_SIZE(-1, false), ANYURI_IS_IN(-1, true), ANYURI_BAG(-1, false),
+
+	/* ANYURI Set */
+
+	ANYURI_INTERSECTION(2, false), ANYURI_AT_LEAST_ONE_MEMBER_OF(2, true), ANYURI_UNION(-1, false), ANYURI_SUBSET(2,
+		true), ANYURI_SET_EQUALS(2, true),
+
+	/* HEXBINARY Bag */
+
+	HEXBINARY_ONE_AND_ONLY(-1, false), HEXBINARY_BAG_SIZE(-1, false), HEXBINARY_IS_IN(-1, true), HEXBINARY_BAG(-1,
+		false),
+
+	/* HEXBINARY Set */
+
+	HEXBINARY_INTERSECTION(2, false), HEXBINARY_AT_LEAST_ONE_MEMBER_OF(2, true), HEXBINARY_UNION(-1,
+		false), HEXBINARY_SUBSET(2, true), HEXBINARY_SET_EQUALS(2, true),
+
+	/* BASE64BINARY Bag */
+
+	BASE64BINARY_ONE_AND_ONLY(-1, false), BASE64BINARY_BAG_SIZE(-1, false), BASE64BINARY_IS_IN(-1,
+		true), BASE64BINARY_BAG(-1, false),
+
+	/* BASE64BINARY Set */
+
+	BASE64BINARY_INTERSECTION(2, false), BASE64BINARY_AT_LEAST_ONE_MEMBER_OF(2, true), BASE64BINARY_UNION(-1,
+		false), BASE64BINARY_SUBSET(2, true), BASE64BINARY_SET_EQUALS(2, true),
+
+	/* DAYTIMEDURATION Bag */
+
+	DAYTIMEDURATION_ONE_AND_ONLY(-1, false), DAYTIMEDURATION_BAG_SIZE(-1, false), DAYTIMEDURATION_IS_IN(-1,
+		true), DAYTIMEDURATION_BAG(-1, false),
+
+	/* DAYTIMEDURATION Set */
+
+	DAYTIMEDURATION_INTERSECTION(2, false), DAYTIMEDURATION_AT_LEAST_ONE_MEMBER_OF(2, true), DAYTIMEDURATION_UNION(-1,
+		false), DAYTIMEDURATION_SUBSET(2, true), DAYTIMEDURATION_SET_EQUALS(2, true),
+
+	/* YEARMONTHDURATION Bag */
+
+	YEARMONTHDURATION_ONE_AND_ONLY(-1, false), YEARMONTHDURATION_BAG_SIZE(-1, false), YEARMONTHDURATION_IS_IN(-1,
+		true), YEARMONTHDURATION_BAG(-1, false),
+
+	/* YEARMONTHDURATION Set */
+
+	YEARMONTHDURATION_INTERSECTION(2, false), YEARMONTHDURATION_AT_LEAST_ONE_MEMBER_OF(2,
+		true), YEARMONTHDURATION_UNION(-1,
+			false), YEARMONTHDURATION_SUBSET(2, true), YEARMONTHDURATION_SET_EQUALS(2, true),
+
+	/* Higher-order bag */
+
+	ANY_OF(-1, true), ALL_OF(-1, true), ANY_OF_ANY(-1, true), ALL_OF_ANY(-1, true), ANY_OF_ALL(-1, true), ALL_OF_ALL(-1,
+		true), MAP(-1, false),
+
+	/* Regular-expression-based */
+
+	STRING_REGEXP_MATCH(2, true), ANYURI_REGEXP_MATCH(2, true), IPADDRESS_REGEXP_MATCH(2, true), DNSNAME_REGEXP_MATCH(2,
+		true), RFC822NAME_REGEXP_MATCH(2, true), X500NAME_REGEXP_MATCH(2, true),
+
+	/* Special match */
+
+	X500NAME_MATCH(2, true), RFC822NAME_MATCH(2, true),
+
+	/* XPath-based */
+
+	XPATH_NODE_COUNT(1, false), XPATH_NODE_EQUAL(2, true), XPATH_NODE_MATCH(2, true),
+
+	/* Other */
+
+	ACCESS_PERMITTED(2, true);
+
+	private final boolean	mBooleanReturn;
+
+	private final int		mArgCount;
+
+	private OperationCode(int pArgCount, boolean pBooleanReturn) {
+		mArgCount = pArgCount;
+		mBooleanReturn = pBooleanReturn;
+	}
+
+	public boolean isBooleanReturn() {
+		return mBooleanReturn;
+	}
+
+	public int getArgCount() {
+		return mArgCount;
+	}
+}

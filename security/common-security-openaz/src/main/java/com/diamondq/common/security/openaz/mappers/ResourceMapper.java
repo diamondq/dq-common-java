@@ -18,7 +18,7 @@ public class ResourceMapper<T extends Resource> extends AbstractObjectMapper {
 		T c = (T) pO;
 		PepRequestAttributes resAttributes = pPepRequest.getPepRequestAttributes(XACML3.ID_ATTRIBUTE_CATEGORY_RESOURCE);
 		resAttributes.addAttribute(XACML3.ID_RESOURCE_RESOURCE_ID.stringValue(),
-				c.getResourceType() + ":" + c.getResourceId());
+			c.getResourceType() + ":" + c.getResourceId());
 	}
 
 }
