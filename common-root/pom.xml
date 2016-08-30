@@ -256,6 +256,7 @@
 		<module>../injection/common-injection-root</module>
 		<module>../jaxrs/common-jaxrs-root</module>
 		<module>../thirdparty/common-jackson-bom</module>
+		<module>../utils/common-utils-root</module>
 		<module>../common-lambda</module>
 	</modules>
 	<build>

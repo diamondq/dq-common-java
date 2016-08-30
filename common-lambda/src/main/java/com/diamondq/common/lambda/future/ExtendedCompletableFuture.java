@@ -1,5 +1,7 @@
 package com.diamondq.common.lambda.future;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
@@ -336,6 +338,14 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
 		for (int i = 0; i < cfs.length; i++)
 			args[i] = decomposeToCompletableFuture(cfs[i]);
+		return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
+	}
+
+	public static ExtendedCompletableFuture<Void> allOf(Collection<? extends CompletableFuture<?>> cfs) {
+		CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
+		int count = 0;
+		for (Iterator<? extends CompletableFuture<?>> i = cfs.iterator(); i.hasNext();)
+			args[count++] = decomposeToCompletableFuture(i.next());
 		return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
 	}
 
