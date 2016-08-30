@@ -35,11 +35,11 @@ public class SyncEngine {
 
 		return aSourceFuture.thenCombine(bSourceFuture, (aMap, bMap) -> {
 
-			Set<A_KEY> aToBeDeleted = new HashSet<>();
+			Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = new HashSet<>();
 			Set<Pair<B_KEY, B_FRAG>> aToBeCreated = new HashSet<>();
 			Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = new HashSet<>();
 
-			Set<B_KEY> bToBeDeleted = new HashSet<>();
+			Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = new HashSet<>();
 			Set<Pair<A_KEY, A_FRAG>> bToBeCreated = new HashSet<>();
 			Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = new HashSet<>();
 
@@ -62,7 +62,7 @@ public class SyncEngine {
 
 						/* B was deleted, so A should be deleted as well */
 
-						aToBeDeleted.add(aKey);
+						aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
 					}
 					else {
 
@@ -109,7 +109,7 @@ public class SyncEngine {
 
 					/* A was deleted, so B should be deleted as well */
 
-					bToBeDeleted.add(bKey);
+					bToBeDeleted.add(Pair.with(bKey, bPair.getValue()));
 
 				}
 				else {
@@ -125,11 +125,11 @@ public class SyncEngine {
 		}).thenCompose(sextext -> {
 
 			Set<Pair<B_KEY, B_FRAG>> aToBeCreated = sextext.getValue0();
-			Set<A_KEY> aToBeDeleted = sextext.getValue1();
+			Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = sextext.getValue1();
 			Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = sextext.getValue2();
 
 			Set<Pair<A_KEY, A_FRAG>> bToBeCreated = sextext.getValue3();
-			Set<B_KEY> bToBeDeleted = sextext.getValue4();
+			Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = sextext.getValue4();
 			Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = sextext.getValue5();
 
 			Collection<ExtendedCompletableFuture<Void>> futures = new ArrayList<>();
