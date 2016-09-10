@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
@@ -419,6 +420,26 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 				}
 			}
 			return result;
+		}));
+	}
+
+	public <R> ExtendedCompletableFuture<R> splitCompose(Predicate<T> pBoolFunc,
+		Function<T, ? extends CompletionStage<R>> pTrueFunc, Function<T, ? extends CompletionStage<R>> pFalseFunc) {
+		return ExtendedCompletableFuture.of(mDelegate.thenCompose((input) -> {
+			if (pBoolFunc.test(input) == true)
+				return pTrueFunc.apply(input);
+			else
+				return pFalseFunc.apply(input);
+		}));
+	}
+
+	public <R> ExtendedCompletableFuture<R> splitApply(Predicate<T> pBoolFunc,
+		Function<T, ? extends R> pTrueFunc, Function<T, ? extends R> pFalseFunc) {
+		return ExtendedCompletableFuture.of(mDelegate.thenApply((input) -> {
+			if (pBoolFunc.test(input) == true)
+				return pTrueFunc.apply(input);
+			else
+				return pFalseFunc.apply(input);
 		}));
 	}
 

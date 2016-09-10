@@ -1,5 +1,7 @@
 package com.diamondq.common.lambda;
 
+import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+
 import java.util.Comparator;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -125,6 +127,15 @@ public final class LambdaExceptionUtil {
 				return null;
 			}
 		};
+	}
+
+	public static <T> ExtendedCompletableFuture<T> wrapSyncSupplierResult(Supplier<T> function) {
+		try {
+			return ExtendedCompletableFuture.completedFuture(function.get());
+		}
+		catch (RuntimeException ex) {
+			return ExtendedCompletableFuture.completedFailure(ex);
+		}
 	}
 
 	/* uncheck(() -> Class.forName("xxx")); */
