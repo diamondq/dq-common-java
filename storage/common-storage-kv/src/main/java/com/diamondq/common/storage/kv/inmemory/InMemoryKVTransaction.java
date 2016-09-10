@@ -1,12 +1,13 @@
 package com.diamondq.common.storage.kv.inmemory;
 
+import com.diamondq.common.storage.kv.IKVTransaction;
 import com.diamondq.common.storage.kv.impl.AbstractKVTransaction;
 
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class InMemoryKVTransaction extends AbstractKVTransaction {
+public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVTransaction {
 
 	private final ConcurrentMap<String, ConcurrentMap<String, String>> mData;
 
