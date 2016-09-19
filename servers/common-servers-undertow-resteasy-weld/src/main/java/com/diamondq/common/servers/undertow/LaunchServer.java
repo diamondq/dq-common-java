@@ -5,10 +5,20 @@ import com.diamondq.common.config.core.std.StandardBootstrap;
 
 import javax.ws.rs.core.Application;
 
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
 public class LaunchServer {
 
 	public static void run(String[] pArgs, String pAppName, Class<? extends Application> pAppClass) {
 		try {
+
+			try {
+				Class.forName("org.slf4j.bridge.SLF4JBridgeHandler");
+				clearJavaUtilLoggingHandlers();
+			}
+			catch (ClassNotFoundException ignored) {
+			}
+
 			/* Set the application name so that the initial bootstrap can load properly */
 
 			System.setProperty("application.name", pAppName);
@@ -38,4 +48,8 @@ public class LaunchServer {
 		}
 	}
 
+	private static void clearJavaUtilLoggingHandlers() {
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
+	}
 }
