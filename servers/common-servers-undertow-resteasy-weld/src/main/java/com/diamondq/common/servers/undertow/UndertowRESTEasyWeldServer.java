@@ -22,10 +22,13 @@ public class UndertowRESTEasyWeldServer extends UndertowServer {
 		/* Now start the server */
 
 		String appName = pConfig.bind("application.name", String.class);
+		String deployContext = pConfig.bind("application.context", String.class);
+		if ((deployContext == null) || (deployContext.trim().isEmpty() == true))
+			deployContext = "/";
 
 		ClassLoader classLoader = UndertowRESTEasyWeldServer.class.getClassLoader();
-		DeploymentInfo di = deployApplication("/", pAppClass).setClassLoader(classLoader).setContextPath("/")
-			.setDeploymentName(appName)
+		DeploymentInfo di = deployApplication("/", pAppClass).setClassLoader(classLoader)
+			.setContextPath(deployContext).setDeploymentName(appName)
 			.setResourceManager(new ClassPathResourceManager(classLoader, "META-INF/resources/"))
 			.addListeners(Servlets.listener(org.jboss.weld.environment.servlet.Listener.class));
 
