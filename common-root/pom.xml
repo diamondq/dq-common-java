@@ -257,6 +257,11 @@
 				<artifactId>openaz-xacml-pdp</artifactId>
 				<version>${openaz.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.esotericsoftware</groupId>
+				<artifactId>kryo</artifactId>
+				<version>4.0.0</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<modules>
