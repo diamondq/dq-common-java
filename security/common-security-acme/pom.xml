@@ -73,7 +73,7 @@
 			<plugin>
 				<groupId>org.datanucleus</groupId>
 				<artifactId>datanucleus-maven-plugin</artifactId>
-				<version>5.0.0-release</version>
+				<version>5.0.2</version>
 				<configuration>
 					<api>JDO</api>
 					<verbose>true</verbose>
@@ -82,7 +82,7 @@
 					<dependency>
 						<groupId>org.datanucleus</groupId>
 						<artifactId>datanucleus-core</artifactId>
-						<version>5.0.0-release</version>
+						<version>5.0.8</version>
 					</dependency>
 				</dependencies>
 				<executions>
