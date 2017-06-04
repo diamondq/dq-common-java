@@ -127,7 +127,7 @@
 			<dependency>
 				<groupId>com.google.code.findbugs</groupId>
 				<artifactId>jsr305</artifactId>
-				<version>3.0.1</version>
+				<version>3.0.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.hibernate.ogm</groupId>
@@ -267,15 +267,16 @@
 	</dependencyManagement>
 	<modules>
 		<module>../common-bom</module>
-		<module>../security/common-security-root</module>
-		<module>../storage/common-storage-root</module>
-		<module>../servers/common-servers-root</module>
+		<module>../common-lambda</module>
+		<module>../deployment/common-deployment-root</module>
 		<module>../injection/common-injection-root</module>
 		<module>../jaxrs/common-jaxrs-root</module>
+		<module>../model/common-model-root</module>
+		<module>../security/common-security-root</module>
+		<module>../servers/common-servers-root</module>
+		<module>../storage/common-storage-root</module>
 		<module>../thirdparty/common-jackson-bom</module>
 		<module>../utils/common-utils-root</module>
-		<module>../deployment/common-deployment-root</module>
-		<module>../common-lambda</module>
 	</modules>
 	<build>
 		<plugins>
