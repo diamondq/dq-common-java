@@ -23,7 +23,7 @@ import java.util.Set;
 public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
 	public MemoryPersistenceLayer(Scope pScope) {
-		super(pScope);
+		super(pScope, true, true, true, true);
 	}
 
 	/**
@@ -87,7 +87,8 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, com.diamondq.common.model.interfaces.Structure)
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
 	protected void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure) {

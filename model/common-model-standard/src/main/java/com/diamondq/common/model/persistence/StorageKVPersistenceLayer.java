@@ -10,63 +10,71 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.storage.kv.IKVIndexSupport;
+import com.diamondq.common.storage.kv.IKVStore;
+import com.diamondq.common.storage.kv.IKVTransaction;
+import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
+import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collection;
-import java.util.Properties;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
-public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceLayer<Properties> {
+public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<Map<String, Object>> {
 
-	private final File	mStructureBaseDir;
+	public static class StorageKVPersistenceLayerBuilder {
+		private Scope		mScope;
 
-	@SuppressWarnings("unused")
-	private final File	mStructureDefBaseDir;
+		private IKVStore	mKVStore;
 
-	@SuppressWarnings("unused")
-	private final File	mEditorStructureDefBaseDir;
-
-	public PropertiesFilePersistenceLayer(Scope pScope, File pStructureBaseDir, File pStructureDefBaseDir,
-		File pEditorStructureDefBaseDir, String pResourceBaseName) {
-		super(pScope, pStructureBaseDir != null, true, pStructureDefBaseDir != null, true,
-			pEditorStructureDefBaseDir != null, true, pResourceBaseName != null, true, pResourceBaseName);
-		mStructureBaseDir = pStructureBaseDir;
-		mStructureDefBaseDir = pStructureDefBaseDir;
-		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
-	}
-
-	protected File getStructureFile(String pKey, boolean pCreateIfMissing) {
-		String[] parts = pKey.split("/");
-		parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
-		File structureFile = mStructureBaseDir;
-		for (String p : parts)
-			structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
-		if (structureFile.exists() == false) {
-			if (pCreateIfMissing == false)
-				return null;
-			if (structureFile.getParentFile().exists() == false)
-				structureFile.getParentFile().mkdirs();
+		public StorageKVPersistenceLayerBuilder scope(Scope pScope) {
+			mScope = pScope;
+			return this;
 		}
-		return structureFile;
+
+		public StorageKVPersistenceLayerBuilder kvStore(IKVStore pStore) {
+			mKVStore = pStore;
+			return this;
+		}
+
+		public StorageKVPersistenceLayer build() {
+			return new StorageKVPersistenceLayer(mScope, mKVStore);
+		}
 	}
 
-	protected File getStructureDir(String pKey, boolean pCreateIfMissing) {
-		String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
-		File structureFile = mStructureBaseDir;
-		for (String p : parts)
-			structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
-		if (structureFile.exists() == false)
-			if (pCreateIfMissing == false)
-				return null;
-		structureFile.mkdirs();
-		return structureFile;
+	private static final String	sROOT_KEY		= "__ROOT__";
+
+	private static final String	sLOOKUPS_TABLE	= "LOOKUPS__";
+
+	private final IKVStore		mStructureStore;
+
+	public StorageKVPersistenceLayer(Scope pScope, IKVStore pStructureStore) {
+		super(pScope, true, false, false, false, false, false, false, false, null);
+		mStructureStore = pStructureStore;
+
+		IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support =
+			mStructureStore.getIndexSupport();
+		if (support != null) {
+
+			/* Define an index for the lookups */
+
+			KVIndexDefinitionBuilder<?> indexDefinitionBuilder = support.createIndexDefinitionBuilder().name("lookups");
+			indexDefinitionBuilder = indexDefinitionBuilder.addColumn(support.createIndexColumnBuilder().name("data.structureDef").type("string").build());
+			support.addRequiredIndexes(Collections.singletonList(indexDefinitionBuilder.build()));
+		}
+	}
+
+	public static StorageKVPersistenceLayerBuilder builder() {
+		return new StorageKVPersistenceLayerBuilder();
 	}
 
 	/**
@@ -74,24 +82,24 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
 	 */
 	@Override
-	protected Properties loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		boolean pCreateIfMissing) {
-		File structureFile = getStructureFile(pKey, pCreateIfMissing);
-		if (structureFile == null)
-			return null;
-
-		Properties p = new Properties();
-		if (structureFile.exists() == true) {
-			try {
-				try (FileInputStream fis = new FileInputStream(structureFile)) {
-					p.load(fis);
-				}
-			}
-			catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
+	protected Map<String, Object> loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
+		String pKey, boolean pCreateIfMissing) {
+		IKVTransaction transaction = mStructureStore.startTransaction();
+		boolean success = false;
+		try {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> configMap = transaction.getByKey(pDefName, pKey, null, Map.class);
+			if (configMap == null)
+				configMap = Maps.newHashMap();
+			success = true;
+			return configMap;
 		}
-		return p;
+		finally {
+			if (success == true)
+				transaction.commit();
+			else
+				transaction.rollback();
+		}
 	}
 
 	/**
@@ -100,9 +108,9 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.PropertyType)
 	 */
 	@Override
-	protected <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
-		String pKey, PropertyType pType) {
-		String value = pConfig.getProperty(pKey);
+	protected <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
+		boolean pIsMeta, String pKey, PropertyType pType) {
+		Object value = pConfig.get(pKey);
 		switch (pType) {
 		case String: {
 			@SuppressWarnings("unchecked")
@@ -111,17 +119,17 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		}
 		case Boolean: {
 			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? Boolean.FALSE : (Boolean) Boolean.parseBoolean(value));
+			R result = (R) (value == null ? Boolean.FALSE : (Boolean) value);
 			return result;
 		}
 		case Integer: {
 			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? Integer.valueOf(0) : (Integer) Integer.parseInt(value));
+			R result = (R) (value == null ? Integer.valueOf(0) : (Integer) value);
 			return result;
 		}
 		case Decimal: {
 			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? new BigDecimal(0.0) : new BigDecimal(value));
+			R result = (R) (value == null ? new BigDecimal(0.0) : new BigDecimal((String) value));
 			return result;
 		}
 		case PropertyRef: {
@@ -135,7 +143,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			return result;
 		}
 		case StructureRefList: {
-			String[] strings = (value == null ? "" : value).split(",");
+			String[] strings = (value == null ? "" : (String) value).split(",");
 			for (int i = 0; i < strings.length; i++)
 				strings[i] = unescape(strings[i]);
 			@SuppressWarnings("unchecked")
@@ -160,7 +168,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.Object)
 	 */
 	@Override
-	protected boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, Properties pConfig) {
+	protected boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig) {
 		return false;
 	}
 
@@ -170,7 +178,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.PropertyType)
 	 */
 	@Override
-	protected boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
+	protected boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
 		boolean pIsMeta, String pKey, PropertyType pType) {
 		return pConfig.remove(pKey) != null;
 	}
@@ -180,8 +188,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
 	 */
 	@Override
-	protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
-		String pKey) {
+	protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
+		boolean pIsMeta, String pKey) {
 		return pConfig.containsKey(pKey);
 	}
 
@@ -201,31 +209,31 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
 	 */
 	@Override
-	protected <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
-		String pKey, PropertyType pType, R pValue) {
+	protected <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
+		boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
 		switch (pType) {
 		case String: {
-			pConfig.setProperty(pKey, (String) pValue);
+			pConfig.put(pKey, pValue);
 			break;
 		}
 		case Boolean: {
-			pConfig.setProperty(pKey, pValue.toString());
+			pConfig.put(pKey, pValue);
 			break;
 		}
 		case Integer: {
-			pConfig.setProperty(pKey, pValue.toString());
+			pConfig.put(pKey, pValue);
 			break;
 		}
 		case Decimal: {
-			pConfig.setProperty(pKey, pValue.toString());
+			pConfig.put(pKey, pValue.toString());
 			break;
 		}
 		case PropertyRef: {
-			pConfig.setProperty(pKey, pValue.toString());
+			pConfig.put(pKey, pValue.toString());
 			break;
 		}
 		case StructureRef: {
-			pConfig.setProperty(pKey, pValue.toString());
+			pConfig.put(pKey, pValue.toString());
 			break;
 		}
 		case StructureRefList: {
@@ -234,7 +242,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			for (int i = 0; i < strings.length; i++)
 				escaped[i] = escape(strings[i]);
 			String escapedStr = String.join(",", escaped);
-			pConfig.setProperty(pKey, escapedStr);
+			pConfig.put(pKey, escapedStr);
 			break;
 		}
 		case Binary: {
@@ -255,16 +263,40 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 */
 	@Override
 	protected void saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Properties pConfig) {
-		File structureFile = getStructureFile(pKey, true);
-
+		Map<String, Object> pConfig) {
+		IKVTransaction transaction = mStructureStore.startTransaction();
+		boolean success = false;
 		try {
-			try (FileOutputStream fos = new FileOutputStream(structureFile)) {
-				pConfig.store(fos, "");
+
+			/* Save the main object */
+
+			transaction.putByKey(pDefName, pKey, null, pConfig);
+
+			/* Then, for each subcomponent, make sure it's listed */
+
+			String[] parts = pKey.split("/");
+			StringBuilder sb = new StringBuilder();
+			for (String part : parts) {
+
+				String parentKey = (sb.length() == 0 ? sROOT_KEY : sb.toString());
+
+				Date lookupDate = transaction.getByKey(sLOOKUPS_TABLE, parentKey, part, Date.class);
+				if (lookupDate == null)
+					transaction.putByKey(sLOOKUPS_TABLE, part, part, new Date());
+
+				if (sb.length() > 0)
+					sb.append('/');
+				sb.append(part);
+
 			}
+
+			success = true;
 		}
-		catch (IOException ex) {
-			throw new RuntimeException(ex);
+		finally {
+			if (success == true)
+				transaction.commit();
+			else
+				transaction.rollback();
 		}
 	}
 
@@ -293,10 +325,18 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 */
 	@Override
 	protected void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure) {
-		File structureFile = getStructureFile(pKey, false);
-		if (structureFile == null)
-			return;
-		structureFile.delete();
+		IKVTransaction transaction = mStructureStore.startTransaction();
+		boolean success = false;
+		try {
+			transaction.removeByKey(pStructure.getDefinition().getName(), pKey, null);
+			success = true;
+		}
+		finally {
+			if (success == true)
+				transaction.commit();
+			else
+				transaction.rollback();
+		}
 	}
 
 	/**
@@ -306,68 +346,73 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
 	 */
 	@Override
-	protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, Properties pConfig,
+	protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
 		StructureDefinition pStructureDefinition, String pStructureDefName, String pKey, PropertyDefinition pPropDef,
 		Builder<StructureRef> pStructureRefListBuilder) {
-		File structureDir = getStructureDir(pKey, false);
-		if (structureDir == null)
-			return;
-		File childDir = (pPropDef == null ? structureDir : new File(structureDir, pPropDef.getName()));
-		if (childDir.exists() == false)
-			return;
-		File[] listTypeDirs = childDir.listFiles((File pFile) -> pFile.isDirectory());
-		StringBuilder refBuilder = new StringBuilder();
-		if (pKey != null)
-			refBuilder.append(pKey).append('/');
-		if (pPropDef != null)
-			refBuilder.append(pPropDef.getName()).append('/');
-		int preTypeOffset = refBuilder.length();
-		for (File listTypeDir : listTypeDirs) {
+		IKVTransaction transaction = mStructureStore.startTransaction();
+		boolean success = false;
+		try {
+			StringBuilder sb = new StringBuilder();
+			sb.append(pKey);
+			if (pPropDef != null)
+				sb.append('/').append(pPropDef.getName());
+			List<String> listTypeList = Lists.newArrayList(transaction.keyIterator2(sLOOKUPS_TABLE, sb.toString()));
+			sb.append('/');
+			int preTypeOffset = sb.length();
+			for (String listType : listTypeList) {
 
-			/* If the PropertyDefinition has type restrictions, then make sure that this directory/type is valid */
+				/* If the PropertyDefinition has type restrictions, then make sure that this directory/type is valid */
 
-			String typeName = unescapeValue(listTypeDir.getName());
+				String typeName = listType;
 
-			if (pPropDef != null) {
-				Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
-				if (referenceTypes.isEmpty() == false) {
-					boolean match = false;
-					for (StructureDefinitionRef sdr : referenceTypes) {
-						StructureDefinition sd = sdr.resolve();
-						String testName = sd.getName();
-						if (typeName.equals(testName)) {
-							match = true;
-							break;
+				if (pPropDef != null) {
+					Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
+					if (referenceTypes.isEmpty() == false) {
+						boolean match = false;
+						for (StructureDefinitionRef sdr : referenceTypes) {
+							StructureDefinition sd = sdr.resolve();
+							String testName = sd.getName();
+							if (typeName.equals(testName)) {
+								match = true;
+								break;
+							}
 						}
+						if (match == false)
+							continue;
 					}
-					if (match == false)
+				}
+				else if (pKey == null) {
+					/*
+					 * Special case where there is no parent key. In this case, the StructureDefinition is the
+					 * restriction
+					 */
+
+					if (typeName.equals(pStructureDefName) == false)
 						continue;
 				}
+
+				sb.setLength(preTypeOffset);
+				sb.append(typeName);
+
+				List<String> listFiles = Lists.newArrayList(transaction.keyIterator2(sLOOKUPS_TABLE, sb.toString()));
+				sb.append('/');
+				int preNameOffset = sb.length();
+				for (String f : listFiles) {
+
+					sb.setLength(preNameOffset);
+					sb.append(f);
+					pStructureRefListBuilder
+						.add(mScope.getToolkit().createStructureRefFromSerialized(mScope, sb.toString()));
+				}
 			}
-			else if (pKey == null) {
-				/*
-				 * Special case where there is no parent key. In this case, the StructureDefinition is the restriction
-				 */
-
-				if (typeName.equals(pStructureDefName) == false)
-					continue;
-			}
-
-			refBuilder.setLength(preTypeOffset);
-			refBuilder.append(typeName).append('/');
-			int preNameOffset = refBuilder.length();
-
-			File[] listFiles = listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties"));
-			for (File f : listFiles) {
-				String name = unescapeValue(f.getName().substring(0, f.getName().length() - ".properties".length()));
-
-				refBuilder.setLength(preNameOffset);
-				refBuilder.append(name);
-				pStructureRefListBuilder
-					.add(mScope.getToolkit().createStructureRefFromSerialized(mScope, refBuilder.toString()));
-			}
+			success = true;
 		}
-		return;
+		finally {
+			if (success == true)
+				transaction.commit();
+			else
+				transaction.rollback();
+		}
 	}
 
 }

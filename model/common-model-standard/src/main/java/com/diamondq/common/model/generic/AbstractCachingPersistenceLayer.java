@@ -16,6 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenceLayer {
 
 	protected final Cache<String, Structure>						mStructureCache;
@@ -26,12 +28,14 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 
 	protected final Cache<String, String>							mResourceCache;
 
-	public AbstractCachingPersistenceLayer(Scope pScope) {
+	public AbstractCachingPersistenceLayer(Scope pScope, boolean pCacheStructures, boolean pCacheStructureDefinitions,
+		boolean pCacheEditorStructureDefinitions, boolean pCacheResources) {
 		super(pScope);
-		mStructureCache = CacheBuilder.newBuilder().build();
-		mStructureDefinitionCache = CacheBuilder.newBuilder().build();
-		mEditorStructureDefinitionCacheByRef = CacheBuilder.newBuilder().build();
-		mResourceCache = CacheBuilder.newBuilder().build();
+		mStructureCache = (pCacheStructures == true ? CacheBuilder.newBuilder().build() : null);
+		mStructureDefinitionCache = (pCacheStructureDefinitions == true ? CacheBuilder.newBuilder().build() : null);
+		mEditorStructureDefinitionCacheByRef =
+			(pCacheEditorStructureDefinitions == true ? CacheBuilder.newBuilder().build() : null);
+		mResourceCache = (pCacheResources == true ? CacheBuilder.newBuilder().build() : null);
 	}
 
 	/**
@@ -41,7 +45,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	@Override
 	public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
 		String key = pToolkit.createStructureRefStr(pScope, pStructure);
-		mStructureCache.put(key, pStructure);
+		if (mStructureCache != null)
+			mStructureCache.put(key, pStructure);
 
 		/* Now write the data to disk */
 
@@ -68,7 +73,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	@Override
 	public void deleteStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
 		String key = pToolkit.createStructureRefStr(pScope, pStructure);
-		mStructureCache.invalidate(key);
+		if (mStructureCache != null)
+			mStructureCache.invalidate(key);
 
 		/* Now write the data to disk */
 
@@ -78,8 +84,10 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	protected abstract void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure);
 
 	protected void invalidateStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
-		String key = pToolkit.createStructureRefStr(pScope, pStructure);
-		mStructureCache.invalidate(key);
+		if (mStructureCache != null) {
+			String key = pToolkit.createStructureRefStr(pScope, pStructure);
+			mStructureCache.invalidate(key);
+		}
 	}
 
 	/**
@@ -88,7 +96,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 */
 	@Override
 	public Structure lookupStructureBySerializedRef(Toolkit pToolkit, Scope pScope, String pSerializedRef) {
-		Structure result = mStructureCache.getIfPresent(pSerializedRef);
+		Structure result = (mStructureCache == null ? null : mStructureCache.getIfPresent(pSerializedRef));
 		if (result != null)
 			return result;
 
@@ -104,7 +112,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 
 		result = internalLookupStructureByName(pToolkit, pScope, typeName, pSerializedRef);
 
-		if (result != null)
+		if ((result != null) && (mStructureCache != null))
 			mStructureCache.put(pSerializedRef, result);
 
 		return result;
@@ -119,8 +127,10 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 */
 	@Override
 	public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
-		String key = pValue.getName();
-		mStructureDefinitionCache.put(key, pValue);
+		if (mStructureDefinitionCache != null) {
+			String key = pValue.getName();
+			mStructureDefinitionCache.put(key, pValue);
+		}
 
 		internalWriteStructureDefinition(pToolkit, pScope, pValue);
 	}
@@ -134,12 +144,13 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 */
 	@Override
 	public StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName) {
-		StructureDefinition result = mStructureDefinitionCache.getIfPresent(pName);
+		StructureDefinition result =
+			(mStructureDefinitionCache == null ? null : mStructureDefinitionCache.getIfPresent(pName));
 		if (result != null)
 			return result;
 
 		result = internalLookupStructureDefinitionByName(pToolkit, pScope, pName);
-		if (result != null)
+		if ((result != null) && (mStructureDefinitionCache != null))
 			mStructureDefinitionCache.put(pName, result);
 
 		return result;
@@ -154,8 +165,10 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 */
 	@Override
 	public void deleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
-		String key = pValue.getName();
-		mStructureDefinitionCache.invalidate(key);
+		if (mStructureDefinitionCache != null) {
+			String key = pValue.getName();
+			mStructureDefinitionCache.invalidate(key);
+		}
 
 		internalDeleteStructureDefinition(pToolkit, pScope, pValue);
 	}
@@ -170,18 +183,22 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	@Override
 	public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope) {
 
-		Collection<StructureDefinitionRef> missing =
-			internalGetAllMissingStructureDefinitionRefs(pToolkit, pScope, mStructureDefinitionCache);
-		for (StructureDefinitionRef ref : missing) {
-			StructureDefinition sd = ref.resolve();
-			mStructureDefinitionCache.put(sd.getName(), sd);
-		}
+		if (mStructureDefinitionCache != null) {
+			Collection<StructureDefinitionRef> missing =
+				internalGetAllMissingStructureDefinitionRefs(pToolkit, pScope, mStructureDefinitionCache);
+			for (StructureDefinitionRef ref : missing) {
+				StructureDefinition sd = ref.resolve();
+				mStructureDefinitionCache.put(sd.getName(), sd);
+			}
 
-		return Collections2.transform(mStructureDefinitionCache.asMap().values(), (sd) -> sd.getReference());
+			return Collections2.transform(mStructureDefinitionCache.asMap().values(), (sd) -> sd.getReference());
+		}
+		else
+			return internalGetAllMissingStructureDefinitionRefs(pToolkit, pScope, null);
 	}
 
 	protected abstract Collection<StructureDefinitionRef> internalGetAllMissingStructureDefinitionRefs(Toolkit pToolkit,
-		Scope pScope, Cache<String, StructureDefinition> pStructureDefinitionCache);
+		Scope pScope, @Nullable Cache<String, StructureDefinition> pStructureDefinitionCache);
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#writeEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
@@ -189,15 +206,16 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 */
 	@Override
 	public void writeEditorStructureDefinition(Toolkit pToolkit, Scope pScope, EditorStructureDefinition pValue) {
-		String key = pValue.getStructureDefinitionRef().getSerializedString();
-		List<EditorStructureDefinition> list = mEditorStructureDefinitionCacheByRef.getIfPresent(key);
-		if (list == null)
-			list = ImmutableList.of();
-		ImmutableList<EditorStructureDefinition> updatedList = ImmutableList.<EditorStructureDefinition> builder()
-			.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName())))).add(pValue)
-			.build();
-		mEditorStructureDefinitionCacheByRef.put(key, updatedList);
-
+		if (mEditorStructureDefinitionCacheByRef != null) {
+			String key = pValue.getStructureDefinitionRef().getSerializedString();
+			List<EditorStructureDefinition> list = mEditorStructureDefinitionCacheByRef.getIfPresent(key);
+			if (list == null)
+				list = ImmutableList.of();
+			ImmutableList<EditorStructureDefinition> updatedList = ImmutableList.<EditorStructureDefinition> builder()
+				.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName()))))
+				.add(pValue).build();
+			mEditorStructureDefinitionCacheByRef.put(key, updatedList);
+		}
 		internalWriteEditorStructureDefinition(pToolkit, pScope, pValue);
 	}
 
@@ -212,12 +230,13 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	public List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef(Toolkit pToolkit, Scope pScope,
 		StructureDefinitionRef pRef) {
 		String key = pRef.getSerializedString();
-		List<EditorStructureDefinition> result = mEditorStructureDefinitionCacheByRef.getIfPresent(key);
+		List<EditorStructureDefinition> result = (mEditorStructureDefinitionCacheByRef != null
+			? mEditorStructureDefinitionCacheByRef.getIfPresent(key) : null);
 		if (result != null)
 			return result;
 
 		result = internalLookupEditorStructureDefinitionByName(pToolkit, pScope, pRef);
-		if (result != null)
+		if ((result != null) && (mEditorStructureDefinitionCacheByRef != null))
 			mEditorStructureDefinitionCacheByRef.put(key, result);
 
 		return result;
@@ -232,17 +251,20 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 */
 	@Override
 	public void deleteEditorStructureDefinition(Toolkit pToolkit, Scope pScope, EditorStructureDefinition pValue) {
-		String key = pValue.getStructureDefinitionRef().getSerializedString();
-		List<EditorStructureDefinition> list = mEditorStructureDefinitionCacheByRef.getIfPresent(key);
-		if (list != null) {
-			ImmutableList<EditorStructureDefinition> updatedList = ImmutableList.<EditorStructureDefinition> builder()
-				.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName())))).build();
-			if (updatedList.isEmpty() == true)
-				mEditorStructureDefinitionCacheByRef.invalidate(key);
-			else
-				mEditorStructureDefinitionCacheByRef.put(key, updatedList);
+		if (mEditorStructureDefinitionCacheByRef != null) {
+			String key = pValue.getStructureDefinitionRef().getSerializedString();
+			List<EditorStructureDefinition> list = mEditorStructureDefinitionCacheByRef.getIfPresent(key);
+			if (list != null) {
+				ImmutableList<EditorStructureDefinition> updatedList =
+					ImmutableList.<EditorStructureDefinition> builder()
+						.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName()))))
+						.build();
+				if (updatedList.isEmpty() == true)
+					mEditorStructureDefinitionCacheByRef.invalidate(key);
+				else
+					mEditorStructureDefinitionCacheByRef.put(key, updatedList);
+			}
 		}
-
 		internalDeleteEditorStructureDefinition(pToolkit, pScope, pValue);
 	}
 
@@ -255,18 +277,21 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 */
 	@Override
 	protected String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
-		StringBuilder sb = new StringBuilder(pLocale.toString());
-		sb.append(':').append(pKey);
-		String key = sb.toString();
-		String result = mResourceCache.getIfPresent(key);
-		if (result != null)
+		if (mResourceCache != null) {
+			StringBuilder sb = new StringBuilder(pLocale.toString());
+			sb.append(':').append(pKey);
+			String key = sb.toString();
+			String result = mResourceCache.getIfPresent(key);
+			if (result != null)
+				return result;
+
+			result = internal2LookupResourceString(pToolkit, pScope, pLocale, pKey);
+			if (result != null)
+				mResourceCache.put(key, result);
+
 			return result;
-
-		result = internal2LookupResourceString(pToolkit, pScope, pLocale, pKey);
-		if (result != null)
-			mResourceCache.put(key, result);
-
-		return result;
+		}
+		return internal2LookupResourceString(pToolkit, pScope, pLocale, pKey);
 	}
 
 	protected abstract String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
@@ -280,10 +305,12 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	public void writeResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey, String pValue) {
 		if (isResourceStringWritingSupported(pToolkit, pScope) == false)
 			throw new UnsupportedOperationException();
-		StringBuilder sb = new StringBuilder(pLocale.toLanguageTag());
-		sb.append(':').append(pKey);
-		String key = sb.toString();
-		mResourceCache.put(key, pValue);
+		if (mResourceCache != null) {
+			StringBuilder sb = new StringBuilder(pLocale.toLanguageTag());
+			sb.append(':').append(pKey);
+			String key = sb.toString();
+			mResourceCache.put(key, pValue);
+		}
 
 		internalWriteResourceString(pToolkit, pScope, pLocale, pKey, pValue);
 	}
@@ -299,10 +326,12 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	public void deleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
 		if (isResourceStringWritingSupported(pToolkit, pScope) == false)
 			throw new UnsupportedOperationException();
-		StringBuilder sb = new StringBuilder(pLocale.toString());
-		sb.append(':').append(pKey);
-		String key = sb.toString();
-		mResourceCache.invalidate(key);
+		if (mResourceCache != null) {
+			StringBuilder sb = new StringBuilder(pLocale.toString());
+			sb.append(':').append(pKey);
+			String key = sb.toString();
+			mResourceCache.invalidate(key);
+		}
 
 		internalDeleteResourceString(pToolkit, pScope, pLocale, pKey);
 	}

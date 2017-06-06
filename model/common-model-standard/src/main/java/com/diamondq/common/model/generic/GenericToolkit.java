@@ -23,6 +23,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.enterprise.inject.Vetoed;
+
+@Vetoed
 public class GenericToolkit implements Toolkit {
 
 	private final ConcurrentMap<Scope, PersistenceLayer>	mPersistence	= Maps.newConcurrentMap();
@@ -125,7 +128,8 @@ public class GenericToolkit implements Toolkit {
 
 	/**
 	 * @see com.diamondq.common.model.interfaces.Toolkit#createPropertyDefinitionRef(com.diamondq.common.model.interfaces.Scope,
-	 *      com.diamondq.common.model.interfaces.PropertyDefinition, com.diamondq.common.model.interfaces.StructureDefinition)
+	 *      com.diamondq.common.model.interfaces.PropertyDefinition,
+	 *      com.diamondq.common.model.interfaces.StructureDefinition)
 	 */
 	@Override
 	public PropertyDefinitionRef createPropertyDefinitionRef(Scope pScope, PropertyDefinition pResolvable,

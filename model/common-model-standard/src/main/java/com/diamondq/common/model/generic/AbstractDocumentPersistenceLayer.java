@@ -44,10 +44,11 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 
 	protected final String	mBaseName;
 
-	public AbstractDocumentPersistenceLayer(Scope pScope, boolean pPersistStructures,
-		boolean pPersistStructureDefinitions, boolean pPersistEditorStructureDefinitions, boolean pPersistResources,
-		String pResourceBaseName) {
-		super(pScope);
+	public AbstractDocumentPersistenceLayer(Scope pScope, boolean pPersistStructures, boolean pCacheStructures,
+		boolean pPersistStructureDefinitions, boolean pCacheStructureDefinitions,
+		boolean pPersistEditorStructureDefinitions, boolean pCacheEditorStructureDefinitions, boolean pPersistResources,
+		boolean pCacheResources, String pResourceBaseName) {
+		super(pScope, pCacheStructures, pCacheStructureDefinitions, pCacheEditorStructureDefinitions, pCacheResources);
 		mPersistStructures = pPersistStructures;
 		mPersistStructureDefinitions = pPersistStructureDefinitions;
 		mPersistEditorStructureDefinitions = pPersistEditorStructureDefinitions;
