@@ -34,9 +34,9 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	private final File	mEditorStructureDefBaseDir;
 
 	public PropertiesFilePersistenceLayer(Scope pScope, File pStructureBaseDir, File pStructureDefBaseDir,
-		File pEditorStructureDefBaseDir, String pResourceBaseName) {
+		File pEditorStructureDefBaseDir) {
 		super(pScope, pStructureBaseDir != null, true, pStructureDefBaseDir != null, true,
-			pEditorStructureDefBaseDir != null, true, pResourceBaseName != null, true, pResourceBaseName);
+			pEditorStructureDefBaseDir != null, true, false, true);
 		mStructureBaseDir = pStructureBaseDir;
 		mStructureDefBaseDir = pStructureDefBaseDir;
 		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
@@ -151,6 +151,11 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		case Image: {
 			throw new UnsupportedOperationException();
 		}
+		case Timestamp: {
+			@SuppressWarnings("unchecked")
+			R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
+			return result;
+		}
 		}
 		throw new IllegalArgumentException();
 	}
@@ -245,6 +250,10 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		}
 		case Image: {
 			throw new UnsupportedOperationException();
+		}
+		case Timestamp: {
+			pConfig.setProperty(pKey, pValue.toString());
+			break;
 		}
 		}
 	}

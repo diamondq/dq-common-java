@@ -30,6 +30,9 @@ public enum PropertyType {
 	Image,
 
 	/** This represents arbitrary binary data */
-	Binary
+	Binary,
+	
+	/** This represents a timestamp */
+	Timestamp
 
 }
