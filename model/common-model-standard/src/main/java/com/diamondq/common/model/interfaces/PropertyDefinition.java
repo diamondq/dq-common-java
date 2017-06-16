@@ -116,6 +116,15 @@ public interface PropertyDefinition
 	@Nonnull
 	public PropertyDefinition setFinal(boolean pValue);
 
+	/* Max Length */
+	
+	@Nullable
+	public Integer getMaxLength();
+	
+	@CheckReturnValue
+	@Nonnull
+	public PropertyDefinition setMaxLength(Integer pValue);
+	
 	/* keywords */
 
 	/**
@@ -171,4 +180,7 @@ public interface PropertyDefinition
 	@CheckReturnValue
 	@Nonnull
 	public PropertyDefinition setPropertyPattern(@Nonnull PropertyPattern pValue);
+	
+	@Nonnull
+	public Scope getScope();
 }

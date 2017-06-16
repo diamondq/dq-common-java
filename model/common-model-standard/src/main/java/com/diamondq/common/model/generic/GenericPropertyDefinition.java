@@ -50,6 +50,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
 	private final BigDecimal							mMaxValue;
 
+	private final Integer								mMaxLength;
+
 	private final boolean								mFinal;
 
 	private final PropertyPattern						mPropertyPattern;
@@ -61,7 +63,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	public GenericPropertyDefinition(Scope pScope, String pName, TranslatableString pLabel, boolean pIsPrimaryKey,
 		int pPrimaryKeyOrder, PropertyType pType, Script pValidationScript, String pDefaultValue,
 		Script pDefaultValueScript, Collection<StructureDefinitionRef> pReferenceTypes, BigDecimal pMinValue,
-		BigDecimal pMaxValue, boolean pFinal, PropertyPattern pPropertyPattern, Multimap<String, String> pKeywords) {
+		BigDecimal pMaxValue, Integer pMaxLength, boolean pFinal, PropertyPattern pPropertyPattern,
+		Multimap<String, String> pKeywords) {
 		super();
 		mScope = pScope;
 		mName = pName;
@@ -75,6 +78,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 		mReferenceTypes = pReferenceTypes == null ? ImmutableSet.of() : ImmutableSet.copyOf(pReferenceTypes);
 		mMinValue = pMinValue;
 		mMaxValue = pMaxValue;
+		mMaxLength = pMaxLength;
 		mFinal = pFinal;
 		mPropertyPattern = pPropertyPattern;
 		mKeywords = pKeywords == null ? ImmutableMultimap.of() : ImmutableMultimap.copyOf(pKeywords);
@@ -96,18 +100,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 		/* Verify that any container parent property is not a primary key */
 
 		if (mIsPrimaryKey == true) {
-			
+
 			if (mKeywords.containsEntry(CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT) == true)
 				throw new IllegalArgumentException("A primary key cannot also be a CONTAINER PARENT");
 		}
-		
+
 		/* If it's a CONTAINER PARENT, then it must be a PropertyRef */
-		
-		if (mKeywords.containsEntry(CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT) == true)
-		{		
+
+		if (mKeywords.containsEntry(CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT) == true) {
 			if (mType != PropertyType.PropertyRef)
 				throw new IllegalArgumentException("Only PropertyRef's are valid types for CONTAINER PARENT");
 		}
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.PropertyDefinition#getScope()
+	 */
+	@Override
+	public Scope getScope() {
+		return mScope;
 	}
 
 	/**
@@ -132,8 +143,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setName(String pValue) {
 		return new GenericPropertyDefinition(mScope, pValue, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal,
-			mPropertyPattern, mKeywords);
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
+			mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -144,8 +155,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setLabel(TranslatableString pValue) {
 		return new GenericPropertyDefinition(mScope, mName, pValue, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal,
-			mPropertyPattern, mKeywords);
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
+			mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -156,8 +167,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setPrimaryKey(boolean pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, pValue, mPrimaryKeyOrder, mType, mValidationScript,
-			mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal, mPropertyPattern,
-			mKeywords);
+			mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
+			mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -168,8 +179,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setType(PropertyType pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, pValue,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal,
-			mPropertyPattern, mKeywords);
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
+			mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -180,8 +191,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setValidationScript(Script pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType, pValue,
-			mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal, mPropertyPattern,
-			mKeywords);
+			mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
+			mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -192,7 +203,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setDefaultValue(String pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, pValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal,
+			mValidationScript, pValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
 			mPropertyPattern, mKeywords);
 	}
 
@@ -204,8 +215,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setDefaultValueScript(Script pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, pValue, mReferenceTypes, mMinValue, mMaxValue, mFinal, mPropertyPattern,
-			mKeywords);
+			mValidationScript, mDefaultValue, pValue, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
+			mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -218,15 +229,15 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, mDefaultValue, mDefaultValueScript,
 			ImmutableSet.<StructureDefinitionRef> builder().addAll(mReferenceTypes).add(pValue).build(), mMinValue,
-			mMaxValue, mFinal, mPropertyPattern, mKeywords);
+			mMaxValue, mMaxLength, mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
 	public PropertyDefinition removeReferenceType(StructureDefinitionRef pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, mDefaultValue, mDefaultValueScript,
-			Sets.filter(mReferenceTypes, Predicates.not(Predicates.equalTo(pValue))), mMinValue, mMaxValue, mFinal,
-			mPropertyPattern, mKeywords);
+			Sets.filter(mReferenceTypes, Predicates.not(Predicates.equalTo(pValue))), mMinValue, mMaxValue, mMaxLength,
+			mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -237,8 +248,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setMinValue(BigDecimal pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, pValue, mMaxValue, mFinal,
-			mPropertyPattern, mKeywords);
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, pValue, mMaxValue, mMaxLength,
+			mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -249,8 +260,20 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setMaxValue(BigDecimal pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, pValue, mFinal,
-			mPropertyPattern, mKeywords);
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, pValue, mMaxLength,
+			mFinal, mPropertyPattern, mKeywords);
+	}
+
+	@Override
+	public Integer getMaxLength() {
+		return mMaxLength;
+	}
+
+	@Override
+	public PropertyDefinition setMaxLength(Integer pValue) {
+		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, pValue,
+			mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
@@ -261,8 +284,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setFinal(boolean pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, pValue,
-			mPropertyPattern, mKeywords);
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
+			pValue, mPropertyPattern, mKeywords);
 	}
 
 	/**
@@ -279,8 +302,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setPropertyPattern(PropertyPattern pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal,
-			pValue, mKeywords);
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
+			mFinal, pValue, mKeywords);
 	}
 
 	/**
@@ -297,8 +320,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition addKeyword(String pKey, String pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal,
-			mPropertyPattern,
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
+			mFinal, mPropertyPattern,
 			ImmutableMultimap.<String, String> builder()
 				.putAll(Multimaps.filterEntries(mKeywords,
 					Predicates
@@ -312,8 +335,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition removeKeyword(String pKey, String pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal,
-			mPropertyPattern, Multimaps.filterEntries(mKeywords,
+			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
+			mFinal, mPropertyPattern, Multimaps.filterEntries(mKeywords,
 				Predicates.<Entry<String, String>> not((e) -> pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
 	}
 
@@ -331,8 +354,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	@Override
 	public PropertyDefinition setPrimaryKeyOrder(int pOrder) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, pOrder, mType, mValidationScript,
-			mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mFinal, mPropertyPattern,
-			mKeywords);
+			mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
+			mPropertyPattern, mKeywords);
 	}
 
 	/**
