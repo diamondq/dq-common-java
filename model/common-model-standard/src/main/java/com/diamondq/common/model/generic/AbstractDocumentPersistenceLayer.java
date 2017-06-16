@@ -25,9 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
 /**
  * @param <STRUCTURECONFIGOBJ>
@@ -42,18 +40,15 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 
 	protected final boolean	mPersistResources;
 
-	protected final String	mBaseName;
-
 	public AbstractDocumentPersistenceLayer(Scope pScope, boolean pPersistStructures, boolean pCacheStructures,
 		boolean pPersistStructureDefinitions, boolean pCacheStructureDefinitions,
 		boolean pPersistEditorStructureDefinitions, boolean pCacheEditorStructureDefinitions, boolean pPersistResources,
-		boolean pCacheResources, String pResourceBaseName) {
+		boolean pCacheResources) {
 		super(pScope, pCacheStructures, pCacheStructureDefinitions, pCacheEditorStructureDefinitions, pCacheResources);
 		mPersistStructures = pPersistStructures;
 		mPersistStructureDefinitions = pPersistStructureDefinitions;
 		mPersistEditorStructureDefinitions = pPersistEditorStructureDefinitions;
 		mPersistResources = pPersistResources;
-		mBaseName = pResourceBaseName;
 	}
 
 	protected abstract STRUCTURECONFIGOBJ loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
@@ -319,6 +314,26 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 			case Binary: {
 				throw new UnsupportedOperationException();
 			}
+			case Timestamp: {
+				if (p.isValueSet() == true) {
+					Long value =
+						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp);
+					Long newValue = (Long) p.getValue(pStructure);
+					if (newValue == null)
+						newValue = 0L;
+					if (value != newValue) {
+						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp,
+							newValue);
+						changed = true;
+					}
+				}
+				else {
+					if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+						PropertyType.Timestamp) == true)
+						changed = true;
+				}
+				break;
+			}
 			}
 
 		}
@@ -513,6 +528,17 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 				}
 				break;
 			}
+			case Timestamp: {
+				if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+					Long value =
+						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp);
+					@SuppressWarnings("unchecked")
+					Property<Long> ap = (Property<Long>) p;
+					ap = ap.setValue(value);
+					structure = structure.updateProperty(ap);
+				}
+				break;
+			}
 			}
 		}
 		return structure;
@@ -576,13 +602,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 		if (mPersistResources == false)
 			return null;
 
-		try {
-			ResourceBundle bundle = ResourceBundle.getBundle(mBaseName, pLocale);
-			return bundle.getString(pKey);
-		}
-		catch (MissingResourceException ex) {
-			return null;
-		}
+		throw new UnsupportedOperationException();
 	}
 
 	/**
