@@ -1,0 +1,268 @@
+package com.diamondq.common.storage.jdbc.dialects;
+
+import com.google.common.collect.ImmutableSet;
+
+import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+
+public class PostgreSQL extends AbstractDialect {
+
+	private static ThreadLocal<Calendar>	sCALENDAR	=
+		ThreadLocal.withInitial(() -> Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH));
+
+	protected static Set<String>			sRESERVED_WORDS;
+
+	static {
+		String wordsStr =
+			"abort,acl,add,aggregate,append,archive,arch_store,backward,binary,boolean,change,cluster,copy,database,delimiter,delimiters,do,extend,explain,forward,heavy,index,inherits,isnull,light,listen,load,merge,nothing,notify,notnull,oids,purge,rename,replace,retrieve,returns,rule,recipe,setof,stdin,stdout,store,vacuum,verbose,version";
+		String[] words = wordsStr.split(",");
+		ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+		for (String w : words)
+			builder.add(w);
+		builder.addAll(sSQL_2003_RESERVED_WORDS);
+		sRESERVED_WORDS = builder.build();
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#generateCreateSchemaSQL(java.lang.String)
+	 */
+	@Override
+	public String generateCreateSchemaSQL(String pSchemaName) {
+		return "CREATE SCHEMA " + pSchemaName;
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getUnlimitedTextType()
+	 */
+	@Override
+	public String getUnlimitedTextType() {
+		return "text";
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readUnlimitedTextType(java.sql.ResultSet, int)
+	 */
+	@Override
+	public String readUnlimitedTextType(ResultSet pRs, int pIndex) throws SQLException {
+		String value = pRs.getString(pIndex);
+		if (pRs.wasNull() == true)
+			return null;
+		return value;
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeUnlimitedText(java.sql.PreparedStatement, int,
+	 *      java.lang.String)
+	 */
+	@Override
+	public void writeUnlimitedText(PreparedStatement pPs, int pIndex, String pValue) throws SQLException {
+		if (pValue == null)
+			pPs.setNull(pIndex, Types.VARCHAR);
+		else
+			pPs.setString(pIndex, pValue);
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getBooleanType()
+	 */
+	@Override
+	public String getBooleanType() {
+		return "boolean";
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readBoolean(java.sql.ResultSet, int)
+	 */
+	@Override
+	public Boolean readBoolean(ResultSet pResultSet, int pIndex) throws SQLException {
+		boolean result = pResultSet.getBoolean(pIndex);
+		if (pResultSet.wasNull() == true)
+			return null;
+		return result;
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeBoolean(java.sql.PreparedStatement, int,
+	 *      java.lang.Boolean)
+	 */
+	@Override
+	public void writeBoolean(PreparedStatement pPs, int pIndex, Boolean pValue) throws SQLException {
+		if (pValue == null)
+			pPs.setNull(pIndex, Types.BOOLEAN);
+		else
+			pPs.setBoolean(pIndex, pValue);
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getLongType()
+	 */
+	@Override
+	public String getLongType() {
+		return "bigint";
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readLong(java.sql.ResultSet, int)
+	 */
+	@Override
+	public Long readLong(ResultSet pRs, int pIndex) throws SQLException {
+		long value = pRs.getLong(pIndex);
+		if (pRs.wasNull() == true)
+			return null;
+		return value;
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeLong(java.sql.PreparedStatement, int, java.lang.Long)
+	 */
+	@Override
+	public void writeLong(PreparedStatement pPs, int pIndex, Long pValue) throws SQLException {
+		if (pValue == null)
+			pPs.setNull(pIndex, Types.BIGINT);
+		else
+			pPs.setLong(pIndex, pValue);
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getUnlimitedDecimalType()
+	 */
+	@Override
+	public String getUnlimitedDecimalType() {
+		return "numeric";
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readDecimal(java.sql.ResultSet, int)
+	 */
+	@Override
+	public BigDecimal readDecimal(ResultSet pRs, int pIndex) throws SQLException {
+		BigDecimal value = pRs.getBigDecimal(pIndex);
+		if (pRs.wasNull() == true)
+			return null;
+		return value;
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeDecimal(java.sql.PreparedStatement, int,
+	 *      java.math.BigDecimal)
+	 */
+	@Override
+	public void writeDecimal(PreparedStatement pPs, int pIndex, BigDecimal pValue) throws SQLException {
+		if (pValue == null)
+			pPs.setNull(pIndex, Types.DECIMAL);
+		else
+			pPs.setBigDecimal(pIndex, pValue);
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getIntegerType()
+	 */
+	@Override
+	public String getIntegerType() {
+		return "integer";
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readInteger(java.sql.ResultSet, int)
+	 */
+	@Override
+	public Integer readInteger(ResultSet pRs, int pIndex) throws SQLException {
+		int value = pRs.getInt(pIndex);
+		if (pRs.wasNull() == true)
+			return null;
+		return value;
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeInteger(java.sql.PreparedStatement, int,
+	 *      java.lang.Integer)
+	 */
+	@Override
+	public void writeInteger(PreparedStatement pPs, int pIndex, Integer pValue) throws SQLException {
+		if (pValue == null)
+			pPs.setNull(pIndex, Types.INTEGER);
+		else
+			pPs.setInt(pIndex, pValue);
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getTextType(int)
+	 */
+	@Override
+	public String getTextType(int pMaxLength) {
+		return "varchar(" + pMaxLength + ")";
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readText(java.sql.ResultSet, int)
+	 */
+	@Override
+	public String readText(ResultSet pRs, int pIndex) throws SQLException {
+		String value = pRs.getString(pIndex);
+		if (pRs.wasNull() == true)
+			return null;
+		return value;
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeText(java.sql.PreparedStatement, int, java.lang.String)
+	 */
+	@Override
+	public void writeText(PreparedStatement pPs, int pIndex, String pValue) throws SQLException {
+		if (pValue == null)
+			pPs.setNull(pIndex, Types.VARCHAR);
+		else
+			pPs.setString(pIndex, pValue);
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getTimestampType()
+	 */
+	@Override
+	public String getTimestampType() {
+		return "timestamp(3) with time zone";
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readTimestamp(java.sql.ResultSet, int)
+	 */
+	@Override
+	public Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException {
+		Calendar c = sCALENDAR.get();
+		Timestamp value = pRs.getTimestamp(pIndex, c);
+		if (pRs.wasNull() == true)
+			return null;
+		return value.getTime();
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeTimestamp(java.sql.PreparedStatement, int,
+	 *      java.lang.Long)
+	 */
+	@Override
+	public void writeTimestamp(PreparedStatement pPs, int pIndex, Long pValue) throws SQLException {
+		if (pValue == null)
+			pPs.setNull(pIndex, Types.TIMESTAMP_WITH_TIMEZONE);
+		else {
+			Calendar c = sCALENDAR.get();
+			pPs.setTimestamp(pIndex, new Timestamp(pValue), c);
+		}
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getReservedWords()
+	 */
+	@Override
+	public Set<String> getReservedWords() {
+		return sRESERVED_WORDS;
+	}
+
+}
