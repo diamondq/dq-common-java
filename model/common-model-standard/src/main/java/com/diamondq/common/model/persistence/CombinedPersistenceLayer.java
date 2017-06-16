@@ -8,6 +8,9 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,22 +19,36 @@ import java.util.Map;
 
 public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
-	private final PersistenceLayer	mStructurePersistenceLayer;
+	private final List<PersistenceLayer>	mStructurePersistenceLayer;
 
-	private final PersistenceLayer	mStructureDefinitionPersistenceLayer;
+	private final boolean					mStructurePersistenceLayerIsSingleton;
 
-	private final PersistenceLayer	mEditorStructureDefinitionPersistenceLayer;
+	private final List<PersistenceLayer>	mStructureDefinitionPersistenceLayer;
 
-	private final PersistenceLayer	mResourcePersistenceLayer;
+	private final boolean					mStructureDefinitionPersistenceLayerIsSingleton;
 
-	public CombinedPersistenceLayer(Scope pScope, PersistenceLayer pStructurePersistenceLayer,
-		PersistenceLayer pStructureDefinitionPersistenceLayer,
-		PersistenceLayer pEditorStructureDefinitionPersistenceLayer, PersistenceLayer pResourcePersistenceLayer) {
+	private final List<PersistenceLayer>	mEditorStructureDefinitionPersistenceLayer;
+
+	private final boolean					mEditorStructureDefinitionPersistenceLayerIsSingleton;
+
+	private final List<PersistenceLayer>	mResourcePersistenceLayer;
+
+	private final boolean					mResourcePersistenceLayerIsSingleton;
+
+	public CombinedPersistenceLayer(Scope pScope, List<PersistenceLayer> pStructurePersistenceLayer,
+		List<PersistenceLayer> pStructureDefinitionPersistenceLayer,
+		List<PersistenceLayer> pEditorStructureDefinitionPersistenceLayer,
+		List<PersistenceLayer> pResourcePersistenceLayer) {
 		super(pScope);
-		mStructurePersistenceLayer = pStructurePersistenceLayer;
-		mStructureDefinitionPersistenceLayer = pStructureDefinitionPersistenceLayer;
-		mEditorStructureDefinitionPersistenceLayer = pEditorStructureDefinitionPersistenceLayer;
-		mResourcePersistenceLayer = pResourcePersistenceLayer;
+		mStructurePersistenceLayer = ImmutableList.copyOf(pStructurePersistenceLayer);
+		mStructurePersistenceLayerIsSingleton = (mStructurePersistenceLayer.size() == 1);
+		mStructureDefinitionPersistenceLayer = ImmutableList.copyOf(pStructureDefinitionPersistenceLayer);
+		mStructureDefinitionPersistenceLayerIsSingleton = (mStructureDefinitionPersistenceLayer.size() == 1);
+		mEditorStructureDefinitionPersistenceLayer = ImmutableList.copyOf(pEditorStructureDefinitionPersistenceLayer);
+		mEditorStructureDefinitionPersistenceLayerIsSingleton =
+			(mEditorStructureDefinitionPersistenceLayer.size() == 1);
+		mResourcePersistenceLayer = ImmutableList.copyOf(pResourcePersistenceLayer);
+		mResourcePersistenceLayerIsSingleton = (mResourcePersistenceLayer.size() == 1);
 	}
 
 	/**
@@ -40,7 +57,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
-		mStructureDefinitionPersistenceLayer.writeStructureDefinition(pToolkit, pScope, pValue);
+		mStructureDefinitionPersistenceLayer.forEach((l) -> l.writeStructureDefinition(pToolkit, pScope, pValue));
 	}
 
 	/**
@@ -49,7 +66,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public void deleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
-		mStructureDefinitionPersistenceLayer.deleteStructureDefinition(pToolkit, pScope, pValue);
+		mStructureDefinitionPersistenceLayer.forEach((l) -> l.deleteStructureDefinition(pToolkit, pScope, pValue));
 	}
 
 	/**
@@ -58,7 +75,13 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope) {
-		return mStructureDefinitionPersistenceLayer.getAllStructureDefinitionRefs(pToolkit, pScope);
+		if (mStructureDefinitionPersistenceLayerIsSingleton == true)
+			return mStructureDefinitionPersistenceLayer.get(0).getAllStructureDefinitionRefs(pToolkit, pScope);
+
+		ImmutableSet.Builder<StructureDefinitionRef> results = ImmutableSet.builder();
+		mStructureDefinitionPersistenceLayer
+			.forEach((l) -> results.addAll(l.getAllStructureDefinitionRefs(pToolkit, pScope)));
+		return results.build();
 	}
 
 	/**
@@ -67,7 +90,15 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName) {
-		return mStructureDefinitionPersistenceLayer.lookupStructureDefinitionByName(pToolkit, pScope, pName);
+		if (mStructureDefinitionPersistenceLayerIsSingleton == true)
+			return mStructureDefinitionPersistenceLayer.get(0).lookupStructureDefinitionByName(pToolkit, pScope, pName);
+
+		for (PersistenceLayer l : mStructureDefinitionPersistenceLayer) {
+			StructureDefinition sd = l.lookupStructureDefinitionByName(pToolkit, pScope, pName);
+			if (sd != null)
+				return sd;
+		}
+		return null;
 	}
 
 	/**
@@ -76,7 +107,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
-		mStructurePersistenceLayer.writeStructure(pToolkit, pScope, pStructure);
+		mStructurePersistenceLayer.forEach((l) -> l.writeStructure(pToolkit, pScope, pStructure));
 	}
 
 	/**
@@ -85,7 +116,16 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope, String pSerializedRef) {
-		return mStructurePersistenceLayer.lookupStructureBySerializedRef(pGenericToolkit, pScope, pSerializedRef);
+		if (mStructurePersistenceLayerIsSingleton == true)
+			return mStructurePersistenceLayer.get(0).lookupStructureBySerializedRef(pGenericToolkit, pScope,
+				pSerializedRef);
+
+		for (PersistenceLayer l : mStructurePersistenceLayer) {
+			Structure s = l.lookupStructureBySerializedRef(pGenericToolkit, pScope, pSerializedRef);
+			if (s != null)
+				return s;
+		}
+		return null;
 	}
 
 	/**
@@ -94,7 +134,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public void deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue) {
-		mStructurePersistenceLayer.deleteStructure(pToolkit, pScope, pValue);
+		mStructurePersistenceLayer.forEach((l) -> l.deleteStructure(pToolkit, pScope, pValue));
 	}
 
 	/**
@@ -104,8 +144,8 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	@Override
 	public void writeEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
 		EditorStructureDefinition pEditorStructureDefinition) {
-		mEditorStructureDefinitionPersistenceLayer.writeEditorStructureDefinition(pToolkit, pScope,
-			pEditorStructureDefinition);
+		mEditorStructureDefinitionPersistenceLayer
+			.forEach((l) -> l.writeEditorStructureDefinition(pToolkit, pScope, pEditorStructureDefinition));
 	}
 
 	/**
@@ -114,7 +154,8 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public void deleteEditorStructureDefinition(Toolkit pToolkit, Scope pScope, EditorStructureDefinition pValue) {
-		mEditorStructureDefinitionPersistenceLayer.deleteEditorStructureDefinition(pToolkit, pScope, pValue);
+		mEditorStructureDefinitionPersistenceLayer
+			.forEach((l) -> l.deleteEditorStructureDefinition(pToolkit, pScope, pValue));
 	}
 
 	/**
@@ -124,7 +165,14 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	@Override
 	public List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef(Toolkit pToolkit, Scope pScope,
 		StructureDefinitionRef pRef) {
-		return mEditorStructureDefinitionPersistenceLayer.lookupEditorStructureDefinitionByRef(pToolkit, pScope, pRef);
+		if (mEditorStructureDefinitionPersistenceLayerIsSingleton == true)
+			return mEditorStructureDefinitionPersistenceLayer.get(0).lookupEditorStructureDefinitionByRef(pToolkit,
+				pScope, pRef);
+
+		ImmutableList.Builder<EditorStructureDefinition> results = ImmutableList.builder();
+		mEditorStructureDefinitionPersistenceLayer
+			.forEach((l) -> results.addAll(l.lookupEditorStructureDefinitionByRef(pToolkit, pScope, pRef)));
+		return results.build();
 	}
 
 	/**
@@ -134,7 +182,13 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	@Override
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
 		StructureDefinitionRef pRef) {
-		return mStructurePersistenceLayer.getAllStructuresByDefinition(pToolkit, pScope, pRef);
+		if (mStructurePersistenceLayerIsSingleton == true)
+			return mStructurePersistenceLayer.get(0).getAllStructuresByDefinition(pToolkit, pScope, pRef);
+
+		ImmutableSet.Builder<Structure> results = ImmutableSet.builder();
+		mStructurePersistenceLayer
+			.forEach((l) -> results.addAll(l.getAllStructuresByDefinition(pToolkit, pScope, pRef)));
+		return results.build();
 	}
 
 	/**
@@ -143,7 +197,10 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public boolean isResourceStringWritingSupported(Toolkit pToolkit, Scope pScope) {
-		return mResourcePersistenceLayer.isResourceStringWritingSupported(pToolkit, pScope);
+		for (PersistenceLayer l : mResourcePersistenceLayer)
+			if (l.isResourceStringWritingSupported(pToolkit, pScope) == true)
+				return true;
+		return false;
 	}
 
 	/**
@@ -152,7 +209,9 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public void writeResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey, String pValue) {
-		mResourcePersistenceLayer.writeResourceString(pToolkit, pScope, pLocale, pKey, pValue);
+		for (PersistenceLayer l : mResourcePersistenceLayer)
+			if (l.isResourceStringWritingSupported(pToolkit, pScope) == true)
+				l.writeResourceString(pToolkit, pScope, pLocale, pKey, pValue);
 	}
 
 	/**
@@ -161,7 +220,9 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public void deleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
-		mResourcePersistenceLayer.deleteResourceString(pToolkit, pScope, pLocale, pKey);
+		for (PersistenceLayer l : mResourcePersistenceLayer)
+			if (l.isResourceStringWritingSupported(pToolkit, pScope) == true)
+				l.deleteResourceString(pToolkit, pScope, pLocale, pKey);
 	}
 
 	/**
@@ -170,7 +231,12 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public Collection<Locale> getResourceStringLocales(Toolkit pToolkit, Scope pScope) {
-		return mResourcePersistenceLayer.getResourceStringLocales(pToolkit, pScope);
+		if (mResourcePersistenceLayerIsSingleton == true)
+			return mResourcePersistenceLayer.get(0).getResourceStringLocales(pToolkit, pScope);
+
+		ImmutableSet.Builder<Locale> results = ImmutableSet.builder();
+		mResourcePersistenceLayer.forEach((l) -> results.addAll(l.getResourceStringLocales(pToolkit, pScope)));
+		return results.build();
 	}
 
 	/**
@@ -179,7 +245,13 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public Map<String, String> getResourceStringsByLocale(Toolkit pToolkit, Scope pScope, Locale pLocale) {
-		return mResourcePersistenceLayer.getResourceStringsByLocale(pToolkit, pScope, pLocale);
+		if (mResourcePersistenceLayerIsSingleton == true)
+			return mResourcePersistenceLayer.get(0).getResourceStringsByLocale(pToolkit, pScope, pLocale);
+
+		ImmutableMap.Builder<String, String> results = ImmutableMap.builder();
+		mResourcePersistenceLayer
+			.forEach((l) -> results.putAll(l.getResourceStringsByLocale(pToolkit, pScope, pLocale)));
+		return results.build();
 	}
 
 	/**
@@ -188,7 +260,15 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 */
 	@Override
 	public String lookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
-		return mResourcePersistenceLayer.lookupResourceString(pToolkit, pScope, pLocale, pKey);
+		if (mResourcePersistenceLayerIsSingleton == true)
+			return mResourcePersistenceLayer.get(0).lookupResourceString(pToolkit, pScope, pLocale, pKey);
+
+		for (PersistenceLayer l : mResourcePersistenceLayer) {
+			String result = l.lookupResourceString(pToolkit, pScope, pLocale, pKey);
+			if (result != null)
+				return result;
+		}
+		return null;
 	}
 
 	/**
