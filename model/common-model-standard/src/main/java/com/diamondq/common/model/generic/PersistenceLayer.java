@@ -130,4 +130,6 @@ public interface PersistenceLayer {
 	public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, Structure pStructure,
 		String pPropName, StructureDefinition pDef, List<Object> pPrimaryKeys);
 
+	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized);
+
 }

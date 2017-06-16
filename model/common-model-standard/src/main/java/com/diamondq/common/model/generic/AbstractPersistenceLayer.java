@@ -83,7 +83,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope) {
 		return new GenericPropertyDefinition(mScope, null, null, false, 0, null, null, null, null, null, null, null,
-			false, PropertyPattern.Normal, null);
+			null, false, PropertyPattern.Normal, null);
 	}
 
 	/**
@@ -97,8 +97,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#createNewProperty(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.PropertyDefinition, boolean,
-	 *      java.lang.Object)
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.PropertyDefinition,
+	 *      boolean, java.lang.Object)
 	 */
 	@Override
 	public <T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope, PropertyDefinition pPropertyDefinition,
@@ -164,8 +164,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#createStructureRefFromParts(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+	 *      java.lang.String, com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)
 	 */
 	@Override
 	public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, Structure pStructure,
@@ -237,6 +237,15 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	public StructureDefinitionRef createStructureDefinitionRef(Toolkit pToolkit, Scope pScope,
 		StructureDefinition pResolvable) {
 		return new GenericStructureDefinitionRef(mScope, pResolvable.getName());
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#createStructureDefinitionRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
+	 *      java.lang.String)
+	 */
+	@Override
+	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized) {
+		return new GenericStructureDefinitionRef(mScope, pSerialized);
 	}
 
 	/**

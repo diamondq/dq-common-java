@@ -87,6 +87,17 @@ public interface Toolkit {
 		@Nonnull StructureDefinition pResolvable);
 
 	/**
+	 * Creates a reference for StructureDefinition
+	 * 
+	 * @param pScope the scope
+	 * @param pSerialized the serialized reference
+	 * @return the reference
+	 */
+	@Nonnull
+	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(@Nonnull Scope pScope,
+		@Nonnull String pSerialized);
+
+	/**
 	 * Creates a reference for a Structure
 	 * 
 	 * @param pScope the scope

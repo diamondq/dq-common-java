@@ -127,6 +127,15 @@ public class GenericToolkit implements Toolkit {
 	}
 
 	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#createStructureDefinitionRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
+	 *      java.lang.String)
+	 */
+	@Override
+	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized) {
+		return getPersistenceLayer(pScope).createStructureDefinitionRefFromSerialized(pScope, pSerialized);
+	}
+
+	/**
 	 * @see com.diamondq.common.model.interfaces.Toolkit#createPropertyDefinitionRef(com.diamondq.common.model.interfaces.Scope,
 	 *      com.diamondq.common.model.interfaces.PropertyDefinition,
 	 *      com.diamondq.common.model.interfaces.StructureDefinition)
