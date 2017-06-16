@@ -7,6 +7,7 @@ import com.diamondq.common.storage.kv.IKVIndexColumn;
 import com.diamondq.common.storage.kv.IKVIndexDefinition;
 import com.diamondq.common.storage.kv.IKVIndexSupport;
 import com.diamondq.common.storage.kv.IKVStore;
+import com.diamondq.common.storage.kv.IKVTableDefinitionSupport;
 import com.diamondq.common.storage.kv.IKVTransaction;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
@@ -62,6 +63,14 @@ public class CloudantKVStore
 	@Override
 	public IKVAsyncTransaction startAsyncTransaction() {
 		return new SyncWrapperAsyncKVTransaction(startTransaction());
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.kv.IKVStore#getTableDefinitionSupport()
+	 */
+	@Override
+	public IKVTableDefinitionSupport getTableDefinitionSupport() {
+		return null;
 	}
 
 	/**
@@ -172,7 +181,7 @@ public class CloudantKVStore
 				JsonObject index = new JsonObject();
 				if (columns.isEmpty() == false) {
 					JsonArray fields = new JsonArray();
-					for(IKVIndexColumn column : columns) {
+					for (IKVIndexColumn column : columns) {
 						JsonObject field = new JsonObject();
 						field.add("name", new JsonPrimitive(column.getName()));
 						field.add("type", new JsonPrimitive(column.getType()));
@@ -184,7 +193,7 @@ public class CloudantKVStore
 				indexTOP.add("index", index);
 				indexes.add(toAdd.getName(), indexTOP);
 				dd.setIndexes(indexes);
-				
+
 				mDatabase.getDesignDocumentManager().put(dd);
 			}
 		}

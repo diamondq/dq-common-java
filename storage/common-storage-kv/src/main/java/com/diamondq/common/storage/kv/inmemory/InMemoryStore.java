@@ -3,6 +3,7 @@ package com.diamondq.common.storage.kv.inmemory;
 import com.diamondq.common.storage.kv.IKVAsyncTransaction;
 import com.diamondq.common.storage.kv.IKVIndexSupport;
 import com.diamondq.common.storage.kv.IKVStore;
+import com.diamondq.common.storage.kv.IKVTableDefinitionSupport;
 import com.diamondq.common.storage.kv.IKVTransaction;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
@@ -39,6 +40,14 @@ public class InMemoryStore implements IKVStore {
 	 */
 	@Override
 	public <ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> IKVIndexSupport<ICB, IDB> getIndexSupport() {
+		return null;
+	}
+
+	/**
+	 * @see com.diamondq.common.storage.kv.IKVStore#getTableDefinitionSupport()
+	 */
+	@Override
+	public IKVTableDefinitionSupport getTableDefinitionSupport() {
 		return null;
 	}
 }

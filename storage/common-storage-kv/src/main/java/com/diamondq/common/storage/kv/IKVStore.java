@@ -13,4 +13,11 @@ public interface IKVStore {
 	 */
 	public <ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> IKVIndexSupport<ICB, IDB> getIndexSupport();
 
+	/**
+	 * Returns a supporting interface for manipulating table definitions, if this store supports dynamic table
+	 * definitions.
+	 * 
+	 * @return returns the interface if it does support it or null if it does not
+	 */
+	public IKVTableDefinitionSupport getTableDefinitionSupport();
 }
