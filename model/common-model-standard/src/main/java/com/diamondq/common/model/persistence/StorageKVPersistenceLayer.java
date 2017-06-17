@@ -290,7 +290,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 				configMap.put("structureDef", pDefName);
 				String primaryKey = mConfiguredTableDefinitions.get(pDefName);
 				if ((primaryKey != null) && (primaryKey.isEmpty() == false))
-					configMap.put(primaryKey, containerAndPrimaryKey.primary);
+					configMap.put(primaryKey, unescapeValue(containerAndPrimaryKey.primary));
 			}
 			success = true;
 			return configMap;
@@ -492,13 +492,13 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 			String[] parts = pKey.split("/");
 			if (parts.length > 2) {
-				for (int i = 0; i < parts.length - 3; i += 3) {
+				for (int i = 0; i < parts.length - 2; i += 3) {
 					StringBuilder typeBuilder = new StringBuilder();
 					typeBuilder.append(parts[i]).append('_').append(parts[i + 2]).append('_').append(parts[i + 3]);
 
 					StringBuilder leftKeyBuilder = new StringBuilder();
 					boolean isFirst = true;
-					for (int o = 1; o <= i + 1; o += 3) {
+					for (int o = 0; o <= i + 1; o++) {
 						if (isFirst == true)
 							isFirst = false;
 						else
@@ -634,6 +634,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 					tableNameBuilder.setLength(builderLength);
 					tableNameBuilder.append(sd.getName());
 					refBuilder.setLength(refBuilderLength);
+					refBuilder.append(pPropDef.getName()).append('/');
 					refBuilder.append(sd.getName()).append('/');
 					int finalRefBuilderLength = refBuilder.length();
 					String tableName = tableNameBuilder.toString();
