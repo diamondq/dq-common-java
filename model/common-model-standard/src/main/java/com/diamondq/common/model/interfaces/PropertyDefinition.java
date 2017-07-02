@@ -5,9 +5,8 @@ import com.google.common.collect.Multimap;
 import java.math.BigDecimal;
 import java.util.Collection;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 
 /**
  * A PropertyDefinition defines all metadata about a given property.
@@ -20,25 +19,25 @@ public interface PropertyDefinition
 	@Nullable
 	public String getName();
 
-	@CheckReturnValue
-	@Nonnull
-	public PropertyDefinition setName(@Nonnull String pValue);
+	
+	
+	public PropertyDefinition setName( String pValue);
 
 	/* Label */
 
 	@Nullable
 	public TranslatableString getLabel();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setLabel(@Nullable TranslatableString pValue);
 
 	/* Primary Key */
 
 	public boolean isPrimaryKey();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setPrimaryKey(boolean pValue);
 
 	/* Type */
@@ -46,17 +45,17 @@ public interface PropertyDefinition
 	@Nullable
 	public PropertyType getType();
 
-	@CheckReturnValue
-	@Nonnull
-	public PropertyDefinition setType(@Nonnull PropertyType pValue);
+	
+	
+	public PropertyDefinition setType( PropertyType pValue);
 
 	/* Validation Script */
 
 	@Nullable
 	public Script getValidationScript();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setValidationScript(@Nullable Script pValue);
 
 	/* Default Value */
@@ -64,8 +63,8 @@ public interface PropertyDefinition
 	@Nullable
 	public String getDefaultValue();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setDefaultValue(@Nullable String pValue);
 
 	/* Default Value Script */
@@ -73,30 +72,30 @@ public interface PropertyDefinition
 	@Nullable
 	public Script getDefaultValueScript();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setDefaultValueScript(@Nullable Script pValue);
 
 	/* Reference Type */
 
-	@Nonnull
+	
 	public Collection<StructureDefinitionRef> getReferenceTypes();
 
-	@CheckReturnValue
-	@Nonnull
-	public PropertyDefinition addReferenceType(@Nonnull StructureDefinitionRef pValue);
+	
+	
+	public PropertyDefinition addReferenceType( StructureDefinitionRef pValue);
 
-	@CheckReturnValue
-	@Nonnull
-	public PropertyDefinition removeReferenceType(@Nonnull StructureDefinitionRef pValue);
+	
+	
+	public PropertyDefinition removeReferenceType( StructureDefinitionRef pValue);
 
 	/* Min Value */
 
 	@Nullable
 	public BigDecimal getMinValue();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setMinValue(@Nullable BigDecimal pValue);
 
 	/* Max Value */
@@ -104,16 +103,16 @@ public interface PropertyDefinition
 	@Nullable
 	public BigDecimal getMaxValue();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setMaxValue(@Nullable BigDecimal pValue);
 
 	/* Final */
 
 	public boolean isFinal();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setFinal(boolean pValue);
 
 	/* Max Length */
@@ -121,8 +120,8 @@ public interface PropertyDefinition
 	@Nullable
 	public Integer getMaxLength();
 	
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setMaxLength(Integer pValue);
 	
 	/* keywords */
@@ -132,7 +131,7 @@ public interface PropertyDefinition
 	 * 
 	 * @return the multimap
 	 */
-	@Nonnull
+	
 	public Multimap<String, String> getKeywords();
 
 	/**
@@ -142,9 +141,9 @@ public interface PropertyDefinition
 	 * @param pValue the value
 	 * @return the updated PropertyDefinition
 	 */
-	@CheckReturnValue
-	@Nonnull
-	public PropertyDefinition addKeyword(@Nonnull String pKey, @Nonnull String pValue);
+	
+	
+	public PropertyDefinition addKeyword( String pKey,  String pValue);
 
 	/**
 	 * Removes a keyword from this StructureDefinition
@@ -153,9 +152,9 @@ public interface PropertyDefinition
 	 * @param pValue the value
 	 * @return the updated PropertyDefinition
 	 */
-	@CheckReturnValue
-	@Nonnull
-	public PropertyDefinition removeKeyword(@Nonnull String pKey, @Nonnull String pValue);
+	
+	
+	public PropertyDefinition removeKeyword( String pKey,  String pValue);
 
 	/**
 	 * Returns the order of this property with other primary keys. Only applies if this property is a primary key
@@ -170,17 +169,17 @@ public interface PropertyDefinition
 	 * @param pOrder the new order
 	 * @return the updated PropertyDefinition
 	 */
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public PropertyDefinition setPrimaryKeyOrder(int pOrder);
 
-	@Nonnull
+	
 	public PropertyPattern getPropertyPattern();
 
-	@CheckReturnValue
-	@Nonnull
-	public PropertyDefinition setPropertyPattern(@Nonnull PropertyPattern pValue);
 	
-	@Nonnull
+	
+	public PropertyDefinition setPropertyPattern( PropertyPattern pValue);
+	
+	
 	public Scope getScope();
 }

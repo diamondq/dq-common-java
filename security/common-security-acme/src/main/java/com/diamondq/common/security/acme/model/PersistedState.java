@@ -3,31 +3,43 @@ package com.diamondq.common.security.acme.model;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 @PersistenceCapable
 public class PersistedState {
 
 	@Persistent(primaryKey = "true")
+	@Nullable
 	private String	id;
 
+	@Nullable
 	private String	acmeServer;
 
+	@Nullable
 	private String	registrationLocation;
 
+	@Nullable
 	private String	authorizationLocation;
 
+	@Nullable
 	private String	certificateLocation;
 
+	@Nullable
 	private String	csr;
 
+	@Nullable
 	private String	userKeyPair;
 
+	@Nullable
 	private String	domainKeyPair;
 
+	@Nullable
 	private String	domainCert;
 
+	@Nullable
 	private String	certChain;
 
-	public String getId() {
+	public @Nullable String getId() {
 		return id;
 	}
 
@@ -35,7 +47,7 @@ public class PersistedState {
 		id = pId;
 	}
 
-	public String getAcmeServer() {
+	public @Nullable String getAcmeServer() {
 		return acmeServer;
 	}
 
@@ -43,7 +55,7 @@ public class PersistedState {
 		acmeServer = pAcmeServer;
 	}
 
-	public String getUserKeyPair() {
+	public @Nullable String getUserKeyPair() {
 		return userKeyPair;
 	}
 
@@ -51,7 +63,7 @@ public class PersistedState {
 		userKeyPair = pUserKeyPair;
 	}
 
-	public String getDomainKeyPair() {
+	public @Nullable String getDomainKeyPair() {
 		return domainKeyPair;
 	}
 
@@ -59,7 +71,7 @@ public class PersistedState {
 		domainKeyPair = pDomainKeyPair;
 	}
 
-	public String getRegistrationLocation() {
+	public @Nullable String getRegistrationLocation() {
 		return registrationLocation;
 	}
 
@@ -67,23 +79,23 @@ public class PersistedState {
 		registrationLocation = pRegistrationLocation;
 	}
 
-	public String getCertChain() {
+	public @Nullable String getCertChain() {
 		return certChain;
 	}
 
-	public void setCertChain(String pCertChain) {
+	public void setCertChain(@Nullable String pCertChain) {
 		certChain = pCertChain;
 	}
 
-	public String getDomainCert() {
+	public @Nullable String getDomainCert() {
 		return domainCert;
 	}
 
-	public void setDomainCert(String pDomainCert) {
+	public void setDomainCert(@Nullable String pDomainCert) {
 		domainCert = pDomainCert;
 	}
 
-	public String getAuthorizationLocation() {
+	public @Nullable String getAuthorizationLocation() {
 		return authorizationLocation;
 	}
 
@@ -91,15 +103,15 @@ public class PersistedState {
 		authorizationLocation = pAuthorizationLocation;
 	}
 
-	public String getCertificateLocation() {
+	public @Nullable String getCertificateLocation() {
 		return certificateLocation;
 	}
 
-	public void setCertificateLocation(String pCertificateLocation) {
+	public void setCertificateLocation(@Nullable String pCertificateLocation) {
 		certificateLocation = pCertificateLocation;
 	}
 
-	public String getCsr() {
+	public @Nullable String getCsr() {
 		return csr;
 	}
 

@@ -9,34 +9,48 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class DatabaseFactory {
 
 	public static class DatabaseFactoryBuilder {
 
+		@Nullable
 		private String		mAccount;
 
+		@Nullable
 		private Long		mConnectTimeoutInSeconds;
 
 		private boolean		mDisableSSLAuthentication	= false;
 
+		@Nullable
 		private GsonBuilder	gsonBuilder;
 
+		@Nullable
 		private Integer		mMaxConnections;
 
+		@Nullable
 		private String		mPassword;
 
+		@Nullable
 		private String		mProxyPassword;
 
+		@Nullable
 		private String		mProxyURL;
 
+		@Nullable
 		private String		mProxyUser;
 
+		@Nullable
 		private Long		mReadTimeout;
 
+		@Nullable
 		private String		mUsername;
 
+		@Nullable
 		private String		mURL;
 
+		@Nullable
 		private String		mDatabase;
 
 		public DatabaseFactoryBuilder account(String pValue) {
@@ -144,7 +158,11 @@ public class DatabaseFactory {
 				builder = builder.username(mUsername);
 
 			CloudantClient client = builder.build();
-			return client.database(mDatabase, true);
+			String name = mDatabase;
+			if (name == null)
+				throw new IllegalArgumentException(
+					"The mandatory field database was not set on the " + this.getClass().getSimpleName());
+			return client.database(name, true);
 		}
 	}
 

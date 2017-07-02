@@ -54,4 +54,10 @@ public abstract class KVIndexDefinitionBuilder<@NonNull IDB extends KVIndexDefin
 		mColumns.add(pValue);
 		return (IDB) this;
 	}
+
+	protected void validate() {
+		if (mName == null)
+			throw new IllegalArgumentException(
+				"The mandatory field name was not set on the " + this.getClass().getSimpleName());
+	}
 }

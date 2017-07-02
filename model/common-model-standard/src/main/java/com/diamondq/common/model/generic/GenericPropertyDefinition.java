@@ -24,8 +24,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
-
 public class GenericPropertyDefinition implements PropertyDefinition {
 
 	private final Scope									mScope;
@@ -214,7 +212,6 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 		return mDefaultValueScript;
 	}
 
-	@Nonnull
 	@Override
 	public PropertyDefinition setDefaultValueScript(Script pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,

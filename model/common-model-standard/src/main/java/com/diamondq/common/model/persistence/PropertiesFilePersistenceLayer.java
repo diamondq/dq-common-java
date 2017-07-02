@@ -219,7 +219,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
 	 */
 	@Override
-	protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
+	protected < R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
 		boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
 		switch (pType) {
 		case String: {

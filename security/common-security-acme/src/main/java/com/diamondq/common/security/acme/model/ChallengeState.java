@@ -3,15 +3,19 @@ package com.diamondq.common.security.acme.model;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 @PersistenceCapable
 public class ChallengeState {
 
 	@Persistent(primaryKey = "true")
+	@Nullable
 	private String	token;
 
+	@Nullable
 	private String	response;
 
-	public String getToken() {
+	public @Nullable String getToken() {
 		return token;
 	}
 
@@ -19,7 +23,7 @@ public class ChallengeState {
 		token = pToken;
 	}
 
-	public String getResponse() {
+	public @Nullable String getResponse() {
 		return response;
 	}
 

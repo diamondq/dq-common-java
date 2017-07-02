@@ -21,6 +21,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.xnio.Option;
 
 import io.undertow.Undertow;
@@ -29,6 +30,7 @@ import io.undertow.UndertowOptions;
 
 public abstract class UndertowServer {
 
+	@Nullable
 	public static UndertowServer	sINSTANCE	= null;
 
 	private final Config			mConfig;
@@ -95,17 +97,15 @@ public abstract class UndertowServer {
 			String keystoreFile = mConfig.bind("web.https.keystore-file", String.class);
 			String keystorePassword = mConfig.bind("web.https.keystore-password", String.class);
 
+			if (keystoreFile == null)
+				throw new IllegalArgumentException("The mandatory web.https.keystore-file config entry was not set");
+			if (keystorePassword == null)
+				throw new IllegalArgumentException("The mandatory web.https.keystore-password config entry was not set");
+
 			SSLContext sslContext =
 				createSSLContext(loadKeyStore(keystoreFile, keystorePassword), null, keystorePassword);
 
 			pBuilder = pBuilder.addHttpsListener(httpsPort, httpsHost, sslContext);
-
-			/* Handle SPDY */
-
-			Boolean spdyEnabled = mConfig.bind("web.spdy.enabled", Boolean.class);
-
-			if ((spdyEnabled != null) && (spdyEnabled == true))
-				pBuilder = pBuilder.setServerOption(UndertowOptions.ENABLE_SPDY, true);
 
 			/* Handle HTTP/2 */
 
@@ -164,7 +164,7 @@ public abstract class UndertowServer {
 		}
 	}
 
-	private static SSLContext createSSLContext(final KeyStore pKeyStore, final KeyStore pTrustStore,
+	private static SSLContext createSSLContext(final KeyStore pKeyStore, @Nullable final KeyStore pTrustStore,
 		String pKeystorePassword) {
 		try {
 			KeyManager[] keyManagers;

@@ -1,8 +1,6 @@
 package com.diamondq.common.model.interfaces;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface Property<TYPE> {
 
@@ -26,8 +24,8 @@ public interface Property<TYPE> {
 	 */
 	public boolean isValueSet();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public Property<TYPE> setValue(TYPE pValue);
 
 	/* Definition */
@@ -38,7 +36,7 @@ public interface Property<TYPE> {
 	 * 
 	 * @return the PropertyDefinition
 	 */
-	@Nonnull
+	
 	public PropertyDefinition getDefinition();
 
 }

@@ -21,11 +21,11 @@ public abstract class AbstractKVTransaction {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected <@Nullable O> O getObjFromString(String pTable, Class<O> pClass, @Nullable String pResult) {
+	protected <O> O getObjFromString(String pTable, Class<O> pClass, @Nullable String pResult) {
 		return (O) pResult;
 	}
 
-	protected <@Nullable O> @Nullable String getStringFromObj(String pTable, O pObj) {
+	protected <O> @Nullable String getStringFromObj(String pTable, O pObj) {
 		return (String) pObj;
 	}
 }

@@ -29,6 +29,8 @@ public class AuthQueryExtenderImpl implements AuthenticationQueryExtender {
 	@Inject
 	public AuthQueryExtenderImpl(PepAgent pAgent, Config pConfig) {
 		String fqdn = pConfig.bind("application.fqdn", String.class);
+		if (fqdn == null)
+			throw new IllegalArgumentException();
 		mCode = new Code(fqdn);
 		mParser = new Parser(pAgent);
 	}

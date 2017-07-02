@@ -2,6 +2,7 @@ package com.diamondq.common.security.xacml.model;
 
 import java.util.Collection;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Style.ImplementationVisibility;
 
@@ -14,7 +15,7 @@ public interface ILiteralBag extends ILiteral {
 
 	@Value.Derived
 	@Override
-	default String getSingleValue() {
+	default @Nullable String getSingleValue() {
 		Collection<String> value = getValue();
 		if (value.isEmpty() == true)
 			return null;

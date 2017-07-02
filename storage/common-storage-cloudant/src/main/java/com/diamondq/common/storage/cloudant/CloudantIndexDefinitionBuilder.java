@@ -11,6 +11,10 @@ public class CloudantIndexDefinitionBuilder extends KVIndexDefinitionBuilder<Clo
 	 */
 	@Override
 	public IKVIndexDefinition build() {
-		return new GenericKVIndexDefinition(mName, mColumns);
+		validate();
+		String name = mName;
+		if (name == null)
+			throw new IllegalStateException();
+		return new GenericKVIndexDefinition(name, mColumns.build());
 	}
 }

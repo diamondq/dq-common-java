@@ -1,7 +1,5 @@
 package com.diamondq.common.model.interfaces;
 
-import javax.annotation.Nonnull;
-
 public interface ResolvableWithContainer<ACTUAL, REF extends Ref<ACTUAL>, CONTAINER> {
 
 	/**
@@ -10,7 +8,7 @@ public interface ResolvableWithContainer<ACTUAL, REF extends Ref<ACTUAL>, CONTAI
 	 * @param pContainer the container
 	 * @return the reference
 	 */
-	@Nonnull
+
 	public REF getReference(CONTAINER pContainer);
 
 }

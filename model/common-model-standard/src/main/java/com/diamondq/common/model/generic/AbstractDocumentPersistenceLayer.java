@@ -57,7 +57,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	protected abstract STRUCTURECONFIGOBJ loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
 		String pKey, boolean pCreateIfMissing);
 
-	protected abstract <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
+	protected abstract < R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
 		boolean pIsMeta, String pKey, PropertyType pType, R pValue);
 
 	protected abstract <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,

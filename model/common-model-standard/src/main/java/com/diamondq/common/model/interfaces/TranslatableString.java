@@ -2,8 +2,6 @@ package com.diamondq.common.model.interfaces;
 
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
 public interface TranslatableString {
 
 	/**
@@ -11,7 +9,7 @@ public interface TranslatableString {
 	 * 
 	 * @return the key
 	 */
-	@Nonnull
+
 	public String getKey();
 
 	/**

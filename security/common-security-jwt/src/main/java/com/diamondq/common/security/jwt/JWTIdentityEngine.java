@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
@@ -32,10 +33,18 @@ public class JWTIdentityEngine implements IdentityEngine {
 
 	@Inject
 	public JWTIdentityEngine(Config pConfig) {
-		mJWTHeader = pConfig.bind("identity.jwt.header", String.class);
-		mBearerPrefix = pConfig.bind("identity.jwt.bearer-prefix", Boolean.class);
+		String jwtHeader = pConfig.bind("identity.jwt.header", String.class);
+		if (jwtHeader == null)
+			throw new IllegalArgumentException();
+		mJWTHeader = jwtHeader;
+		Boolean bearerPrefix = pConfig.bind("identity.jwt.bearer-prefix", Boolean.class);
+		if (bearerPrefix == null)
+			throw new IllegalArgumentException();
+		mBearerPrefix = bearerPrefix;
 
 		JWTConfigProperties jwtConfigProperties = pConfig.bind("roadassistant.jwt", JWTConfigProperties.class);
+		if (jwtConfigProperties == null)
+			throw new IllegalArgumentException();
 
 		RsaJsonWebKey key;
 		try {
@@ -67,7 +76,7 @@ public class JWTIdentityEngine implements IdentityEngine {
 	 * @see com.diamondq.common.security.acl.api.IdentityEngine#getIdentity(javax.servlet.http.HttpServletRequest)
 	 */
 	@Override
-	public UserInfo getIdentity(HttpServletRequest pRequest) {
+	public @Nullable UserInfo getIdentity(HttpServletRequest pRequest) {
 
 		String header = pRequest.getHeader(mJWTHeader);
 		if (header == null)
@@ -92,6 +101,13 @@ public class JWTIdentityEngine implements IdentityEngine {
 			String nameClaim = jwtClaims.getClaimValue("name", String.class);
 			String emailClaim = jwtClaims.getClaimValue("email", String.class);
 
+			if (nameClaim == null)
+				throw new IllegalArgumentException("The mandatory name claim was not found in the JWT");
+			if (emailClaim == null)
+				throw new IllegalArgumentException("The mandatory email claim was not found in the JWT");
+			if (subjectId == null)
+				throw new IllegalArgumentException("The mandatory subjectId claim was not found in the JWT");
+			
 			Set<String> roles = new HashSet<>();
 			List<String> list = jwtClaims.getStringListClaimValue("roles");
 			roles.addAll(list);

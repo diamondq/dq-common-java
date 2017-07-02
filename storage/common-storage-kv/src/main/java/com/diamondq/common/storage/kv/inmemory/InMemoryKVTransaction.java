@@ -16,22 +16,22 @@ import org.eclipse.jdt.annotation.NonNull;
  */
 public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVTransaction {
 
-	private final ConcurrentMap<String, ConcurrentMap<String, String>> mData;
+	private final ConcurrentMap<String, ConcurrentMap<String, @Nullable String>> mData;
 
 	/**
 	 * Default constructor
 	 * 
 	 * @param pData the main data (from the store). This is just a reference
 	 */
-	public InMemoryKVTransaction(ConcurrentMap<String, ConcurrentMap<String, String>> pData) {
+	public InMemoryKVTransaction(ConcurrentMap<String, ConcurrentMap<String, @Nullable String>> pData) {
 		super();
 		mData = pData;
 	}
 
-	protected ConcurrentMap<String, String> getFromTable(String pTable) {
-		ConcurrentMap<String, String> map = mData.get(pTable);
+	protected ConcurrentMap<String, @Nullable String> getFromTable(String pTable) {
+		ConcurrentMap<String, @Nullable String> map = mData.get(pTable);
 		if (map == null) {
-			ConcurrentMap<String, String> newMap = new ConcurrentHashMap<>();
+			ConcurrentMap<String, @Nullable String> newMap = new ConcurrentHashMap<>();
 			if ((map = mData.putIfAbsent(pTable, newMap)) == null)
 				map = newMap;
 		}
@@ -44,7 +44,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
 	 */
 	@Override
 	public <@Nullable O> O getByKey(String pTable, String pKey1, @Nullable String pKey2, Class<O> pClass) {
-		ConcurrentMap<String, String> table = getFromTable(pTable);
+		ConcurrentMap<String, @Nullable String> table = getFromTable(pTable);
 		String key = getFlattenedKey(pKey1, pKey2);
 		String result = table.get(key);
 		return getObjFromString(pTable, pClass, result);
@@ -56,7 +56,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
 	 */
 	@Override
 	public <@Nullable O> void putByKey(String pTable, String pKey1, @Nullable String pKey2, O pObj) {
-		ConcurrentMap<String, String> table = getFromTable(pTable);
+		ConcurrentMap<String, @Nullable String> table = getFromTable(pTable);
 		String key = getFlattenedKey(pKey1, pKey2);
 		table.put(key, getStringFromObj(pTable, pObj));
 	}
@@ -67,7 +67,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
 	 */
 	@Override
 	public boolean removeByKey(String pTable, String pKey1, @Nullable String pKey2) {
-		ConcurrentMap<String, String> table = getFromTable(pTable);
+		ConcurrentMap<String, @Nullable String> table = getFromTable(pTable);
 		String key = getFlattenedKey(pKey1, pKey2);
 		return table.remove(key) != null;
 	}
@@ -101,7 +101,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
 	 */
 	@Override
 	public long getCount(String pTable) {
-		ConcurrentMap<String, String> table = getFromTable(pTable);
+		ConcurrentMap<String, @Nullable String> table = getFromTable(pTable);
 		return table.size();
 	}
 

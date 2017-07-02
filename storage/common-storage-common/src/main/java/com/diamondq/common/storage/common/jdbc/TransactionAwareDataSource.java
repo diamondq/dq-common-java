@@ -86,6 +86,8 @@ public class TransactionAwareDataSource implements DataSource {
 
 	@Override
 	public Connection getConnection(@Nullable String pUsername, @Nullable String pPassword) throws SQLException {
+		if (pUsername == null)
+			throw new IllegalArgumentException();
 		Map<@NonNull String, @Nullable DelegatingConnection> map = mThreadUserPWLocal.get();
 		if (map == null) {
 			map = new HashMap<>();

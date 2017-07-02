@@ -3,8 +3,6 @@ package com.diamondq.common.model.interfaces;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-import javax.annotation.Nonnull;
-
 public abstract class ToolkitFactory {
 
 	protected ToolkitFactory() {
@@ -26,12 +24,11 @@ public abstract class ToolkitFactory {
 	 * 
 	 * @return a new <code>ToolkitFactory</code> instance, never null.
 	 */
-	@Nonnull
+
 	public static ToolkitFactory newInstance() {
 		return newInstance(null);
 	}
 
-	@Nonnull
 	public static ToolkitFactory newInstance(ClassLoader pLoader) {
 
 		ToolkitFactory result = null;
@@ -108,6 +105,6 @@ public abstract class ToolkitFactory {
 	 * 
 	 * @return the new GenericToolkit, never null
 	 */
-	@Nonnull
+
 	public abstract Toolkit newToolkit();
 }

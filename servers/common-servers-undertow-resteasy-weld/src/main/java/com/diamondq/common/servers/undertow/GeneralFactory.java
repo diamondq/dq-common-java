@@ -21,12 +21,17 @@ public class GeneralFactory {
 		URI unsecuredURI;
 		URI securedURI;
 		String fqdn;
-		
+
 		try {
 			Boolean httpEnabled = pConfig.bind("web.http.enabled", Boolean.class);
 			if ((httpEnabled != null) && (httpEnabled == true)) {
 				Integer httpPort = pConfig.bind("web.http.port", Integer.class);
 				String httpHost = pConfig.bind("web.http.host", String.class);
+
+				if (httpPort == null)
+					throw new IllegalArgumentException("The mandatory web.http.port config entry is not present");
+				if (httpHost == null)
+					throw new IllegalArgumentException("The mandatory web.http.host config entry is not present");
 
 				unsecuredURI = new URI("http://" + httpHost + (httpPort == 80 ? "" : ":" + httpPort));
 			}
@@ -38,12 +43,19 @@ public class GeneralFactory {
 				Integer httpsPort = pConfig.bind("web.https.port", Integer.class);
 				String httpsHost = pConfig.bind("web.https.host", String.class);
 
+				if (httpsPort == null)
+					throw new IllegalArgumentException("The mandatory web.https.port config entry is not present");
+				if (httpsHost == null)
+					throw new IllegalArgumentException("The mandatory web.https.host config entry is not present");
+
 				securedURI = new URI("https://" + httpsHost + (httpsPort == 443 ? "" : ":" + httpsPort));
 			}
 			else
 				securedURI = null;
 
 			fqdn = pConfig.bind("application.fqdn", String.class);
+			if (fqdn == null)
+				throw new IllegalArgumentException();
 		}
 		catch (URISyntaxException ex) {
 			throw new RuntimeException(ex);

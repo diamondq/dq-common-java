@@ -22,7 +22,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class InMemoryStore implements IKVStore {
 
-	private final ConcurrentMap<String, ConcurrentMap<String, String>> mData = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, ConcurrentMap<String, @Nullable String>> mData = new ConcurrentHashMap<>();
 
 	/**
 	 * Default constructor
@@ -55,7 +55,7 @@ public class InMemoryStore implements IKVStore {
 	}
 
 	/**
-	 * @see com.diamondq.common.storage.kv.IKVStore#getTableDefinitionSupport()
+	 * @see com.diamondq.common.storage.kv.IKVStore
 	 */
 	@Override
 	public <TDB extends @NonNull KVTableDefinitionBuilder<@NonNull TDB>, CDB extends @NonNull KVColumnDefinitionBuilder<@NonNull CDB>> @Nullable IKVTableDefinitionSupport<@NonNull TDB, @NonNull CDB> getTableDefinitionSupport() {

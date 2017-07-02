@@ -25,11 +25,6 @@
 			<artifactId>cloudant-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>com.diamondq.common.java.config</groupId>
 			<artifactId>common-config-api</artifactId>
 		</dependency>

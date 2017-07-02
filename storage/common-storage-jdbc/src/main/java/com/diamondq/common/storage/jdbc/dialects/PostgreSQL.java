@@ -242,7 +242,7 @@ public class PostgreSQL extends AbstractDialect {
 	public @Nullable Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException {
 		Calendar c = sCALENDAR.get();
 		Timestamp value = pRs.getTimestamp(pIndex, c);
-		if (pRs.wasNull() == true)
+		if ((pRs.wasNull() == true) || (value == null))
 			return null;
 		return value.getTime();
 	}

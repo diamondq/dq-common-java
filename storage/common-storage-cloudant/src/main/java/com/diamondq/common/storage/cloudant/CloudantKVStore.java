@@ -9,8 +9,11 @@ import com.diamondq.common.storage.kv.IKVIndexSupport;
 import com.diamondq.common.storage.kv.IKVStore;
 import com.diamondq.common.storage.kv.IKVTableDefinitionSupport;
 import com.diamondq.common.storage.kv.IKVTransaction;
+import com.diamondq.common.storage.kv.KVColumnDefinitionBuilder;
+import com.diamondq.common.storage.kv.KVColumnType;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
+import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
 import com.diamondq.common.storage.kv.impl.SyncWrapperAsyncKVTransaction;
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
@@ -26,10 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class CloudantKVStore
 	implements IKVStore, IKVIndexSupport<CloudantIndexColumnBuilder, CloudantIndexDefinitionBuilder> {
 
 	public static class CloudantKVStoreBuilder {
+		@Nullable
 		private Database mDatabase;
 
 		public CloudantKVStoreBuilder database(Database pDatabase) {
@@ -38,7 +45,11 @@ public class CloudantKVStore
 		}
 
 		public CloudantKVStore build() {
-			return new CloudantKVStore(mDatabase);
+			Database database = mDatabase;
+			if (database == null)
+				throw new IllegalArgumentException(
+					"The mandatory field database was not set on this " + this.getClass().getSimpleName());
+			return new CloudantKVStore(database);
 		}
 	}
 
@@ -66,10 +77,10 @@ public class CloudantKVStore
 	}
 
 	/**
-	 * @see com.diamondq.common.storage.kv.IKVStore#getTableDefinitionSupport()
+	 * @see com.diamondq.common.storage.kv.IKVStore
 	 */
 	@Override
-	public IKVTableDefinitionSupport getTableDefinitionSupport() {
+	public <TDB extends @NonNull KVTableDefinitionBuilder<@NonNull TDB>, CDB extends @NonNull KVColumnDefinitionBuilder<@NonNull CDB>> @Nullable IKVTableDefinitionSupport<@NonNull TDB, @NonNull CDB> getTableDefinitionSupport() {
 		return null;
 	}
 
@@ -78,8 +89,8 @@ public class CloudantKVStore
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> IKVIndexSupport<ICB, IDB> getIndexSupport() {
-		return (IKVIndexSupport<ICB, IDB>) this;
+	public <ICB extends @NonNull KVIndexColumnBuilder<@NonNull ICB>, IDB extends @NonNull KVIndexDefinitionBuilder<@NonNull IDB>> @Nullable IKVIndexSupport<@NonNull ICB, @NonNull IDB> getIndexSupport() {
+		return (@Nullable IKVIndexSupport<@NonNull ICB, @NonNull IDB>) this;
 	}
 
 	/**
@@ -139,7 +150,7 @@ public class CloudantKVStore
 									columnFailed = true;
 									break;
 								}
-								String columnType = column.getType();
+								KVColumnType columnType = column.getType();
 								String existingType = existingColumn.get("type").getAsString();
 								if (Objects.equal(columnType, existingType) == false) {
 									columnFailed = true;
@@ -184,7 +195,7 @@ public class CloudantKVStore
 					for (IKVIndexColumn column : columns) {
 						JsonObject field = new JsonObject();
 						field.add("name", new JsonPrimitive(column.getName()));
-						field.add("type", new JsonPrimitive(column.getType()));
+						field.add("type", new JsonPrimitive(column.getType().toString()));
 						fields.add(field);
 					}
 					index.add("fields", fields);

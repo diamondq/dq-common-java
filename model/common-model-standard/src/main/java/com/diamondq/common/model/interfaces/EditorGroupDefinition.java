@@ -2,9 +2,8 @@ package com.diamondq.common.model.interfaces;
 
 import java.util.List;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 
 public interface EditorGroupDefinition extends EditorComponentDefinition<EditorGroupDefinition> {
 
@@ -13,29 +12,29 @@ public interface EditorGroupDefinition extends EditorComponentDefinition<EditorG
 	@Nullable
 	public EditorComponentDirection getDirection();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorGroupDefinition setDirection(@Nullable EditorComponentDirection pValue);
 
 	/* numColumns */
 
 	public int getNumColumns();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorGroupDefinition setNumColumns(int pValue);
 
 	/* components */
 
-	@Nonnull
+	
 	public List<? extends EditorComponentDefinition<?>> getComponents();
 
-	@CheckReturnValue
-	@Nonnull
-	public <T extends EditorComponentDefinition<T>> EditorGroupDefinition addComponent(@Nonnull T pValue);
+	
+	
+	public <T extends EditorComponentDefinition<T>> EditorGroupDefinition addComponent( T pValue);
 
-	@CheckReturnValue
-	@Nonnull
-	public <T extends EditorComponentDefinition<T>> EditorGroupDefinition removeComponent(@Nonnull T pValue);
+	
+	
+	public <T extends EditorComponentDefinition<T>> EditorGroupDefinition removeComponent( T pValue);
 
 }

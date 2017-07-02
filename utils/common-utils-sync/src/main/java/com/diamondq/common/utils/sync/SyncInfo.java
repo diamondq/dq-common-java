@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
 
 /**
@@ -165,7 +166,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 	 * @param pStream the stream of A_KEY/A's to create
 	 * @return future to indicate success or failure
 	 */
-	public ExtendedCompletableFuture<Void> createA(Stream<Pair<A_KEY, A>> pStream);
+	public ExtendedCompletableFuture<@Nullable Void> createA(Stream<Pair<A_KEY, A>> pStream);
 
 	/**
 	 * Deletes a set of A_KEY/A_FRAG's
@@ -173,7 +174,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 	 * @param pStream the stream of A_KEY/A_FRAG's to delete
 	 * @return future to indicate success or failure
 	 */
-	public ExtendedCompletableFuture<Void> deleteA(Stream<Pair<A_KEY, A_FRAG>> pStream);
+	public ExtendedCompletableFuture<@Nullable Void> deleteA(Stream<Pair<A_KEY, A_FRAG>> pStream);
 
 	/**
 	 * Updates a set of A_KEY/A's
@@ -181,7 +182,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 	 * @param pStream the stream of A_KEY's/A's to update
 	 * @return future to indicate success or failure
 	 */
-	public ExtendedCompletableFuture<Void> modifyA(Stream<Pair<A_KEY, A>> pStream);
+	public ExtendedCompletableFuture<@Nullable Void> modifyA(Stream<Pair<A_KEY, A>> pStream);
 
 	/**
 	 * Creates a new set of B_KEY/B's
@@ -189,7 +190,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 	 * @param pStream the stream of B_KEY/B's to create
 	 * @return future to indicate success or failure
 	 */
-	public ExtendedCompletableFuture<Void> createB(Stream<Pair<B_KEY, B>> pStream);
+	public ExtendedCompletableFuture<@Nullable Void> createB(Stream<Pair<B_KEY, B>> pStream);
 
 	/**
 	 * Deletes a set of B_KEY/B_FRAG's
@@ -197,7 +198,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 	 * @param pStream the stream of B_KEY/B_FRAG's to delete
 	 * @return future to indicate success or failure
 	 */
-	public ExtendedCompletableFuture<Void> deleteB(Stream<Pair<B_KEY, B_FRAG>> pStream);
+	public ExtendedCompletableFuture<@Nullable Void> deleteB(Stream<Pair<B_KEY, B_FRAG>> pStream);
 
 	/**
 	 * Updates a set of B_KEY/B's
@@ -205,6 +206,6 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 	 * @param pStream the stream of B_KEY's/B's to update
 	 * @return future to indicate success or failure
 	 */
-	public ExtendedCompletableFuture<Void> modifyB(Stream<Pair<B_KEY, B>> pStream);
+	public ExtendedCompletableFuture<@Nullable Void> modifyB(Stream<Pair<B_KEY, B>> pStream);
 
 }

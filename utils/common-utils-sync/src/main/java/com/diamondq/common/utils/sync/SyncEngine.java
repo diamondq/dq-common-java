@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.inject.Singleton;
 
@@ -28,6 +29,120 @@ public class SyncEngine {
 	 */
 	public SyncEngine() {
 	}
+
+	/**
+	 * Return a Function that creates an A from the B
+	 * 
+	 * @param pSyncInfo the SyncInfo
+	 * @param pIsKeyTypesEqual are the key types equal (passed for performance)
+	 * @param bFragTypeComplete is the B_FRAG type complete (passed for performance)
+	 * @param typesEqual are the A/B types equal
+	 * @return the conversion function
+	 */
+	public static <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> Function<Pair<B_KEY, B_FRAG>, Pair<A_KEY, A>> bToACreation(
+		SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> pSyncInfo, boolean pIsKeyTypesEqual, boolean bFragTypeComplete,
+		boolean typesEqual) {
+		return new Function<Pair<B_KEY, B_FRAG>, Pair<A_KEY, A>>() {
+
+			@Override
+			public Pair<A_KEY, A> apply(Pair<B_KEY, B_FRAG> p) {
+				B_KEY bKey = p.getValue0();
+				B_FRAG bFrag = p.getValue1();
+				@SuppressWarnings("unchecked")
+				A_KEY aKey = (pIsKeyTypesEqual == true ? (A_KEY) bKey : pSyncInfo.convertBKeyToAKey(bKey));
+				@SuppressWarnings("unchecked")
+				B b = (B) (bFragTypeComplete == true ? bFrag : pSyncInfo.convertBFragToB(bKey, bFrag));
+				@SuppressWarnings("unchecked")
+				A a = (typesEqual == true ? (A) b : pSyncInfo.convertBToA(bKey, b));
+				return Pair.with(aKey, a);
+			}
+		};
+	};
+
+	/**
+	 * Return a Function that creates a B from the A
+	 * 
+	 * @param pSyncInfo the SyncInfo
+	 * @param pIsKeyTypesEqual are the key types equal (passed for performance)
+	 * @param aFragTypeComplete is the A_FRAG type complete (passed for performance)
+	 * @param typesEqual are the A/B types equal
+	 * @return the conversion function
+	 */
+	public static <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> Function<Pair<A_KEY, A_FRAG>, Pair<B_KEY, B>> aToBCreation(
+		SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> pSyncInfo, boolean pIsKeyTypesEqual, boolean aFragTypeComplete,
+		boolean typesEqual) {
+		return new Function<Pair<A_KEY, A_FRAG>, Pair<B_KEY, B>>() {
+
+			@Override
+			public Pair<B_KEY, B> apply(Pair<A_KEY, A_FRAG> p) {
+				A_KEY aKey = p.getValue0();
+				A_FRAG aFrag = p.getValue1();
+				@SuppressWarnings("unchecked")
+				B_KEY bKey = (pIsKeyTypesEqual == true ? (B_KEY) aKey : pSyncInfo.convertAKeyToBKey(aKey));
+				@SuppressWarnings("unchecked")
+				A a = (aFragTypeComplete == true ? (A) aFrag : pSyncInfo.convertAFragToA(aKey, aFrag));
+				@SuppressWarnings("unchecked")
+				B b = (typesEqual == true ? (B) a : pSyncInfo.convertAToB(aKey, a));
+				return Pair.with(bKey, b);
+			}
+		};
+	};
+
+	/**
+	 * Returns a Function that does the work of modifying A
+	 * 
+	 * @param pSyncInfo the SyncInfo
+	 * @param aFragTypeComplete is the A_FRAG type complete (passed for performance)
+	 * @param bFragTypeComplete is the B_FRAG type complete (passed for performance)
+	 * @return the function
+	 */
+	public static <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> Function<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>, Pair<A_KEY, A>> modifyA(
+		SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> pSyncInfo, boolean aFragTypeComplete, boolean bFragTypeComplete) {
+		return new Function<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>, Pair<A_KEY, A>>() {
+
+			@Override
+			public Pair<A_KEY, A> apply(Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG> q) {
+				A_KEY aKey = q.getValue0();
+				A_FRAG aFrag = q.getValue1();
+				B_KEY bKey = q.getValue2();
+				B_FRAG bFrag = q.getValue3();
+				@SuppressWarnings("unchecked")
+				A a = (aFragTypeComplete == true ? (A) aFrag : pSyncInfo.convertAFragToA(aKey, aFrag));
+				@SuppressWarnings("unchecked")
+				B b = (bFragTypeComplete == true ? (B) bFrag : pSyncInfo.convertBFragToB(bKey, bFrag));
+				A resultA = pSyncInfo.mergeBIntoA(a, b);
+				return Pair.with(aKey, resultA);
+			}
+		};
+	};
+
+	/**
+	 * Returns a Function that does the work of modifying A
+	 * 
+	 * @param pSyncInfo the SyncInfo
+	 * @param aFragTypeComplete is the A_FRAG type complete (passed for performance)
+	 * @param bFragTypeComplete is the B_FRAG type complete (passed for performance)
+	 * @return the function
+	 */
+	public static <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> Function<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>, Pair<B_KEY, B>> modifyB(
+		SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> pSyncInfo, boolean aFragTypeComplete, boolean bFragTypeComplete) {
+		return new Function<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>, Pair<B_KEY, B>>() {
+
+			@Override
+			public Pair<B_KEY, B> apply(Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG> q) {
+				A_KEY aKey = q.getValue0();
+				A_FRAG aFrag = q.getValue1();
+				B_KEY bKey = q.getValue2();
+				B_FRAG bFrag = q.getValue3();
+				@SuppressWarnings("unchecked")
+				A a = (aFragTypeComplete == true ? (A) aFrag : pSyncInfo.convertAFragToA(aKey, aFrag));
+				@SuppressWarnings("unchecked")
+				B b = (bFragTypeComplete == true ? (B) bFrag : pSyncInfo.convertBFragToB(bKey, bFrag));
+				B resultB = pSyncInfo.mergeAIntoB(a, b);
+				return Pair.with(bKey, resultB);
+			}
+		};
+	};
 
 	/**
 	 * Perform a sync between A/B by passing in the SyncInfo. This synchronization will occur asynchronously (as much as
@@ -67,6 +182,7 @@ public class SyncEngine {
 
 				/* See if the item exists in the other side */
 
+				@Nullable
 				B_FRAG bItem = bMap.remove(bKey);
 
 				if (bItem == null) {
@@ -148,23 +264,14 @@ public class SyncEngine {
 			Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = sextext.getValue4();
 			Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = sextext.getValue5();
 
-			Collection<ExtendedCompletableFuture<Void>> futures = new ArrayList<>();
+			Collection<ExtendedCompletableFuture<@Nullable Void>> futures = new ArrayList<>();
 
 			/* Now start processing the changes */
 
 			/* Add A records */
 
-			futures.add(pInfo.createA(aToBeCreated.stream().map(p -> {
-				B_KEY bKey = p.getValue0();
-				B_FRAG bFrag = p.getValue1();
-				@SuppressWarnings("unchecked")
-				A_KEY aKey = (keyTypesEqual == true ? (A_KEY) bKey : pInfo.convertBKeyToAKey(bKey));
-				@SuppressWarnings("unchecked")
-				B b = (B) (bFragTypeComplete == true ? bFrag : pInfo.convertBFragToB(bKey, bFrag));
-				@SuppressWarnings("unchecked")
-				A a = (typesEqual == true ? (A) b : pInfo.convertBToA(bKey, b));
-				return Pair.with(aKey, a);
-			})));
+			futures.add(pInfo.createA(aToBeCreated.stream()
+				.map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual))));
 
 			/* Delete A records */
 
@@ -172,32 +279,13 @@ public class SyncEngine {
 
 			/* Modify A records */
 
-			futures.add(pInfo.modifyA(aToBeModified.stream().map(q -> {
-				A_KEY aKey = q.getValue0();
-				A_FRAG aFrag = q.getValue1();
-				B_KEY bKey = q.getValue2();
-				B_FRAG bFrag = q.getValue3();
-				@SuppressWarnings("unchecked")
-				A a = (aFragTypeComplete == true ? (A) aFrag : pInfo.convertAFragToA(aKey, aFrag));
-				@SuppressWarnings("unchecked")
-				B b = (bFragTypeComplete == true ? (B) bFrag : pInfo.convertBFragToB(bKey, bFrag));
-				A resultA = pInfo.mergeBIntoA(a, b);
-				return Pair.with(aKey, resultA);
-			})));
+			futures.add(pInfo
+				.modifyA(aToBeModified.stream().map(SyncEngine.modifyA(pInfo, aFragTypeComplete, bFragTypeComplete))));
 
 			/* Add B records */
 
-			futures.add(pInfo.createB(bToBeCreated.stream().map(p -> {
-				A_KEY aKey = p.getValue0();
-				A_FRAG aFrag = p.getValue1();
-				@SuppressWarnings("unchecked")
-				B_KEY bKey = (keyTypesEqual == true ? (B_KEY) aKey : pInfo.convertAKeyToBKey(aKey));
-				@SuppressWarnings("unchecked")
-				A a = (aFragTypeComplete == true ? (A) aFrag : pInfo.convertAFragToA(aKey, aFrag));
-				@SuppressWarnings("unchecked")
-				B b = (typesEqual == true ? (B) a : pInfo.convertAToB(aKey, a));
-				return Pair.with(bKey, b);
-			})));
+			futures.add(pInfo.createB(bToBeCreated.stream()
+				.map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual))));
 
 			/* Delete B records */
 
@@ -205,18 +293,8 @@ public class SyncEngine {
 
 			/* Modify B records */
 
-			futures.add(pInfo.modifyB(bToBeModified.stream().map(q -> {
-				A_KEY aKey = q.getValue0();
-				A_FRAG aFrag = q.getValue1();
-				B_KEY bKey = q.getValue2();
-				B_FRAG bFrag = q.getValue3();
-				@SuppressWarnings("unchecked")
-				A a = (aFragTypeComplete == true ? (A) aFrag : pInfo.convertAFragToA(aKey, aFrag));
-				@SuppressWarnings("unchecked")
-				B b = (bFragTypeComplete == true ? (B) bFrag : pInfo.convertBFragToB(bKey, bFrag));
-				B resultB = pInfo.mergeAIntoB(a, b);
-				return Pair.with(bKey, resultB);
-			})));
+			futures.add(pInfo
+				.modifyB(bToBeModified.stream().map(SyncEngine.modifyB(pInfo, aFragTypeComplete, bFragTypeComplete))));
 
 			/* Now set up a future for all these */
 

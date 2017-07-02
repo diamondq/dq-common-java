@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 
 public interface StructureDefinition extends Resolvable<StructureDefinition, StructureDefinitionRef> {
 
@@ -21,7 +20,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * 
 	 * @return the name
 	 */
-	@Nonnull
+	
 	public String getName();
 
 	/* Label */
@@ -29,30 +28,30 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	@Nullable
 	public TranslatableString getLabel();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public StructureDefinition setLabel(@Nullable TranslatableString pValue);
 
 	/* Single Instance */
 
 	public boolean isSingleInstance();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public StructureDefinition setSingleInstance(boolean pValue);
 
 	/* Properties */
 
-	@Nonnull
+	
 	public Map<String, PropertyDefinition> getPropertyDefinitions();
 
-	@CheckReturnValue
-	@Nonnull
-	public StructureDefinition addPropertyDefinition(@Nonnull PropertyDefinition pValue);
+	
+	
+	public StructureDefinition addPropertyDefinition( PropertyDefinition pValue);
 
-	@CheckReturnValue
-	@Nonnull
-	public StructureDefinition removePropertyDefinition(@Nonnull PropertyDefinition pValue);
+	
+	
+	public StructureDefinition removePropertyDefinition( PropertyDefinition pValue);
 
 	/* Parents */
 
@@ -62,16 +61,16 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * 
 	 * @return the set of StructureDefinitionRef's
 	 */
-	@Nonnull
+	
 	public Set<StructureDefinitionRef> getParentDefinitions();
 
-	@CheckReturnValue
-	@Nonnull
-	public StructureDefinition addParentDefinition(@Nonnull StructureDefinitionRef pValue);
+	
+	
+	public StructureDefinition addParentDefinition( StructureDefinitionRef pValue);
 
-	@CheckReturnValue
-	@Nonnull
-	public StructureDefinition removeParentDefinition(@Nonnull StructureDefinitionRef pValue);
+	
+	
+	public StructureDefinition removeParentDefinition( StructureDefinitionRef pValue);
 
 	/* Complete Properties (virtual) */
 
@@ -87,11 +86,11 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * 
 	 * @return a Map of PropertyDefinitions using their name as the key
 	 */
-	@Nonnull
+	
 	public Map<String, PropertyDefinition> getAllProperties();
 
 	@Nullable
-	public PropertyDefinition lookupPropertyDefinitionByName(@Nonnull String pName);
+	public PropertyDefinition lookupPropertyDefinitionByName( String pName);
 
 	/**
 	 * Returns back the set of PropertyDefinition names that match the given keyword
@@ -102,7 +101,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * @return the collection of PropertyDefinition name's
 	 */
 	@Nullable
-	public Collection<String> lookupPropertyDefinitionNamesByKeyword(@Nonnull String pKey, @Nullable String pValue,
+	public Collection<String> lookupPropertyDefinitionNamesByKeyword( String pKey, @Nullable String pValue,
 		@Nullable PropertyType pType);
 
 	/**
@@ -111,7 +110,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * 
 	 * @return the list, may be empty, but not null
 	 */
-	@Nonnull
+	
 	public List<String> lookupPrimaryKeyNames();
 
 	/**
@@ -120,7 +119,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * 
 	 * @return the new, empty, Structure
 	 */
-	@Nonnull
+	
 	public Structure createNewStructure();
 
 	/* keywords */
@@ -131,7 +130,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * 
 	 * @return the multimap
 	 */
-	@Nonnull
+	
 	public Multimap<String, String> getKeywords();
 
 	/**
@@ -140,7 +139,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * 
 	 * @return the multimap
 	 */
-	@Nonnull
+	
 	public Multimap<String, String> getAllKeywords();
 
 	/**
@@ -150,9 +149,9 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * @param pValue the value
 	 * @return the updated StructureDefinition
 	 */
-	@CheckReturnValue
-	@Nonnull
-	public StructureDefinition addKeyword(@Nonnull String pKey, @Nonnull String pValue);
+	
+	
+	public StructureDefinition addKeyword( String pKey,  String pValue);
 
 	/**
 	 * Removes a keyword from this StructureDefinition
@@ -161,8 +160,8 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * @param pValue the value
 	 * @return the updated StructureDefinition
 	 */
-	@CheckReturnValue
-	@Nonnull
-	public StructureDefinition removeKeyword(@Nonnull String pKey, @Nonnull String pValue);
+	
+	
+	public StructureDefinition removeKeyword( String pKey,  String pValue);
 
 }

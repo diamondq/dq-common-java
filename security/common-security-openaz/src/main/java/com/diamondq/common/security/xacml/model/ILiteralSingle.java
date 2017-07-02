@@ -1,5 +1,6 @@
 package com.diamondq.common.security.xacml.model;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Style.ImplementationVisibility;
 
@@ -8,11 +9,11 @@ import org.immutables.value.Value.Style.ImplementationVisibility;
 		"is*"}, typeImmutable = "*", visibility = ImplementationVisibility.PUBLIC)
 public interface ILiteralSingle extends ILiteral {
 
-	public abstract String getValue();
+	public abstract @Nullable String getValue();
 
 	@Value.Derived
 	@Override
-	default String getSingleValue() {
+	default @Nullable String getSingleValue() {
 		return getValue();
 	}
 }

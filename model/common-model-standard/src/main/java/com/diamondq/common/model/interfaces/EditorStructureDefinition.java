@@ -4,14 +4,10 @@ import com.google.common.collect.Multimap;
 
 import java.util.List;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-
 public interface EditorStructureDefinition {
 
 	/* Name */
-	
-	@Nonnull
+
 	public String getName();
 
 	/* StructureType */
@@ -21,22 +17,16 @@ public interface EditorStructureDefinition {
 	 * 
 	 * @return the reference, never null
 	 */
-	@Nonnull
+
 	public StructureDefinitionRef getStructureDefinitionRef();
 
 	/* components */
 
-	@CheckReturnValue
-	@Nonnull
 	public List<? extends EditorComponentDefinition<?>> getComponents();
 
-	@CheckReturnValue
-	@Nonnull
-	public <T extends EditorComponentDefinition<T>> EditorStructureDefinition addComponent(@Nonnull T pValue);
+	public <T extends EditorComponentDefinition<T>> EditorStructureDefinition addComponent(T pValue);
 
-	@CheckReturnValue
-	@Nonnull
-	public <T extends EditorComponentDefinition<T>> EditorStructureDefinition removeComponent(@Nonnull T pValue);
+	public <T extends EditorComponentDefinition<T>> EditorStructureDefinition removeComponent(T pValue);
 
 	/* keywords */
 
@@ -45,7 +35,7 @@ public interface EditorStructureDefinition {
 	 * 
 	 * @return the multimap
 	 */
-	@Nonnull
+
 	public Multimap<String, String> getKeywords();
 
 	/**
@@ -55,9 +45,8 @@ public interface EditorStructureDefinition {
 	 * @param pValue the value
 	 * @return the updated EditorStructureDefinition
 	 */
-	@CheckReturnValue
-	@Nonnull
-	public EditorStructureDefinition addKeyword(@Nonnull String pKey, @Nonnull String pValue);
+
+	public EditorStructureDefinition addKeyword(String pKey, String pValue);
 
 	/**
 	 * Removes a keyword from this EditorStructureDefinition
@@ -66,8 +55,7 @@ public interface EditorStructureDefinition {
 	 * @param pValue the value
 	 * @return the updated EditorStructureDefinition
 	 */
-	@CheckReturnValue
-	@Nonnull
-	public EditorStructureDefinition removeKeyword(@Nonnull String pKey, @Nonnull String pValue);
+
+	public EditorStructureDefinition removeKeyword(String pKey, String pValue);
 
 }

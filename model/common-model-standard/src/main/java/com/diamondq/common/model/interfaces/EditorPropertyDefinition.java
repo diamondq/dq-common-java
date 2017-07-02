@@ -4,9 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 
 public interface EditorPropertyDefinition extends EditorComponentDefinition<EditorPropertyDefinition> {
 
@@ -15,16 +14,16 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public String getName();
 
-	@CheckReturnValue
-	@Nonnull
-	public EditorPropertyDefinition setName(@Nonnull String pName);
+	
+	
+	public EditorPropertyDefinition setName( String pName);
 
 	/* displayType */
 
 	public EditorDisplayType getDisplayType();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setDisplayType(EditorDisplayType pValue);
 
 	/* enabledIfProperty */
@@ -32,29 +31,29 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public PropertyDefinitionRef getEnabledIfProperty();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setEnabledIfProperty(@Nullable PropertyDefinitionRef pValue);
 
 	/* enabledIfValueEquals */
 
-	@Nonnull
+	
 	public Collection<String> getEnabledIfValueEquals();
 
-	@CheckReturnValue
-	@Nonnull
-	public EditorPropertyDefinition addEnabledIfValueEquals(@Nonnull String pValue);
+	
+	
+	public EditorPropertyDefinition addEnabledIfValueEquals( String pValue);
 
-	@CheckReturnValue
-	@Nonnull
-	public EditorPropertyDefinition removeEnabledIfValueEquals(@Nonnull String pValue);
+	
+	
+	public EditorPropertyDefinition removeEnabledIfValueEquals( String pValue);
 
 	/* mandatory */
 
 	public boolean isMandatory();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setMandatory(boolean pValue);
 
 	/* mandatoryReason */
@@ -62,8 +61,8 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public TranslatableString getMandatoryReason();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setMandatoryReason(@Nullable TranslatableString pValue);
 
 	/* valueMapScript */
@@ -77,8 +76,8 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public Script getValueMapScript();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setValueMapScript(@Nullable Script pValue);
 
 	/* simpleValueMap */
@@ -92,13 +91,13 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public Map<String, TranslatableString> getSimpleValueMap();
 
-	@CheckReturnValue
-	@Nonnull
-	public EditorPropertyDefinition putSimpleValueMapEntry(@Nonnull String pKey, @Nonnull TranslatableString pValue);
+	
+	
+	public EditorPropertyDefinition putSimpleValueMapEntry( String pKey,  TranslatableString pValue);
 
-	@CheckReturnValue
-	@Nonnull
-	public EditorPropertyDefinition removeSimpleValueMapEntry(@Nonnull String pKey);
+	
+	
+	public EditorPropertyDefinition removeSimpleValueMapEntry( String pKey);
 
 	/* valueMapProperty */
 
@@ -111,8 +110,8 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public PropertyDefinitionRef getValueMapProperty();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setValueMapProperty(@Nullable PropertyDefinitionRef pValue);
 
 	/* tableDisplayProperties */
@@ -120,12 +119,12 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public List<PropertyDefinitionRef> getTableDisplayProperties();
 
-	@CheckReturnValue
-	@Nonnull
-	public EditorPropertyDefinition addTableDisplayProperty(int pIndex, @Nonnull PropertyDefinitionRef pValue);
+	
+	
+	public EditorPropertyDefinition addTableDisplayProperty(int pIndex,  PropertyDefinitionRef pValue);
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition removeTableDisplayProperty(int pIndex);
 
 	/* embedTableRowEditor */
@@ -133,8 +132,8 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public EmbedEditorDirection getEmbedTableRowEditor();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setEmbedTableRowEditor(EmbedEditorDirection pValue);
 
 	/* displayRefImage */
@@ -142,8 +141,8 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public PropertyDefinitionRef getDisplayRefImage();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setDisplayRefImage(@Nullable PropertyDefinitionRef pValue);
 
 	/* customScript */
@@ -151,7 +150,7 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	@Nullable
 	public Script getCustomScript();
 
-	@CheckReturnValue
-	@Nonnull
+	
+	
 	public EditorPropertyDefinition setCustomScript(@Nullable Script pValue);
 }

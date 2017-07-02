@@ -450,7 +450,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
 	 */
 	@Override
-	protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
+	protected < R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
 		Map<String, Object> pConfig, boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
 		switch (pType) {
 		case String: {

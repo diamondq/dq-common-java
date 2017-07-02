@@ -1,6 +1,6 @@
 package com.diamondq.common.model.interfaces;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface PropertyRef<T> extends Ref<Property<T>> {
 

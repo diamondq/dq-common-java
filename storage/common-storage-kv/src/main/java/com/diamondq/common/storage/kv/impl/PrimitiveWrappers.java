@@ -3,7 +3,6 @@ package com.diamondq.common.storage.kv.impl;
 import com.diamondq.common.storage.kv.IObjectWithId;
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -18,7 +17,7 @@ public class PrimitiveWrappers {
 	 * @param pMustHaveRevision true if the wrapper (or main object) must support both id and revision
 	 * @return the wrapper class that should be used or null if this is not a primitive
 	 */
-	public static <@NonNull O> @Nullable Class<?> getIfPrimitive(Class<O> pClass, boolean pMustHaveRevision) {
+	public static <O> @Nullable Class<?> getIfPrimitive(Class<O> pClass, boolean pMustHaveRevision) {
 		assert (pClass != null);
 
 		/* If this is an object with an id and revision, then it's definitely not a primitive */
@@ -52,7 +51,7 @@ public class PrimitiveWrappers {
 	 * @return the result
 	 */
 	@SuppressWarnings("unchecked")
-	public static <@NonNull O> @Nullable O unwrap(@Nullable Object pObj, Class<O> pClass) {
+	public static <O> @Nullable O unwrap(@Nullable Object pObj, Class<O> pClass) {
 		if (pObj == null) {
 
 			/* If it's a pure primitive, then we need to return the 'default' value */
@@ -99,14 +98,20 @@ public class PrimitiveWrappers {
 	 * @return the wrapped object (or the object itself if wrapping isn't necessary)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <@NonNull O> @Nullable Object wrap(@Nullable O pObj, Class<?> pPrimitiveWrapperClass, String pKey,
+	public static <O> @Nullable Object wrap(@Nullable O pObj, Class<?> pPrimitiveWrapperClass, String pKey,
 		@Nullable String pRevision) {
 		try {
 			Object obj = pPrimitiveWrapperClass.newInstance();
-			if (IObjectWithId.class.isAssignableFrom(pPrimitiveWrapperClass))
+			if (IObjectWithId.class.isAssignableFrom(pPrimitiveWrapperClass)) {
 				obj = ((IObjectWithId<O>) obj).setObjectId(pKey);
-			if ((IObjectWithIdAndRev.class.isAssignableFrom(pPrimitiveWrapperClass)) && (pRevision != null))
+				if (obj == null)
+					throw new IllegalStateException();
+			}
+			if ((IObjectWithIdAndRev.class.isAssignableFrom(pPrimitiveWrapperClass)) && (pRevision != null)) {
 				obj = ((IObjectWithIdAndRev<O>) obj).setObjectRevision(pRevision);
+				if (obj == null)
+					throw new IllegalStateException();
+			}
 
 			/* Now set the data */
 
@@ -119,7 +124,6 @@ public class PrimitiveWrappers {
 				obj = ((IdAndRevisionWrapper<O>) obj).setData(pObj);
 			else if (IdWrapper.class.isAssignableFrom(pPrimitiveWrapperClass))
 				obj = ((IdWrapper<O>) obj).setData(pObj);
-
 			return obj;
 		}
 		catch (InstantiationException | IllegalAccessException ex) {

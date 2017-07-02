@@ -12,11 +12,12 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * The Cloudant database is effectively flat. Thus, mapping the concept of a 'table' is done by concatenating the
@@ -30,8 +31,7 @@ public class CloudantKVTransaction implements IKVTransaction {
 		mDatabase = pDatabase;
 	}
 
-	@Nonnull
-	protected String combineToKey(@Nonnull String pTable, @Nonnull String pKey1, @Nullable String pKey2) {
+	protected String combineToKey(String pTable, String pKey1, @Nullable String pKey2) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(pTable);
 		sb.append('-');
@@ -49,7 +49,7 @@ public class CloudantKVTransaction implements IKVTransaction {
 	 *      java.lang.Class)
 	 */
 	@Override
-	public <O> O getByKey(String pTable, String pKey1, String pKey2, Class<O> pClass) {
+	public <@Nullable O> O getByKey(String pTable, String pKey1, @Nullable String pKey2, Class<O> pClass) {
 		Class<?> primitiveWrapperClass = PrimitiveWrappers.getIfPrimitive(pClass, true);
 		if (primitiveWrapperClass != null) {
 			Object findResult;
@@ -70,8 +70,10 @@ public class CloudantKVTransaction implements IKVTransaction {
 	 *      java.lang.Object)
 	 */
 	@Override
-	public <O> void putByKey(String pTable, String pKey1, String pKey2, O pObj) {
+	public <@Nullable O> void putByKey(String pTable, String pKey1, @Nullable String pKey2, O pObj) {
 		String key = combineToKey(pTable, pKey1, pKey2);
+		if (pObj == null)
+			throw new IllegalArgumentException();
 		Class<?> primitiveWrapperClass = PrimitiveWrappers.getIfPrimitive(pObj.getClass(), true);
 		if (primitiveWrapperClass != null) {
 			@SuppressWarnings("unchecked")
@@ -100,7 +102,7 @@ public class CloudantKVTransaction implements IKVTransaction {
 	 *      java.lang.String)
 	 */
 	@Override
-	public boolean removeByKey(String pTable, String pKey1, String pKey2) {
+	public boolean removeByKey(String pTable, String pKey1, @Nullable String pKey2) {
 		String key = combineToKey(pTable, pKey1, pKey2);
 		try {
 			try (InputStream is = mDatabase.find(key)) {
@@ -119,16 +121,19 @@ public class CloudantKVTransaction implements IKVTransaction {
 		}
 	}
 
+	/**
+	 * @see com.diamondq.common.storage.kv.IKVTransaction#keyIterator(java.lang.String)
+	 */
 	@Override
-	public Iterator<String> keyIterator(String pTable) {
+	public Iterator<@NonNull String> keyIterator(String pTable) {
 		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyIterator();
 	}
 
 	@Override
-	public Iterator<String> keyIterator2(String pTable, String pKey1) {
+	public Iterator<@NonNull String> keyIterator2(String pTable, String pKey1) {
 		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyIterator();
 	}
 
 	@Override
@@ -144,9 +149,9 @@ public class CloudantKVTransaction implements IKVTransaction {
 	}
 
 	@Override
-	public Iterator<String> getTableList() {
+	public Iterator<@NonNull String> getTableList() {
 		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyIterator();
 	}
 
 	/**

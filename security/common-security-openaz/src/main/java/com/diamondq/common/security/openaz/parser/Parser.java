@@ -58,6 +58,7 @@ import org.apache.openaz.xacml.pdp.policy.Target;
 import org.apache.openaz.xacml.pdp.policy.expressions.Apply;
 import org.apache.openaz.xacml.pdp.policy.expressions.AttributeDesignator;
 import org.apache.openaz.xacml.std.StdIndividualDecisionRequestGenerator;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,19 +85,34 @@ public class Parser {
 		try {
 			Method method = pAgent.getClass().getMethod("getPdpEngine");
 			method.setAccessible(true);
-			mPDPEngine = (OpenAZPDPEngine) method.invoke(pAgent);
+			OpenAZPDPEngine pPDPEngine = (OpenAZPDPEngine) method.invoke(pAgent);
+			if (pPDPEngine == null)
+				throw new IllegalArgumentException();
+			mPDPEngine = pPDPEngine;
 			Field field = mPDPEngine.getClass().getDeclaredField("evaluationContextFactory");
 			field.setAccessible(true);
-			mEvalContextFactory = (EvaluationContextFactory) field.get(mPDPEngine);
+			EvaluationContextFactory evalContextFactory = (EvaluationContextFactory) field.get(mPDPEngine);
+			if (evalContextFactory == null)
+				throw new IllegalArgumentException();
+			mEvalContextFactory = evalContextFactory;
 			field = mPDPEngine.getClass().getDeclaredField("scopeResolver");
 			field.setAccessible(true);
-			mScopeResolver = (ScopeResolver) field.get(mPDPEngine);
+			ScopeResolver scopeResolver = (ScopeResolver) field.get(mPDPEngine);
+			if (scopeResolver == null)
+				throw new IllegalArgumentException();
+			mScopeResolver = scopeResolver;
 			field = mPDPEngine.getClass().getDeclaredField("defaultDecision");
 			field.setAccessible(true);
-			mDefaultDecision = (Decision) field.get(mPDPEngine);
+			Decision defaultDecision = (Decision) field.get(mPDPEngine);
+			if (defaultDecision == null)
+				throw new IllegalArgumentException();
+			mDefaultDecision = defaultDecision;
 			field = pAgent.getClass().getDeclaredField("pepRequestFactory");
 			field.setAccessible(true);
-			mPEPRequestFactory = (PepRequestFactory) field.get(pAgent);
+			PepRequestFactory pepRequestFactory = (PepRequestFactory) field.get(pAgent);
+			if (pepRequestFactory == null)
+				throw new IllegalArgumentException();
+			mPEPRequestFactory = pepRequestFactory;
 
 			mPolicySetEnsureReferenceeMethod =
 				PolicySetIdReference.class.getDeclaredMethod("ensureReferencee", EvaluationContext.class);
@@ -194,7 +210,7 @@ public class Parser {
 		return Conditional.builder().code(ConditionalCode.AND).addAllOperations(policySet).build();
 	}
 
-	private IFunctionArgument handleTarget(Target pTarget, EvaluationContext pEvaluationContext) {
+	private IFunctionArgument handleTarget(@Nullable Target pTarget, EvaluationContext pEvaluationContext) {
 		if (pTarget != null) {
 			IFunctionArgument firstAny = null;
 			Conditional.Builder anyBuilder = null;
@@ -371,6 +387,8 @@ public class Parser {
 					try {
 						PolicySet child =
 							(PolicySet) mPolicySetEnsureReferenceeMethod.invoke(policySetChild, pEvaluationContext);
+						if (child == null)
+							throw new IllegalArgumentException();
 						childResult = handlePolicySet(child, pEvaluationContext);
 					}
 					catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -383,6 +401,8 @@ public class Parser {
 					try {
 						Policy child =
 							(Policy) mPolicyEnsureReferenceeMethod.invoke(policySetChild, pEvaluationContext);
+						if (child == null)
+							throw new IllegalArgumentException();
 						childResult = handlePolicy(child, pEvaluationContext);
 					}
 					catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -540,7 +560,7 @@ public class Parser {
 	}
 
 	private IFunctionArgument handleExpression(Expression pExpression, EvaluationContext pEvaluationContext,
-		PolicyDefaults pPolicyDefaults) throws EvaluationException {
+		@Nullable PolicyDefaults pPolicyDefaults) throws EvaluationException {
 
 		if (pExpression instanceof Apply)
 			return handleApply((Apply) pExpression, pEvaluationContext, pPolicyDefaults);
@@ -605,7 +625,8 @@ public class Parser {
 		return ShortCircuit.NA;
 	}
 
-	private IFunctionArgument convertExpressionResultToLiteral(ExpressionResult result, boolean pBooleanValue) {
+	private IFunctionArgument convertExpressionResultToLiteral(@Nullable ExpressionResult result,
+		boolean pBooleanValue) {
 		if (result == null)
 			throw new UnsupportedOperationException();
 		if (result.isBag() == true) {
@@ -638,7 +659,7 @@ public class Parser {
 	}
 
 	private IFunctionArgument handleApply(Apply pExpression, EvaluationContext pEvaluationContext,
-		PolicyDefaults pPolicyDefaults) throws EvaluationException {
+		@Nullable PolicyDefaults pPolicyDefaults) throws EvaluationException {
 		Identifier functionId = pExpression.getFunctionId();
 
 		String functionIdStr = functionId.stringValue();

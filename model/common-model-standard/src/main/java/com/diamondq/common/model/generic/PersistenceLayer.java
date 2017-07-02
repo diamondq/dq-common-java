@@ -21,10 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-@ParametersAreNonnullByDefault
 public interface PersistenceLayer {
 
 	/* StructureDefinitions */

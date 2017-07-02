@@ -5,15 +5,13 @@ import com.diamondq.common.model.interfaces.Toolkit;
 
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-
 public class GenericScope implements Scope {
 
 	private final Toolkit	mToolkit;
 
 	private final String	mName;
 
-	public GenericScope(Toolkit pToolkit, @Nonnull String pName) {
+	public GenericScope(Toolkit pToolkit, String pName) {
 		mToolkit = pToolkit;
 		mName = pName;
 	}

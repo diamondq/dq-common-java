@@ -4,6 +4,7 @@ import com.diamondq.common.config.Config;
 
 import javax.ws.rs.core.Application;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 
@@ -14,12 +15,13 @@ import io.undertow.servlet.api.DeploymentInfo;
 
 public class UndertowRESTEasyWeldServer extends UndertowServer {
 
-	private UndertowJaxrsServer server;
+	@Nullable
+	private UndertowJaxrsServer mServer;
 
 	public UndertowRESTEasyWeldServer(Config pConfig, Class<? extends Application> pAppClass) {
 		super(pConfig);
 
-		/* Now start the server */
+		/* Now start the mServer */
 
 		String appName = pConfig.bind("application.name", String.class);
 		String deployContext = pConfig.bind("application.context", String.class);
@@ -27,8 +29,8 @@ public class UndertowRESTEasyWeldServer extends UndertowServer {
 			deployContext = "/";
 
 		ClassLoader classLoader = UndertowRESTEasyWeldServer.class.getClassLoader();
-		DeploymentInfo di = deployApplication("/", pAppClass).setClassLoader(classLoader)
-			.setContextPath(deployContext).setDeploymentName(appName)
+		DeploymentInfo di = deployApplication("/", pAppClass).setClassLoader(classLoader).setContextPath(deployContext)
+			.setDeploymentName(appName)
 			.setResourceManager(new ClassPathResourceManager(classLoader, "META-INF/resources/"))
 			.addListeners(Servlets.listener(org.jboss.weld.environment.servlet.Listener.class));
 
@@ -40,18 +42,24 @@ public class UndertowRESTEasyWeldServer extends UndertowServer {
 	 */
 	@Override
 	protected void startServer(Undertow.Builder pBuilder) {
-		server = new UndertowJaxrsServer();
-		server.start(pBuilder);
+		mServer = new UndertowJaxrsServer();
+		mServer.start(pBuilder);
 	}
 
 	protected DeploymentInfo deployApplication(String appPath, Class<? extends Application> applicationClass) {
 		ResteasyDeployment deployment = new ResteasyDeployment();
 		deployment.setInjectorFactoryClass("org.jboss.resteasy.cdi.CdiInjectorFactory");
 		deployment.setApplicationClass(applicationClass.getName());
+		UndertowJaxrsServer server = mServer;
+		if (server == null)
+			throw new IllegalArgumentException();
 		return server.undertowDeployment(deployment, appPath);
 	}
 
 	protected void deploy(DeploymentInfo deploymentInfo) {
+		UndertowJaxrsServer server = mServer;
+		if (server == null)
+			throw new IllegalArgumentException();
 		server.deploy(deploymentInfo);
 	}
 

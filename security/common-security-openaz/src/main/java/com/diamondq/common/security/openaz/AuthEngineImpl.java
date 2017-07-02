@@ -22,6 +22,8 @@ public class AuthEngineImpl implements AuthenticationEngine {
 	public AuthEngineImpl(PepAgent pAgent, Config pConfig) {
 		mPepAgent = pAgent;
 		String fqdn = pConfig.bind("application.fqdn", String.class);
+		if (fqdn == null)
+			throw new IllegalArgumentException();
 		mCode = new Code(fqdn);
 	}
 

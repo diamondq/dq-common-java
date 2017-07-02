@@ -3,15 +3,14 @@ package com.diamondq.common.model.interfaces;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 
 public interface Structure extends Resolvable<Structure, StructureRef> {
 
 	/* Definition */
 
-	@Nonnull
+	
 	public StructureDefinition getDefinition();
 
 	/* Virtual Property: Local Name */
@@ -52,12 +51,12 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 
 	/* Properties */
 
-	@Nonnull
+	
 	public Map<String, Property<?>> getProperties();
 
-	@CheckReturnValue
-	@Nonnull
-	public Structure updateProperty(@Nonnull Property<?> pValue);
+	
+	
+	public Structure updateProperty( Property<?> pValue);
 
 	/**
 	 * Returns a property with the given name
@@ -66,7 +65,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * @return the Property or null
 	 */
 	@Nullable
-	public <T> Property<T> lookupPropertyByName(@Nonnull String pName);
+	public <T> Property<T> lookupPropertyByName( String pName);
 
 	/**
 	 * Returns back the set of Property's that match the given keyword
@@ -77,7 +76,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * @return the collection of Properties
 	 */
 	@Nullable
-	public <T> Collection<Property<T>> lookupPropertiesByKeyword(@Nonnull String pKey, @Nullable String pValue,
+	public <T> Collection<Property<T>> lookupPropertiesByKeyword( String pKey, @Nullable String pValue,
 		@Nullable PropertyType pType);
 
 }

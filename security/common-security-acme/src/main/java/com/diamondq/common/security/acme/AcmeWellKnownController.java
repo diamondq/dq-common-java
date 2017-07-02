@@ -17,6 +17,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class AcmeWellKnownController {
 	@Path("{token}")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
-	public String getAuthorization(@PathParam("token") String pToken) throws IOException {
+	public String getAuthorization(@Nullable @PathParam("token") String pToken) throws IOException {
 		sLogger.info("Received acme-challenge token {}", pToken);
 		if (pToken == null)
 			throw new IllegalStateException("Invalid token " + pToken);
