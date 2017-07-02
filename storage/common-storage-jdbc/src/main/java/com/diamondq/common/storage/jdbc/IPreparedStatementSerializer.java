@@ -3,6 +3,8 @@ package com.diamondq.common.storage.jdbc;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public interface IPreparedStatementSerializer {
 
 	/**
@@ -14,6 +16,7 @@ public interface IPreparedStatementSerializer {
 	 * @return the next offset after the last one written by the serializer
 	 * @throws SQLException an exception
 	 */
-	public <O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex) throws SQLException;
+	public <@Nullable O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
+		throws SQLException;
 
 }

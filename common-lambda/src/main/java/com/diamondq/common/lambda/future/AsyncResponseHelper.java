@@ -7,18 +7,34 @@ import java.util.Locale;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.container.AsyncResponse;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A JAX-RS helper that will take a AsyncResponse (from the JAX-RS system), and a Completable Future, and when the
+ * future completes, pass the result (or the error) to the AsyncResponse
+ */
 @ApplicationScoped
 public class AsyncResponseHelper {
 
 	private static final Logger sLogger = LoggerFactory.getLogger(AsyncResponseHelper.class);
 
+	/**
+	 * Default constructor
+	 */
 	public AsyncResponseHelper() {
 	}
 
-	public void toDeferredResult(Locale pLocale, AsyncResponse pResponse, ExtendedCompletableFuture<?> pFuture) {
+	/**
+	 * Defer the result until the future completes or errors
+	 * 
+	 * @param pLocale the locale (for error handling)
+	 * @param pResponse the AsyncResponse
+	 * @param pFuture the future
+	 */
+	public void toDeferredResult(Locale pLocale, AsyncResponse pResponse,
+		ExtendedCompletableFuture<@Nullable ?> pFuture) {
 
 		pFuture.whenComplete((response, error) -> {
 			try {

@@ -6,10 +6,13 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class JDBCResultSetIterator implements Iterator<String> {
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public class JDBCResultSetIterator implements Iterator<@Nullable String> {
 
 	private PreparedStatement	mPs;
 
+	@Nullable
 	private ResultSet			mRs;
 
 	private boolean				moved;
@@ -25,17 +28,17 @@ public class JDBCResultSetIterator implements Iterator<String> {
 	 */
 	@Override
 	public boolean hasNext() {
-		if (mRs == null)
+		ResultSet rs = mRs;
+		if (rs == null)
 			return false;
 		if (moved == true)
 			return true;
 		try {
-			boolean next = mRs.next();
+			boolean next = rs.next();
 			if (next == false) {
-				mRs.close();
+				rs.close();
 				mRs = null;
 				mPs.close();
-				mPs = null;
 			}
 			moved = true;
 			return next;
@@ -49,23 +52,23 @@ public class JDBCResultSetIterator implements Iterator<String> {
 	 * @see java.util.Iterator#next()
 	 */
 	@Override
-	public String next() {
-		if (mRs == null)
+	public @Nullable String next() {
+		ResultSet rs = mRs;
+		if (rs == null)
 			throw new NoSuchElementException();
 		try {
 			if (moved == false) {
-				boolean next = mRs.next();
+				boolean next = rs.next();
 				if (next == false) {
-					mRs.close();
+					rs.close();
 					mRs = null;
 					mPs.close();
-					mPs = null;
 					throw new NoSuchElementException();
 				}
 			}
 			else
 				moved = false;
-			return mRs.getString(1);
+			return rs.getString(1);
 		}
 		catch (SQLException ex) {
 			throw new RuntimeException(ex);

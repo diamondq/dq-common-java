@@ -37,23 +37,51 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * A Persistence Layer that stores the information in a Storage KV store
+ */
 public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<Map<String, Object>> {
 
+	/**
+	 * The builder (generally used for the Config system)
+	 */
 	public static class StorageKVPersistenceLayerBuilder {
+		@Nullable
 		private Scope		mScope;
 
+		@Nullable
 		private IKVStore	mKVStore;
 
+		/**
+		 * Sets the scope
+		 * 
+		 * @param pScope the scope
+		 * @return the builder
+		 */
 		public StorageKVPersistenceLayerBuilder scope(Scope pScope) {
 			mScope = pScope;
 			return this;
 		}
 
+		/**
+		 * Sets the store
+		 * 
+		 * @param pStore the store
+		 * @return the builder
+		 */
 		public StorageKVPersistenceLayerBuilder kvStore(IKVStore pStore) {
 			mKVStore = pStore;
 			return this;
 		}
 
+		/**
+		 * Builds the layer
+		 * 
+		 * @return the layer
+		 */
 		public StorageKVPersistenceLayer build() {
 			return new StorageKVPersistenceLayer(mScope, mKVStore);
 		}
@@ -87,6 +115,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 	private final Map<String, String>		mConfiguredTableDefinitions;
 
+	/**
+	 * Default constructor
+	 * 
+	 * @param pScope the scope
+	 * @param pStructureStore the KV store for structures
+	 */
 	public StorageKVPersistenceLayer(Scope pScope, IKVStore pStructureStore) {
 		super(pScope, true, false, false, false, false, false, false, false);
 		mStructureStore = pStructureStore;
@@ -416,8 +450,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
 	 */
 	@Override
-	protected <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
-		boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
+	protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
+		Map<String, Object> pConfig, boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
 		switch (pType) {
 		case String: {
 			pConfig.put(pKey, pValue);

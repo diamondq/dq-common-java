@@ -16,18 +16,37 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+/**
+ * This abstract class is used to provide caching capability to a given PersistenceLayer
+ */
+@ParametersAreNonnullByDefault
 public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenceLayer {
 
+	@Nullable
 	protected final Cache<String, Structure>						mStructureCache;
 
+	@Nullable
 	protected final Cache<String, StructureDefinition>				mStructureDefinitionCache;
 
+	@Nullable
 	protected final Cache<String, List<EditorStructureDefinition>>	mEditorStructureDefinitionCacheByRef;
 
+	@Nullable
 	protected final Cache<String, String>							mResourceCache;
 
+	/**
+	 * The main constructor
+	 * 
+	 * @param pScope the scope
+	 * @param pCacheStructures true if the class should cache structures
+	 * @param pCacheStructureDefinitions true if the class should cache structure definitions
+	 * @param pCacheEditorStructureDefinitions true if the class should cache editor structure definitions
+	 * @param pCacheResources true if the class should cache resources
+	 */
 	public AbstractCachingPersistenceLayer(Scope pScope, boolean pCacheStructures, boolean pCacheStructureDefinitions,
 		boolean pCacheEditorStructureDefinitions, boolean pCacheResources) {
 		super(pScope);
@@ -84,16 +103,16 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	protected abstract void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure);
 
 	protected void invalidateStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
-		if (mStructureCache != null) {
-			String key = pToolkit.createStructureRefStr(pScope, pStructure);
+		String key = pToolkit.createStructureRefStr(pScope, pStructure);
+		if (mStructureCache != null)
 			mStructureCache.invalidate(key);
-		}
 	}
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureBySerializedRef(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
 	 */
+	@Nullable
 	@Override
 	public Structure lookupStructureBySerializedRef(Toolkit pToolkit, Scope pScope, String pSerializedRef) {
 		Structure result = (mStructureCache == null ? null : mStructureCache.getIfPresent(pSerializedRef));
@@ -118,8 +137,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 		return result;
 	}
 
-	protected abstract Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName,
-		String pKey);
+	protected abstract Structure internalLookupStructureByName(@Nonnull Toolkit pToolkit, @Nonnull Scope pScope,
+		@Nonnull String pDefName, @Nonnull String pKey);
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
@@ -135,8 +154,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 		internalWriteStructureDefinition(pToolkit, pScope, pValue);
 	}
 
-	protected abstract void internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope,
-		StructureDefinition pValue);
+	protected abstract void internalWriteStructureDefinition(@Nonnull Toolkit pToolkit, @Nonnull Scope pScope,
+		@Nonnull StructureDefinition pValue);
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Toolkit,
@@ -156,8 +175,9 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 		return result;
 	}
 
-	protected abstract StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
-		String pName);
+	@Nullable
+	protected abstract StructureDefinition internalLookupStructureDefinitionByName(@Nonnull Toolkit pToolkit,
+		@Nonnull Scope pScope, @Nonnull String pName);
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#deleteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
@@ -173,8 +193,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 		internalDeleteStructureDefinition(pToolkit, pScope, pValue);
 	}
 
-	protected abstract void internalDeleteStructureDefinition(Toolkit pToolkit, Scope pScope,
-		StructureDefinition pValue);
+	protected abstract void internalDeleteStructureDefinition(@Nonnull Toolkit pToolkit, @Nonnull Scope pScope,
+		@Nonnull StructureDefinition pValue);
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructureDefinitionRefs(com.diamondq.common.model.interfaces.Toolkit,
@@ -188,17 +208,21 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 				internalGetAllMissingStructureDefinitionRefs(pToolkit, pScope, mStructureDefinitionCache);
 			for (StructureDefinitionRef ref : missing) {
 				StructureDefinition sd = ref.resolve();
-				mStructureDefinitionCache.put(sd.getName(), sd);
+				if (sd != null)
+					mStructureDefinitionCache.put(sd.getName(), sd);
 			}
 
-			return Collections2.transform(mStructureDefinitionCache.asMap().values(), (sd) -> sd.getReference());
+			return Collections2.transform(mStructureDefinitionCache.asMap().values(),
+				(sd) -> sd == null ? null : sd.getReference());
 		}
 		else
 			return internalGetAllMissingStructureDefinitionRefs(pToolkit, pScope, null);
 	}
 
-	protected abstract Collection<StructureDefinitionRef> internalGetAllMissingStructureDefinitionRefs(Toolkit pToolkit,
-		Scope pScope, @Nullable Cache<String, StructureDefinition> pStructureDefinitionCache);
+	@Nonnull
+	protected abstract Collection<StructureDefinitionRef> internalGetAllMissingStructureDefinitionRefs(
+		@Nonnull Toolkit pToolkit, @Nonnull Scope pScope,
+		@Nullable Cache<String, StructureDefinition> pStructureDefinitionCache);
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#writeEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
@@ -212,7 +236,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 			if (list == null)
 				list = ImmutableList.of();
 			ImmutableList<EditorStructureDefinition> updatedList = ImmutableList.<EditorStructureDefinition> builder()
-				.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName()))))
+				.addAll(Collections2.filter(list,
+					Predicates.not((a) -> a == null ? false : a.getName().equals(pValue.getName()))))
 				.add(pValue).build();
 			mEditorStructureDefinitionCacheByRef.put(key, updatedList);
 		}
@@ -256,9 +281,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 			List<EditorStructureDefinition> list = mEditorStructureDefinitionCacheByRef.getIfPresent(key);
 			if (list != null) {
 				ImmutableList<EditorStructureDefinition> updatedList =
-					ImmutableList.<EditorStructureDefinition> builder()
-						.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName()))))
-						.build();
+					ImmutableList.<EditorStructureDefinition> builder().addAll(Collections2.filter(list,
+						Predicates.not((a) -> a == null ? false : a.getName().equals(pValue.getName())))).build();
 				if (updatedList.isEmpty() == true)
 					mEditorStructureDefinitionCacheByRef.invalidate(key);
 				else

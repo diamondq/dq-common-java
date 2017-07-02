@@ -14,21 +14,25 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * An extension to the standard CompletableFuture to add a few extra functions
+ * 
+ * @param <T>
+ */
 public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	private CompletableFuture<T> mDelegate;
 
 	private static <U> CompletionStage<U> decomposeToCompletionStage(CompletionStage<U> pStage) {
-		if (pStage == null)
-			return null;
 		if (pStage instanceof ExtendedCompletableFuture)
 			return ((ExtendedCompletableFuture<U>) pStage).mDelegate;
 		return pStage;
 	}
 
 	private static <U> CompletableFuture<U> decomposeToCompletableFuture(CompletableFuture<U> pFuture) {
-		if (pFuture == null)
-			return null;
 		if (pFuture instanceof ExtendedCompletableFuture)
 			return ((ExtendedCompletableFuture<U>) pFuture).mDelegate;
 		return pFuture;
@@ -40,7 +44,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	}
 
 	@Override
-	public boolean equals(Object pObj) {
+	public boolean equals(@Nullable Object pObj) {
 		return mDelegate.equals(pObj);
 	}
 
@@ -90,179 +94,189 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> pFn, Executor pExecutor) {
+	public <U> ExtendedCompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> pFn,
+		@Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture.of(mDelegate.thenApplyAsync(pFn, pExecutor));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> thenAccept(Consumer<? super T> pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer<? super T> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.thenAccept(pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> thenAcceptAsync(Consumer<? super T> pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.thenAcceptAsync(pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> thenAcceptAsync(Consumer<? super T> pAction, Executor pExecutor) {
+	public ExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction,
+		@Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture.of(mDelegate.thenAcceptAsync(pAction, pExecutor));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> thenRun(Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> thenRun(Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.thenRun(pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> thenRunAsync(Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> thenRunAsync(Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.thenRunAsync(pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> thenRunAsync(Runnable pAction, Executor pExecutor) {
+	public ExtendedCompletableFuture<@Nullable Void> thenRunAsync(Runnable pAction, Executor pExecutor) {
 		return ExtendedCompletableFuture.of(mDelegate.thenRunAsync(pAction, pExecutor));
 	}
 
 	@Override
 	public <U, V> ExtendedCompletableFuture<V> thenCombine(CompletionStage<? extends U> pOther,
-		BiFunction<? super T, ? super U, ? extends V> pFn) {
+		@Nullable BiFunction<? super T, ? super U, ? extends V> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), pFn));
 	}
 
 	@Override
 	public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-		BiFunction<? super T, ? super U, ? extends V> pFn) {
+		@Nullable BiFunction<? super T, ? super U, ? extends V> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), pFn));
 	}
 
 	@Override
 	public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-		BiFunction<? super T, ? super U, ? extends V> pFn, Executor pExecutor) {
+		@Nullable BiFunction<? super T, ? super U, ? extends V> pFn, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), pFn, pExecutor));
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<Void> thenAcceptBoth(CompletionStage<? extends U> pOther,
-		BiConsumer<? super T, ? super U> pAction) {
+	public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(CompletionStage<? extends U> pOther,
+		@Nullable BiConsumer<? super T, ? super U> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.thenAcceptBoth(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
-		BiConsumer<? super T, ? super U> pAction) {
+	public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
+		@Nullable BiConsumer<? super T, ? super U> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.thenAcceptBothAsync(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
-		BiConsumer<? super T, ? super U> pAction, Executor pExecutor) {
+	public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
+		@Nullable BiConsumer<? super T, ? super U> pAction, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.thenAcceptBothAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> runAfterBoth(CompletionStage<?> pOther, Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(CompletionStage<?> pOther,
+		@Nullable Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.runAfterBoth(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> runAfterBothAsync(CompletionStage<?> pOther, Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther,
+		@Nullable Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.runAfterBothAsync(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> runAfterBothAsync(CompletionStage<?> pOther, Runnable pAction,
-		Executor pExecutor) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther,
+		@Nullable Runnable pAction, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.runAfterBothAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEither(CompletionStage<? extends T> pOther,
-		Function<? super T, U> pFn) {
+		@Nullable Function<? super T, U> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), pFn));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
-		Function<? super T, U> pFn) {
+		@Nullable Function<? super T, U> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), pFn));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
-		Function<? super T, U> pFn, Executor pExecutor) {
+		@Nullable Function<? super T, U> pFn, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), pFn, pExecutor));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> acceptEither(CompletionStage<? extends T> pOther,
-		Consumer<? super T> pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> acceptEither(CompletionStage<? extends T> pOther,
+		@Nullable Consumer<? super T> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.acceptEither(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
-		Consumer<? super T> pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
+		@Nullable Consumer<? super T> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.acceptEitherAsync(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
-		Consumer<? super T> pAction, Executor pExecutor) {
+	public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
+		@Nullable Consumer<? super T> pAction, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.acceptEitherAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> runAfterEither(CompletionStage<?> pOther, Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterEither(CompletionStage<?> pOther,
+		@Nullable Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther,
+		@Nullable Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction,
-		Executor pExecutor) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther,
+		@Nullable Runnable pAction, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> thenCompose(Function<? super T, ? extends CompletionStage<U>> pFn) {
+	public <U> ExtendedCompletableFuture<U> thenCompose(
+		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.thenCompose(pFn));
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> thenComposeAsync(Function<? super T, ? extends CompletionStage<U>> pFn) {
+	public <U> ExtendedCompletableFuture<U> thenComposeAsync(
+		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(pFn));
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> thenComposeAsync(Function<? super T, ? extends CompletionStage<U>> pFn,
-		Executor pExecutor) {
+	public <U> ExtendedCompletableFuture<U> thenComposeAsync(
+		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn, Executor pExecutor) {
 		return ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(pFn, pExecutor));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<T> whenComplete(BiConsumer<? super T, ? super Throwable> pAction) {
+	public ExtendedCompletableFuture<T> whenComplete(
+		BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.whenComplete(pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<T> whenCompleteAsync(BiConsumer<? super T, ? super Throwable> pAction) {
+	public ExtendedCompletableFuture<T> whenCompleteAsync(
+		BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.whenCompleteAsync(pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<T> whenCompleteAsync(BiConsumer<? super T, ? super Throwable> pAction,
-		Executor pExecutor) {
+	public ExtendedCompletableFuture<T> whenCompleteAsync(
+		BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture.of(mDelegate.whenCompleteAsync(pAction, pExecutor));
 	}
 
@@ -278,7 +292,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, Throwable, ? extends U> pFn,
-		Executor pExecutor) {
+		@Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture.of(mDelegate.handleAsync(pFn, pExecutor));
 	}
 
@@ -327,6 +341,9 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		return mDelegate.toString();
 	}
 
+	/**
+	 * Default constructor
+	 */
 	public ExtendedCompletableFuture() {
 		mDelegate = new CompletableFuture<T>();
 	}
@@ -335,22 +352,32 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		mDelegate = pFuture;
 	}
 
-	public static ExtendedCompletableFuture<Void> allOf(CompletableFuture<?>... cfs) {
-		CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
+	public static ExtendedCompletableFuture<@Nullable Void> allOf(@NonNull CompletableFuture<?>... cfs) {
+		@NonNull
+		CompletableFuture<?>[] args = new @NonNull CompletableFuture<?>[cfs.length];
 		for (int i = 0; i < cfs.length; i++)
 			args[i] = decomposeToCompletableFuture(cfs[i]);
 		return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
 	}
 
-	public static ExtendedCompletableFuture<Void> allOf(Collection<? extends CompletableFuture<?>> cfs) {
+	/**
+	 * Generates an allOf future
+	 * 
+	 * @param cfs the collection of futures
+	 * @return the future
+	 */
+	public static ExtendedCompletableFuture<@Nullable Void> allOf(
+		Collection<@NonNull ? extends @NonNull CompletableFuture<?>> cfs) {
 		CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
 		int count = 0;
-		for (Iterator<? extends CompletableFuture<?>> i = cfs.iterator(); i.hasNext();)
-			args[count++] = decomposeToCompletableFuture(i.next());
+		for (Iterator<@NonNull ? extends @NonNull CompletableFuture<?>> i = cfs.iterator(); i.hasNext();) {
+			CompletableFuture<?> next = i.next();
+			args[count++] = decomposeToCompletableFuture(next);
+		}
 		return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
 	}
 
-	public static ExtendedCompletableFuture<Object> anyOf(CompletableFuture<?>... cfs) {
+	public static ExtendedCompletableFuture<@Nullable Object> anyOf(@NonNull CompletableFuture<?>... cfs) {
 		CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
 		for (int i = 0; i < cfs.length; i++)
 			args[i] = decomposeToCompletableFuture(cfs[i]);
@@ -361,11 +388,23 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		return ExtendedCompletableFuture.of(CompletableFuture.completedFuture(value));
 	}
 
+	/**
+	 * Generates a new ExtendedCompletableFuture from an existing CompletableFuture
+	 * 
+	 * @param pFuture the existing CompletableFuture
+	 * @return the new ExtendedCompletableFuture
+	 */
 	public static <U> ExtendedCompletableFuture<U> of(CompletableFuture<U> pFuture) {
 		return new ExtendedCompletableFuture<U>(decomposeToCompletableFuture(pFuture));
 	}
 
-	public <U> ExtendedCompletableFuture<?> continueIfNull(Function<T, U> pFunc) {
+	/**
+	 * Continues if the result is null
+	 * 
+	 * @param pFunc the function
+	 * @return the future
+	 */
+	public <U> ExtendedCompletableFuture<?> continueIfNull(Function<@Nullable T, U> pFunc) {
 		return ExtendedCompletableFuture.of(mDelegate.thenApply(result -> {
 			if (result != null)
 				return result;
@@ -373,16 +412,32 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		}));
 	}
 
+	/**
+	 * Continues the compose if null
+	 * 
+	 * @param pFunc the function
+	 * @return the future
+	 */
 	@SuppressWarnings("unchecked")
-	public <U> ExtendedCompletableFuture<?> continueComposeIfNull(Function<T, ? extends CompletionStage<U>> pFunc) {
+	public <U> ExtendedCompletableFuture<?> continueComposeIfNull(
+		Function<@Nullable T, @NonNull ? extends @NonNull CompletionStage<U>> pFunc) {
 		return ExtendedCompletableFuture.of(mDelegate.thenCompose(result -> {
-			if (result != null)
-				return CompletableFuture.completedFuture(result);
+			if (result != null) {
+				CompletableFuture<@Nullable T> future = CompletableFuture.completedFuture(result);
+				CompletionStage<Object> finalFuture = (CompletionStage<Object>) future;
+				return finalFuture;
+			}
 			return (CompletionStage<Object>) pFunc.apply(null);
 		}));
 	}
 
-	public <U> ExtendedCompletableFuture<?> continueAsyncIfNull(Function<T, U> pFunc) {
+	/**
+	 * Continues async if null
+	 * 
+	 * @param pFunc the function
+	 * @return the future
+	 */
+	public <U> ExtendedCompletableFuture<?> continueAsyncIfNull(Function<@Nullable T, U> pFunc) {
 		return ExtendedCompletableFuture.of(mDelegate.thenApplyAsync(result -> {
 			if (result != null)
 				return result;
@@ -390,15 +445,28 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		}));
 	}
 
+	/**
+	 * Marks a completed failure
+	 * 
+	 * @param pEx the exception
+	 * @return the future
+	 */
 	public static <U> ExtendedCompletableFuture<U> completedFailure(Throwable pEx) {
 		CompletableFuture<U> result = new CompletableFuture<U>();
 		result.completeExceptionally(pEx);
 		return ExtendedCompletableFuture.of(result);
 	}
 
+	/**
+	 * Continues to compose if
+	 * 
+	 * @param pClass the class
+	 * @param pFunc the function
+	 * @return the future
+	 */
 	@SuppressWarnings("unchecked")
 	public <C, U> ExtendedCompletableFuture<?> continueComposeIf(Class<C> pClass,
-		Function<C, ? extends CompletionStage<U>> pFunc) {
+		Function<C, @NonNull ? extends @NonNull CompletionStage<U>> pFunc) {
 		return ExtendedCompletableFuture.of(mDelegate.thenCompose(result -> {
 			if (result != null) {
 				if (pClass.isInstance(result) == true) {
@@ -410,6 +478,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		}));
 	}
 
+	/**
+	 * Continues if
+	 * 
+	 * @param pClass the class
+	 * @param pFunc the function
+	 * @return the future
+	 */
 	@SuppressWarnings("unchecked")
 	public <C, U> ExtendedCompletableFuture<?> continueIf(Class<C> pClass, Function<C, U> pFunc) {
 		return ExtendedCompletableFuture.of(mDelegate.thenApply(result -> {
@@ -423,8 +498,17 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		}));
 	}
 
+	/**
+	 * Splits a compose into two tracks
+	 * 
+	 * @param pBoolFunc the boolean function
+	 * @param pTrueFunc the true side
+	 * @param pFalseFunc the false side
+	 * @return the future
+	 */
 	public <R> ExtendedCompletableFuture<R> splitCompose(Predicate<T> pBoolFunc,
-		Function<T, ? extends CompletionStage<R>> pTrueFunc, Function<T, ? extends CompletionStage<R>> pFalseFunc) {
+		Function<T, @NonNull ? extends @NonNull CompletionStage<R>> pTrueFunc,
+		Function<T, @NonNull ? extends @NonNull CompletionStage<R>> pFalseFunc) {
 		return ExtendedCompletableFuture.of(mDelegate.thenCompose((input) -> {
 			if (pBoolFunc.test(input) == true)
 				return pTrueFunc.apply(input);
@@ -433,8 +517,16 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		}));
 	}
 
-	public <R> ExtendedCompletableFuture<R> splitApply(Predicate<T> pBoolFunc,
-		Function<T, ? extends R> pTrueFunc, Function<T, ? extends R> pFalseFunc) {
+	/**
+	 * Split based apply
+	 * 
+	 * @param pBoolFunc the boolean function
+	 * @param pTrueFunc the true result
+	 * @param pFalseFunc the false result
+	 * @return the future
+	 */
+	public <R> ExtendedCompletableFuture<R> splitApply(Predicate<T> pBoolFunc, Function<T, ? extends R> pTrueFunc,
+		Function<T, ? extends R> pFalseFunc) {
 		return ExtendedCompletableFuture.of(mDelegate.thenApply((input) -> {
 			if (pBoolFunc.test(input) == true)
 				return pTrueFunc.apply(input);
@@ -443,44 +535,107 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 		}));
 	}
 
+	/**
+	 * The state object for these 'future' based loops
+	 * 
+	 * @param <INPUT>
+	 * @param <STARTPRE>
+	 * @param <STARTRESULT>
+	 * @param <STARTPOST>
+	 * @param <ACTIONPRE>
+	 * @param <ACTIONRESULT>
+	 * @param <ACTIONPOST>
+	 * @param <TESTPRE>
+	 * @param <TESTRESULT>
+	 * @param <TESTPOST>
+	 * @param <ENDPRE>
+	 * @param <ENDRESULT>
+	 * @param <ENDPOST>
+	 */
 	public static class LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> {
 
+		/**
+		 * The input
+		 */
 		public volatile INPUT			input;
+
+		/**
+		 * The before start
+		 */
 
 		public volatile STARTPRE		startPre;
 
+		/**
+		 * The start result
+		 */
 		public volatile STARTRESULT		startResult;
 
+		/**
+		 * The after start
+		 */
 		public volatile STARTPOST		startPost;
 
+		/**
+		 * The before action
+		 */
 		public volatile ACTIONPRE		actionPre;
 
+		/**
+		 * The action
+		 */
 		public volatile ACTIONRESULT	actionResult;
 
+		/**
+		 * The after action
+		 */
 		public volatile ACTIONPOST		actionPost;
 
+		/**
+		 * The before test
+		 */
 		public volatile TESTPRE			testPre;
 
+		/**
+		 * The test
+		 */
 		public volatile TESTRESULT		testResult;
 
+		/**
+		 * The after test
+		 */
 		public volatile TESTPOST		testPost;
 
+		/**
+		 * The before end
+		 */
 		public volatile ENDPRE			endPre;
 
+		/**
+		 * The end
+		 */
 		public volatile ENDRESULT		endResult;
 
+		/**
+		 * The after end
+		 */
 		public volatile ENDPOST			endPost;
 
+		/**
+		 * The default constructor
+		 * 
+		 * @param pInput the input
+		 */
+		@SuppressWarnings("null")
 		public LoopState(INPUT pInput) {
 			input = pInput;
 		}
 	}
 
-	private static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> ExtendedCompletableFuture<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> startLoop(
-		ExtendedCompletableFuture<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPRE> pStartPreFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<STARTRESULT>> pStartFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPOST> pStartPostFunction) {
+	private static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> ExtendedCompletableFuture<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> startLoop(
+		ExtendedCompletableFuture<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPRE> pStartPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<STARTRESULT>> pStartFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPOST> pStartPostFunction) {
 
 		/* Perform the start pre */
 
@@ -494,7 +649,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 		if (pStartFunction != null)
 			current = current.thenCompose(state -> {
-				return pStartFunction.apply(state).thenApply(i -> {
+				ExtendedCompletableFuture<STARTRESULT> startFunctionResult = pStartFunction.apply(state);
+				return startFunctionResult.thenApply(i -> {
 					state.startResult = i;
 					return state;
 				});
@@ -512,16 +668,16 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	}
 
 	private static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> void performDoWhile(
-		ExtendedCompletableFuture<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPRE> pActionPreFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<ACTIONRESULT>> pActionFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPOST> pActionPostFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPRE> pTestPreFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<TESTRESULT>> pTestFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPOST> pTestPostFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<ENDRESULT>> pEndFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
+		ExtendedCompletableFuture<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPRE> pActionPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletableFuture<ACTIONRESULT>> pActionFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPOST> pActionPostFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPRE> pTestPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletableFuture<TESTRESULT>> pTestFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPOST> pTestPostFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletableFuture<ENDRESULT>> pEndFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
 		ExtendedCompletableFuture<ENDPOST> pFinalResult) {
 
 		/* Do the work */
@@ -538,7 +694,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 		if (pActionFunction != null)
 			current = current.thenCompose(state -> {
-				return pActionFunction.apply(state).thenApply(i -> {
+				ExtendedCompletableFuture<ACTIONRESULT> actionFunctionResult = pActionFunction.apply(state);
+				return actionFunctionResult.thenApply(i -> {
 					state.actionResult = i;
 					return state;
 				});
@@ -566,7 +723,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 		if (pTestFunction != null)
 			current = current.thenCompose(state -> {
-				return pTestFunction.apply(state).thenApply(i -> {
+				ExtendedCompletableFuture<TESTRESULT> testFunctionResult = pTestFunction.apply(state);
+				return testFunctionResult.thenApply(i -> {
 					state.testResult = i;
 					return state;
 				});
@@ -593,7 +751,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 					/* We're finished running */
 
-					ExtendedCompletableFuture<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> start =
+					ExtendedCompletableFuture<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> start =
 						ExtendedCompletableFuture.completedFuture(state);
 
 					endLoop(start, pEndPreFunction, pEndFunction, pEndPostFunction, pFinalResult);
@@ -624,12 +782,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	}
 
 	private static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> void endLoop(
-		ExtendedCompletableFuture<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<ENDRESULT>> pEndFunction,
-		Function<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
+		ExtendedCompletableFuture<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletableFuture<ENDRESULT>> pEndFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
 		ExtendedCompletableFuture<ENDPOST> pFinalResult) {
 		try {
+
 			/* Perform the end pre */
 
 			if (pEndPreFunction != null)
@@ -642,7 +801,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 			if (pEndFunction != null)
 				current = current.thenCompose(state -> {
-					return pEndFunction.apply(state).thenApply(i -> {
+					ExtendedCompletableFuture<ENDRESULT> endFunctionResult = pEndFunction.apply(state);
+					return endFunctionResult.thenApply(i -> {
 						state.endResult = i;
 						return state;
 					});
@@ -687,28 +847,31 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	 * @param pEndPostFunction
 	 * @return the result
 	 */
-	public <STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> ExtendedCompletableFuture<ENDPOST> thenDoWhile(
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPRE> pStartPreFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<STARTRESULT>> pStartFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPOST> pStartPostFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPRE> pActionPreFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<ACTIONRESULT>> pActionFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPOST> pActionPostFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPRE> pTestPreFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<TESTRESULT>> pTestFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPOST> pTestPostFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<ENDRESULT>> pEndFunction,
-		Function<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction) {
+	public <@Nullable STARTPRE, @Nullable STARTRESULT, @Nullable STARTPOST, @Nullable ACTIONPRE, @Nullable ACTIONRESULT, @Nullable ACTIONPOST, @Nullable TESTPRE, @Nullable TESTRESULT, @Nullable TESTPOST, @Nullable ENDPRE, @Nullable ENDRESULT, @Nullable ENDPOST> ExtendedCompletableFuture<ENDPOST> thenDoWhile(
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPRE> pStartPreFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<STARTRESULT>> pStartFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPOST> pStartPostFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPRE> pActionPreFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<ACTIONRESULT>> pActionFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPOST> pActionPostFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPRE> pTestPreFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<TESTRESULT>> pTestFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPOST> pTestPostFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletableFuture<ENDRESULT>> pEndFunction,
+		@Nullable Function<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction) {
 
 		ExtendedCompletableFuture<ENDPOST> finalResult = new ExtendedCompletableFuture<ENDPOST>();
 
 		/* Setup the LoopState object */
 
-		ExtendedCompletableFuture<LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
+		ExtendedCompletableFuture<@Nullable LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> applyResult =
 			thenApply(
-				input -> new LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>(
+				input -> new LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>(
 					input));
+		@SuppressWarnings("null")
+		ExtendedCompletableFuture<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
+			(ExtendedCompletableFuture<@NonNull LoopState<@Nullable T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
 
 		current = startLoop(current, pStartPreFunction, pStartFunction, pStartPostFunction);
 

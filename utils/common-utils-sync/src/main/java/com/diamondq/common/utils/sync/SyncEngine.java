@@ -10,23 +10,39 @@ import java.util.Set;
 
 import javax.inject.Singleton;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
 import org.javatuples.Sextet;
 
+/**
+ * This engine is capable of synchronizing two sets of data. Either sets may have changes that need to be synchronized
+ * to the other.
+ */
 @Singleton
 public class SyncEngine {
 
+	/**
+	 * Default constructor
+	 */
 	public SyncEngine() {
 	}
 
-	public <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> ExtendedCompletableFuture<Void> performSync(
+	/**
+	 * Perform a sync between A/B by passing in the SyncInfo. This synchronization will occur asynchronously (as much as
+	 * possible) and the function will return a future that can be checked for completion (or failure)
+	 * 
+	 * @param pInfo the SyncInfo
+	 * @return the future
+	 */
+	public <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> ExtendedCompletableFuture<@Nullable Void> performSync(
 		SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> pInfo) {
 
 		/* Stream the data into a set of data */
 
-		ExtendedCompletableFuture<Map<A_KEY, A_FRAG>> aSourceFuture = pInfo.getASource();
-		ExtendedCompletableFuture<Map<B_KEY, B_FRAG>> bSourceFuture = pInfo.getBSource();
+		ExtendedCompletableFuture<@NonNull Map<@NonNull A_KEY, @NonNull A_FRAG>> aSourceFuture = pInfo.getASource();
+		ExtendedCompletableFuture<@NonNull Map<@NonNull B_KEY, @NonNull B_FRAG>> bSourceFuture = pInfo.getBSource();
 
 		boolean keyTypesEqual = pInfo.isKeyTypesEqual();
 		boolean aFragTypeComplete = pInfo.isAFragTypeComplete();

@@ -6,17 +6,27 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * Generic implementation of the Table Definition
+ */
 public class GenericKVTableDefinition implements IKVTableDefinition {
 
-	private final String					mTableName;
+	private final String								mTableName;
 
-	private final List<IKVColumnDefinition>	mColumnDefinitions;
+	private final List<@NonNull IKVColumnDefinition>	mColumnDefinitions;
 
-	public GenericKVTableDefinition(String pTableName, List<IKVColumnDefinition> pColumnDefinitions) {
+	/**
+	 * Default constructor
+	 * 
+	 * @param pTableName the table name
+	 * @param pColumnDefinitions the list of columns
+	 */
+	public GenericKVTableDefinition(String pTableName, List<@NonNull IKVColumnDefinition> pColumnDefinitions) {
 		super();
 		mTableName = pTableName;
-		mColumnDefinitions =
-			(pColumnDefinitions == null ? ImmutableList.of() : ImmutableList.copyOf(pColumnDefinitions));
+		mColumnDefinitions = ImmutableList.copyOf(pColumnDefinitions);
 	}
 
 	/**
@@ -31,7 +41,7 @@ public class GenericKVTableDefinition implements IKVTableDefinition {
 	 * @see com.diamondq.common.storage.kv.IKVTableDefinition#getColumnDefinitions()
 	 */
 	@Override
-	public List<IKVColumnDefinition> getColumnDefinitions() {
+	public List<@NonNull IKVColumnDefinition> getColumnDefinitions() {
 		return mColumnDefinitions;
 	}
 

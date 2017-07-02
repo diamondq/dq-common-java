@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
 public interface PersistenceLayer {
 
 	/* StructureDefinitions */
@@ -33,6 +37,7 @@ public interface PersistenceLayer {
 
 	public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope);
 
+	@Nullable
 	public StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName);
 
 	/* Reference */
@@ -62,6 +67,7 @@ public interface PersistenceLayer {
 
 	public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure);
 
+	@Nullable
 	public Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope, String pSerializedRef);
 
 	public void deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue);
@@ -69,7 +75,7 @@ public interface PersistenceLayer {
 	/* Property */
 
 	public <T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope, PropertyDefinition pPropertyDefinition,
-		boolean pIsValueSet, T pValue);
+		boolean pIsValueSet, @Nullable T pValue);
 
 	/* TranslatableString */
 
@@ -103,7 +109,8 @@ public interface PersistenceLayer {
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
 		StructureDefinitionRef pRef);
 
-	public String lookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey);
+	@Nullable
+	public String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey);
 
 	public void setGlobalDefaultLocale(Toolkit pToolkit, Scope pScope, Locale pLocale);
 

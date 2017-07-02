@@ -23,6 +23,11 @@ import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * A Persistence Layer that stores the information in Properties files.
+ */
 public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceLayer<Properties> {
 
 	private final File	mStructureBaseDir;
@@ -33,6 +38,14 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	@SuppressWarnings("unused")
 	private final File	mEditorStructureDefBaseDir;
 
+	/**
+	 * Default constructor
+	 * 
+	 * @param pScope the scope
+	 * @param pStructureBaseDir the directory for structures
+	 * @param pStructureDefBaseDir the directory for structure definitions
+	 * @param pEditorStructureDefBaseDir the directory for editor structure definitions
+	 */
 	public PropertiesFilePersistenceLayer(Scope pScope, File pStructureBaseDir, File pStructureDefBaseDir,
 		File pEditorStructureDefBaseDir) {
 		super(pScope, pStructureBaseDir != null, true, pStructureDefBaseDir != null, true,
@@ -206,8 +219,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
 	 */
 	@Override
-	protected <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
-		String pKey, PropertyType pType, R pValue) {
+	protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
+		boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
 		switch (pType) {
 		case String: {
 			pConfig.setProperty(pKey, (String) pValue);

@@ -27,6 +27,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * @param <STRUCTURECONFIGOBJ>
  */
@@ -54,7 +57,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	protected abstract STRUCTURECONFIGOBJ loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
 		String pKey, boolean pCreateIfMissing);
 
-	protected abstract <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
+	protected abstract <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
 		boolean pIsMeta, String pKey, PropertyType pType, R pValue);
 
 	protected abstract <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
@@ -208,7 +211,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 						throw new UnsupportedOperationException();
 					if (value.equals(newDec) == false) {
 						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal,
-							newValue);
+							newDec);
 						changed = true;
 					}
 				}

@@ -22,6 +22,19 @@
 		<openaz.version>0.0.1-SNAPSHOT</openaz.version>
 		<jboss-logging.version>3.3.1.Final</jboss-logging.version>
 	</properties>
+	<profiles>
+		<profile>
+			<id>m2e</id>
+			<activation>
+				<property>
+					<name>m2e.version</name>
+				</property>
+			</activation>
+			<properties>
+				<m2e.jdt.annotationpath>${eclipse.external.annotations}</m2e.jdt.annotationpath>
+			</properties>
+		</profile>
+	</profiles>
 	<repositories>
 	</repositories>
 	<pluginRepositories>
@@ -48,6 +61,28 @@
 				<version>0.1.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jdt</groupId>
+				<artifactId>org.eclipse.jdt.annotation</artifactId>
+				<version>2.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.checkerframework</groupId>
+				<artifactId>checker-qual</artifactId>
+				<version>2.1.12</version>
+			</dependency>
+			<dependency>
+				<groupId>org.checkerframework</groupId>
+				<artifactId>checker</artifactId>
+				<version>2.1.12</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.checkerframework</groupId>
+				<artifactId>jdk8</artifactId>
+				<version>2.1.12</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.logging</groupId>
@@ -265,6 +300,18 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.annotation</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.checkerframework</groupId>
+			<artifactId>checker-qual</artifactId>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
 	<modules>
 		<module>../common-bom</module>
 		<module>../common-lambda</module>

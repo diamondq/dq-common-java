@@ -1,6 +1,6 @@
 package com.diamondq.common.storage.kv;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This can be attached to a model object to allow the underlying KV store implementation to get access to the id field.
@@ -14,7 +14,7 @@ public interface IObjectWithId<O> {
 	 * 
 	 * @return the id (may be null if this object has not yet been persisted, and automatic id generation is in use)
 	 */
-	public String getObjectId();
+	public @Nullable String getObjectId();
 
 	/**
 	 * Changes the object's id value. NOTE: Some objects may be read-only, and thus, changing the id generates a new
@@ -23,6 +23,5 @@ public interface IObjectWithId<O> {
 	 * @param pObjectId the new object id
 	 * @return the updated object (may or may not be the same as the passed in object)
 	 */
-	@Nonnull
-	public O setObjectId(@Nonnull String pObjectId);
+	public O setObjectId(String pObjectId);
 }

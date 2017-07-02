@@ -13,16 +13,20 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class PostgreSQL extends AbstractDialect {
 
-	private static ThreadLocal<Calendar>	sCALENDAR	=
+	private static ThreadLocal<@NonNull Calendar>	sCALENDAR	=
 		ThreadLocal.withInitial(() -> Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH));
 
-	protected static Set<String>			sRESERVED_WORDS;
+	protected static Set<@NonNull String>			sRESERVED_WORDS;
 
 	static {
 		String wordsStr =
 			"abort,acl,add,aggregate,append,archive,arch_store,backward,binary,boolean,change,cluster,copy,database,delimiter,delimiters,do,extend,explain,forward,heavy,index,inherits,isnull,light,listen,load,merge,nothing,notify,notnull,oids,purge,rename,replace,retrieve,returns,rule,recipe,setof,stdin,stdout,store,vacuum,verbose,version";
+		@NonNull
 		String[] words = wordsStr.split(",");
 		ImmutableSet.Builder<String> builder = ImmutableSet.builder();
 		for (String w : words)
@@ -51,7 +55,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readUnlimitedTextType(java.sql.ResultSet, int)
 	 */
 	@Override
-	public String readUnlimitedTextType(ResultSet pRs, int pIndex) throws SQLException {
+	public @Nullable String readUnlimitedTextType(ResultSet pRs, int pIndex) throws SQLException {
 		String value = pRs.getString(pIndex);
 		if (pRs.wasNull() == true)
 			return null;
@@ -63,7 +67,7 @@ public class PostgreSQL extends AbstractDialect {
 	 *      java.lang.String)
 	 */
 	@Override
-	public void writeUnlimitedText(PreparedStatement pPs, int pIndex, String pValue) throws SQLException {
+	public void writeUnlimitedText(PreparedStatement pPs, int pIndex, @Nullable String pValue) throws SQLException {
 		if (pValue == null)
 			pPs.setNull(pIndex, Types.VARCHAR);
 		else
@@ -82,7 +86,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readBoolean(java.sql.ResultSet, int)
 	 */
 	@Override
-	public Boolean readBoolean(ResultSet pResultSet, int pIndex) throws SQLException {
+	public @Nullable Boolean readBoolean(ResultSet pResultSet, int pIndex) throws SQLException {
 		boolean result = pResultSet.getBoolean(pIndex);
 		if (pResultSet.wasNull() == true)
 			return null;
@@ -94,7 +98,7 @@ public class PostgreSQL extends AbstractDialect {
 	 *      java.lang.Boolean)
 	 */
 	@Override
-	public void writeBoolean(PreparedStatement pPs, int pIndex, Boolean pValue) throws SQLException {
+	public void writeBoolean(PreparedStatement pPs, int pIndex, @Nullable Boolean pValue) throws SQLException {
 		if (pValue == null)
 			pPs.setNull(pIndex, Types.BOOLEAN);
 		else
@@ -113,7 +117,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readLong(java.sql.ResultSet, int)
 	 */
 	@Override
-	public Long readLong(ResultSet pRs, int pIndex) throws SQLException {
+	public @Nullable Long readLong(ResultSet pRs, int pIndex) throws SQLException {
 		long value = pRs.getLong(pIndex);
 		if (pRs.wasNull() == true)
 			return null;
@@ -124,7 +128,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeLong(java.sql.PreparedStatement, int, java.lang.Long)
 	 */
 	@Override
-	public void writeLong(PreparedStatement pPs, int pIndex, Long pValue) throws SQLException {
+	public void writeLong(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException {
 		if (pValue == null)
 			pPs.setNull(pIndex, Types.BIGINT);
 		else
@@ -143,7 +147,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readDecimal(java.sql.ResultSet, int)
 	 */
 	@Override
-	public BigDecimal readDecimal(ResultSet pRs, int pIndex) throws SQLException {
+	public @Nullable BigDecimal readDecimal(ResultSet pRs, int pIndex) throws SQLException {
 		BigDecimal value = pRs.getBigDecimal(pIndex);
 		if (pRs.wasNull() == true)
 			return null;
@@ -155,7 +159,7 @@ public class PostgreSQL extends AbstractDialect {
 	 *      java.math.BigDecimal)
 	 */
 	@Override
-	public void writeDecimal(PreparedStatement pPs, int pIndex, BigDecimal pValue) throws SQLException {
+	public void writeDecimal(PreparedStatement pPs, int pIndex, @Nullable BigDecimal pValue) throws SQLException {
 		if (pValue == null)
 			pPs.setNull(pIndex, Types.DECIMAL);
 		else
@@ -174,7 +178,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readInteger(java.sql.ResultSet, int)
 	 */
 	@Override
-	public Integer readInteger(ResultSet pRs, int pIndex) throws SQLException {
+	public @Nullable Integer readInteger(ResultSet pRs, int pIndex) throws SQLException {
 		int value = pRs.getInt(pIndex);
 		if (pRs.wasNull() == true)
 			return null;
@@ -186,7 +190,7 @@ public class PostgreSQL extends AbstractDialect {
 	 *      java.lang.Integer)
 	 */
 	@Override
-	public void writeInteger(PreparedStatement pPs, int pIndex, Integer pValue) throws SQLException {
+	public void writeInteger(PreparedStatement pPs, int pIndex, @Nullable Integer pValue) throws SQLException {
 		if (pValue == null)
 			pPs.setNull(pIndex, Types.INTEGER);
 		else
@@ -205,7 +209,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readText(java.sql.ResultSet, int)
 	 */
 	@Override
-	public String readText(ResultSet pRs, int pIndex) throws SQLException {
+	public @Nullable String readText(ResultSet pRs, int pIndex) throws SQLException {
 		String value = pRs.getString(pIndex);
 		if (pRs.wasNull() == true)
 			return null;
@@ -216,7 +220,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeText(java.sql.PreparedStatement, int, java.lang.String)
 	 */
 	@Override
-	public void writeText(PreparedStatement pPs, int pIndex, String pValue) throws SQLException {
+	public void writeText(PreparedStatement pPs, int pIndex, @Nullable String pValue) throws SQLException {
 		if (pValue == null)
 			pPs.setNull(pIndex, Types.VARCHAR);
 		else
@@ -235,7 +239,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readTimestamp(java.sql.ResultSet, int)
 	 */
 	@Override
-	public Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException {
+	public @Nullable Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException {
 		Calendar c = sCALENDAR.get();
 		Timestamp value = pRs.getTimestamp(pIndex, c);
 		if (pRs.wasNull() == true)
@@ -248,7 +252,7 @@ public class PostgreSQL extends AbstractDialect {
 	 *      java.lang.Long)
 	 */
 	@Override
-	public void writeTimestamp(PreparedStatement pPs, int pIndex, Long pValue) throws SQLException {
+	public void writeTimestamp(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException {
 		if (pValue == null)
 			pPs.setNull(pIndex, Types.TIMESTAMP_WITH_TIMEZONE);
 		else {
@@ -261,7 +265,7 @@ public class PostgreSQL extends AbstractDialect {
 	 * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getReservedWords()
 	 */
 	@Override
-	public Set<String> getReservedWords() {
+	public Set<@NonNull String> getReservedWords() {
 		return sRESERVED_WORDS;
 	}
 

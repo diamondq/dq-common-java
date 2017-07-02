@@ -8,17 +8,34 @@ import com.esotericsoftware.kryo.io.Output;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Helper to move a class into and out of long term serialization format (which is currently Kryo)
+ */
 @Singleton
 public class LongTermSerializer {
 
 	private final KryoPool mPool;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param pPool the Kryo Pool
+	 */
 	@Inject
 	public LongTermSerializer(KryoPool pPool) {
 		mPool = pPool;
 	}
 
-	public <T> byte[] toByteArray(T pObj, Class<T> pClass) {
+	/**
+	 * Converts an object into a byte array
+	 * 
+	 * @param pObj the object
+	 * @param pClass the class of the object
+	 * @return the serialized bytes
+	 */
+	public <T> byte[] toByteArray(@Nullable T pObj, Class<T> pClass) {
 		Output output = new Output(300, -1);
 		Kryo kryo = mPool.getFromPool();
 		try {
@@ -33,13 +50,21 @@ public class LongTermSerializer {
 		return output.toBytes();
 	}
 
-	public <T> DeserializeResult<T> fromByteArray(byte[] pBytes) {
+	/**
+	 * Deserializes the bytes to an object
+	 * 
+	 * @param pBytes the bytes
+	 * @return the deserialized result object
+	 */
+	public <@Nullable T> DeserializeResult<T> fromByteArray(byte @Nullable [] pBytes) {
 		if (pBytes == null)
 			return DeserializeResult.ofNull();
 		Input input = new Input(pBytes);
 		Kryo kryo = mPool.getFromPool();
 		try {
 			String name = kryo.readObject(input, String.class);
+			if (name == null)
+				throw new IllegalArgumentException();
 			if (name.startsWith("C")) {
 				String className = name.substring(1);
 				try {

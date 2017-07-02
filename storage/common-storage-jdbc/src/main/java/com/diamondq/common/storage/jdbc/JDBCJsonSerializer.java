@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class JDBCJsonSerializer implements IPreparedStatementSerializer {
 
 	private final ObjectMapper mMapper;
@@ -19,7 +21,8 @@ public class JDBCJsonSerializer implements IPreparedStatementSerializer {
 	 *      java.sql.PreparedStatement, int)
 	 */
 	@Override
-	public <O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex) throws SQLException {
+	public <@Nullable O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
+		throws SQLException {
 		try {
 			String str = mMapper.writeValueAsString(pObj);
 			pPs.setString(pStartAtIndex, str);

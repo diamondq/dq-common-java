@@ -3,9 +3,12 @@ package com.diamondq.common.storage.kv.impl;
 import com.diamondq.common.storage.kv.IObjectWithId;
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Helper for Primitive Wrappers
+ */
 public class PrimitiveWrappers {
 
 	/**
@@ -15,7 +18,7 @@ public class PrimitiveWrappers {
 	 * @param pMustHaveRevision true if the wrapper (or main object) must support both id and revision
 	 * @return the wrapper class that should be used or null if this is not a primitive
 	 */
-	public static <O> Class<?> getIfPrimitive(@Nonnull Class<O> pClass, boolean pMustHaveRevision) {
+	public static <@NonNull O> @Nullable Class<?> getIfPrimitive(Class<O> pClass, boolean pMustHaveRevision) {
 		assert (pClass != null);
 
 		/* If this is an object with an id and revision, then it's definitely not a primitive */
@@ -41,8 +44,15 @@ public class PrimitiveWrappers {
 		}
 	}
 
+	/**
+	 * Unwraps a wrapper
+	 * 
+	 * @param pObj the wrapper
+	 * @param pClass the actual class
+	 * @return the result
+	 */
 	@SuppressWarnings("unchecked")
-	public static <O> O unwrap(Object pObj, Class<O> pClass) {
+	public static <@NonNull O> @Nullable O unwrap(@Nullable Object pObj, Class<O> pClass) {
 		if (pObj == null) {
 
 			/* If it's a pure primitive, then we need to return the 'default' value */
@@ -79,17 +89,29 @@ public class PrimitiveWrappers {
 			"The object " + pObj.getClass().getName() + " cannot be unwrapped to " + pClass.getName());
 	}
 
+	/**
+	 * Wraps an object
+	 * 
+	 * @param pObj the object
+	 * @param pPrimitiveWrapperClass the wrapper class to use
+	 * @param pKey the key
+	 * @param pRevision the revision
+	 * @return the wrapped object (or the object itself if wrapping isn't necessary)
+	 */
 	@SuppressWarnings("unchecked")
-	public static <O> Object wrap(O pObj, @Nonnull Class<?> pPrimitiveWrapperClass, @Nonnull String pKey,
+	public static <@NonNull O> @Nullable Object wrap(@Nullable O pObj, Class<?> pPrimitiveWrapperClass, String pKey,
 		@Nullable String pRevision) {
 		try {
 			Object obj = pPrimitiveWrapperClass.newInstance();
 			if (IObjectWithId.class.isAssignableFrom(pPrimitiveWrapperClass))
 				obj = ((IObjectWithId<O>) obj).setObjectId(pKey);
-			if (IObjectWithIdAndRev.class.isAssignableFrom(pPrimitiveWrapperClass))
+			if ((IObjectWithIdAndRev.class.isAssignableFrom(pPrimitiveWrapperClass)) && (pRevision != null))
 				obj = ((IObjectWithIdAndRev<O>) obj).setObjectRevision(pRevision);
 
 			/* Now set the data */
+
+			if (pObj == null)
+				return null;
 
 			if (RevisionOnlyWrapper.class.isAssignableFrom(pPrimitiveWrapperClass))
 				obj = ((RevisionOnlyWrapper<O>) obj).setData(pObj);

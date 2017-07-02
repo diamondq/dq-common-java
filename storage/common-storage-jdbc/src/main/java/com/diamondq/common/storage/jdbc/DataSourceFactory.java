@@ -1,17 +1,19 @@
 package com.diamondq.common.storage.jdbc;
 
 import com.diamondq.common.config.ConfigKey;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class DataSourceFactory {
 
@@ -26,7 +28,7 @@ public class DataSourceFactory {
 				Class<? extends DataSource> sourceClass = (Class<? extends DataSource>) Class.forName(type);
 				DataSource source = sourceClass.newInstance();
 
-				param: for (Map.Entry<Object, Object> pair : mParams.entrySet()) {
+				param: for (Map.Entry<@NonNull Object, Object> pair : mParams.entrySet()) {
 					String key = pair.getKey().toString();
 					List<String> possibleNames = determinePossible(key);
 					Set<Class<?>> possibleArgs = determinePossibleArgs(pair.getValue());
@@ -93,7 +95,7 @@ public class DataSourceFactory {
 		}
 
 		private Set<Class<?>> determinePossibleArgs(Object pValue) {
-			ImmutableSet.Builder<Class<?>> builder = ImmutableSet.builder();
+			ImmutableSet.Builder<@NonNull Class<?>> builder = ImmutableSet.builder();
 			builder.add(String.class);
 			if (pValue instanceof Boolean)
 				builder.add(Boolean.class).add(Boolean.TYPE);
@@ -148,7 +150,7 @@ public class DataSourceFactory {
 			return builder.build();
 		}
 
-		private List<String> determinePossible(String pKey) {
+		private List<@NonNull String> determinePossible(String pKey) {
 
 			/* The key may be either a-b or aB or just a, in which case, the possible values should be AB or A */
 
@@ -177,7 +179,7 @@ public class DataSourceFactory {
 				}
 			}
 
-			return Collections.singletonList(sb.toString());
+			return ImmutableList.of(sb.toString());
 		}
 
 		@ConfigKey("*")

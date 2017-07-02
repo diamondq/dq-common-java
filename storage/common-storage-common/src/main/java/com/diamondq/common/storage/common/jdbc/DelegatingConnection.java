@@ -20,15 +20,27 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * A wrapper for an existing Connection that always calls a callback when the Connection is closed
+ */
 public class DelegatingConnection implements Connection {
 
-	private final Connection							mDelegate;
+	private final Connection											mDelegate;
 
-	private int											mReferenceCount	= 1;
+	private int															mReferenceCount	= 1;
 
-	private final BiConsumer<Connection, Connection>	mCallback;
+	private final BiConsumer<@NonNull Connection, @NonNull Connection>	mCallback;
 
-	public DelegatingConnection(Connection pDelegate, BiConsumer<Connection, Connection> pCallback) {
+	/**
+	 * The constructor
+	 * 
+	 * @param pDelegate the delegated Connection
+	 * @param pCallback the callback to call
+	 */
+	public DelegatingConnection(Connection pDelegate, BiConsumer<@NonNull Connection, @NonNull Connection> pCallback) {
 		super();
 		mDelegate = pDelegate;
 		mCallback = pCallback;
@@ -118,12 +130,12 @@ public class DelegatingConnection implements Connection {
 	}
 
 	@Override
-	public void setCatalog(String pCatalog) throws SQLException {
+	public void setCatalog(@Nullable String pCatalog) throws SQLException {
 		mDelegate.setCatalog(pCatalog);
 	}
 
 	@Override
-	public String getCatalog() throws SQLException {
+	public @Nullable String getCatalog() throws SQLException {
 		return mDelegate.getCatalog();
 	}
 
@@ -138,7 +150,7 @@ public class DelegatingConnection implements Connection {
 	}
 
 	@Override
-	public SQLWarning getWarnings() throws SQLException {
+	public @Nullable SQLWarning getWarnings() throws SQLException {
 		return mDelegate.getWarnings();
 	}
 
@@ -263,7 +275,7 @@ public class DelegatingConnection implements Connection {
 	}
 
 	@Override
-	public void setClientInfo(String pName, String pValue) throws SQLClientInfoException {
+	public void setClientInfo(String pName, @Nullable String pValue) throws SQLClientInfoException {
 		mDelegate.setClientInfo(pName, pValue);
 	}
 
@@ -273,7 +285,7 @@ public class DelegatingConnection implements Connection {
 	}
 
 	@Override
-	public String getClientInfo(String pName) throws SQLException {
+	public @Nullable String getClientInfo(String pName) throws SQLException {
 		return mDelegate.getClientInfo(pName);
 	}
 
@@ -283,22 +295,24 @@ public class DelegatingConnection implements Connection {
 	}
 
 	@Override
-	public Array createArrayOf(String pTypeName, Object[] pElements) throws SQLException {
+	public Array createArrayOf(@Nullable String pTypeName, @Nullable Object @Nullable [] pElements)
+		throws SQLException {
 		return mDelegate.createArrayOf(pTypeName, pElements);
 	}
 
 	@Override
-	public Struct createStruct(String pTypeName, Object[] pAttributes) throws SQLException {
+	public Struct createStruct(@Nullable String pTypeName, @Nullable Object @Nullable [] pAttributes)
+		throws SQLException {
 		return mDelegate.createStruct(pTypeName, pAttributes);
 	}
 
 	@Override
-	public void setSchema(String pSchema) throws SQLException {
+	public void setSchema(@Nullable String pSchema) throws SQLException {
 		mDelegate.setSchema(pSchema);
 	}
 
 	@Override
-	public String getSchema() throws SQLException {
+	public @Nullable String getSchema() throws SQLException {
 		return mDelegate.getSchema();
 	}
 
@@ -317,6 +331,9 @@ public class DelegatingConnection implements Connection {
 		return mDelegate.getNetworkTimeout();
 	}
 
+	/**
+	 * Increase the reference count on this connection
+	 */
 	public void increaseRefCount() {
 		mReferenceCount++;
 	}

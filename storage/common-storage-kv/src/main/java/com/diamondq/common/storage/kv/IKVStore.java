@@ -1,9 +1,25 @@
 package com.diamondq.common.storage.kv;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * The main interface representing a Key/Value store
+ */
 public interface IKVStore {
 
+	/**
+	 * Starts a new transaction.
+	 * 
+	 * @return the transaction
+	 */
 	public IKVTransaction startTransaction();
 
+	/**
+	 * Starts an asynchronous transaction
+	 * 
+	 * @return the transaction
+	 */
 	public IKVAsyncTransaction startAsyncTransaction();
 
 	/**
@@ -11,7 +27,7 @@ public interface IKVStore {
 	 * 
 	 * @return returns the interface if it does or null if it does not
 	 */
-	public <ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> IKVIndexSupport<ICB, IDB> getIndexSupport();
+	public <@NonNull ICB extends @NonNull KVIndexColumnBuilder<ICB>, @NonNull IDB extends @NonNull KVIndexDefinitionBuilder<IDB>> @Nullable IKVIndexSupport<ICB, IDB> getIndexSupport();
 
 	/**
 	 * Returns a supporting interface for manipulating table definitions, if this store supports dynamic table
@@ -19,5 +35,5 @@ public interface IKVStore {
 	 * 
 	 * @return returns the interface if it does support it or null if it does not
 	 */
-	public IKVTableDefinitionSupport getTableDefinitionSupport();
+	public <@NonNull TDB extends @NonNull KVTableDefinitionBuilder<@NonNull TDB>, @NonNull CDB extends @NonNull KVColumnDefinitionBuilder<@NonNull CDB>> @Nullable IKVTableDefinitionSupport<TDB, CDB> getTableDefinitionSupport();
 }

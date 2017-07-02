@@ -1,19 +1,34 @@
 package com.diamondq.common.storage.kv;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
-import java.util.List;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class KVIndexDefinitionBuilder<IDB extends KVIndexDefinitionBuilder<IDB>> {
+/**
+ * Builder for Index Definitions
+ * 
+ * @param <IDB> the actual type for the Index Definitions builder
+ */
+public abstract class KVIndexDefinitionBuilder<@NonNull IDB extends KVIndexDefinitionBuilder<IDB>> {
 
-	protected String				mName;
+	@Nullable
+	protected String											mName;
 
-	protected List<IKVIndexColumn>	mColumns;
+	protected ImmutableList.Builder<@NonNull IKVIndexColumn>	mColumns;
 
+	/**
+	 * Builds the Index Definition
+	 * 
+	 * @return the Index definition
+	 */
 	public abstract IKVIndexDefinition build();
 
+	/**
+	 * Default constructor
+	 */
 	public KVIndexDefinitionBuilder() {
-		mColumns = Lists.newArrayList();
+		mColumns = ImmutableList.builder();
 	}
 
 	/**

@@ -1,14 +1,24 @@
 package com.diamondq.common.storage.kv.impl;
 
 import com.diamondq.common.storage.kv.IKVIndexColumn;
+import com.diamondq.common.storage.kv.KVColumnType;
 
+/**
+ * Generic implementation of the KVIndexColumn
+ */
 public class GenericKVIndexColumn implements IKVIndexColumn {
 
-	private final String	mName;
+	private final String		mName;
 
-	private final String	mType;
+	private final KVColumnType	mType;
 
-	public GenericKVIndexColumn(String pName, String pType) {
+	/**
+	 * Default constructor
+	 * 
+	 * @param pName the name
+	 * @param pType the type
+	 */
+	public GenericKVIndexColumn(String pName, KVColumnType pType) {
 		mName = pName;
 		mType = pType;
 	}
@@ -25,7 +35,7 @@ public class GenericKVIndexColumn implements IKVIndexColumn {
 	 * @see com.diamondq.common.storage.kv.IKVIndexColumn#getType()
 	 */
 	@Override
-	public String getType() {
+	public KVColumnType getType() {
 		return mType;
 	}
 

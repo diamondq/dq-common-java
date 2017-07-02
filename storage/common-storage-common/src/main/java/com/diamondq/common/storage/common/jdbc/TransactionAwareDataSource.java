@@ -10,20 +10,33 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * A DataSource where the actual connections are wrapped up in ThreadLocal storage.
+ */
 public class TransactionAwareDataSource implements DataSource {
 
-	private final DataSource										mDelegate;
+	private final DataSource																	mDelegate;
 
-	private final ThreadLocal<DelegatingConnection>					mThreadLocal		= new ThreadLocal<>();
+	private final ThreadLocal<@Nullable DelegatingConnection>									mThreadLocal		=
+		new ThreadLocal<>();
 
-	private final ThreadLocal<Map<String, DelegatingConnection>>	mThreadUserPWLocal	= new ThreadLocal<>();
+	private final ThreadLocal<@Nullable Map<@NonNull String, @Nullable DelegatingConnection>>	mThreadUserPWLocal	=
+		new ThreadLocal<>();
 
+	/**
+	 * Constructor
+	 * 
+	 * @param pDataSource the DataSource to actually use to retrieve Connections
+	 */
 	public TransactionAwareDataSource(DataSource pDataSource) {
 		mDelegate = pDataSource;
 	}
 
 	@Override
-	public PrintWriter getLogWriter() throws SQLException {
+	public @Nullable PrintWriter getLogWriter() throws SQLException {
 		return mDelegate.getLogWriter();
 	}
 
@@ -33,7 +46,7 @@ public class TransactionAwareDataSource implements DataSource {
 	}
 
 	@Override
-	public void setLogWriter(PrintWriter pOut) throws SQLException {
+	public void setLogWriter(@Nullable PrintWriter pOut) throws SQLException {
 		mDelegate.setLogWriter(pOut);
 	}
 
@@ -53,7 +66,7 @@ public class TransactionAwareDataSource implements DataSource {
 	}
 
 	@Override
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+	public @Nullable Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		return mDelegate.getParentLogger();
 	}
 
@@ -72,8 +85,8 @@ public class TransactionAwareDataSource implements DataSource {
 	}
 
 	@Override
-	public Connection getConnection(String pUsername, String pPassword) throws SQLException {
-		Map<String, DelegatingConnection> map = mThreadUserPWLocal.get();
+	public Connection getConnection(@Nullable String pUsername, @Nullable String pPassword) throws SQLException {
+		Map<@NonNull String, @Nullable DelegatingConnection> map = mThreadUserPWLocal.get();
 		if (map == null) {
 			map = new HashMap<>();
 			mThreadUserPWLocal.set(map);
@@ -94,8 +107,8 @@ public class TransactionAwareDataSource implements DataSource {
 		mThreadLocal.remove();
 	}
 
-	private void closeUserPWConnection(Connection pWrapper, Connection pDelegate, String pUserName) {
-		Map<String, DelegatingConnection> map = mThreadUserPWLocal.get();
+	private void closeUserPWConnection(Connection pWrapper, Connection pDelegate, @Nullable String pUserName) {
+		Map<@NonNull String, @Nullable DelegatingConnection> map = mThreadUserPWLocal.get();
 		if (map != null) {
 			map.remove(pUserName);
 			if (map.isEmpty() == true)

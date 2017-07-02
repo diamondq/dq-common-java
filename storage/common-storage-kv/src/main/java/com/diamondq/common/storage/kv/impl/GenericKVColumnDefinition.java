@@ -5,20 +5,37 @@ import com.diamondq.common.storage.kv.KVColumnType;
 
 import java.math.BigDecimal;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * A generic KVColumnDefinition
+ */
 public class GenericKVColumnDefinition implements IKVColumnDefinition {
 
 	private final String		mName;
 
 	private final KVColumnType	mType;
 
+	@Nullable
 	private final Integer		mMaxLength;
 
+	@Nullable
 	private final BigDecimal	mMinValue;
 
+	@Nullable
 	private final BigDecimal	mMaxValue;
 
-	public GenericKVColumnDefinition(String pName, KVColumnType pType, Integer pMaxLength, BigDecimal pMinValue,
-		BigDecimal pMaxValue) {
+	/**
+	 * Default constructor
+	 * 
+	 * @param pName the name
+	 * @param pType the type
+	 * @param pMaxLength the max length (can be null)
+	 * @param pMinValue the min value (can be null)
+	 * @param pMaxValue the max value (can be null)
+	 */
+	public GenericKVColumnDefinition(String pName, KVColumnType pType, @Nullable Integer pMaxLength,
+		@Nullable BigDecimal pMinValue, @Nullable BigDecimal pMaxValue) {
 		super();
 		mName = pName;
 		mType = pType;
@@ -47,7 +64,7 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
 	 * @see com.diamondq.common.storage.kv.IKVColumnDefinition#getMaxLength()
 	 */
 	@Override
-	public Integer getMaxLength() {
+	public @Nullable Integer getMaxLength() {
 		return mMaxLength;
 	}
 
@@ -55,7 +72,7 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
 	 * @see com.diamondq.common.storage.kv.IKVColumnDefinition#getMinValue()
 	 */
 	@Override
-	public BigDecimal getMinValue() {
+	public @Nullable BigDecimal getMinValue() {
 		return mMinValue;
 	}
 
@@ -63,7 +80,7 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
 	 * @see com.diamondq.common.storage.kv.IKVColumnDefinition#getMaxValue()
 	 */
 	@Override
-	public BigDecimal getMaxValue() {
+	public @Nullable BigDecimal getMaxValue() {
 		return mMaxValue;
 	}
 

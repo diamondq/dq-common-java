@@ -6,6 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Interface defining a JDBC Dialect (aka Postgres, MySQL, Oracle, etc.)
+ */
 public interface IJDBCDialect {
 
 	/**
@@ -23,45 +29,45 @@ public interface IJDBCDialect {
 	 */
 	public String getUnlimitedTextType();
 
-	public String readUnlimitedTextType(ResultSet pRs, int pIndex) throws SQLException;
+	public @Nullable String readUnlimitedTextType(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeUnlimitedText(PreparedStatement pPs, int pIndex, String pValue) throws SQLException;
+	public void writeUnlimitedText(PreparedStatement pPs, int pIndex, @Nullable String pValue) throws SQLException;
 
 	public String getBooleanType();
 
-	public Boolean readBoolean(ResultSet pResultSet, int pIndex) throws SQLException;
+	public @Nullable Boolean readBoolean(ResultSet pResultSet, int pIndex) throws SQLException;
 
-	public void writeBoolean(PreparedStatement pPs, int pIndex, Boolean pValue) throws SQLException;
+	public void writeBoolean(PreparedStatement pPs, int pIndex, @Nullable Boolean pValue) throws SQLException;
 
 	public String getLongType();
 
-	public Long readLong(ResultSet pRs, int pIndex) throws SQLException;
+	public @Nullable Long readLong(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeLong(PreparedStatement pPs, int pIndex, Long pValue) throws SQLException;
+	public void writeLong(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException;
 
 	public String getUnlimitedDecimalType();
 
-	public BigDecimal readDecimal(ResultSet pRs, int pIndex) throws SQLException;
+	public @Nullable BigDecimal readDecimal(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeDecimal(PreparedStatement pPs, int pIndex, BigDecimal pValue) throws SQLException;
+	public void writeDecimal(PreparedStatement pPs, int pIndex, @Nullable BigDecimal pValue) throws SQLException;
 
 	public String getIntegerType();
 
-	public Integer readInteger(ResultSet pRs, int pIndex) throws SQLException;
+	public @Nullable Integer readInteger(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeInteger(PreparedStatement pPs, int pIndex, Integer pValue) throws SQLException;
+	public void writeInteger(PreparedStatement pPs, int pIndex, @Nullable Integer pValue) throws SQLException;
 
 	public String getTextType(int pMaxLength);
 
-	public String readText(ResultSet pRs, int pIndex) throws SQLException;
+	public @Nullable String readText(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeText(PreparedStatement pPs, int pIndex, String pValue) throws SQLException;
+	public void writeText(PreparedStatement pPs, int pIndex, @Nullable String pValue) throws SQLException;
 
 	public String getTimestampType();
 
-	public Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException;
+	public @Nullable Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeTimestamp(PreparedStatement pPs, int pIndex, Long pValue) throws SQLException;
+	public void writeTimestamp(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException;
 
-	public Set<String> getReservedWords();
+	public Set<@NonNull String> getReservedWords();
 }

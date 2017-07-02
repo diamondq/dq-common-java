@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class JDBCColumnSerializer implements IPreparedStatementSerializer {
 
 	private final IKVTableDefinition	mDefinition;
@@ -20,7 +22,10 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
 	}
 
 	@Override
-	public <O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex) throws SQLException {
+	public <@Nullable O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
+		throws SQLException {
+		if (pObj == null)
+			throw new UnsupportedOperationException();
 		if (Map.class.isAssignableFrom(pObj.getClass()) == false)
 			throw new UnsupportedOperationException();
 		@SuppressWarnings("unchecked")

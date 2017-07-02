@@ -20,8 +20,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A Persistence Layer that stores all the information in memory
+ */
 public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
+	/**
+	 * Default constructor
+	 * 
+	 * @param pScope the scope
+	 */
 	public MemoryPersistenceLayer(Scope pScope) {
 		super(pScope, true, true, true, true);
 	}
@@ -69,7 +77,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 		for (Map.Entry<String, String> pair : mResourceCache.asMap().entrySet()) {
 			String key = pair.getKey();
-			if (key.startsWith(prefix) == true)
+			if ((key != null) && (key.startsWith(prefix) == true))
 				builder.put(key.substring(prefix.length()), pair.getValue());
 		}
 		return builder.build();

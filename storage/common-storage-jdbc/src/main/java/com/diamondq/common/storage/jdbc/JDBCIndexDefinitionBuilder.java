@@ -11,6 +11,9 @@ public class JDBCIndexDefinitionBuilder extends KVIndexDefinitionBuilder<JDBCInd
 	 */
 	@Override
 	public IKVIndexDefinition build() {
-		return new GenericKVIndexDefinition(mName, mColumns);
+		String name = mName;
+		if (name == null)
+			throw new IllegalArgumentException("The name was not set in the JDBCIndexDefinitionBuilder");
+		return new GenericKVIndexDefinition(name, mColumns.build());
 	}
 }

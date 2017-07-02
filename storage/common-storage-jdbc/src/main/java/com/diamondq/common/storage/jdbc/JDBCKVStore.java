@@ -28,11 +28,13 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBuilder, JDBCIndexDefinitionBuilder>,
-	IKVTableDefinitionSupport {
+	IKVTableDefinitionSupport<JDBCTableDefinitionBuilder, JDBCColumnDefinitionBuilder> {
 
 	private static final Logger	sLogger			= LoggerFactory.getLogger(JDBCKVStore.class);
 
@@ -47,10 +49,13 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 	static final BigDecimal		sLONG_MAX_VALUE	= BigDecimal.valueOf(Long.MAX_VALUE);
 
 	public static class JDBCKVStoreBuilder {
+		@Nullable
 		private DataSource		mDatabase;
 
+		@Nullable
 		private IJDBCDialect	mDialect;
 
+		@Nullable
 		private String			mTableSchema;
 
 		public JDBCKVStoreBuilder database(DataSource pDatabase) {
@@ -69,7 +74,13 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 		}
 
 		public JDBCKVStore build() {
-			return new JDBCKVStore(mDatabase, mDialect, mTableSchema);
+			DataSource database = mDatabase;
+			if (database == null)
+				throw new IllegalArgumentException("database not set in JDBCKVStoreBuilder");
+			IJDBCDialect dialect = mDialect;
+			if (dialect == null)
+				throw new IllegalArgumentException("dialect not set in JDBCKVStoreBuilder");
+			return new JDBCKVStore(database, dialect, mTableSchema);
 		}
 	}
 
@@ -77,11 +88,12 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 	private final IJDBCDialect					mDialect;
 
+	@Nullable
 	private final String						mTableSchema;
 
 	private final Cache<String, JDBCTableInfo>	mTableCache;
 
-	public JDBCKVStore(DataSource pDatabase, IJDBCDialect pDialect, String pTableSchema) {
+	public JDBCKVStore(DataSource pDatabase, IJDBCDialect pDialect, @Nullable String pTableSchema) {
 		mDatabase = pDatabase;
 		mDialect = pDialect;
 		mTableSchema = (pTableSchema == null ? null : pTableSchema.toLowerCase());
@@ -120,7 +132,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> IKVIndexSupport<ICB, IDB> getIndexSupport() {
+	public <ICB extends @NonNull KVIndexColumnBuilder<@NonNull ICB>, IDB extends @NonNull KVIndexDefinitionBuilder<@NonNull IDB>> @Nullable IKVIndexSupport<@NonNull ICB, @NonNull IDB> getIndexSupport() {
 		return (IKVIndexSupport<ICB, IDB>) this;
 	}
 
@@ -128,8 +140,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 	 * @see com.diamondq.common.storage.kv.IKVIndexSupport#addRequiredIndexes(java.util.Collection)
 	 */
 	@Override
-	public void addRequiredIndexes(Collection<IKVIndexDefinition> pIndexes) {
-		Map<String, IKVIndexDefinition> indexByName = Maps.newHashMap();
+	public void addRequiredIndexes(Collection<@NonNull IKVIndexDefinition> pIndexes) {
+		Map<@NonNull String, @NonNull IKVIndexDefinition> indexByName = Maps.newHashMap();
 		for (IKVIndexDefinition index : pIndexes)
 			indexByName.put(index.getName(), index);
 
@@ -160,7 +172,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 	 * @param pClass the class that will be stored in the table
 	 * @return the table info
 	 */
-	public <O> JDBCTableInfo validateTable(Connection pConnection, String pTable, Class<O> pClass) {
+	public <O> JDBCTableInfo validateTable(Connection pConnection, String pTable, @Nullable Class<O> pClass) {
 		JDBCTableInfo tableInfo = mTableCache.getIfPresent(pTable);
 		String mungedTableName = escapeTableName(pTable);
 		if (tableInfo == null) {
@@ -170,15 +182,19 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			try {
 
 				String matchingSchema = null;
-				if (getTableSchema() != null) {
+				String tableSchema = getTableSchema();
+				if (tableSchema != null) {
 
 					/* Check the schema */
 
 					boolean missingSchema = true;
 					try (ResultSet rs = pConnection.getMetaData().getSchemas(null, null)) {
 						while (rs.next() == true) {
-							String testName = rs.getString(1).toLowerCase();
-							if (getTableSchema().equals(testName) == true) {
+							String str = rs.getString(1);
+							if (str == null)
+								continue;
+							String testName = str.toLowerCase();
+							if (tableSchema.equals(testName) == true) {
 								missingSchema = false;
 								matchingSchema = testName;
 								break;
@@ -188,14 +204,14 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 					if (missingSchema == true) {
 						try (PreparedStatement ps =
-							pConnection.prepareStatement(mDialect.generateCreateSchemaSQL(getTableSchema()))) {
+							pConnection.prepareStatement(mDialect.generateCreateSchemaSQL(tableSchema))) {
 							ps.execute();
 						}
 
 						try (ResultSet rs = pConnection.getMetaData().getSchemas(null, null)) {
 							while (rs.next() == true) {
 								String testName = rs.getString(1);
-								if (getTableSchema().equals(testName) == true) {
+								if (tableSchema.equals(testName) == true) {
 									matchingSchema = testName;
 									break;
 								}
@@ -209,7 +225,10 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 				boolean missingTable = true;
 				try (ResultSet rs = pConnection.getMetaData().getTables(null, matchingSchema, null, null)) {
 					while (rs.next() == true) {
-						String testName = rs.getString(3).toLowerCase();
+						String str = rs.getString(3);
+						if (str == null)
+							continue;
+						String testName = str.toLowerCase();
 						if (mungedTableName.equals(testName) == true) {
 
 							/* Validate the fields */
@@ -256,8 +275,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			StringBuilder sb = new StringBuilder();
 			sb.append("SELECT ").append(sDATA_KEY).append(" FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			String tableSchema = getTableSchema();
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
 			sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
@@ -275,8 +295,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("SELECT 1 FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
 			sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
@@ -286,8 +306,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("INSERT INTO ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append('(');
 			sb.append(sPRIMARY_KEY_1).append(',');
@@ -300,8 +320,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("UPDATE ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" SET ");
 			sb.append(sDATA_KEY).append("=?");
@@ -314,8 +334,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("DELETE FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" WHERE ");
 			sb.append(sPRIMARY_KEY_1).append("=? AND ");
@@ -326,8 +346,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("SELECT count(1) FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			String getCountSQL = sb.toString();
 
@@ -335,8 +355,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("DELETE FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			String clearSQL = sb.toString();
 
@@ -346,8 +366,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			sb.append("SELECT distinct ");
 			sb.append(sPRIMARY_KEY_1);
 			sb.append(" FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			String keyIteratorSQL = sb.toString();
 
@@ -357,8 +377,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			sb.append("SELECT ");
 			sb.append(sPRIMARY_KEY_2);
 			sb.append(" FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" WHERE ");
 			sb.append(sPRIMARY_KEY_1).append("=?");
@@ -390,23 +410,24 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 	 * 
 	 * @return the table schema
 	 */
-	public String getTableSchema() {
+	public @Nullable String getTableSchema() {
 		return mTableSchema;
 	}
 
 	/**
-	 * @see com.diamondq.common.storage.kv.IKVStore#getTableDefinitionSupport()
+	 * @see com.diamondq.common.storage.kv.IKVStore
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public IKVTableDefinitionSupport getTableDefinitionSupport() {
-		return this;
+	public <TDB extends @NonNull KVTableDefinitionBuilder<@NonNull TDB>, CDB extends @NonNull KVColumnDefinitionBuilder<@NonNull CDB>> @Nullable IKVTableDefinitionSupport<@NonNull TDB, @NonNull CDB> getTableDefinitionSupport() {
+		return (@Nullable IKVTableDefinitionSupport<@NonNull TDB, @NonNull CDB>) this;
 	}
 
 	/**
 	 * @see com.diamondq.common.storage.kv.IKVTableDefinitionSupport#createTableDefinitionBuilder()
 	 */
 	@Override
-	public KVTableDefinitionBuilder createTableDefinitionBuilder() {
+	public JDBCTableDefinitionBuilder createTableDefinitionBuilder() {
 		return new JDBCTableDefinitionBuilder();
 	}
 
@@ -414,7 +435,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 	 * @see com.diamondq.common.storage.kv.IKVTableDefinitionSupport#createColumnDefinitionBuilder()
 	 */
 	@Override
-	public KVColumnDefinitionBuilder createColumnDefinitionBuilder() {
+	public JDBCColumnDefinitionBuilder createColumnDefinitionBuilder() {
 		return new JDBCColumnDefinitionBuilder();
 	}
 
@@ -429,20 +450,25 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			/* Query the database to see if the table exists */
 
+			String tableSchema = getTableSchema();
+
 			try {
 				try (Connection connection = mDatabase.getConnection()) {
 					connection.setAutoCommit(true);
 
 					String matchingSchema = null;
-					if (getTableSchema() != null) {
+					if (tableSchema != null) {
 
 						/* Check the schema */
 
 						boolean missingSchema = true;
 						try (ResultSet rs = connection.getMetaData().getSchemas(null, null)) {
 							while (rs.next() == true) {
-								String testName = rs.getString(1).toLowerCase();
-								if (getTableSchema().equals(testName) == true) {
+								String str = rs.getString(1);
+								if (str == null)
+									continue;
+								String testName = str.toLowerCase();
+								if (tableSchema.equals(testName) == true) {
 									missingSchema = false;
 									matchingSchema = testName;
 									break;
@@ -452,14 +478,14 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 						if (missingSchema == true) {
 							try (PreparedStatement ps =
-								connection.prepareStatement(mDialect.generateCreateSchemaSQL(getTableSchema()))) {
+								connection.prepareStatement(mDialect.generateCreateSchemaSQL(tableSchema))) {
 								ps.execute();
 							}
 
 							try (ResultSet rs = connection.getMetaData().getSchemas(null, null)) {
 								while (rs.next() == true) {
 									String testName = rs.getString(1);
-									if (getTableSchema().equals(testName) == true) {
+									if (tableSchema.equals(testName) == true) {
 										matchingSchema = testName;
 										break;
 									}
@@ -473,7 +499,10 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 					boolean missingTable = true;
 					try (ResultSet rs = connection.getMetaData().getTables(null, matchingSchema, null, null)) {
 						while (rs.next() == true) {
-							String testName = rs.getString(3).toLowerCase();
+							String str = rs.getString(3);
+							if (str == null)
+								continue;
+							String testName = str.toLowerCase();
 							if (mungedTableName.equals(testName) == true) {
 
 								/* Validate the fields */
@@ -487,8 +516,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 					if (missingTable == true) {
 						StringBuilder sb = new StringBuilder();
 						sb.append("CREATE TABLE ");
-						if (getTableSchema() != null)
-							sb.append(getTableSchema()).append('.');
+						if (tableSchema != null)
+							sb.append(tableSchema).append('.');
 						sb.append(mungedTableName);
 						sb.append(" (");
 						sb.append(sPRIMARY_KEY_1);
@@ -565,8 +594,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			sb.append(String.join(",",
 				Iterables.transform(pDefinition.getColumnDefinitions(), (cd) -> escapeColumnName(cd.getName()))));
 			sb.append(" FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
 			sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
@@ -584,8 +613,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("SELECT 1 FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
 			sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
@@ -595,8 +624,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("INSERT INTO ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append('(');
 			sb.append(sPRIMARY_KEY_1).append(',');
@@ -612,8 +641,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("UPDATE ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" SET ");
 			sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
@@ -627,8 +656,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("DELETE FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" WHERE ");
 			sb.append(sPRIMARY_KEY_1).append("=? AND ");
@@ -639,8 +668,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("SELECT count(1) FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			String getCountSQL = sb.toString();
 
@@ -648,8 +677,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			sb = new StringBuilder();
 			sb.append("DELETE FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			String clearSQL = sb.toString();
 
@@ -659,8 +688,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			sb.append("SELECT distinct ");
 			sb.append(sPRIMARY_KEY_1);
 			sb.append(" FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			String keyIteratorSQL = sb.toString();
 
@@ -670,8 +699,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			sb.append("SELECT ");
 			sb.append(sPRIMARY_KEY_2);
 			sb.append(" FROM ");
-			if (getTableSchema() != null)
-				sb.append(getTableSchema()).append('.');
+			if (tableSchema != null)
+				sb.append(tableSchema).append('.');
 			sb.append(mungedTableName);
 			sb.append(" WHERE ");
 			sb.append(sPRIMARY_KEY_1).append("=?");
