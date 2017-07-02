@@ -8,10 +8,7 @@ public interface EditorComponentDefinition<T extends EditorComponentDefinition<T
 
 	/* label */
 
-	@Nullable
-	public TranslatableString getLabel();
-
-	
+	public @Nullable TranslatableString getLabel();
 
 	public T setLabel(@Nullable TranslatableString pValue);
 
@@ -24,15 +21,11 @@ public interface EditorComponentDefinition<T extends EditorComponentDefinition<T
 	 */
 	public int getColumn();
 
-	
-
 	public T setColumn(int pValue);
 
 	/* Column Span */
 
 	public int getColumnSpan();
-
-	
 
 	public T setColumnSpan(int pValue);
 
@@ -40,16 +33,11 @@ public interface EditorComponentDefinition<T extends EditorComponentDefinition<T
 
 	public int getOrder();
 
-	
-
 	public T setOrder(int pValue);
 
 	/* VisibleIfProperty */
 
-	@Nullable
-	public PropertyDefinitionRef getVisibleIfProperty();
-
-	
+	public @Nullable PropertyDefinitionRef getVisibleIfProperty();
 
 	public T setVisibleIfProperty(@Nullable PropertyDefinitionRef pValue);
 
@@ -57,11 +45,7 @@ public interface EditorComponentDefinition<T extends EditorComponentDefinition<T
 
 	public Set<String> getVisibleIfValueEquals();
 
-	
-
 	public T addVisibleIfValueEquals(String pValue);
-
-	
 
 	public T removeVisibleIfValueEquals(String pValue);
 }

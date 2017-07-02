@@ -5,12 +5,10 @@ import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-
 public interface Structure extends Resolvable<Structure, StructureRef> {
 
 	/* Definition */
 
-	
 	public StructureDefinition getDefinition();
 
 	/* Virtual Property: Local Name */
@@ -22,8 +20,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * 
 	 * @return the unique name
 	 */
-	@Nullable
-	public String getLocalName();
+	public @Nullable String getLocalName();
 
 	/* Virtual Property: parent */
 
@@ -34,8 +31,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * 
 	 * @return the parent reference
 	 */
-	@Nullable
-	public StructureRef getParentRef();
+	public @Nullable StructureRef getParentRef();
 
 	/* Virtual Property: container */
 
@@ -46,17 +42,13 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * 
 	 * @return the container reference or null
 	 */
-	@Nullable
-	public <T> PropertyRef<T> getContainerRef();
+	public <T> @Nullable PropertyRef<T> getContainerRef();
 
 	/* Properties */
 
-	
 	public Map<String, Property<?>> getProperties();
 
-	
-	
-	public Structure updateProperty( Property<?> pValue);
+	public Structure updateProperty(Property<?> pValue);
 
 	/**
 	 * Returns a property with the given name
@@ -64,8 +56,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * @param pName the name of the property
 	 * @return the Property or null
 	 */
-	@Nullable
-	public <T> Property<T> lookupPropertyByName( String pName);
+	public <T> @Nullable Property<T> lookupPropertyByName(String pName);
 
 	/**
 	 * Returns back the set of Property's that match the given keyword
@@ -75,8 +66,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * @param pType the type (or null if any type is valid)
 	 * @return the collection of Properties
 	 */
-	@Nullable
-	public <T> Collection<Property<T>> lookupPropertiesByKeyword( String pKey, @Nullable String pValue,
+	public <T> Collection<Property<T>> lookupPropertiesByKeyword(String pKey, @Nullable String pValue,
 		@Nullable PropertyType pType);
 
 }

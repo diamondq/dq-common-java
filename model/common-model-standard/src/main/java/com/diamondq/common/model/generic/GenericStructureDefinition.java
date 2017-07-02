@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * 
  */
@@ -37,6 +39,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 	private final String									mName;
 
+	@Nullable
 	private final TranslatableString						mLabel;
 
 	private final boolean									mSingleInstance;
@@ -51,9 +54,9 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 	private static final Pattern							sValidNamePattern	= Pattern.compile("^[0-9a-zA-Z.-]+$");
 
-	public GenericStructureDefinition(Scope pScope, String pName, TranslatableString pLabel, boolean pSingleInstance,
-		Map<String, PropertyDefinition> pProperties, Set<StructureDefinitionRef> pParentDefinitions,
-		Multimap<String, String> pKeywords) {
+	public GenericStructureDefinition(Scope pScope, String pName, @Nullable TranslatableString pLabel,
+		boolean pSingleInstance, @Nullable Map<String, PropertyDefinition> pProperties,
+		@Nullable Set<StructureDefinitionRef> pParentDefinitions, @Nullable Multimap<String, String> pKeywords) {
 		super();
 		mScope = pScope;
 		mName = pName;
@@ -72,13 +75,14 @@ public class GenericStructureDefinition implements StructureDefinition {
 		});
 	}
 
+	@SuppressWarnings("unused")
 	public void validate() {
 
 		if (mName == null)
 			throw new IllegalArgumentException("The StructureDefinition must have a name.");
 		if (sValidNamePattern.matcher(mName).matches() == false)
 			throw new IllegalArgumentException(
-				"The StructureDefinition must have a valid name, which can only be the characters 0-9, a-z, A-Z, . and -.");		
+				"The StructureDefinition must have a valid name, which can only be the characters 0-9, a-z, A-Z, . and -.");
 	}
 
 	/**
@@ -90,7 +94,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	}
 
 	@Override
-	public TranslatableString getLabel() {
+	public @Nullable TranslatableString getLabel() {
 		return mLabel;
 	}
 
@@ -98,7 +102,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 * @see com.diamondq.common.model.interfaces.StructureDefinition#setLabel(com.diamondq.common.model.interfaces.TranslatableString)
 	 */
 	@Override
-	public StructureDefinition setLabel(TranslatableString pValue) {
+	public StructureDefinition setLabel(@Nullable TranslatableString pValue) {
 		return new GenericStructureDefinition(mScope, mName, pValue, mSingleInstance, mProperties, mParentDefinitions,
 			mKeywords);
 	}
@@ -133,8 +137,11 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition addPropertyDefinition(PropertyDefinition pValue) {
-		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance, ImmutableMap
-			.<String, PropertyDefinition> builder().putAll(mProperties).put(pValue.getName(), pValue).build(),
+		String name = pValue.getName();
+		if (name == null)
+			throw new IllegalArgumentException();
+		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance,
+			ImmutableMap.<String, PropertyDefinition> builder().putAll(mProperties).put(name, pValue).build(),
 			mParentDefinitions, mKeywords);
 	}
 
@@ -182,8 +189,10 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 		/* Add all the parent properties */
 
-		Iterables.transform(mParentDefinitions, (sdr) -> sdr.resolve())
-			.forEach((sd) -> builder.putAll(sd.getAllProperties()));
+		Iterables.transform(mParentDefinitions, (sdr) -> sdr.resolve()).forEach((sd) -> {
+			if (sd != null)
+				builder.putAll(sd.getAllProperties());
+		});
 
 		return builder.build();
 	}

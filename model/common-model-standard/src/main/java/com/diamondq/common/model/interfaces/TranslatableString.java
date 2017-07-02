@@ -2,6 +2,8 @@ package com.diamondq.common.model.interfaces;
 
 import java.util.Locale;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public interface TranslatableString {
 
 	/**
@@ -9,7 +11,6 @@ public interface TranslatableString {
 	 * 
 	 * @return the key
 	 */
-
 	public String getKey();
 
 	/**
@@ -19,6 +20,6 @@ public interface TranslatableString {
 	 * @param pArgs the arguments to be used to inject into the string
 	 * @return the actual human readable string
 	 */
-	public String resolve(Locale pLocale, Object... pArgs);
+	public String resolve(@Nullable Locale pLocale, @Nullable Object @Nullable... pArgs);
 
 }

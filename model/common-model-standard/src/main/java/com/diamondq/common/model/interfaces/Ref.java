@@ -9,8 +9,7 @@ public interface Ref<X> {
 	 * 
 	 * @return the object
 	 */
-	@Nullable
-	public X resolve();
+	public @Nullable X resolve();
 
 	/**
 	 * Returns a string that can be used to reconstruct this Reference at a later time.

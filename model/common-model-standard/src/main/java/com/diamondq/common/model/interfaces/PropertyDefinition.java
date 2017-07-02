@@ -7,7 +7,6 @@ import java.util.Collection;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-
 /**
  * A PropertyDefinition defines all metadata about a given property.
  */
@@ -16,114 +15,78 @@ public interface PropertyDefinition
 
 	/* Name */
 
-	@Nullable
-	public String getName();
+	public @Nullable String getName();
 
-	
-	
-	public PropertyDefinition setName( String pValue);
+	public PropertyDefinition setName(String pValue);
 
 	/* Label */
 
-	@Nullable
-	public TranslatableString getLabel();
+	public @Nullable TranslatableString getLabel();
 
-	
-	
 	public PropertyDefinition setLabel(@Nullable TranslatableString pValue);
 
 	/* Primary Key */
 
 	public boolean isPrimaryKey();
 
-	
-	
 	public PropertyDefinition setPrimaryKey(boolean pValue);
 
 	/* Type */
 
-	@Nullable
-	public PropertyType getType();
+	public @Nullable PropertyType getType();
 
-	
-	
-	public PropertyDefinition setType( PropertyType pValue);
+	public PropertyDefinition setType(PropertyType pValue);
 
 	/* Validation Script */
 
-	@Nullable
-	public Script getValidationScript();
+	public @Nullable Script getValidationScript();
 
-	
-	
 	public PropertyDefinition setValidationScript(@Nullable Script pValue);
 
 	/* Default Value */
 
-	@Nullable
-	public String getDefaultValue();
+	public @Nullable String getDefaultValue();
 
-	
-	
 	public PropertyDefinition setDefaultValue(@Nullable String pValue);
 
 	/* Default Value Script */
 
-	@Nullable
-	public Script getDefaultValueScript();
+	public @Nullable Script getDefaultValueScript();
 
-	
-	
 	public PropertyDefinition setDefaultValueScript(@Nullable Script pValue);
 
 	/* Reference Type */
 
-	
 	public Collection<StructureDefinitionRef> getReferenceTypes();
 
-	
-	
-	public PropertyDefinition addReferenceType( StructureDefinitionRef pValue);
+	public PropertyDefinition addReferenceType(StructureDefinitionRef pValue);
 
-	
-	
-	public PropertyDefinition removeReferenceType( StructureDefinitionRef pValue);
+	public PropertyDefinition removeReferenceType(StructureDefinitionRef pValue);
 
 	/* Min Value */
 
-	@Nullable
-	public BigDecimal getMinValue();
+	public @Nullable BigDecimal getMinValue();
 
-	
-	
 	public PropertyDefinition setMinValue(@Nullable BigDecimal pValue);
 
 	/* Max Value */
 
-	@Nullable
-	public BigDecimal getMaxValue();
+	public @Nullable BigDecimal getMaxValue();
 
-	
-	
 	public PropertyDefinition setMaxValue(@Nullable BigDecimal pValue);
 
 	/* Final */
 
 	public boolean isFinal();
 
-	
-	
 	public PropertyDefinition setFinal(boolean pValue);
 
 	/* Max Length */
-	
-	@Nullable
-	public Integer getMaxLength();
-	
-	
-	
+
+	public @Nullable Integer getMaxLength();
+
 	public PropertyDefinition setMaxLength(Integer pValue);
-	
+
 	/* keywords */
 
 	/**
@@ -131,7 +94,6 @@ public interface PropertyDefinition
 	 * 
 	 * @return the multimap
 	 */
-	
 	public Multimap<String, String> getKeywords();
 
 	/**
@@ -141,9 +103,7 @@ public interface PropertyDefinition
 	 * @param pValue the value
 	 * @return the updated PropertyDefinition
 	 */
-	
-	
-	public PropertyDefinition addKeyword( String pKey,  String pValue);
+	public PropertyDefinition addKeyword(String pKey, String pValue);
 
 	/**
 	 * Removes a keyword from this StructureDefinition
@@ -152,9 +112,7 @@ public interface PropertyDefinition
 	 * @param pValue the value
 	 * @return the updated PropertyDefinition
 	 */
-	
-	
-	public PropertyDefinition removeKeyword( String pKey,  String pValue);
+	public PropertyDefinition removeKeyword(String pKey, String pValue);
 
 	/**
 	 * Returns the order of this property with other primary keys. Only applies if this property is a primary key
@@ -169,17 +127,11 @@ public interface PropertyDefinition
 	 * @param pOrder the new order
 	 * @return the updated PropertyDefinition
 	 */
-	
-	
 	public PropertyDefinition setPrimaryKeyOrder(int pOrder);
 
-	
-	public PropertyPattern getPropertyPattern();
+	public @Nullable PropertyPattern getPropertyPattern();
 
-	
-	
-	public PropertyDefinition setPropertyPattern( PropertyPattern pValue);
-	
-	
+	public PropertyDefinition setPropertyPattern(@Nullable PropertyPattern pValue);
+
 	public Scope getScope();
 }

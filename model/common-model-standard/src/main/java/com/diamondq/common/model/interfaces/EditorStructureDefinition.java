@@ -35,7 +35,6 @@ public interface EditorStructureDefinition {
 	 * 
 	 * @return the multimap
 	 */
-
 	public Multimap<String, String> getKeywords();
 
 	/**
@@ -45,7 +44,6 @@ public interface EditorStructureDefinition {
 	 * @param pValue the value
 	 * @return the updated EditorStructureDefinition
 	 */
-
 	public EditorStructureDefinition addKeyword(String pKey, String pValue);
 
 	/**
@@ -55,7 +53,6 @@ public interface EditorStructureDefinition {
 	 * @param pValue the value
 	 * @return the updated EditorStructureDefinition
 	 */
-
 	public EditorStructureDefinition removeKeyword(String pKey, String pValue);
 
 }

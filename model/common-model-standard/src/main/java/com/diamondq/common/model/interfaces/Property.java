@@ -1,7 +1,5 @@
 package com.diamondq.common.model.interfaces;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public interface Property<TYPE> {
 
 	/* Value */
@@ -14,7 +12,6 @@ public interface Property<TYPE> {
 	 * @param pContainer the containing structure.
 	 * @return the value
 	 */
-	@Nullable
 	public TYPE getValue(Structure pContainer);
 
 	/**
@@ -24,8 +21,6 @@ public interface Property<TYPE> {
 	 */
 	public boolean isValueSet();
 
-	
-	
 	public Property<TYPE> setValue(TYPE pValue);
 
 	/* Definition */
@@ -36,7 +31,6 @@ public interface Property<TYPE> {
 	 * 
 	 * @return the PropertyDefinition
 	 */
-	
 	public PropertyDefinition getDefinition();
 
 }

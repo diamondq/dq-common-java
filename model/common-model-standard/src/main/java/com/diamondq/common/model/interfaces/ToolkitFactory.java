@@ -3,6 +3,8 @@ package com.diamondq.common.model.interfaces;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public abstract class ToolkitFactory {
 
 	protected ToolkitFactory() {
@@ -29,7 +31,7 @@ public abstract class ToolkitFactory {
 		return newInstance(null);
 	}
 
-	public static ToolkitFactory newInstance(ClassLoader pLoader) {
+	public static ToolkitFactory newInstance(@Nullable ClassLoader pLoader) {
 
 		ToolkitFactory result = null;
 
@@ -65,7 +67,7 @@ public abstract class ToolkitFactory {
 	}
 
 	private static ToolkitFactory newInstance(Class<ToolkitFactory> pClass, String pClassName,
-		ClassLoader pClassLoader) {
+		@Nullable ClassLoader pClassLoader) {
 
 		try {
 			/* Attempt to find the class */

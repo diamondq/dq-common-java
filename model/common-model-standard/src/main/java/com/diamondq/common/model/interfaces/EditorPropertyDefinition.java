@@ -6,63 +6,44 @@ import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-
 public interface EditorPropertyDefinition extends EditorComponentDefinition<EditorPropertyDefinition> {
 
 	/* name */
 
-	@Nullable
-	public String getName();
+	public @Nullable String getName();
 
-	
-	
-	public EditorPropertyDefinition setName( String pName);
+	public EditorPropertyDefinition setName(String pName);
 
 	/* displayType */
 
 	public EditorDisplayType getDisplayType();
 
-	
-	
 	public EditorPropertyDefinition setDisplayType(EditorDisplayType pValue);
 
 	/* enabledIfProperty */
 
-	@Nullable
-	public PropertyDefinitionRef getEnabledIfProperty();
+	public @Nullable PropertyDefinitionRef getEnabledIfProperty();
 
-	
-	
 	public EditorPropertyDefinition setEnabledIfProperty(@Nullable PropertyDefinitionRef pValue);
 
 	/* enabledIfValueEquals */
 
-	
 	public Collection<String> getEnabledIfValueEquals();
 
-	
-	
-	public EditorPropertyDefinition addEnabledIfValueEquals( String pValue);
+	public EditorPropertyDefinition addEnabledIfValueEquals(String pValue);
 
-	
-	
-	public EditorPropertyDefinition removeEnabledIfValueEquals( String pValue);
+	public EditorPropertyDefinition removeEnabledIfValueEquals(String pValue);
 
 	/* mandatory */
 
 	public boolean isMandatory();
 
-	
-	
 	public EditorPropertyDefinition setMandatory(boolean pValue);
 
 	/* mandatoryReason */
 
-	@Nullable
-	public TranslatableString getMandatoryReason();
+	public @Nullable TranslatableString getMandatoryReason();
 
-	
-	
 	public EditorPropertyDefinition setMandatoryReason(@Nullable TranslatableString pValue);
 
 	/* valueMapScript */
@@ -73,11 +54,8 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	 * 
 	 * @return the Script or null
 	 */
-	@Nullable
-	public Script getValueMapScript();
+	public @Nullable Script getValueMapScript();
 
-	
-	
 	public EditorPropertyDefinition setValueMapScript(@Nullable Script pValue);
 
 	/* simpleValueMap */
@@ -88,16 +66,11 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	 * 
 	 * @return the map or null
 	 */
-	@Nullable
-	public Map<String, TranslatableString> getSimpleValueMap();
+	public @Nullable Map<String, TranslatableString> getSimpleValueMap();
 
-	
-	
-	public EditorPropertyDefinition putSimpleValueMapEntry( String pKey,  TranslatableString pValue);
+	public EditorPropertyDefinition putSimpleValueMapEntry(String pKey, TranslatableString pValue);
 
-	
-	
-	public EditorPropertyDefinition removeSimpleValueMapEntry( String pKey);
+	public EditorPropertyDefinition removeSimpleValueMapEntry(String pKey);
 
 	/* valueMapProperty */
 
@@ -107,50 +80,33 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 	 * 
 	 * @return the PropertyDefinitionRef or null
 	 */
-	@Nullable
-	public PropertyDefinitionRef getValueMapProperty();
+	public @Nullable PropertyDefinitionRef getValueMapProperty();
 
-	
-	
 	public EditorPropertyDefinition setValueMapProperty(@Nullable PropertyDefinitionRef pValue);
 
 	/* tableDisplayProperties */
 
-	@Nullable
 	public List<PropertyDefinitionRef> getTableDisplayProperties();
 
-	
-	
-	public EditorPropertyDefinition addTableDisplayProperty(int pIndex,  PropertyDefinitionRef pValue);
+	public EditorPropertyDefinition addTableDisplayProperty(int pIndex, PropertyDefinitionRef pValue);
 
-	
-	
 	public EditorPropertyDefinition removeTableDisplayProperty(int pIndex);
 
 	/* embedTableRowEditor */
 
-	@Nullable
-	public EmbedEditorDirection getEmbedTableRowEditor();
+	public @Nullable EmbedEditorDirection getEmbedTableRowEditor();
 
-	
-	
 	public EditorPropertyDefinition setEmbedTableRowEditor(EmbedEditorDirection pValue);
 
 	/* displayRefImage */
 
-	@Nullable
-	public PropertyDefinitionRef getDisplayRefImage();
+	public @Nullable PropertyDefinitionRef getDisplayRefImage();
 
-	
-	
 	public EditorPropertyDefinition setDisplayRefImage(@Nullable PropertyDefinitionRef pValue);
 
 	/* customScript */
 
-	@Nullable
-	public Script getCustomScript();
+	public @Nullable Script getCustomScript();
 
-	
-	
 	public EditorPropertyDefinition setCustomScript(@Nullable Script pValue);
 }

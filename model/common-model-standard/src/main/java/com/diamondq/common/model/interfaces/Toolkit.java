@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-
 /**
  * The toolkit represents the top of the model chain. Get access to a Toolkit via the {@link ToolkitFactory}.
  */
@@ -18,7 +17,7 @@ public interface Toolkit {
 	 * 
 	 * @return the scopes
 	 */
-	
+
 	public Collection<Scope> getAllScopes();
 
 	/**
@@ -28,7 +27,7 @@ public interface Toolkit {
 	 * @return the Scope or null if there is no scope by that name
 	 */
 	@Nullable
-	public Scope getScope( String pName);
+	public Scope getScope(String pName);
 
 	/**
 	 * Returns a scope with a given name
@@ -36,8 +35,8 @@ public interface Toolkit {
 	 * @param pName the name
 	 * @return the Scope (the existing one or a new one will be created)
 	 */
-	
-	public Scope getOrCreateScope( String pName);
+
+	public Scope getOrCreateScope(String pName);
 
 	/**
 	 * Returns the complete set of StructureDefinitions (references).
@@ -45,8 +44,8 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @return the set
 	 */
-	
-	public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs( Scope pScope);
+
+	public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Scope pScope);
 
 	/**
 	 * Creates a new StructureDefinition that is not yet persisted.
@@ -55,8 +54,8 @@ public interface Toolkit {
 	 * @param pName the name for the StructureDefinition
 	 * @return the blank StructureDefinition
 	 */
-	
-	public StructureDefinition createNewStructureDefinition( Scope pScope,  String pName);
+
+	public StructureDefinition createNewStructureDefinition(Scope pScope, String pName);
 
 	/**
 	 * Writes a StructureDefinition back to persistent storage. Future queries will return the persisted value, but
@@ -65,7 +64,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @param pValue the StructureDefinition to write
 	 */
-	public void writeStructureDefinition( Scope pScope,  StructureDefinition pValue);
+	public void writeStructureDefinition(Scope pScope, StructureDefinition pValue);
 
 	/**
 	 * Deletes an existing StructureDefinition from permanent storage.
@@ -73,7 +72,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @param pValue the StructureDefinition to delete.
 	 */
-	public void deleteStructureDefinition( Scope pScope,  StructureDefinition pValue);
+	public void deleteStructureDefinition(Scope pScope, StructureDefinition pValue);
 
 	/**
 	 * Creates a reference for a StructureDefinition
@@ -82,9 +81,8 @@ public interface Toolkit {
 	 * @param pResolvable the StructureDefinition
 	 * @return the reference
 	 */
-	
-	public StructureDefinitionRef createStructureDefinitionRef( Scope pScope,
-		 StructureDefinition pResolvable);
+
+	public StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable);
 
 	/**
 	 * Creates a reference for StructureDefinition
@@ -93,9 +91,8 @@ public interface Toolkit {
 	 * @param pSerialized the serialized reference
 	 * @return the reference
 	 */
-	
-	public StructureDefinitionRef createStructureDefinitionRefFromSerialized( Scope pScope,
-		 String pSerialized);
+
+	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized);
 
 	/**
 	 * Creates a reference for a Structure
@@ -104,8 +101,8 @@ public interface Toolkit {
 	 * @param pResolvable the Structure
 	 * @return the reference
 	 */
-	
-	public StructureRef createStructureRef( Scope pScope,  Structure pResolvable);
+
+	public StructureRef createStructureRef(Scope pScope, Structure pResolvable);
 
 	/**
 	 * Creates a reference string for a Structure
@@ -114,8 +111,8 @@ public interface Toolkit {
 	 * @param pResolvable the Structure
 	 * @return the reference string
 	 */
-	
-	public String createStructureRefStr( Scope pScope,  Structure pResolvable);
+
+	public String createStructureRefStr(Scope pScope, Structure pResolvable);
 
 	/**
 	 * Creates a reference for a PropertyDefinition
@@ -125,9 +122,9 @@ public interface Toolkit {
 	 * @param pContaining the containing StructureDefinition
 	 * @return the reference
 	 */
-	
-	public PropertyDefinitionRef createPropertyDefinitionRef( Scope pScope,
-		 PropertyDefinition pResolvable,  StructureDefinition pContaining);
+
+	public PropertyDefinitionRef createPropertyDefinitionRef(Scope pScope, PropertyDefinition pResolvable,
+		StructureDefinition pContaining);
 
 	/**
 	 * Creates a reference for a Property
@@ -137,9 +134,8 @@ public interface Toolkit {
 	 * @param pContaining the containing Structure
 	 * @return the reference
 	 */
-	
-	public <T> PropertyRef<T> createPropertyRef( Scope pScope, @Nullable Property<T> pResolvable,
-		 Structure pContaining);
+
+	public <T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable, Structure pContaining);
 
 	/**
 	 * Looks up a StructureDefinition by name
@@ -148,8 +144,7 @@ public interface Toolkit {
 	 * @param pName the name
 	 * @return the StructureDefinition or null
 	 */
-	@Nullable
-	public StructureDefinition lookupStructureDefinitionByName( Scope pScope,  String pName);
+	public @Nullable StructureDefinition lookupStructureDefinitionByName(Scope pScope, String pName);
 
 	/**
 	 * Creates a new blank PropertyDefinition.
@@ -157,8 +152,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @return the PropertyDefinition, never null.
 	 */
-	
-	public PropertyDefinition createNewPropertyDefinition( Scope pScope);
+	public PropertyDefinition createNewPropertyDefinition(Scope pScope);
 
 	/**
 	 * Given a list of primary keys, collapse it into a single name. This usually just returns a String separated by a
@@ -169,8 +163,7 @@ public interface Toolkit {
 	 * @param pNames the names
 	 * @return the collapsed primary key
 	 */
-	
-	public String collapsePrimaryKeys( Scope pScope,  List<Object> pNames);
+	public String collapsePrimaryKeys(Scope pScope, List<Object> pNames);
 
 	/**
 	 * Looks up a Structure by the full serialized reference string. This is actually called by the
@@ -181,8 +174,7 @@ public interface Toolkit {
 	 *            {@link StructureRef#getSerializedString()}
 	 * @return the Structure or null
 	 */
-	@Nullable
-	public Structure lookupStructureBySerializedRef( Scope pScope,  String pSerializedRef);
+	public @Nullable Structure lookupStructureBySerializedRef(Scope pScope, String pSerializedRef);
 
 	/**
 	 * Creates a new Structure given a StructureDefinition. NOTE: The StructureDefinition must be in the same scope as
@@ -192,8 +184,7 @@ public interface Toolkit {
 	 * @param pStructureDefinition the StructureDefinition to use
 	 * @return the new, empty, Structure
 	 */
-	
-	public Structure createNewStructure( Scope pScope,  StructureDefinition pStructureDefinition);
+	public Structure createNewStructure(Scope pScope, StructureDefinition pStructureDefinition);
 
 	/**
 	 * Writes a Structure to the persistence layer.
@@ -201,7 +192,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @param pStructure the Structure
 	 */
-	public void writeStructure( Scope pScope,  Structure pStructure);
+	public void writeStructure(Scope pScope, Structure pStructure);
 
 	/**
 	 * Deletes an existing Structure from permanent storage.
@@ -209,7 +200,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @param pValue the Structure to delete.
 	 */
-	public void deleteStructure( Scope pScope,  Structure pValue);
+	public void deleteStructure(Scope pScope, Structure pValue);
 
 	/**
 	 * Creates a new Property given a PropertyDefinition. NOTE: The PropertyDefinition must be in the same scope as that
@@ -221,9 +212,8 @@ public interface Toolkit {
 	 * @param pValue the value (if the value is not set, then this is ignored)
 	 * @return the new, empty, Property
 	 */
-	
-	public <TYPE> Property<TYPE> createNewProperty( Scope pScope,
-		 PropertyDefinition pPropertyDefinition, boolean isValueSet, TYPE pValue);
+	public <TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
+		boolean isValueSet, TYPE pValue);
 
 	/**
 	 * Creates a new TranslatableString object for the given key
@@ -232,8 +222,7 @@ public interface Toolkit {
 	 * @param pKey the key
 	 * @return the TranslatableString
 	 */
-	
-	public TranslatableString createNewTranslatableString( Scope pScope,  String pKey);
+	public TranslatableString createNewTranslatableString(Scope pScope, String pKey);
 
 	/**
 	 * Lookup for existing EditorStructureDefinition's that correspond to the provided StructureDefinition.
@@ -243,9 +232,8 @@ public interface Toolkit {
 	 * @return the list of EditorStructureDefinition's in descending order of priority. At minimum, will include a
 	 *         generic editor structure definition.
 	 */
-	
-	public List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef( Scope pScope,
-		 StructureDefinitionRef pRef);
+	public List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef(Scope pScope,
+		StructureDefinitionRef pRef);
 
 	/**
 	 * Creates a new EditorGroupDefinition. NOTE: It is not attached to any parent upon creation.
@@ -253,8 +241,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @return the new EditorGroupDefinition
 	 */
-	
-	public EditorGroupDefinition createNewEditorGroupDefinition( Scope pScope);
+	public EditorGroupDefinition createNewEditorGroupDefinition(Scope pScope);
 
 	/**
 	 * Creates a new EditorPropertyDefinition. NOTE: It is not attached to any parent upon creation.
@@ -262,8 +249,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @return the new EditorPropertyDefinition
 	 */
-	
-	public EditorPropertyDefinition createNewEditorPropertyDefinition( Scope pScope);
+	public EditorPropertyDefinition createNewEditorPropertyDefinition(Scope pScope);
 
 	/**
 	 * Creates a new EditorStructureDefinition. NOTE: It is not persisted upon creation.
@@ -273,8 +259,8 @@ public interface Toolkit {
 	 * @param pRef the reference
 	 * @return the new EditorStructureDefinition
 	 */
-	public EditorStructureDefinition createNewEditorStructureDefinition( Scope pScope,  String pName,
-		 StructureDefinitionRef pRef);
+	public EditorStructureDefinition createNewEditorStructureDefinition(Scope pScope, String pName,
+		StructureDefinitionRef pRef);
 
 	/**
 	 * Writes an EditorStructureDefintion to persistent storage.
@@ -282,8 +268,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @param pEditorStructureDefinition the object to write
 	 */
-	public void writeEditorStructureDefinition( Scope pScope,
-		 EditorStructureDefinition pEditorStructureDefinition);
+	public void writeEditorStructureDefinition(Scope pScope, EditorStructureDefinition pEditorStructureDefinition);
 
 	/**
 	 * Deletes an existing EditorStructureDefinition from permanent storage.
@@ -291,7 +276,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @param pValue the EditorStructureDefinition to delete.
 	 */
-	public void deleteEditorStructureDefinition( Scope pScope,  EditorStructureDefinition pValue);
+	public void deleteEditorStructureDefinition(Scope pScope, EditorStructureDefinition pValue);
 
 	/**
 	 * Creates a new StructureRef from a serialized string
@@ -300,8 +285,7 @@ public interface Toolkit {
 	 * @param pValue the serialized string
 	 * @return the StructureRef
 	 */
-	
-	public StructureRef createStructureRefFromSerialized( Scope pScope,  String pValue);
+	public StructureRef createStructureRefFromSerialized(Scope pScope, String pValue);
 
 	/**
 	 * Creates a new StructureRef from the parts of a serialized string. There are multiple different ways that this can
@@ -320,8 +304,7 @@ public interface Toolkit {
 	 * @param pPrimaryKeys the set of primary keys in the appropriate order
 	 * @return the StructureRef
 	 */
-	
-	public StructureRef createStructureRefFromParts( Scope pScope, @Nullable Structure pStructure,
+	public StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure,
 		@Nullable String pPropName, @Nullable StructureDefinition pDef, List<Object> pPrimaryKeys);
 
 	/**
@@ -331,12 +314,9 @@ public interface Toolkit {
 	 * @param pValue the serialized string
 	 * @return the PropertyRef
 	 */
-	
-	public <T> PropertyRef<T> createPropertyRefFromSerialized( Scope pScope,  String pValue);
+	public <T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue);
 
-	
-	public Collection<Structure> getAllStructuresByDefinition( Scope pScope,
-		 StructureDefinitionRef pRef);
+	public Collection<Structure> getAllStructuresByDefinition(Scope pScope, StructureDefinitionRef pRef);
 
 	/**
 	 * Looks up a resource string under the given scope, locale and key
@@ -346,8 +326,7 @@ public interface Toolkit {
 	 * @param pKey the key
 	 * @return the matching resource string or null if there is none anywhere.
 	 */
-	@Nullable
-	public String lookupResourceString( Scope pScope, @Nullable Locale pLocale,  String pKey);
+	public @Nullable String lookupResourceString(Scope pScope, @Nullable Locale pLocale, String pKey);
 
 	/**
 	 * Sets the global default locale (applies to all threads that have not specifically been set)
@@ -355,7 +334,7 @@ public interface Toolkit {
 	 * @param pScope the scope or if null, then it applies to all existing scopes (but not to-be created ones)
 	 * @param pLocale the locale
 	 */
-	public void setGlobalDefaultLocale(@Nullable Scope pScope,  Locale pLocale);
+	public void setGlobalDefaultLocale(@Nullable Scope pScope, Locale pLocale);
 
 	/**
 	 * Sets the thread specific locale
@@ -371,7 +350,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @return true if it is supported or false otherwise.
 	 */
-	public boolean isResourceStringWritingSupported( Scope pScope);
+	public boolean isResourceStringWritingSupported(Scope pScope);
 
 	/**
 	 * This writes a new resource string to the scope. NOTE: Not all scopes will support this. Check with
@@ -382,7 +361,7 @@ public interface Toolkit {
 	 * @param pKey the key
 	 * @param pValue the value
 	 */
-	public void writeResourceString( Scope pScope,  Locale pLocale, String pKey, String pValue);
+	public void writeResourceString(Scope pScope, Locale pLocale, String pKey, String pValue);
 
 	/**
 	 * This deletes an existing resource string from the scope. NOTE: Not all scopes will support this. Check with
@@ -392,7 +371,7 @@ public interface Toolkit {
 	 * @param pLocale the locale
 	 * @param pKey the key
 	 */
-	public void deleteResourceString( Scope pScope,  Locale pLocale, String pKey);
+	public void deleteResourceString(Scope pScope, Locale pLocale, String pKey);
 
 	/**
 	 * Returns the set of key/value pairs for a given locale. This will not do any form of fallbacks, and will only
@@ -402,8 +381,7 @@ public interface Toolkit {
 	 * @param pLocale the locale
 	 * @return the set of key/value pairs, never null
 	 */
-	
-	public Map<String, String> getResourceStringsByLocale( Scope pScope,  Locale pLocale);
+	public Map<String, String> getResourceStringsByLocale(Scope pScope, Locale pLocale);
 
 	/**
 	 * Returns the set of Locales that have ResourceStrings assigned to them
@@ -411,8 +389,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @return the set of Locales, never null
 	 */
-	
-	public Collection<Locale> getResourceStringLocales( Scope pScope);
+	public Collection<Locale> getResourceStringLocales(Scope pScope);
 
 	/**
 	 * Creates a new empty QueryBuilder object.
@@ -420,7 +397,7 @@ public interface Toolkit {
 	 * @param pScope the scope
 	 * @return the QueryBuilder
 	 */
-	public QueryBuilder createNewQueryBuilder( Scope pScope);
+	public QueryBuilder createNewQueryBuilder(Scope pScope);
 
 	public List<Structure> lookupStructuresByQuery(Scope pScope, StructureDefinition pStructureDefinition,
 		QueryBuilder pBuilder, Map<String, Object> pParamValues);

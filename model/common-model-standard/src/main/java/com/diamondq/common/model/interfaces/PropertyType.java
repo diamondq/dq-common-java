@@ -16,7 +16,7 @@ public enum PropertyType {
 
 	/** This represents a reference to an existing Property */
 	PropertyRef,
-	
+
 	/** This represents a reference to an existing Structure */
 	StructureRef,
 
@@ -31,7 +31,7 @@ public enum PropertyType {
 
 	/** This represents arbitrary binary data */
 	Binary,
-	
+
 	/** This represents a timestamp */
 	Timestamp
 

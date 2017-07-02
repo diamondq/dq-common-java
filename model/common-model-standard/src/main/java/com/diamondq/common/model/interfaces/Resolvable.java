@@ -1,6 +1,5 @@
 package com.diamondq.common.model.interfaces;
 
-
 public interface Resolvable<ACTUAL, REF extends Ref<ACTUAL>> {
 
 	/**
@@ -8,7 +7,6 @@ public interface Resolvable<ACTUAL, REF extends Ref<ACTUAL>> {
 	 * 
 	 * @return the reference
 	 */
-	
 	public REF getReference();
 
 }

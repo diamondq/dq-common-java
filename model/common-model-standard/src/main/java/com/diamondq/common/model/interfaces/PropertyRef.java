@@ -9,14 +9,13 @@ public interface PropertyRef<T> extends Ref<Property<T>> {
 	 * 
 	 * @return the object
 	 */
-	@Nullable
-	public Structure resolveToStructure();
+	public @Nullable Structure resolveToStructure();
 
 	/**
 	 * Resolves this reference into a Structure and a Property
 	 * 
 	 * @return the StructureAndProperty
 	 */
-	public StructureAndProperty<T> resolveToBoth();
+	public @Nullable StructureAndProperty<T> resolveToBoth();
 
 }
