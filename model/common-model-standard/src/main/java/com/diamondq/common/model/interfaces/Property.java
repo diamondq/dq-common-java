@@ -1,6 +1,8 @@
 package com.diamondq.common.model.interfaces;
 
-public interface Property<TYPE> {
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public interface Property<@Nullable TYPE> {
 
 	/* Value */
 

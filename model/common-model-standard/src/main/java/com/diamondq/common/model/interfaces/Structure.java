@@ -42,7 +42,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * 
 	 * @return the container reference or null
 	 */
-	public <T> @Nullable PropertyRef<T> getContainerRef();
+	public <@Nullable T> @Nullable PropertyRef<T> getContainerRef();
 
 	/* Properties */
 
@@ -56,7 +56,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * @param pName the name of the property
 	 * @return the Property or null
 	 */
-	public <T> @Nullable Property<T> lookupPropertyByName(String pName);
+	public <@Nullable T> @Nullable Property<T> lookupPropertyByName(String pName);
 
 	/**
 	 * Returns back the set of Property's that match the given keyword
@@ -66,7 +66,7 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	 * @param pType the type (or null if any type is valid)
 	 * @return the collection of Properties
 	 */
-	public <T> Collection<Property<T>> lookupPropertiesByKeyword(String pKey, @Nullable String pValue,
+	public <@Nullable T> Collection<Property<T>> lookupPropertiesByKeyword(String pKey, @Nullable String pValue,
 		@Nullable PropertyType pType);
 
 }

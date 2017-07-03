@@ -9,6 +9,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyPattern;
 import com.diamondq.common.model.interfaces.PropertyRef;
+import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Ref;
 import com.diamondq.common.model.interfaces.Scope;
@@ -33,6 +34,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
@@ -78,11 +81,13 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#createNewPropertyDefinition(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope)
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.PropertyType)
 	 */
 	@Override
-	public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope) {
-		return new GenericPropertyDefinition(mScope, null, null, false, 0, null, null, null, null, null, null, null,
+	public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope, String pName,
+		PropertyType pType) {
+		return new GenericPropertyDefinition(mScope, pName, null, false, 0, pType, null, null, null, null, null, null,
 			null, false, PropertyPattern.Normal, null);
 	}
 
@@ -101,8 +106,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      boolean, java.lang.Object)
 	 */
 	@Override
-	public <T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope, PropertyDefinition pPropertyDefinition,
-		boolean pIsValueSet, T pValue) {
+	public <@Nullable T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope,
+		PropertyDefinition pPropertyDefinition, boolean pIsValueSet, T pValue) {
 		switch (pPropertyDefinition.getPropertyPattern()) {
 		case Normal:
 			return new GenericProperty<T>(pPropertyDefinition, pIsValueSet, pValue);
@@ -168,8 +173,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      java.lang.String, com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)
 	 */
 	@Override
-	public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, Structure pStructure,
-		String pPropName, StructureDefinition pDef, List<Object> pPrimaryKeys) {
+	public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
+		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<Object> pPrimaryKeys) {
 		StringBuilder sb = new StringBuilder();
 		if (pStructure != null) {
 			if ((pDef == null) && (pPropName == null) && (pPrimaryKeys == null))
@@ -215,7 +220,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
 	 */
 	@Override
-	public <T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope, String pValue) {
+	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope, String pValue) {
 		return new GenericPropertyRef<>(mScope, pValue);
 	}
 
@@ -295,7 +300,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	public <T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope, Property<T> pResolvable,
+	public <@Nullable T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope, @Nullable Property<T> pResolvable,
 		Structure pContaining) {
 		return new GenericPropertyRef<T>(mScope, pContaining.getReference(),
 			(pResolvable == null ? null : pResolvable.getDefinition().getName()));
@@ -325,7 +330,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale)
 	 */
 	@Override
-	public void setGlobalDefaultLocale(Toolkit pToolkit, Scope pScope, Locale pLocale) {
+	public void setGlobalDefaultLocale(Toolkit pToolkit, @Nullable Scope pScope, Locale pLocale) {
 		mGlobalDefaultLocale = pLocale;
 	}
 
@@ -334,7 +339,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale)
 	 */
 	@Override
-	public void setThreadLocale(Toolkit pToolkit, Scope pScope, Locale pLocale) {
+	public void setThreadLocale(Toolkit pToolkit, @Nullable Scope pScope, @Nullable Locale pLocale) {
 		if (pLocale == null)
 			mDefaultLocale.remove();
 		else
@@ -346,7 +351,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
 	 */
 	@Override
-	public String lookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
+	public @Nullable String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale,
+		String pKey) {
 
 		/* There are three main passes: provided locale, thread default locale, global default locale */
 
@@ -412,7 +418,9 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
 			boolean matches = true;
 			for (GenericWhereInfo w : whereList) {
-				Property<Object> prop = test.lookupPropertyByName(w.key);
+				Property<@Nullable Object> prop = test.lookupPropertyByName(w.key);
+				if (prop == null)
+					continue;
 				Object testValue = prop.getValue(test);
 				Object actValue;
 				if (w.paramKey != null)
@@ -519,7 +527,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 * @param pKey the key
 	 * @return the result or null if there is no match
 	 */
-	protected abstract String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey);
+	protected abstract @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey);
 
 	/**
 	 * Converts a given string into characters that are valid. To guarantee uniqueness, it will escape unsupported
@@ -530,7 +538,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 * @param pInvalid
 	 * @return the munged name
 	 */
-	protected String escapeValue(String pValue, BitSet pValid, BitSet pInvalid) {
+	protected String escapeValue(String pValue, @Nullable BitSet pValid, @Nullable BitSet pInvalid) {
 		StringBuilder buffer = new StringBuilder();
 		char[] chars = pValue.toCharArray();
 		for (int i = 0; i < chars.length; i++) {

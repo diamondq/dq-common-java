@@ -13,18 +13,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class GenericEditorGroupDefinition extends GenericEditorComponentDefinition<EditorGroupDefinition>
 	implements EditorGroupDefinition {
 
-	private final EditorComponentDirection				mDirection;
+	private final @Nullable EditorComponentDirection	mDirection;
 
 	private final int									mNumColumns;
 
 	private final List<EditorComponentDefinition<?>>	mComponents;
 
-	public GenericEditorGroupDefinition(TranslatableString pLabel, int pColumn, int pColumnSpan, int pOrder,
-		PropertyDefinitionRef pVisibleIfProperty, Set<String> pVisibleIfValueEquals,
-		EditorComponentDirection pDirection, int pNumColumns, List<EditorComponentDefinition<?>> pComponents) {
+	public GenericEditorGroupDefinition(@Nullable TranslatableString pLabel, int pColumn, int pColumnSpan, int pOrder,
+		@Nullable PropertyDefinitionRef pVisibleIfProperty, @Nullable Set<String> pVisibleIfValueEquals,
+		@Nullable EditorComponentDirection pDirection, int pNumColumns,
+		@Nullable List<EditorComponentDefinition<?>> pComponents) {
 		super(pLabel, pColumn, pColumnSpan, pOrder, pVisibleIfProperty, pVisibleIfValueEquals);
 		mDirection = pDirection;
 		mNumColumns = pNumColumns;
@@ -39,7 +42,7 @@ public class GenericEditorGroupDefinition extends GenericEditorComponentDefiniti
 	 * @see com.diamondq.common.model.interfaces.EditorGroupDefinition#getDirection()
 	 */
 	@Override
-	public EditorComponentDirection getDirection() {
+	public @Nullable EditorComponentDirection getDirection() {
 		return mDirection;
 	}
 
@@ -47,7 +50,7 @@ public class GenericEditorGroupDefinition extends GenericEditorComponentDefiniti
 	 * @see com.diamondq.common.model.interfaces.EditorGroupDefinition#setDirection(com.diamondq.common.model.interfaces.EditorComponentDirection)
 	 */
 	@Override
-	public EditorGroupDefinition setDirection(EditorComponentDirection pValue) {
+	public EditorGroupDefinition setDirection(@Nullable EditorComponentDirection pValue) {
 		return new GenericEditorGroupDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
 			mVisibleIfValueEquals, pValue, mNumColumns, mComponents);
 	}
@@ -102,8 +105,8 @@ public class GenericEditorGroupDefinition extends GenericEditorComponentDefiniti
 	 *      int, int, int, com.diamondq.common.model.interfaces.PropertyDefinitionRef, java.util.Set)
 	 */
 	@Override
-	protected EditorGroupDefinition constructNew(TranslatableString pLabel, int pColumn, int pColumnSpan, int pOrder,
-		PropertyDefinitionRef pVisibleIfProperty, Set<String> pVisibleIfValueEquals) {
+	protected EditorGroupDefinition constructNew(@Nullable TranslatableString pLabel, int pColumn, int pColumnSpan,
+		int pOrder, @Nullable PropertyDefinitionRef pVisibleIfProperty, @Nullable Set<String> pVisibleIfValueEquals) {
 		return new GenericEditorGroupDefinition(pLabel, pColumn, pColumnSpan, pOrder, pVisibleIfProperty,
 			pVisibleIfValueEquals, mDirection, mNumColumns, mComponents);
 	}

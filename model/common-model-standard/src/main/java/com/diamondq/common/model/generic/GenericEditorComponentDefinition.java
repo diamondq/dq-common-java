@@ -10,23 +10,25 @@ import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public abstract class GenericEditorComponentDefinition<T extends EditorComponentDefinition<T>>
 	implements EditorComponentDefinition<T> {
 
-	protected final TranslatableString		mLabel;
+	protected final @Nullable TranslatableString	mLabel;
 
-	protected final int						mColumn;
+	protected final int								mColumn;
 
-	protected final int						mColumnSpan;
+	protected final int								mColumnSpan;
 
-	protected final int						mOrder;
+	protected final int								mOrder;
 
-	protected final PropertyDefinitionRef	mVisibleIfProperty;
+	protected final @Nullable PropertyDefinitionRef	mVisibleIfProperty;
 
-	protected final Set<String>				mVisibleIfValueEquals;
+	protected final @Nullable Set<String>			mVisibleIfValueEquals;
 
-	protected GenericEditorComponentDefinition(TranslatableString pLabel, int pColumn, int pColumnSpan, int pOrder,
-		PropertyDefinitionRef pVisibleIfProperty, Set<String> pVisibleIfValueEquals) {
+	protected GenericEditorComponentDefinition(@Nullable TranslatableString pLabel, int pColumn, int pColumnSpan,
+		int pOrder, @Nullable PropertyDefinitionRef pVisibleIfProperty, @Nullable Set<String> pVisibleIfValueEquals) {
 		super();
 		mLabel = pLabel;
 		mColumn = pColumn;
@@ -36,14 +38,14 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
 		mVisibleIfValueEquals = pVisibleIfValueEquals == null ? null : ImmutableSet.copyOf(pVisibleIfValueEquals);
 	}
 
-	protected abstract T constructNew(TranslatableString pLabel, int pColumn, int pColumnSpan, int pOrder,
-		PropertyDefinitionRef pVisibleIfProperty, Set<String> pVisibleIfValueEquals);
+	protected abstract T constructNew(@Nullable TranslatableString pLabel, int pColumn, int pColumnSpan, int pOrder,
+		@Nullable PropertyDefinitionRef pVisibleIfProperty, @Nullable Set<String> pVisibleIfValueEquals);
 
 	/**
 	 * @see com.diamondq.common.model.interfaces.EditorComponentDefinition#getLabel()
 	 */
 	@Override
-	public TranslatableString getLabel() {
+	public @Nullable TranslatableString getLabel() {
 		return mLabel;
 	}
 
@@ -51,7 +53,7 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
 	 * @see com.diamondq.common.model.interfaces.EditorComponentDefinition#setLabel(com.diamondq.common.model.interfaces.TranslatableString)
 	 */
 	@Override
-	public T setLabel(TranslatableString pValue) {
+	public T setLabel(@Nullable TranslatableString pValue) {
 		return constructNew(pValue, mColumn, mColumnSpan, mOrder, mVisibleIfProperty, mVisibleIfValueEquals);
 	}
 
@@ -107,12 +109,12 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
 	 * @see com.diamondq.common.model.interfaces.EditorComponentDefinition#getVisibleIfProperty()
 	 */
 	@Override
-	public PropertyDefinitionRef getVisibleIfProperty() {
+	public @Nullable PropertyDefinitionRef getVisibleIfProperty() {
 		return mVisibleIfProperty;
 	}
 
 	@Override
-	public T setVisibleIfProperty(PropertyDefinitionRef pValue) {
+	public T setVisibleIfProperty(@Nullable PropertyDefinitionRef pValue) {
 		return constructNew(mLabel, mColumn, mColumnSpan, mOrder, pValue, mVisibleIfValueEquals);
 	}
 
@@ -120,7 +122,7 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
 	 * @see com.diamondq.common.model.interfaces.EditorComponentDefinition#getVisibleIfValueEquals()
 	 */
 	@Override
-	public Set<String> getVisibleIfValueEquals() {
+	public @Nullable Set<String> getVisibleIfValueEquals() {
 		return mVisibleIfValueEquals;
 	}
 

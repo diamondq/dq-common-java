@@ -10,14 +10,15 @@ import com.diamondq.common.model.interfaces.TranslatableString;
 
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
 public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
-	protected Toolkit	mToolkit;
+	protected @Nullable Toolkit	mToolkit;
 
-	protected Scope		mScope;
+	protected @Nullable Scope	mScope;
 
 	@Override
 	public void setup(Toolkit pToolkit, Scope pScope) {
@@ -26,14 +27,20 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 	}
 
 	protected StructureDefinition checkAndCreate(String pName) {
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		/* Make sure it doesn't already exist */
 
-		StructureDefinition def = mToolkit.lookupStructureDefinitionByName(mScope, pName);
+		StructureDefinition def = toolkit.lookupStructureDefinitionByName(scope, pName);
 		Assert.assertNull(def);
 
 		/* Create a new object */
 
-		StructureDefinition newDef = mToolkit.createNewStructureDefinition(mScope, pName);
+		StructureDefinition newDef = toolkit.createNewStructureDefinition(scope, pName);
 		Assert.assertNotNull(newDef);
 
 		return newDef;
@@ -47,12 +54,17 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		String name = "asdt_1";
 
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition def = checkAndCreate(name);
 		Assert.assertNotNull(def);
 
 		/* Make sure it doesn't exist, since it hasn't been written */
 
-		StructureDefinition testDef = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		StructureDefinition testDef = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNull(testDef);
 	}
 
@@ -64,13 +76,18 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		String name = "asdt-2";
 
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition newDef = checkAndCreate(name);
 
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 
 		/* Make sure it doesn't exist, since it hasn't been written */
 
-		StructureDefinition testDef = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		StructureDefinition testDef = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNotNull(testDef);
 	}
 
@@ -79,16 +96,26 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 	 */
 	@Test
 	public void testValidName() {
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		String validName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-";
 		StructureDefinition newDef = checkAndCreate(validName);
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testInvalidName() {
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		String validName = "def/abc";
 		StructureDefinition newDef = checkAndCreate(validName);
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 	}
 
 	/**
@@ -98,11 +125,17 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 	public void testLabel() {
 
 		String name = "asdt-ts";
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition newDef = checkAndCreate(name);
 
 		/* Setup Label */
 
-		TranslatableString ts = mToolkit.createNewTranslatableString(mScope, "dummy.key");
+		TranslatableString ts = toolkit.createNewTranslatableString(scope, "dummy.key");
 		Assert.assertNotNull(ts);
 		Assert.assertEquals("Key does not match", "dummy.key", ts.getKey());
 
@@ -110,11 +143,11 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		/* Write */
 
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 
 		/* Read */
 
-		StructureDefinition testDef = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		StructureDefinition testDef = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNotNull(testDef);
 
 		/* Test */
@@ -131,6 +164,12 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 	public void testSettingSingleInstance() {
 
 		String name = "asdt-ssi";
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition newDef = checkAndCreate(name);
 
 		/* Setup Single Instance */
@@ -139,11 +178,11 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		/* Write */
 
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 
 		/* Read */
 
-		StructureDefinition testDef = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		StructureDefinition testDef = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNotNull(testDef);
 
 		/* Test */
@@ -158,15 +197,21 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 	public void testDefaultSingleInstance() {
 
 		String name = "asdt-dsi";
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition newDef = checkAndCreate(name);
 
 		/* Write */
 
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 
 		/* Read */
 
-		StructureDefinition testDef = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		StructureDefinition testDef = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNotNull(testDef);
 
 		/* Test */
@@ -182,22 +227,27 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		String name = "asdt-apd";
 		String propName = name + "-name";
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition newDef = checkAndCreate(name);
 
 		/* Setup PropertyDefinition */
 
-		PropertyDefinition newPD = mToolkit.createNewPropertyDefinition(mScope);
-		newPD = newPD.setName(propName).setType(PropertyType.String);
+		PropertyDefinition newPD = toolkit.createNewPropertyDefinition(scope, propName, PropertyType.String);
 
 		newDef = newDef.addPropertyDefinition(newPD);
 
 		/* Write */
 
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 
 		/* Read */
 
-		StructureDefinition testDef = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		StructureDefinition testDef = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNotNull(testDef);
 
 		/* Test */
@@ -225,22 +275,27 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		String name = "asdt-rpd";
 		String propName = name + "-name";
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition newDef = checkAndCreate(name);
 
 		/* Setup PropertyDefinition */
 
-		PropertyDefinition newPD = mToolkit.createNewPropertyDefinition(mScope);
-		newPD = newPD.setName(propName).setType(PropertyType.String);
+		PropertyDefinition newPD = toolkit.createNewPropertyDefinition(scope, propName, PropertyType.String);
 
 		newDef = newDef.addPropertyDefinition(newPD);
 
 		/* Write */
 
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 
 		/* Read */
 
-		StructureDefinition testDef = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		StructureDefinition testDef = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNotNull(testDef);
 
 		/* Test */
@@ -262,11 +317,11 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 		/* Remove */
 
 		testDef = testDef.removePropertyDefinition(testPD);
-		mToolkit.writeStructureDefinition(mScope, testDef);
+		toolkit.writeStructureDefinition(scope, testDef);
 
 		/* Re-Read */
 
-		testDef = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		testDef = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNotNull(testDef);
 
 		/* Test */
@@ -294,12 +349,17 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 		String parentName = "asdt-sp-parent";
 		String childName = "asdt-sp-child";
 		String parentPropName = parentName + "-name";
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition parentDef = checkAndCreate(parentName);
 
 		/* Setup PropertyDefinition on parent */
 
-		PropertyDefinition newPD = mToolkit.createNewPropertyDefinition(mScope);
-		newPD = newPD.setName(parentPropName).setType(PropertyType.String);
+		PropertyDefinition newPD = toolkit.createNewPropertyDefinition(scope, parentPropName, PropertyType.String);
 
 		parentDef = parentDef.addPropertyDefinition(newPD);
 
@@ -307,18 +367,18 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		/* Write */
 
-		mToolkit.writeStructureDefinition(mScope, parentDef);
+		toolkit.writeStructureDefinition(scope, parentDef);
 
 		/* Now build the 'empty' child */
 
 		StructureDefinition childDef = checkAndCreate(childName);
 		childDef = childDef.addParentDefinition(parentDefRef);
 
-		mToolkit.writeStructureDefinition(mScope, childDef);
+		toolkit.writeStructureDefinition(scope, childDef);
 
 		/* Lookup the child */
 
-		StructureDefinition testChildDef = mToolkit.lookupStructureDefinitionByName(mScope, childName);
+		StructureDefinition testChildDef = toolkit.lookupStructureDefinitionByName(scope, childName);
 		Assert.assertNotNull(testChildDef);
 
 		/* Look for the property (which comes from the parent */
@@ -333,12 +393,17 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		String name = "asdt-sr";
 		String propName = name + "-name";
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition newDef = checkAndCreate(name);
 
 		/* Setup PropertyDefinition */
 
-		PropertyDefinition newPD = mToolkit.createNewPropertyDefinition(mScope);
-		newPD = newPD.setName(propName).setType(PropertyType.String);
+		PropertyDefinition newPD = toolkit.createNewPropertyDefinition(scope, propName, PropertyType.String);
 
 		newDef = newDef.addPropertyDefinition(newPD);
 
@@ -346,7 +411,7 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
 		/* Write */
 
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 
 		/* Test */
 

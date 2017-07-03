@@ -13,14 +13,15 @@ import com.google.common.collect.Iterables;
 
 import java.util.Collection;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
 public abstract class AbstractPropertyTests implements StandardTest {
 
-	protected Toolkit	mToolkit;
+	protected @Nullable Toolkit	mToolkit;
 
-	protected Scope		mScope;
+	protected @Nullable Scope	mScope;
 
 	@Override
 	public void setup(Toolkit pToolkit, Scope pScope) {
@@ -30,14 +31,20 @@ public abstract class AbstractPropertyTests implements StandardTest {
 
 	protected StructureDefinition checkAndCreate(String pStructureName) {
 
+		Toolkit toolkit = mToolkit;
+		Assert.assertNotNull(toolkit);
+
+		Scope scope = mScope;
+		Assert.assertNotNull(scope);
+
 		/* Make sure it doesn't already exist */
 
-		StructureDefinition def = mToolkit.lookupStructureDefinitionByName(mScope, pStructureName);
+		StructureDefinition def = toolkit.lookupStructureDefinitionByName(scope, pStructureName);
 		Assert.assertNull(def);
 
 		/* Create a new object */
 
-		StructureDefinition newDef = mToolkit.createNewStructureDefinition(mScope, pStructureName);
+		StructureDefinition newDef = toolkit.createNewStructureDefinition(scope, pStructureName);
 		Assert.assertNotNull(newDef);
 
 		return newDef;
@@ -48,27 +55,31 @@ public abstract class AbstractPropertyTests implements StandardTest {
 
 		String name = "apt-sv-1";
 
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		/* Define a basic structure definition */
 
 		StructureDefinition def = checkAndCreate(name);
 		Assert.assertNotNull(def);
 
-		def = def.addPropertyDefinition(mToolkit.createNewPropertyDefinition(mScope).setName("name").setPrimaryKey(true)
-			.setType(PropertyType.String));
 		def = def.addPropertyDefinition(
-			mToolkit.createNewPropertyDefinition(mScope).setName("testValue").setType(PropertyType.String));
+			toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
+		def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "testValue", PropertyType.String));
 
-		mToolkit.writeStructureDefinition(mScope, def);
+		toolkit.writeStructureDefinition(scope, def);
 
 		/* Create a structure */
 
-		def = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		def = toolkit.lookupStructureDefinitionByName(scope, name);
 		Assert.assertNotNull(def);
 
 		Structure structure = def.createNewStructure();
 		Assert.assertNotNull(structure);
 
-		Property<String> prop = structure.lookupPropertyByName("name");
+		Property<@Nullable String> prop = structure.lookupPropertyByName("name");
 		Assert.assertNotNull(prop);
 		prop = prop.setValue("testStructure");
 		Assert.assertNotNull(prop);
@@ -82,17 +93,17 @@ public abstract class AbstractPropertyTests implements StandardTest {
 		structure = structure.updateProperty(prop);
 
 		String structureRef = structure.getReference().getSerializedString();
-		
+
 		/* Write */
 
-		mToolkit.writeStructure(mScope, structure);
+		toolkit.writeStructure(scope, structure);
 
 		/* Read */
 
-		Structure testStructure = mToolkit.createStructureRefFromSerialized(mScope, structureRef).resolve();
+		Structure testStructure = toolkit.createStructureRefFromSerialized(scope, structureRef).resolve();
 		Assert.assertNotNull(testStructure);
 
-		Property<String> testProp = testStructure.lookupPropertyByName("testValue");
+		Property<@Nullable String> testProp = testStructure.lookupPropertyByName("testValue");
 		Assert.assertNotNull(testProp);
 		String testValue = testProp.getValue(testStructure);
 		Assert.assertEquals("value1", testValue);
@@ -104,40 +115,45 @@ public abstract class AbstractPropertyTests implements StandardTest {
 		String parentDefName = "apt-iv-1";
 		String childDefName = "apt-iv-2";
 
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		/* Define a basic structure definition */
 
 		StructureDefinition def = checkAndCreate(parentDefName);
 		Assert.assertNotNull(def);
 
-		def = def.addPropertyDefinition(mToolkit.createNewPropertyDefinition(mScope).setName("name").setPrimaryKey(true)
-			.setType(PropertyType.String));
 		def = def.addPropertyDefinition(
-			mToolkit.createNewPropertyDefinition(mScope).setName("testValue").setType(PropertyType.String));
+			toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
+		def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "testValue", PropertyType.String));
 
-		mToolkit.writeStructureDefinition(mScope, def);
+		toolkit.writeStructureDefinition(scope, def);
 
 		/* Define a child structure */
 
 		StructureDefinition childDef = checkAndCreate(childDefName);
 		Assert.assertNotNull(childDef);
-		childDef = childDef.addPropertyDefinition(mToolkit.createNewPropertyDefinition(mScope).setName("name")
-			.setPrimaryKey(true).setType(PropertyType.String));
 		childDef = childDef.addPropertyDefinition(
-			mToolkit.createNewPropertyDefinition(mScope).setName("testValue").setType(PropertyType.String));
-		childDef = childDef.addPropertyDefinition(mToolkit.createNewPropertyDefinition(mScope).setName("parent")
-			.setType(PropertyType.StructureRef).addKeyword(CommonKeywordKeys.INHERIT_PARENT, CommonKeywordValues.TRUE));
+			toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
+		childDef = childDef
+			.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "testValue", PropertyType.String));
+		childDef = childDef
+			.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "parent", PropertyType.StructureRef)
+				.addKeyword(CommonKeywordKeys.INHERIT_PARENT, CommonKeywordValues.TRUE));
 
-		mToolkit.writeStructureDefinition(mScope, childDef);
+		toolkit.writeStructureDefinition(scope, childDef);
 
 		/* Create a structure */
 
-		def = mToolkit.lookupStructureDefinitionByName(mScope, parentDefName);
+		def = toolkit.lookupStructureDefinitionByName(scope, parentDefName);
 		Assert.assertNotNull(def);
 
 		Structure parentStructure = def.createNewStructure();
 		Assert.assertNotNull(parentStructure);
 
-		Property<String> prop = parentStructure.lookupPropertyByName("name");
+		Property<@Nullable String> prop = parentStructure.lookupPropertyByName("name");
 		Assert.assertNotNull(prop);
 		prop = prop.setValue("testStructure");
 		Assert.assertNotNull(prop);
@@ -150,17 +166,17 @@ public abstract class AbstractPropertyTests implements StandardTest {
 
 		parentStructure = parentStructure.updateProperty(prop);
 		StructureRef parentRef = parentStructure.getReference();
-		
+
 		/* Write */
 
-		mToolkit.writeStructure(mScope, parentStructure);
+		toolkit.writeStructure(scope, parentStructure);
 
 		/* Create the child structure */
 
 		parentStructure = parentRef.resolve();
 		Assert.assertNotNull(parentStructure);
 
-		childDef = mToolkit.lookupStructureDefinitionByName(mScope, childDefName);
+		childDef = toolkit.lookupStructureDefinitionByName(scope, childDefName);
 		Assert.assertNotNull(childDef);
 
 		Structure childStructure = childDef.createNewStructure();
@@ -174,24 +190,25 @@ public abstract class AbstractPropertyTests implements StandardTest {
 		String value = prop.getValue(childStructure);
 		Assert.assertNull(value);
 
-		Collection<Property<StructureRef>> parentProps =
+		Collection<Property<@Nullable StructureRef>> parentProps =
 			childStructure.lookupPropertiesByKeyword(CommonKeywordKeys.INHERIT_PARENT, null, PropertyType.StructureRef);
-		childStructure = childStructure
-			.updateProperty(Iterables.getFirst(parentProps, null).setValue(parentStructure.getReference()));
+		childStructure =
+			childStructure.updateProperty(Iterables.get(parentProps, 0).setValue(parentStructure.getReference()));
 		prop = childStructure.lookupPropertyByName("testValue");
+		Assert.assertNotNull(prop);
 
 		String childValue = prop.getValue(childStructure);
 		Assert.assertEquals("value1", childValue);
 
 		StructureRef childRef = childStructure.getReference();
-		mToolkit.writeStructure(mScope, childStructure);
+		toolkit.writeStructure(scope, childStructure);
 
 		/* Read */
 
 		Structure testStructure = childRef.resolve();
 		Assert.assertNotNull(testStructure);
 
-		Property<String> testProp = testStructure.lookupPropertyByName("testValue");
+		Property<@Nullable String> testProp = testStructure.lookupPropertyByName("testValue");
 		Assert.assertNotNull(testProp);
 		String testValue = testProp.getValue(testStructure);
 		Assert.assertEquals("value1", testValue);

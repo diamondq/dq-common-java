@@ -7,6 +7,7 @@ import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyRef;
+import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
@@ -35,8 +36,7 @@ public interface PersistenceLayer {
 
 	public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope);
 
-	@Nullable
-	public StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName);
+	public @Nullable StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName);
 
 	/* Reference */
 
@@ -50,12 +50,13 @@ public interface PersistenceLayer {
 
 	public String createStructureRefStr(Toolkit pToolkit, Scope pScope, Structure pResolvable);
 
-	public <T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope, Property<T> pResolvable,
+	public <@Nullable T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope, @Nullable Property<T> pResolvable,
 		Structure pContaining);
 
 	/* PropertyDefinition */
 
-	public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope);
+	public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope, String pName,
+		PropertyType pType);
 
 	public String collapsePrimaryKeys(Toolkit pToolkit, Scope pScope, List<Object> pNames);
 
@@ -65,15 +66,15 @@ public interface PersistenceLayer {
 
 	public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure);
 
-	@Nullable
-	public Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope, String pSerializedRef);
+	public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope,
+		String pSerializedRef);
 
 	public void deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue);
 
 	/* Property */
 
-	public <T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope, PropertyDefinition pPropertyDefinition,
-		boolean pIsValueSet, @Nullable T pValue);
+	public <@Nullable T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope, PropertyDefinition pPropertyDefinition,
+		boolean pIsValueSet, T pValue);
 
 	/* TranslatableString */
 
@@ -102,17 +103,16 @@ public interface PersistenceLayer {
 
 	public StructureRef createStructureRefFromSerialized(Toolkit pToolkit, Scope pScope, String pValue);
 
-	public <T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope, String pValue);
+	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope, String pValue);
 
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
 		StructureDefinitionRef pRef);
 
-	@Nullable
-	public String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey);
+	public @Nullable String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey);
 
-	public void setGlobalDefaultLocale(Toolkit pToolkit, Scope pScope, Locale pLocale);
+	public void setGlobalDefaultLocale(Toolkit pToolkit, @Nullable Scope pScope, Locale pLocale);
 
-	public void setThreadLocale(Toolkit pToolkit, Scope pScope, Locale pLocale);
+	public void setThreadLocale(Toolkit pToolkit, @Nullable Scope pScope, @Nullable Locale pLocale);
 
 	public boolean isResourceStringWritingSupported(Toolkit pToolkit, Scope pScope);
 
@@ -132,8 +132,8 @@ public interface PersistenceLayer {
 
 	public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope);
 
-	public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, Structure pStructure,
-		String pPropName, StructureDefinition pDef, List<Object> pPrimaryKeys);
+	public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
+		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<Object> pPrimaryKeys);
 
 	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized);
 

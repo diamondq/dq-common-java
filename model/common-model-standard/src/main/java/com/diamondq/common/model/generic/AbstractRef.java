@@ -4,6 +4,8 @@ import com.diamondq.common.model.interfaces.Scope;
 
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public abstract class AbstractRef<A> {
 
 	protected final Scope		mScope;
@@ -35,7 +37,7 @@ public abstract class AbstractRef<A> {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object pObj) {
+	public boolean equals(@Nullable Object pObj) {
 		if (this == pObj)
 			return true;
 		if (pObj == null)

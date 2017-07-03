@@ -18,6 +18,8 @@ import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class DynamicEditorStructureDefinition implements EditorStructureDefinition {
 
 	private final Scope												mScope;
@@ -75,7 +77,7 @@ public class DynamicEditorStructureDefinition implements EditorStructureDefiniti
 		mComponents = builder.build();
 	}
 
-	private static EditorPropertyDefinition buildEditorPropertyDescription(Scope pScope, PropertyDefinition pPD,
+	private static @Nullable EditorPropertyDefinition buildEditorPropertyDescription(Scope pScope, PropertyDefinition pPD,
 		int pOrder) {
 
 		switch (pPD.getType()) {

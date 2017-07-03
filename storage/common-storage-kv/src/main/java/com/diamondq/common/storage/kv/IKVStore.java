@@ -35,5 +35,5 @@ public interface IKVStore {
 	 * 
 	 * @return returns the interface if it does support it or null if it does not
 	 */
-	public <@NonNull TDB extends @NonNull KVTableDefinitionBuilder<@NonNull TDB>, @NonNull CDB extends @NonNull KVColumnDefinitionBuilder<@NonNull CDB>> @Nullable IKVTableDefinitionSupport<TDB, CDB> getTableDefinitionSupport();
+	public <@NonNull TDB extends @NonNull KVTableDefinitionBuilder<TDB>, @NonNull CDB extends @NonNull KVColumnDefinitionBuilder<CDB>> @Nullable IKVTableDefinitionSupport<TDB, CDB> getTableDefinitionSupport();
 }

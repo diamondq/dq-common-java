@@ -26,8 +26,7 @@ public interface Toolkit {
 	 * @param pName the name
 	 * @return the Scope or null if there is no scope by that name
 	 */
-	@Nullable
-	public Scope getScope(String pName);
+	public @Nullable Scope getScope(String pName);
 
 	/**
 	 * Returns a scope with a given name
@@ -135,7 +134,7 @@ public interface Toolkit {
 	 * @return the reference
 	 */
 
-	public <T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable, Structure pContaining);
+	public <@Nullable T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable, Structure pContaining);
 
 	/**
 	 * Looks up a StructureDefinition by name
@@ -150,9 +149,11 @@ public interface Toolkit {
 	 * Creates a new blank PropertyDefinition.
 	 * 
 	 * @param pScope the scope
+	 * @param pName the property name
+	 * @param pType the property type
 	 * @return the PropertyDefinition, never null.
 	 */
-	public PropertyDefinition createNewPropertyDefinition(Scope pScope);
+	public PropertyDefinition createNewPropertyDefinition(Scope pScope, String pName, PropertyType pType);
 
 	/**
 	 * Given a list of primary keys, collapse it into a single name. This usually just returns a String separated by a
@@ -212,7 +213,7 @@ public interface Toolkit {
 	 * @param pValue the value (if the value is not set, then this is ignored)
 	 * @return the new, empty, Property
 	 */
-	public <TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
+	public <@Nullable TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
 		boolean isValueSet, TYPE pValue);
 
 	/**
@@ -305,7 +306,7 @@ public interface Toolkit {
 	 * @return the StructureRef
 	 */
 	public StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure,
-		@Nullable String pPropName, @Nullable StructureDefinition pDef, List<Object> pPrimaryKeys);
+		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<Object> pPrimaryKeys);
 
 	/**
 	 * Creates a new PropertyRef from a serialized string
@@ -314,7 +315,7 @@ public interface Toolkit {
 	 * @param pValue the serialized string
 	 * @return the PropertyRef
 	 */
-	public <T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue);
+	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue);
 
 	public Collection<Structure> getAllStructuresByDefinition(Scope pScope, StructureDefinitionRef pRef);
 

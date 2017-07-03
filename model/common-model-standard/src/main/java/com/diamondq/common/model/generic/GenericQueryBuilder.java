@@ -6,6 +6,8 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class GenericQueryBuilder implements QueryBuilder {
 
 	public static class GenericWhereInfo {
@@ -13,11 +15,14 @@ public class GenericQueryBuilder implements QueryBuilder {
 
 		public final WhereOperator	operator;
 
+		@Nullable
 		public final Object			constant;
 
+		@Nullable
 		public final String			paramKey;
 
-		public GenericWhereInfo(String pKey, WhereOperator pOperator, Object pConstant, String pParamKey) {
+		public GenericWhereInfo(String pKey, WhereOperator pOperator, @Nullable Object pConstant,
+			@Nullable String pParamKey) {
 			super();
 			key = pKey;
 			operator = pOperator;
@@ -28,7 +33,7 @@ public class GenericQueryBuilder implements QueryBuilder {
 
 	private final ImmutableList<GenericWhereInfo> mWhereList;
 
-	public GenericQueryBuilder(List<GenericWhereInfo> pWhereList) {
+	public GenericQueryBuilder(@Nullable List<GenericWhereInfo> pWhereList) {
 		mWhereList = (pWhereList == null ? ImmutableList.of() : ImmutableList.copyOf(pWhereList));
 	}
 

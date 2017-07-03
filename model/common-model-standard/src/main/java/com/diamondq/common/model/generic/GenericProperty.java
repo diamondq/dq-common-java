@@ -12,7 +12,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
-public class GenericProperty<TYPE> implements Property<TYPE> {
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 
 	private final PropertyDefinition	mPropertyDefinition;
 
@@ -93,8 +95,9 @@ public class GenericProperty<TYPE> implements Property<TYPE> {
 			case EmbeddedStructureList:
 			case PropertyRef:
 			case StructureRef:
-			case StructureRefList:
+			case StructureRefList: {
 				return null;
+			}
 			}
 		}
 
@@ -244,7 +247,7 @@ public class GenericProperty<TYPE> implements Property<TYPE> {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object pObj) {
+	public boolean equals(@Nullable Object pObj) {
 		if (this == pObj)
 			return true;
 		if (pObj == null)

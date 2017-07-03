@@ -7,10 +7,12 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureAndProperty;
 import com.diamondq.common.model.interfaces.StructureRef;
 
-@SuppressWarnings("rawtypes")
-public class GenericPropertyRef<T> extends AbstractRef<Property> implements PropertyRef<T> {
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-	public GenericPropertyRef(Scope pScope, StructureRef pStructureRef, String pPropDefName) {
+@SuppressWarnings("rawtypes")
+public class GenericPropertyRef<@Nullable T> extends AbstractRef<Property> implements PropertyRef<T> {
+
+	public GenericPropertyRef(Scope pScope, StructureRef pStructureRef, @Nullable String pPropDefName) {
 		super(pScope, pStructureRef.getSerializedString() + "/" + (pPropDefName == null ? "unknown" : pPropDefName),
 			Property.class);
 	}
@@ -23,12 +25,14 @@ public class GenericPropertyRef<T> extends AbstractRef<Property> implements Prop
 	 * @see com.diamondq.common.model.interfaces.Ref#resolve()
 	 */
 	@Override
-	public Property<T> resolve() {
+	public @Nullable Property<T> resolve() {
 		int lastOffset = mId.lastIndexOf('/');
 		if (lastOffset == -1)
 			throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);
 		String structureStr = mId.substring(0, lastOffset);
 		Structure structure = mScope.getToolkit().lookupStructureBySerializedRef(mScope, structureStr);
+		if (structure == null)
+			return null;
 		String propName = mId.substring(lastOffset + 1);
 		if ("unknown".equals(propName))
 			return null;
@@ -40,7 +44,7 @@ public class GenericPropertyRef<T> extends AbstractRef<Property> implements Prop
 	 * @see com.diamondq.common.model.interfaces.PropertyRef#resolveToBoth()
 	 */
 	@Override
-	public StructureAndProperty<T> resolveToBoth() {
+	public @Nullable StructureAndProperty<T> resolveToBoth() {
 		int lastOffset = mId.lastIndexOf('/');
 		if (lastOffset == -1)
 			throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);
@@ -59,7 +63,7 @@ public class GenericPropertyRef<T> extends AbstractRef<Property> implements Prop
 	 * @see com.diamondq.common.model.interfaces.PropertyRef#resolveToStructure()
 	 */
 	@Override
-	public Structure resolveToStructure() {
+	public @Nullable Structure resolveToStructure() {
 		int lastOffset = mId.lastIndexOf('/');
 		if (lastOffset == -1)
 			throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);

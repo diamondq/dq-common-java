@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A Persistence Layer that stores the information in Properties files.
@@ -55,7 +56,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
 	}
 
-	protected File getStructureFile(String pKey, boolean pCreateIfMissing) {
+	protected @Nullable File getStructureFile(String pKey, boolean pCreateIfMissing) {
+		@NonNull
 		String[] parts = pKey.split("/");
 		parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
 		File structureFile = mStructureBaseDir;
@@ -70,7 +72,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		return structureFile;
 	}
 
-	protected File getStructureDir(String pKey, boolean pCreateIfMissing) {
+	protected @Nullable File getStructureDir(@Nullable String pKey, boolean pCreateIfMissing) {
+		@NonNull
 		String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
 		File structureFile = mStructureBaseDir;
 		for (String p : parts)
@@ -87,8 +90,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
 	 */
 	@Override
-	protected Properties loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		boolean pCreateIfMissing) {
+	protected @Nullable Properties loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
+		String pKey, boolean pCreateIfMissing) {
 		File structureFile = getStructureFile(pKey, pCreateIfMissing);
 		if (structureFile == null)
 			return null;
@@ -148,6 +151,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			return result;
 		}
 		case StructureRefList: {
+			@NonNull
 			String[] strings = (value == null ? "" : value).split(",");
 			for (int i = 0; i < strings.length; i++)
 				strings[i] = unescape(strings[i]);
@@ -219,7 +223,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
 	 */
 	@Override
-	protected < R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
+	protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
 		boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
 		switch (pType) {
 		case String: {
@@ -247,6 +251,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			break;
 		}
 		case StructureRefList: {
+			@SuppressWarnings("null")
+			@NonNull
 			String[] strings = (String[]) pValue;
 			String[] escaped = new String[strings.length];
 			for (int i = 0; i < strings.length; i++)
@@ -328,9 +334,9 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *      com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
 	 */
 	@Override
-	protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, Properties pConfig,
-		StructureDefinition pStructureDefinition, String pStructureDefName, String pKey, PropertyDefinition pPropDef,
-		Builder<StructureRef> pStructureRefListBuilder) {
+	protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, @Nullable Properties pConfig,
+		StructureDefinition pStructureDefinition, String pStructureDefName, @Nullable String pKey,
+		@Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
 		File structureDir = getStructureDir(pKey, false);
 		if (structureDir == null)
 			return;
@@ -338,6 +344,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		if (childDir.exists() == false)
 			return;
 		File[] listTypeDirs = childDir.listFiles((File pFile) -> pFile.isDirectory());
+		if (listTypeDirs == null)
+			throw new IllegalArgumentException("Unable to list the content of " + childDir.toString());
 		StringBuilder refBuilder = new StringBuilder();
 		if (pKey != null)
 			refBuilder.append(pKey).append('/');
@@ -356,6 +364,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 					boolean match = false;
 					for (StructureDefinitionRef sdr : referenceTypes) {
 						StructureDefinition sd = sdr.resolve();
+						if (sd == null)
+							continue;
 						String testName = sd.getName();
 						if (typeName.equals(testName)) {
 							match = true;

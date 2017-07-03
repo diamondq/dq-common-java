@@ -10,11 +10,14 @@ import com.diamondq.common.model.interfaces.Toolkit;
 import com.google.common.cache.Cache;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLayer {
 
@@ -30,7 +33,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
 	 */
 	@Override
-	protected String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
+	protected @Nullable String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
 		try {
 			ResourceBundle bundle = ResourceBundle.getBundle(mBaseName, pLocale);
 			return bundle.getString(pKey);
@@ -51,14 +54,12 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
 	@Override
 	public Collection<Locale> getResourceStringLocales(Toolkit pToolkit, Scope pScope) {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
 	public Map<String, String> getResourceStringsByLocale(Toolkit pToolkit, Scope pScope, Locale pLocale) {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyMap();
 	}
 
 	/**
@@ -97,7 +98,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String)
 	 */
 	@Override
-	protected Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName, String pKey) {
+	protected @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName, String pKey) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -115,7 +116,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
 	 */
 	@Override
-	protected StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
+	protected @Nullable StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
 		String pName) {
 		throw new UnsupportedOperationException();
 	}
@@ -135,7 +136,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 */
 	@Override
 	protected Collection<StructureDefinitionRef> internalGetAllMissingStructureDefinitionRefs(Toolkit pToolkit,
-		Scope pScope, Cache<String, StructureDefinition> pStructureDefinitionCache) {
+		Scope pScope, @Nullable Cache<String, StructureDefinition> pStructureDefinitionCache) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -154,7 +155,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
 	 */
 	@Override
-	protected List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(Toolkit pToolkit,
+	protected @Nullable List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(Toolkit pToolkit,
 		Scope pScope, StructureDefinitionRef pRef) {
 		throw new UnsupportedOperationException();
 	}

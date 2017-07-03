@@ -2,6 +2,7 @@ package com.diamondq.adventuretools.model;
 
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.CommonKeywordValues;
+import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.Scope;
@@ -10,14 +11,15 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
 public abstract class AbstractStructureTests implements StandardTest {
 
-	protected Toolkit	mToolkit;
+	protected @Nullable Toolkit	mToolkit;
 
-	protected Scope		mScope;
+	protected @Nullable Scope	mScope;
 
 	@Override
 	public void setup(Toolkit pToolkit, Scope pScope) {
@@ -27,14 +29,19 @@ public abstract class AbstractStructureTests implements StandardTest {
 
 	protected StructureDefinition checkAndCreate(String pName) {
 
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		/* Make sure it doesn't already exist */
 
-		StructureDefinition def = mToolkit.lookupStructureDefinitionByName(mScope, pName);
+		StructureDefinition def = toolkit.lookupStructureDefinitionByName(scope, pName);
 		Assert.assertNull(def);
 
 		/* Create a new object */
 
-		StructureDefinition newDef = mToolkit.createNewStructureDefinition(mScope, pName);
+		StructureDefinition newDef = toolkit.createNewStructureDefinition(scope, pName);
 		Assert.assertNotNull(newDef);
 
 		return newDef;
@@ -46,50 +53,65 @@ public abstract class AbstractStructureTests implements StandardTest {
 		String name = "asdt-pc";
 		String propName = name + "-name";
 		String parentName = name + "-parent";
+
+		Toolkit toolkit = mToolkit;
+		Scope scope = mScope;
+		Assert.assertNotNull(toolkit);
+		Assert.assertNotNull(scope);
+
 		StructureDefinition newDef = checkAndCreate(name);
 
 		/* Setup PropertyDefinition */
 
-		newDef = newDef.addPropertyDefinition(mToolkit.createNewPropertyDefinition(mScope).setName(propName)
-			.setPrimaryKey(true).setType(PropertyType.String));
-
 		newDef = newDef.addPropertyDefinition(
-			mToolkit.createNewPropertyDefinition(mScope).setName(parentName).setType(PropertyType.PropertyRef)
+			toolkit.createNewPropertyDefinition(scope, propName, PropertyType.String).setPrimaryKey(true));
+
+		newDef = newDef
+			.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, parentName, PropertyType.StructureRef)
 				.addKeyword(CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT));
 
 		/* Write */
 
-		mToolkit.writeStructureDefinition(mScope, newDef);
+		toolkit.writeStructureDefinition(scope, newDef);
 
-		StructureDefinition def = mToolkit.lookupStructureDefinitionByName(mScope, name);
+		StructureDefinition def = toolkit.lookupStructureDefinitionByName(scope, name);
+		Assert.assertNotNull(def);
 
 		/* Setup instances */
 
-		Structure parent = mToolkit.createNewStructure(mScope, def);
-		parent = parent.updateProperty(parent.lookupPropertyByName(propName).setValue("INHERIT_PARENT"));
-		PropertyRef<?> parentRef = mToolkit.createPropertyRef(mScope, null, parent);
+		Structure parent = toolkit.createNewStructure(scope, def);
+		Property<@Nullable Object> parentProperty = parent.lookupPropertyByName(propName);
+		Assert.assertNotNull(parentProperty);
+		parent = parent.updateProperty(parentProperty.setValue("INHERIT_PARENT"));
+		PropertyRef<?> parentRef = toolkit.createPropertyRef(scope, null, parent);
 
-		mToolkit.writeStructure(mScope, parent);
+		toolkit.writeStructure(scope, parent);
 
-		Structure child = mToolkit.createNewStructure(mScope, def);
-		child = child.updateProperty(child.lookupPropertyByName(propName).setValue("CHILD"));
-		child = child.updateProperty(child.lookupPropertyByName(parentName).setValue(parentRef));
+		Structure child = toolkit.createNewStructure(scope, def);
+		Property<@Nullable Object> childProperty = child.lookupPropertyByName(propName);
+		Assert.assertNotNull(childProperty);
+		child = child.updateProperty(childProperty.setValue("CHILD"));
+		Property<@Nullable Object> childParentProperty = child.lookupPropertyByName(parentName);
+		Assert.assertNotNull(childParentProperty);
+		child = child.updateProperty(childParentProperty.setValue(parentRef));
 
 		String childRef = child.getReference().getSerializedString();
-		mToolkit.writeStructure(mScope, child);
+		toolkit.writeStructure(scope, child);
 
 		/* Test */
 
-		StructureRef childRefObj = mToolkit.createStructureRefFromSerialized(mScope, childRef);
+		StructureRef childRefObj = toolkit.createStructureRefFromSerialized(scope, childRef);
 		child = childRefObj.resolve();
-		Assert.assertEquals("CHILD", child.lookupPropertyByName(propName).getValue(child));
+		Assert.assertNotNull(child);
+		Assert.assertEquals("CHILD", childProperty.getValue(child));
 
 		/* Verify the destruction of the parent destroys the child */
 
 		parent = parentRef.resolveToStructure();
-		mToolkit.deleteStructure(mScope, parent);
+		Assert.assertNotNull(parent);
+		toolkit.deleteStructure(scope, parent);
 
-		childRefObj = mToolkit.createStructureRefFromSerialized(mScope, childRef);
+		childRefObj = toolkit.createStructureRefFromSerialized(scope, childRef);
 		child = childRefObj.resolve();
 		Assert.assertNull(child);
 	}

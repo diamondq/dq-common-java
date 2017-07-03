@@ -84,7 +84,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * @param pType the type (or null if any type is valid)
 	 * @return the collection of PropertyDefinition name's
 	 */
-	public @Nullable Collection<String> lookupPropertyDefinitionNamesByKeyword(String pKey, @Nullable String pValue,
+	public Collection<String> lookupPropertyDefinitionNamesByKeyword(String pKey, @Nullable String pValue,
 		@Nullable PropertyType pType);
 
 	/**

@@ -39,8 +39,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 	private final String									mName;
 
-	@Nullable
-	private final TranslatableString						mLabel;
+	private final @Nullable TranslatableString				mLabel;
 
 	private final boolean									mSingleInstance;
 
@@ -138,8 +137,6 @@ public class GenericStructureDefinition implements StructureDefinition {
 	@Override
 	public StructureDefinition addPropertyDefinition(PropertyDefinition pValue) {
 		String name = pValue.getName();
-		if (name == null)
-			throw new IllegalArgumentException();
 		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance,
 			ImmutableMap.<String, PropertyDefinition> builder().putAll(mProperties).put(name, pValue).build(),
 			mParentDefinitions, mKeywords);
@@ -221,7 +218,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 * @see com.diamondq.common.model.interfaces.StructureDefinition#lookupPropertyDefinitionByName(java.lang.String)
 	 */
 	@Override
-	public PropertyDefinition lookupPropertyDefinitionByName(String pName) {
+	public @Nullable PropertyDefinition lookupPropertyDefinitionByName(String pName) {
 		return mMemoizer.memoize(this::internalGetAllProperties, "gap").get(pName);
 	}
 
@@ -250,8 +247,10 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 		/* Add all the parent properties */
 
-		Iterables.transform(mParentDefinitions, (sdr) -> sdr.resolve())
-			.forEach((sd) -> builder.putAll(sd.getAllKeywords()));
+		Iterables.transform(mParentDefinitions, (sdr) -> sdr.resolve()).forEach((sd) -> {
+			if (sd != null)
+				builder.putAll(sd.getAllKeywords());
+		});
 
 		return builder.build();
 	}
@@ -296,8 +295,8 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 * @param pType the type (or null if it matches all types)
 	 * @return the list of matching names
 	 */
-	private Collection<String> internalLookupPropertyDefinitionNamesByKeyword(String pKey, String pValue,
-		PropertyType pType) {
+	private Collection<String> internalLookupPropertyDefinitionNamesByKeyword(String pKey, @Nullable String pValue,
+		@Nullable PropertyType pType) {
 
 		/* Build the actual list of keyword based PropertyDefinitions */
 
@@ -323,7 +322,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 *      java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
 	 */
 	@Override
-	public Collection<String> lookupPropertyDefinitionNamesByKeyword(String pKey, String pValue, PropertyType pType) {
+	public Collection<String> lookupPropertyDefinitionNamesByKeyword(String pKey, @Nullable String pValue, @Nullable PropertyType pType) {
 		return mMemoizer.memoize(this::internalLookupPropertyDefinitionNamesByKeyword, pKey, pValue, pType, "pdnbk");
 	}
 
@@ -376,7 +375,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object pObj) {
+	public boolean equals(@Nullable Object pObj) {
 		if (this == pObj)
 			return true;
 		if (pObj == null)

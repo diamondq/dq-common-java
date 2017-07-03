@@ -24,13 +24,15 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class GenericPropertyDefinition implements PropertyDefinition {
 
 	private final Scope									mScope;
 
 	private final String								mName;
 
-	private final TranslatableString					mLabel;
+	private final @Nullable TranslatableString			mLabel;
 
 	private final boolean								mIsPrimaryKey;
 
@@ -38,19 +40,19 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
 	private final PropertyType							mType;
 
-	private final Script								mValidationScript;
+	private final @Nullable Script						mValidationScript;
 
-	private final String								mDefaultValue;
+	private final @Nullable String						mDefaultValue;
 
-	private final Script								mDefaultValueScript;
+	private final @Nullable Script						mDefaultValueScript;
 
 	private final ImmutableSet<StructureDefinitionRef>	mReferenceTypes;
 
-	private final BigDecimal							mMinValue;
+	private final @Nullable BigDecimal					mMinValue;
 
-	private final BigDecimal							mMaxValue;
+	private final @Nullable BigDecimal					mMaxValue;
 
-	private final Integer								mMaxLength;
+	private final @Nullable Integer						mMaxLength;
 
 	private final boolean								mFinal;
 
@@ -60,11 +62,12 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
 	private static final Pattern						sValidNamePattern	= Pattern.compile("^[0-9a-zA-Z.\\-]+$");
 
-	public GenericPropertyDefinition(Scope pScope, String pName, TranslatableString pLabel, boolean pIsPrimaryKey,
-		int pPrimaryKeyOrder, PropertyType pType, Script pValidationScript, String pDefaultValue,
-		Script pDefaultValueScript, Collection<StructureDefinitionRef> pReferenceTypes, BigDecimal pMinValue,
-		BigDecimal pMaxValue, Integer pMaxLength, boolean pFinal, PropertyPattern pPropertyPattern,
-		Multimap<String, String> pKeywords) {
+	public GenericPropertyDefinition(Scope pScope, String pName, @Nullable TranslatableString pLabel,
+		boolean pIsPrimaryKey, int pPrimaryKeyOrder, PropertyType pType, @Nullable Script pValidationScript,
+		@Nullable String pDefaultValue, @Nullable Script pDefaultValueScript,
+		@Nullable Collection<StructureDefinitionRef> pReferenceTypes, @Nullable BigDecimal pMinValue,
+		@Nullable BigDecimal pMaxValue, @Nullable Integer pMaxLength, boolean pFinal, PropertyPattern pPropertyPattern,
+		@Nullable Multimap<String, String> pKeywords) {
 		super();
 		mScope = pScope;
 		mName = pName;
@@ -89,13 +92,9 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	 */
 	public void validate() {
 
-		if (mName == null)
-			throw new IllegalArgumentException("The PropertyDefinition must have a name.");
 		if (sValidNamePattern.matcher(mName).matches() == false)
 			throw new IllegalArgumentException(
 				"The PropertyDefinition must have a valid name, which can only be the characters 0-9, a-z, A-Z, . and -.");
-		if (mType == null)
-			throw new IllegalArgumentException("The PropertyDefinition must have a type.");
 
 		/* Verify that any container parent property is not a primary key */
 
@@ -137,23 +136,13 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 		return mName;
 	}
 
-	/**
-	 * @see com.diamondq.common.model.interfaces.PropertyDefinition#setName(java.lang.String)
-	 */
 	@Override
-	public PropertyDefinition setName(String pValue) {
-		return new GenericPropertyDefinition(mScope, pValue, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
-			mFinal, mPropertyPattern, mKeywords);
-	}
-
-	@Override
-	public TranslatableString getLabel() {
+	public @Nullable TranslatableString getLabel() {
 		return mLabel;
 	}
 
 	@Override
-	public PropertyDefinition setLabel(TranslatableString pValue) {
+	public PropertyDefinition setLabel(@Nullable TranslatableString pValue) {
 		return new GenericPropertyDefinition(mScope, mName, pValue, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
 			mFinal, mPropertyPattern, mKeywords);
@@ -177,43 +166,36 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	}
 
 	@Override
-	public PropertyDefinition setType(PropertyType pValue) {
-		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, pValue,
-			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
-			mFinal, mPropertyPattern, mKeywords);
-	}
-
-	@Override
-	public Script getValidationScript() {
+	public @Nullable Script getValidationScript() {
 		return mValidationScript;
 	}
 
 	@Override
-	public PropertyDefinition setValidationScript(Script pValue) {
+	public PropertyDefinition setValidationScript(@Nullable Script pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType, pValue,
 			mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
 			mPropertyPattern, mKeywords);
 	}
 
 	@Override
-	public String getDefaultValue() {
+	public @Nullable String getDefaultValue() {
 		return mDefaultValue;
 	}
 
 	@Override
-	public PropertyDefinition setDefaultValue(String pValue) {
+	public PropertyDefinition setDefaultValue(@Nullable String pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, pValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
 			mPropertyPattern, mKeywords);
 	}
 
 	@Override
-	public Script getDefaultValueScript() {
+	public @Nullable Script getDefaultValueScript() {
 		return mDefaultValueScript;
 	}
 
 	@Override
-	public PropertyDefinition setDefaultValueScript(Script pValue) {
+	public PropertyDefinition setDefaultValueScript(@Nullable Script pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, mDefaultValue, pValue, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
 			mPropertyPattern, mKeywords);
@@ -241,36 +223,36 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	}
 
 	@Override
-	public BigDecimal getMinValue() {
+	public @Nullable BigDecimal getMinValue() {
 		return mMinValue;
 	}
 
 	@Override
-	public PropertyDefinition setMinValue(BigDecimal pValue) {
+	public PropertyDefinition setMinValue(@Nullable BigDecimal pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, pValue, mMaxValue, mMaxLength,
 			mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
-	public BigDecimal getMaxValue() {
+	public @Nullable BigDecimal getMaxValue() {
 		return mMaxValue;
 	}
 
 	@Override
-	public PropertyDefinition setMaxValue(BigDecimal pValue) {
+	public PropertyDefinition setMaxValue(@Nullable BigDecimal pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, pValue, mMaxLength,
 			mFinal, mPropertyPattern, mKeywords);
 	}
 
 	@Override
-	public Integer getMaxLength() {
+	public @Nullable Integer getMaxLength() {
 		return mMaxLength;
 	}
 
 	@Override
-	public PropertyDefinition setMaxLength(Integer pValue) {
+	public PropertyDefinition setMaxLength(@Nullable Integer pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, pValue,
 			mFinal, mPropertyPattern, mKeywords);
@@ -372,7 +354,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object pObj) {
+	public boolean equals(@Nullable Object pObj) {
 		if (this == pObj)
 			return true;
 		if (pObj == null)

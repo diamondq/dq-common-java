@@ -20,42 +20,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class GenericEditorPropertyDefinition extends GenericEditorComponentDefinition<EditorPropertyDefinition>
 	implements EditorPropertyDefinition {
 
-	private final String							mName;
+	private final @Nullable String							mName;
 
-	private final EditorDisplayType					mDisplayType;
+	private final @Nullable EditorDisplayType				mDisplayType;
 
-	private final PropertyDefinitionRef				mEnabledIfProperty;
+	private final @Nullable PropertyDefinitionRef			mEnabledIfProperty;
 
-	private final Set<String>						mEnabledIfValueEquals;
+	private final @Nullable Set<String>						mEnabledIfValueEquals;
 
-	private final boolean							mIsMandatory;
+	private final boolean									mIsMandatory;
 
-	private final TranslatableString				mMandatoryReason;
+	private final @Nullable TranslatableString				mMandatoryReason;
 
-	private final Script							mValueMapScript;
+	private final @Nullable Script							mValueMapScript;
 
-	private final Map<String, TranslatableString>	mSimpleValueMap;
+	private final @Nullable Map<String, TranslatableString>	mSimpleValueMap;
 
-	private final PropertyDefinitionRef				mValueMapProperty;
+	private final @Nullable PropertyDefinitionRef			mValueMapProperty;
 
-	private final List<PropertyDefinitionRef>		mTableDisplayProperties;
+	private final @Nullable List<PropertyDefinitionRef>		mTableDisplayProperties;
 
-	private final EmbedEditorDirection				mEmbedTableRowEditor;
+	private final @Nullable EmbedEditorDirection			mEmbedTableRowEditor;
 
-	private final PropertyDefinitionRef				mDisplayRefImage;
+	private final @Nullable PropertyDefinitionRef			mDisplayRefImage;
 
-	private final Script							mCustomScript;
+	private final @Nullable Script							mCustomScript;
 
-	public GenericEditorPropertyDefinition(TranslatableString pLabel, int pColumn, int pColumnSpan, int pOrder,
-		PropertyDefinitionRef pVisibleIfProperty, Set<String> pVisibleIfValueEquals, String pName,
-		EditorDisplayType pDisplayType, PropertyDefinitionRef pEnabledIfProperty, Set<String> pEnabledIfValueEquals,
-		boolean pIsMandatory, TranslatableString pMandatoryReason, Script pValueMapScript,
-		Map<String, TranslatableString> pSimpleValueMap, PropertyDefinitionRef pValueMapProperty,
-		List<PropertyDefinitionRef> pTableDisplayProperties, EmbedEditorDirection pEmbedTableRowEditor,
-		PropertyDefinitionRef pDisplayRefImage, Script pCustomScript) {
+	public GenericEditorPropertyDefinition(@Nullable TranslatableString pLabel, int pColumn, int pColumnSpan,
+		int pOrder, @Nullable PropertyDefinitionRef pVisibleIfProperty, @Nullable Set<String> pVisibleIfValueEquals,
+		@Nullable String pName, @Nullable EditorDisplayType pDisplayType,
+		@Nullable PropertyDefinitionRef pEnabledIfProperty, @Nullable Set<String> pEnabledIfValueEquals,
+		boolean pIsMandatory, @Nullable TranslatableString pMandatoryReason, @Nullable Script pValueMapScript,
+		@Nullable Map<String, TranslatableString> pSimpleValueMap, @Nullable PropertyDefinitionRef pValueMapProperty,
+		@Nullable List<PropertyDefinitionRef> pTableDisplayProperties,
+		@Nullable EmbedEditorDirection pEmbedTableRowEditor, @Nullable PropertyDefinitionRef pDisplayRefImage,
+		@Nullable Script pCustomScript) {
 		super(pLabel, pColumn, pColumnSpan, pOrder, pVisibleIfProperty, pVisibleIfValueEquals);
 		mName = pName;
 		mDisplayType = pDisplayType;
@@ -78,7 +82,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getName()
 	 */
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return mName;
 	}
 
@@ -97,7 +101,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getDisplayType()
 	 */
 	@Override
-	public EditorDisplayType getDisplayType() {
+	public @Nullable EditorDisplayType getDisplayType() {
 		return mDisplayType;
 	}
 
@@ -116,7 +120,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getEnabledIfProperty()
 	 */
 	@Override
-	public PropertyDefinitionRef getEnabledIfProperty() {
+	public @Nullable PropertyDefinitionRef getEnabledIfProperty() {
 		return mEnabledIfProperty;
 	}
 
@@ -124,7 +128,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#setEnabledIfProperty(com.diamondq.common.model.interfaces.PropertyDefinitionRef)
 	 */
 	@Override
-	public EditorPropertyDefinition setEnabledIfProperty(PropertyDefinitionRef pValue) {
+	public EditorPropertyDefinition setEnabledIfProperty(@Nullable PropertyDefinitionRef pValue) {
 		return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
 			mVisibleIfValueEquals, mName, mDisplayType, pValue, mEnabledIfValueEquals, mIsMandatory, mMandatoryReason,
 			mValueMapScript, mSimpleValueMap, mValueMapProperty, mTableDisplayProperties, mEmbedTableRowEditor,
@@ -135,7 +139,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getEnabledIfValueEquals()
 	 */
 	@Override
-	public Collection<String> getEnabledIfValueEquals() {
+	public @Nullable Collection<String> getEnabledIfValueEquals() {
 		return mEnabledIfValueEquals;
 	}
 
@@ -189,7 +193,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getMandatoryReason()
 	 */
 	@Override
-	public TranslatableString getMandatoryReason() {
+	public @Nullable TranslatableString getMandatoryReason() {
 		return mMandatoryReason;
 	}
 
@@ -197,7 +201,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#setMandatoryReason(com.diamondq.common.model.interfaces.TranslatableString)
 	 */
 	@Override
-	public EditorPropertyDefinition setMandatoryReason(TranslatableString pValue) {
+	public EditorPropertyDefinition setMandatoryReason(@Nullable TranslatableString pValue) {
 		return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
 			mVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty, mEnabledIfValueEquals, mIsMandatory, pValue,
 			mValueMapScript, mSimpleValueMap, mValueMapProperty, mTableDisplayProperties, mEmbedTableRowEditor,
@@ -208,7 +212,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getValueMapScript()
 	 */
 	@Override
-	public Script getValueMapScript() {
+	public @Nullable Script getValueMapScript() {
 		return mValueMapScript;
 	}
 
@@ -216,7 +220,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#setValueMapScript(com.diamondq.common.model.interfaces.Script)
 	 */
 	@Override
-	public EditorPropertyDefinition setValueMapScript(Script pValue) {
+	public EditorPropertyDefinition setValueMapScript(@Nullable Script pValue) {
 		return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
 			mVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty, mEnabledIfValueEquals, mIsMandatory,
 			mMandatoryReason, pValue, mSimpleValueMap, mValueMapProperty, mTableDisplayProperties, mEmbedTableRowEditor,
@@ -227,7 +231,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getSimpleValueMap()
 	 */
 	@Override
-	public Map<String, TranslatableString> getSimpleValueMap() {
+	public @Nullable Map<String, TranslatableString> getSimpleValueMap() {
 		return mSimpleValueMap;
 	}
 
@@ -264,7 +268,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getValueMapProperty()
 	 */
 	@Override
-	public PropertyDefinitionRef getValueMapProperty() {
+	public @Nullable PropertyDefinitionRef getValueMapProperty() {
 		return mValueMapProperty;
 	}
 
@@ -272,7 +276,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#setValueMapProperty(com.diamondq.common.model.interfaces.PropertyDefinitionRef)
 	 */
 	@Override
-	public EditorPropertyDefinition setValueMapProperty(PropertyDefinitionRef pValue) {
+	public EditorPropertyDefinition setValueMapProperty(@Nullable PropertyDefinitionRef pValue) {
 		return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
 			mVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty, mEnabledIfValueEquals, mIsMandatory,
 			mMandatoryReason, mValueMapScript, mSimpleValueMap, pValue, mTableDisplayProperties, mEmbedTableRowEditor,
@@ -283,7 +287,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getTableDisplayProperties()
 	 */
 	@Override
-	public List<PropertyDefinitionRef> getTableDisplayProperties() {
+	public @Nullable List<PropertyDefinitionRef> getTableDisplayProperties() {
 		return mTableDisplayProperties;
 	}
 
@@ -320,7 +324,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getEmbedTableRowEditor()
 	 */
 	@Override
-	public EmbedEditorDirection getEmbedTableRowEditor() {
+	public @Nullable EmbedEditorDirection getEmbedTableRowEditor() {
 		return mEmbedTableRowEditor;
 	}
 
@@ -339,7 +343,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getDisplayRefImage()
 	 */
 	@Override
-	public PropertyDefinitionRef getDisplayRefImage() {
+	public @Nullable PropertyDefinitionRef getDisplayRefImage() {
 		return mDisplayRefImage;
 	}
 
@@ -347,7 +351,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#setDisplayRefImage(com.diamondq.common.model.interfaces.PropertyDefinitionRef)
 	 */
 	@Override
-	public EditorPropertyDefinition setDisplayRefImage(PropertyDefinitionRef pValue) {
+	public EditorPropertyDefinition setDisplayRefImage(@Nullable PropertyDefinitionRef pValue) {
 		return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
 			mVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty, mEnabledIfValueEquals, mIsMandatory,
 			mMandatoryReason, mValueMapScript, mSimpleValueMap, mValueMapProperty, mTableDisplayProperties,
@@ -358,7 +362,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#getCustomScript()
 	 */
 	@Override
-	public Script getCustomScript() {
+	public @Nullable Script getCustomScript() {
 		return mCustomScript;
 	}
 
@@ -366,7 +370,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 * @see com.diamondq.common.model.interfaces.EditorPropertyDefinition#setCustomScript(com.diamondq.common.model.interfaces.Script)
 	 */
 	@Override
-	public EditorPropertyDefinition setCustomScript(Script pValue) {
+	public EditorPropertyDefinition setCustomScript(@Nullable Script pValue) {
 		return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
 			mVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty, mEnabledIfValueEquals, mIsMandatory,
 			mMandatoryReason, mValueMapScript, mSimpleValueMap, mValueMapProperty, mTableDisplayProperties,
@@ -378,8 +382,8 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
 	 *      int, int, int, com.diamondq.common.model.interfaces.PropertyDefinitionRef, java.util.Set)
 	 */
 	@Override
-	protected EditorPropertyDefinition constructNew(TranslatableString pLabel, int pColumn, int pColumnSpan, int pOrder,
-		PropertyDefinitionRef pVisibleIfProperty, Set<String> pVisibleIfValueEquals) {
+	protected EditorPropertyDefinition constructNew(@Nullable TranslatableString pLabel, int pColumn, int pColumnSpan,
+		int pOrder, @Nullable PropertyDefinitionRef pVisibleIfProperty, @Nullable Set<String> pVisibleIfValueEquals) {
 		return new GenericEditorPropertyDefinition(pLabel, pColumn, pColumnSpan, pOrder, pVisibleIfProperty,
 			pVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty, mEnabledIfValueEquals, mIsMandatory,
 			mMandatoryReason, mValueMapScript, mSimpleValueMap, mValueMapProperty, mTableDisplayProperties,

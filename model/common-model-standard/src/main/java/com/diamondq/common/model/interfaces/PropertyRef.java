@@ -2,7 +2,7 @@ package com.diamondq.common.model.interfaces;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface PropertyRef<T> extends Ref<Property<T>> {
+public interface PropertyRef<@Nullable T> extends Ref<Property<T>> {
 
 	/**
 	 * Resolves this reference into the containing Structure

@@ -6,6 +6,8 @@ import com.diamondq.common.model.interfaces.TranslatableString;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class GenericTranslatableString implements TranslatableString {
 
 	private final Scope		mScope;
@@ -29,7 +31,7 @@ public class GenericTranslatableString implements TranslatableString {
 	 * @see com.diamondq.common.model.interfaces.TranslatableString#resolve(java.util.Locale, java.lang.Object[])
 	 */
 	@Override
-	public String resolve(Locale pLocale, Object... pArgs) {
+	public String resolve(@Nullable Locale pLocale, @Nullable Object @Nullable ... pArgs) {
 		String resourceString = mScope.getToolkit().lookupResourceString(mScope, pLocale, mKey);
 		if (resourceString == null)
 			resourceString = mKey;
@@ -53,7 +55,7 @@ public class GenericTranslatableString implements TranslatableString {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object pObj) {
+	public boolean equals(@Nullable Object pObj) {
 		if (this == pObj)
 			return true;
 		if (pObj == null)

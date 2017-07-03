@@ -5,6 +5,8 @@ import com.diamondq.common.model.interfaces.Toolkit;
 
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class GenericScope implements Scope {
 
 	private final Toolkit	mToolkit;
@@ -44,7 +46,7 @@ public class GenericScope implements Scope {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object pObj) {
+	public boolean equals(@Nullable Object pObj) {
 		if (this == pObj)
 			return true;
 		if (pObj == null)

@@ -54,11 +54,11 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 		mPersistResources = pPersistResources;
 	}
 
-	protected abstract STRUCTURECONFIGOBJ loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
-		String pKey, boolean pCreateIfMissing);
+	protected abstract @Nullable STRUCTURECONFIGOBJ loadStructureConfigObject(Toolkit pToolkit, Scope pScope,
+		String pDefName, String pKey, boolean pCreateIfMissing);
 
-	protected abstract < R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
-		boolean pIsMeta, String pKey, PropertyType pType, R pValue);
+	protected abstract <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
+		STRUCTURECONFIGOBJ pConfig, boolean pIsMeta, String pKey, PropertyType pType, R pValue);
 
 	protected abstract <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
 		boolean pIsMeta, String pKey, PropertyType pType);
@@ -75,8 +75,9 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	protected abstract boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig);
 
 	protected abstract void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope,
-		STRUCTURECONFIGOBJ pConfig, StructureDefinition pStructureDefinition, String pStructureDefName, String pKey,
-		PropertyDefinition pPropDef, ImmutableList.Builder<StructureRef> pStructureRefListBuilder);
+		@Nullable STRUCTURECONFIGOBJ pConfig, StructureDefinition pStructureDefinition, String pStructureDefName,
+		@Nullable String pKey, @Nullable PropertyDefinition pPropDef,
+		ImmutableList.Builder<StructureRef> pStructureRefListBuilder);
 
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteStructure(com.diamondq.common.model.interfaces.Toolkit,
@@ -89,7 +90,10 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 		if (mPersistStructures == false)
 			return;
 
+		@Nullable
 		STRUCTURECONFIGOBJ config = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
+		if (config == null)
+			throw new IllegalStateException("The config should always exist since createIfMissing was set");
 
 		boolean changed = false;
 
@@ -107,7 +111,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 			if (propDef.getKeywords().containsEntry(CommonKeywordKeys.PERSIST, CommonKeywordValues.FALSE) == true)
 				continue;
 			Collection<String> containerValue = propDef.getKeywords().get(CommonKeywordKeys.CONTAINER);
-			if ((containerValue != null) && (containerValue.isEmpty() == false)) {
+			if (containerValue.isEmpty() == false) {
 				if (containerValue.contains(CommonKeywordValues.CONTAINER_PARENT)) {
 
 					/*
@@ -118,22 +122,25 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 					PropertyRef<?> parentPropRef = (PropertyRef<?>) p.getValue(pStructure);
 					if (parentPropRef != null) {
 						StructureAndProperty<?> structureAndProperty = parentPropRef.resolveToBoth();
-						if ((structureAndProperty != null) && (structureAndProperty.property != null)) {
-							@SuppressWarnings("unchecked")
-							List<StructureRef> structureRefList = (List<StructureRef>) structureAndProperty.property
-								.getValue(structureAndProperty.structure);
-							boolean invalidate = true;
-							if (structureRefList != null) {
-								StructureRef thisRef = pToolkit.createStructureRef(pScope, pStructure);
-								for (StructureRef testRef : structureRefList) {
-									if (testRef.equals(thisRef)) {
-										invalidate = false;
-										break;
+						if (structureAndProperty != null) {
+							Property<?> property = structureAndProperty.property;
+							if (property != null) {
+								@SuppressWarnings("unchecked")
+								List<StructureRef> structureRefList =
+									(List<StructureRef>) property.getValue(structureAndProperty.structure);
+								boolean invalidate = true;
+								if (structureRefList != null) {
+									StructureRef thisRef = pToolkit.createStructureRef(pScope, pStructure);
+									for (StructureRef testRef : structureRefList) {
+										if (testRef.equals(thisRef)) {
+											invalidate = false;
+											break;
+										}
 									}
 								}
+								if (invalidate == true)
+									invalidateStructure(pToolkit, pScope, structureAndProperty.structure);
 							}
-							if (invalidate == true)
-								invalidateStructure(pToolkit, pScope, structureAndProperty.structure);
 						}
 					}
 				}
@@ -367,12 +374,18 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 		if (mPersistStructures == false)
 			return Collections.emptyList();
 
-		StructureDefinition sd = pRef.resolve();
-		ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
-		internalPopulateChildStructureList(pToolkit, pScope, null, sd, sd.getName(), null, null, builder);
 		ImmutableList.Builder<Structure> sBuilder = ImmutableList.builder();
-		for (StructureRef ref : builder.build())
-			sBuilder.add(ref.resolve());
+
+		StructureDefinition sd = pRef.resolve();
+		if (sd != null) {
+			ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
+			internalPopulateChildStructureList(pToolkit, pScope, null, sd, sd.getName(), null, null, builder);
+			for (StructureRef ref : builder.build()) {
+				Structure resolution = ref.resolve();
+				if (resolution != null)
+					sBuilder.add(resolution);
+			}
+		}
 		return sBuilder.build();
 	}
 
@@ -381,17 +394,20 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String)
 	 */
 	@Override
-	protected Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName, String pKey) {
+	protected @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName,
+		String pKey) {
 		if (mPersistStructures == false)
 			return null;
 
+		@Nullable
 		STRUCTURECONFIGOBJ config = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
 		if (config == null)
 			return null;
 
 		String structureDefName =
 			getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
-
+		if (structureDefName == null)
+			throw new IllegalArgumentException("The mandatory property structureDef doesn't exist");
 		StructureDefinition structureDef =
 			mScope.getToolkit().lookupStructureDefinitionByName(mScope, structureDefName);
 		if (structureDef == null)
@@ -405,12 +421,10 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 		if (secondLastSlash != -1)
 			parentRef = pKey.substring(0, secondLastSlash);
 		if (parentRef != null) {
-			Collection<Property<PropertyRef<?>>> parentProps = structure.lookupPropertiesByKeyword(
+			Collection<Property<@Nullable PropertyRef<?>>> parentProps = structure.lookupPropertiesByKeyword(
 				CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT, PropertyType.PropertyRef);
-			Property<PropertyRef<?>> parentProp = Iterables.getFirst(parentProps, null);
-			if (parentProp != null)
-				structure = structure.updateProperty(
-					parentProp.setValue(mScope.getToolkit().createPropertyRefFromSerialized(mScope, parentRef)));
+			structure = structure.updateProperty(Iterables.get(parentProps, 0)
+				.setValue(mScope.getToolkit().createPropertyRefFromSerialized(mScope, parentRef)));
 		}
 
 		/* See if there are children */
@@ -420,7 +434,9 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 		if (childrenPropNames.isEmpty() == false) {
 			for (String childrenPropName : childrenPropNames) {
 				PropertyDefinition propDef = structureDef.lookupPropertyDefinitionByName(childrenPropName);
-				Property<List<StructureRef>> childProp = structure.lookupPropertyByName(childrenPropName);
+				Property<@Nullable List<StructureRef>> childProp = structure.lookupPropertyByName(childrenPropName);
+				if (childProp == null)
+					continue;
 				ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
 				internalPopulateChildStructureList(pToolkit, pScope, config, structureDef, structureDefName, pKey,
 					propDef, builder);
@@ -428,17 +444,18 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 			}
 		}
 
-		for (Property<?> p : structure.getProperties().values()) {
+		for (Property<@Nullable ?> p : structure.getProperties().values()) {
 			String propName = p.getDefinition().getName();
 			switch (p.getDefinition().getType()) {
 			case String: {
 				if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+					@Nullable
 					String string =
 						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String);
 					if ("".equals(string))
 						string = null;
 					@SuppressWarnings("unchecked")
-					Property<String> ap = (Property<String>) p;
+					Property<@Nullable String> ap = (Property<@Nullable String>) p;
 					ap = ap.setValue(string);
 					structure = structure.updateProperty(ap);
 				}
@@ -449,7 +466,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 					boolean value =
 						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean);
 					@SuppressWarnings("unchecked")
-					Property<Boolean> ap = (Property<Boolean>) p;
+					Property<@Nullable Boolean> ap = (Property<@Nullable Boolean>) p;
 					ap = ap.setValue(value);
 					structure = structure.updateProperty(ap);
 				}
@@ -460,7 +477,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 					BigDecimal value =
 						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal);
 					@SuppressWarnings("unchecked")
-					Property<BigDecimal> ap = (Property<BigDecimal>) p;
+					Property<@Nullable BigDecimal> ap = (Property<@Nullable BigDecimal>) p;
 					ap = ap.setValue(value);
 					structure = structure.updateProperty(ap);
 				}
@@ -471,7 +488,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 					int value =
 						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer);
 					@SuppressWarnings("unchecked")
-					Property<Integer> ap = (Property<Integer>) p;
+					Property<@Nullable Integer> ap = (Property<@Nullable Integer>) p;
 					ap = ap.setValue(value);
 					structure = structure.updateProperty(ap);
 				}
@@ -486,7 +503,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 					PropertyRef<?> ref =
 						(string == null ? null : pToolkit.createPropertyRefFromSerialized(pScope, string));
 					@SuppressWarnings("unchecked")
-					Property<PropertyRef<?>> ap = (Property<PropertyRef<?>>) p;
+					Property<@Nullable PropertyRef<?>> ap = (Property<@Nullable PropertyRef<?>>) p;
 					ap = ap.setValue(ref);
 					structure = structure.updateProperty(ap);
 				}
@@ -501,7 +518,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 					StructureRef ref =
 						(string == null ? null : pToolkit.createStructureRefFromSerialized(pScope, string));
 					@SuppressWarnings("unchecked")
-					Property<StructureRef> ap = (Property<StructureRef>) p;
+					Property<@Nullable StructureRef> ap = (Property<@Nullable StructureRef>) p;
 					ap = ap.setValue(ref);
 					structure = structure.updateProperty(ap);
 				}
@@ -536,7 +553,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 					Long value =
 						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp);
 					@SuppressWarnings("unchecked")
-					Property<Long> ap = (Property<Long>) p;
+					Property<@Nullable Long> ap = (Property<@Nullable Long>) p;
 					ap = ap.setValue(value);
 					structure = structure.updateProperty(ap);
 				}
@@ -552,7 +569,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
 	 */
 	@Override
-	protected StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
+	protected @Nullable StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
 		String pName) {
 		if (mPersistStructureDefinitions == false)
 			return null;
@@ -566,7 +583,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	 */
 	@Override
 	protected Collection<StructureDefinitionRef> internalGetAllMissingStructureDefinitionRefs(Toolkit pToolkit,
-		Scope pScope, Cache<String, StructureDefinition> pStructureDefinitionCache) {
+		Scope pScope, @Nullable Cache<String, StructureDefinition> pStructureDefinitionCache) {
 		if (mPersistStructureDefinitions == false)
 			return Collections.emptyList();
 		throw new UnsupportedOperationException();
@@ -601,7 +618,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
 	 */
 	@Override
-	protected String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
+	protected @Nullable String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
+		String pKey) {
 		if (mPersistResources == false)
 			return null;
 
@@ -667,7 +685,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
 	 */
 	@Override
-	protected List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(Toolkit pToolkit,
+	protected @Nullable List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(Toolkit pToolkit,
 		Scope pScope, StructureDefinitionRef pRef) {
 		if (mPersistEditorStructureDefinitions == false)
 			return null;

@@ -6,7 +6,9 @@ import com.diamondq.common.model.interfaces.Structure;
 
 import java.util.Objects;
 
-public class GenericSDNameProperty implements Property<String> {
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public class GenericSDNameProperty implements Property<@Nullable String> {
 
 	private final PropertyDefinition mPropertyDefinition;
 
@@ -18,7 +20,7 @@ public class GenericSDNameProperty implements Property<String> {
 	 * @see com.diamondq.common.model.interfaces.Property#getValue(com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	public String getValue(Structure pContainer) {
+	public @Nullable String getValue(Structure pContainer) {
 		return pContainer.getDefinition().getName();
 	}
 
@@ -34,7 +36,7 @@ public class GenericSDNameProperty implements Property<String> {
 	 * @see com.diamondq.common.model.interfaces.Property#setValue(java.lang.Object)
 	 */
 	@Override
-	public Property<String> setValue(String pValue) {
+	public Property<@Nullable String> setValue(@Nullable String pValue) {
 		throw new IllegalArgumentException();
 	}
 
@@ -58,7 +60,7 @@ public class GenericSDNameProperty implements Property<String> {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object pObj) {
+	public boolean equals(@Nullable Object pObj) {
 		if (this == pObj)
 			return true;
 		if (pObj == null)

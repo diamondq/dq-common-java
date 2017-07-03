@@ -43,7 +43,7 @@ public interface EditorComponentDefinition<T extends EditorComponentDefinition<T
 
 	/* VisibleIfValueEquals */
 
-	public Set<String> getVisibleIfValueEquals();
+	public @Nullable Set<String> getVisibleIfValueEquals();
 
 	public T addVisibleIfValueEquals(String pValue);
 

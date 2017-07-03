@@ -21,7 +21,7 @@ public interface IKVTransaction {
 	 * @param pClass the class of the object to retrieve
 	 * @return the retrieved object or null if it doesn't exist
 	 */
-	public <@Nullable O> O getByKey(String pTable, String pKey1, @Nullable String pKey2, Class<O> pClass);
+	public <O> @Nullable O getByKey(String pTable, String pKey1, @Nullable String pKey2, Class<O> pClass);
 
 	/**
 	 * Stores a new value

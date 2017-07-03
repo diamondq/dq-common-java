@@ -49,11 +49,10 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 * The builder (generally used for the Config system)
 	 */
 	public static class StorageKVPersistenceLayerBuilder {
-		@Nullable
-		private Scope		mScope;
 
-		@Nullable
-		private IKVStore	mKVStore;
+		private @Nullable Scope		mScope;
+
+		private @Nullable IKVStore	mKVStore;
 
 		/**
 		 * Sets the scope
@@ -83,7 +82,13 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 		 * @return the layer
 		 */
 		public StorageKVPersistenceLayer build() {
-			return new StorageKVPersistenceLayer(mScope, mKVStore);
+			Scope scope = mScope;
+			IKVStore store = mKVStore;
+			if (scope == null)
+				throw new IllegalArgumentException("The mandatory field scope was not set");
+			if (store == null)
+				throw new IllegalArgumentException("The mandatory field kvStore was not set");
+			return new StorageKVPersistenceLayer(scope, store);
 		}
 	}
 
@@ -109,11 +114,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 		}
 	}
 
-	private final IKVStore					mStructureStore;
+	private final IKVStore									mStructureStore;
 
-	private final IKVTableDefinitionSupport	mTableDefinitionSupport;
+	private final @Nullable IKVTableDefinitionSupport<?, ?>	mTableDefinitionSupport;
 
-	private final Map<String, String>		mConfiguredTableDefinitions;
+	private final Map<String, String>						mConfiguredTableDefinitions;
 
 	/**
 	 * Default constructor
@@ -135,8 +140,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			/* Define an index for the lookups */
 
 			KVIndexDefinitionBuilder<?> indexDefinitionBuilder = support.createIndexDefinitionBuilder().name("lookups");
-			indexDefinitionBuilder = indexDefinitionBuilder
-				.addColumn(support.createIndexColumnBuilder().name("data.structureDef").type("string").build());
+			indexDefinitionBuilder = indexDefinitionBuilder.addColumn(
+				support.createIndexColumnBuilder().name("data.structureDef").type(KVColumnType.String).build());
 			support.addRequiredIndexes(Collections.singletonList(indexDefinitionBuilder.build()));
 		}
 	}
@@ -146,26 +151,28 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	}
 
 	protected void validateKVStoreManyToManySetup(Toolkit pToolkit, Scope pScope, String pTableName) {
-		if (mTableDefinitionSupport != null) {
+		IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
+		if (tableDefinitionSupport != null) {
 			synchronized (this) {
 				if (mConfiguredTableDefinitions.putIfAbsent(pTableName, "") == null) {
-					KVTableDefinitionBuilder builder = mTableDefinitionSupport.createTableDefinitionBuilder();
+					KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
 					builder = builder.tableName(pTableName);
-					builder.addColumn(mTableDefinitionSupport.createColumnDefinitionBuilder().name("dateCreated")
+					builder.addColumn(tableDefinitionSupport.createColumnDefinitionBuilder().name("dateCreated")
 						.type(KVColumnType.Timestamp).build());
-					mTableDefinitionSupport.addTableDefinition(builder.build());
+					tableDefinitionSupport.addTableDefinition(builder.build());
 				}
 			}
 		}
 	}
 
 	protected void validateKVStoreTableSetup(Toolkit pToolkit, Scope pScope, String pTableName) {
-		if (mTableDefinitionSupport != null) {
+		IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
+		if (tableDefinitionSupport != null) {
 			synchronized (this) {
 				if (mConfiguredTableDefinitions.containsKey(pTableName) == false) {
 					String singlePrimaryKey = "";
 					try {
-						KVTableDefinitionBuilder builder = mTableDefinitionSupport.createTableDefinitionBuilder();
+						KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
 						builder = builder.tableName(pTableName);
 						StructureDefinition sd = pToolkit.lookupStructureDefinitionByName(pScope, pTableName);
 						if (sd == null)
@@ -214,8 +221,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 								continue;
 							}
 
-							KVColumnDefinitionBuilder colBuilder =
-								mTableDefinitionSupport.createColumnDefinitionBuilder();
+							KVColumnDefinitionBuilder<?> colBuilder =
+								tableDefinitionSupport.createColumnDefinitionBuilder();
 
 							String colName = pd.getName();
 							colBuilder = colBuilder.name(colName);
@@ -236,10 +243,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 							}
 							case Decimal: {
 								colBuilder = colBuilder.type(KVColumnType.Decimal);
-								if (pd.getMinValue() != null)
-									colBuilder = colBuilder.minValue(pd.getMinValue());
-								if (pd.getMaxValue() != null)
-									colBuilder = colBuilder.maxValue(pd.getMaxValue());
+								BigDecimal minValue = pd.getMinValue();
+								if (minValue != null)
+									colBuilder = colBuilder.minValue(minValue);
+								BigDecimal maxValue = pd.getMaxValue();
+								if (maxValue != null)
+									colBuilder = colBuilder.maxValue(maxValue);
 								break;
 							}
 							case EmbeddedStructureList:
@@ -269,7 +278,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 							builder = builder.addColumn(colBuilder.build());
 						}
-						mTableDefinitionSupport.addTableDefinition(builder.build());
+						tableDefinitionSupport.addTableDefinition(builder.build());
 					}
 					catch (RuntimeException ex) {
 						mConfiguredTableDefinitions.remove(pTableName);
@@ -308,7 +317,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
 	 */
 	@Override
-	protected Map<String, Object> loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
+	protected @Nullable Map<String, Object> loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
 		String pKey, boolean pCreateIfMissing) {
 		IKVTransaction transaction = mStructureStore.startTransaction();
 		boolean success = false;
@@ -379,6 +388,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			return result;
 		}
 		case StructureRefList: {
+			@NonNull
 			String[] strings = (value == null ? "" : (String) value).split(",");
 			for (int i = 0; i < strings.length; i++)
 				strings[i] = unescape(strings[i]);
@@ -450,7 +460,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
 	 */
 	@Override
-	protected < R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
+	protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
 		Map<String, Object> pConfig, boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
 		switch (pType) {
 		case String: {
@@ -478,7 +488,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			break;
 		}
 		case StructureRefList: {
-			String[] strings = (String[]) pValue;
+			@NonNull
+			String[] strings = (@NonNull String[]) pValue;
 			String[] escaped = new String[strings.length];
 			for (int i = 0; i < strings.length; i++)
 				escaped[i] = escape(strings[i]);
@@ -615,14 +626,14 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 *      com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
 	 */
 	@Override
-	protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
-		StructureDefinition pStructureDefinition, String pStructureDefName, String pKey, PropertyDefinition pPropDef,
-		Builder<StructureRef> pStructureRefListBuilder) {
+	protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope,
+		@Nullable Map<String, Object> pConfig, StructureDefinition pStructureDefinition, String pStructureDefName,
+		@Nullable String pKey, @Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
 		IKVTransaction transaction = mStructureStore.startTransaction();
 		boolean success = false;
 		try {
 
-			if (pKey == null) {
+			if ((pKey == null) || (pPropDef == null)) {
 
 				/* This is a root level lookup */
 
@@ -665,6 +676,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 				int refBuilderLength = refBuilder.length();
 				for (StructureDefinitionRef sdr : referenceTypes) {
 					StructureDefinition sd = sdr.resolve();
+					if (sd == null)
+						continue;
 					tableNameBuilder.setLength(builderLength);
 					tableNameBuilder.append(sd.getName());
 					refBuilder.setLength(refBuilderLength);

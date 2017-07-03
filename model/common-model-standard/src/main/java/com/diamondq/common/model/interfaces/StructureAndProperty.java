@@ -1,12 +1,15 @@
 package com.diamondq.common.model.interfaces;
 
-public class StructureAndProperty<T> {
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public class StructureAndProperty<@Nullable T> {
 
 	public final Structure		structure;
 
+	@Nullable
 	public final Property<T>	property;
 
-	public StructureAndProperty(Structure pStructure, Property<T> pProperty) {
+	public StructureAndProperty(Structure pStructure, @Nullable Property<T> pProperty) {
 		structure = pStructure;
 		property = pProperty;
 	}

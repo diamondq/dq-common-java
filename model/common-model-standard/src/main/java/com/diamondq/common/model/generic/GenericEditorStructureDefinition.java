@@ -13,6 +13,8 @@ import com.google.common.collect.Multimaps;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class GenericEditorStructureDefinition implements EditorStructureDefinition {
 
 	private final String										mName;
@@ -24,7 +26,8 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
 	private final ImmutableMultimap<String, String>				mKeywords;
 
 	public GenericEditorStructureDefinition(String pName, StructureDefinitionRef pStructureDefinitionRef,
-		List<? extends EditorComponentDefinition<?>> pComponents, Multimap<String, String> pKeywords) {
+		@Nullable List<? extends EditorComponentDefinition<?>> pComponents,
+		@Nullable Multimap<String, String> pKeywords) {
 		super();
 		assert pName != null && pStructureDefinitionRef != null;
 		mName = pName;
@@ -85,7 +88,8 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
 	}
 
 	/**
-	 * @see com.diamondq.common.model.interfaces.EditorStructureDefinition#addKeyword(java.lang.String, java.lang.String)
+	 * @see com.diamondq.common.model.interfaces.EditorStructureDefinition#addKeyword(java.lang.String,
+	 *      java.lang.String)
 	 */
 	@Override
 	public EditorStructureDefinition addKeyword(String pKey, String pValue) {

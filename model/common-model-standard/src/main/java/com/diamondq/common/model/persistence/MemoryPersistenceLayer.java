@@ -20,6 +20,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A Persistence Layer that stores all the information in memory
  */
@@ -41,7 +44,10 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	@Override
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
 		StructureDefinitionRef pRef) {
-		return Collections2.filter(mStructureCache.asMap().values(),
+		Cache<String, Structure> structureCache = mStructureCache;
+		if (structureCache == null)
+			throw new IllegalStateException("The structureCache is mandatory for the MemoryPersistenceLayer");
+		return Collections2.filter(structureCache.asMap().values(),
 			(s) -> s.getDefinition().getReference().equals(pRef));
 	}
 
@@ -60,8 +66,11 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 */
 	@Override
 	public Collection<Locale> getResourceStringLocales(Toolkit pToolkit, Scope pScope) {
-		return ImmutableSet.<Locale> builder()
-			.addAll(Collections2.transform(mResourceCache.asMap().keySet(), (String k) -> {
+		Cache<String, String> resourceCache = mResourceCache;
+		if (resourceCache == null)
+			throw new IllegalStateException("The resourceCache is mandatory for the MemoryPersistenceLayer");
+		return ImmutableSet.<Locale> builder().addAll(
+			Collections2.<@NonNull String, @NonNull Locale> transform(resourceCache.asMap().keySet(), (String k) -> {
 				int offset = k.indexOf(':');
 				return Locale.forLanguageTag(k.substring(0, offset));
 			})).build();
@@ -75,7 +84,10 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	public Map<String, String> getResourceStringsByLocale(Toolkit pToolkit, Scope pScope, Locale pLocale) {
 		String prefix = pLocale.toLanguageTag() + ":";
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-		for (Map.Entry<String, String> pair : mResourceCache.asMap().entrySet()) {
+		Cache<String, String> resourceCache = mResourceCache;
+		if (resourceCache == null)
+			throw new IllegalStateException("The resourceCache is mandatory for the MemoryPersistenceLayer");
+		for (Map.Entry<String, String> pair : resourceCache.asMap().entrySet()) {
 			String key = pair.getKey();
 			if ((key != null) && (key.startsWith(prefix) == true))
 				builder.put(key.substring(prefix.length()), pair.getValue());
@@ -102,9 +114,11 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	protected void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure) {
 
 		/* Handle the recursive deleting */
-
-		Set<String> set = ImmutableSet.copyOf(Sets.filter(mStructureCache.asMap().keySet(), (k) -> k.startsWith(pKey)));
-		set.forEach((k) -> mStructureCache.invalidate(k));
+		Cache<String, Structure> structureCache = mStructureCache;
+		if (structureCache == null)
+			throw new IllegalStateException("The structureCache is mandatory for the MemoryPersistenceLayer");
+		Set<String> set = ImmutableSet.copyOf(Sets.filter(structureCache.asMap().keySet(), (k) -> k.startsWith(pKey)));
+		set.forEach((k) -> structureCache.invalidate(k));
 
 	}
 
@@ -113,7 +127,8 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String)
 	 */
 	@Override
-	protected Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName, String pKey) {
+	protected @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName,
+		String pKey) {
 		return null;
 	}
 
@@ -130,7 +145,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
 	 */
 	@Override
-	protected StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
+	protected @Nullable StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
 		String pName) {
 		return null;
 	}
@@ -149,7 +164,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 */
 	@Override
 	protected Collection<StructureDefinitionRef> internalGetAllMissingStructureDefinitionRefs(Toolkit pToolkit,
-		Scope pScope, Cache<String, StructureDefinition> pStructureDefinitionCache) {
+		Scope pScope, @Nullable Cache<String, StructureDefinition> pStructureDefinitionCache) {
 		return Collections.emptyList();
 	}
 
@@ -167,7 +182,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
 	 */
 	@Override
-	protected List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(Toolkit pToolkit,
+	protected @Nullable List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(Toolkit pToolkit,
 		Scope pScope, StructureDefinitionRef pRef) {
 		return null;
 	}
@@ -186,7 +201,8 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
 	 */
 	@Override
-	protected String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
+	protected @Nullable String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
+		String pKey) {
 		return null;
 	}
 

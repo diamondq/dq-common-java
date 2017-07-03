@@ -7,6 +7,7 @@ import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyRef;
+import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
@@ -24,6 +25,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.enterprise.inject.Vetoed;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Vetoed
 public class GenericToolkit implements Toolkit {
@@ -47,7 +50,7 @@ public class GenericToolkit implements Toolkit {
 	 * @see com.diamondq.common.model.interfaces.Toolkit#getScope(java.lang.String)
 	 */
 	@Override
-	public Scope getScope(String pValue) {
+	public @Nullable Scope getScope(String pValue) {
 		return mScopes.get(pValue);
 	}
 
@@ -169,7 +172,8 @@ public class GenericToolkit implements Toolkit {
 	 *      com.diamondq.common.model.interfaces.Property, com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	public <T> PropertyRef<T> createPropertyRef(Scope pScope, Property<T> pResolvable, Structure pContaining) {
+	public <@Nullable T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
+		Structure pContaining) {
 		return getPersistenceLayer(pScope).createPropertyRef(this, pScope, pResolvable, pContaining);
 	}
 
@@ -178,16 +182,16 @@ public class GenericToolkit implements Toolkit {
 	 *      java.lang.String)
 	 */
 	@Override
-	public StructureDefinition lookupStructureDefinitionByName(Scope pScope, String pName) {
+	public @Nullable StructureDefinition lookupStructureDefinitionByName(Scope pScope, String pName) {
 		return getPersistenceLayer(pScope).lookupStructureDefinitionByName(this, pScope, pName);
 	}
 
 	/**
-	 * @see com.diamondq.common.model.interfaces.Toolkit#createNewPropertyDefinition(com.diamondq.common.model.interfaces.Scope)
+	 * @see com.diamondq.common.model.interfaces.Toolkit#createNewPropertyDefinition(com.diamondq.common.model.interfaces.Scope, java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
 	 */
 	@Override
-	public PropertyDefinition createNewPropertyDefinition(Scope pScope) {
-		return getPersistenceLayer(pScope).createNewPropertyDefinition(this, pScope);
+	public PropertyDefinition createNewPropertyDefinition(Scope pScope, String pName, PropertyType pType) {
+		return getPersistenceLayer(pScope).createNewPropertyDefinition(this, pScope, pName, pType);
 	}
 
 	/**
@@ -204,7 +208,7 @@ public class GenericToolkit implements Toolkit {
 	 *      java.lang.String)
 	 */
 	@Override
-	public Structure lookupStructureBySerializedRef(Scope pScope, String pSerializedRef) {
+	public @Nullable Structure lookupStructureBySerializedRef(Scope pScope, String pSerializedRef) {
 		return getPersistenceLayer(pScope).lookupStructureBySerializedRef(this, pScope, pSerializedRef);
 	}
 
@@ -214,8 +218,8 @@ public class GenericToolkit implements Toolkit {
 	 *      com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)
 	 */
 	@Override
-	public StructureRef createStructureRefFromParts(Scope pScope, Structure pStructure, String pPropName,
-		StructureDefinition pDef, List<Object> pPrimaryKeys) {
+	public StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure,
+		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<Object> pPrimaryKeys) {
 		return getPersistenceLayer(pScope).createStructureRefFromParts(this, pScope, pStructure, pPropName, pDef,
 			pPrimaryKeys);
 	}
@@ -255,7 +259,7 @@ public class GenericToolkit implements Toolkit {
 	 *      com.diamondq.common.model.interfaces.PropertyDefinition, boolean, java.lang.Object)
 	 */
 	@Override
-	public <TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
+	public <@Nullable TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
 		boolean pIsValueSet, TYPE pValue) {
 		return getPersistenceLayer(pScope).createNewProperty(this, pScope, pPropertyDefinition, pIsValueSet, pValue);
 	}
@@ -351,7 +355,7 @@ public class GenericToolkit implements Toolkit {
 	 *      java.lang.String)
 	 */
 	@Override
-	public <T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
+	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
 		return getPersistenceLayer(pScope).createPropertyRefFromSerialized(this, pScope, pValue);
 	}
 
@@ -369,7 +373,7 @@ public class GenericToolkit implements Toolkit {
 	 *      java.util.Locale, java.lang.String)
 	 */
 	@Override
-	public String lookupResourceString(Scope pScope, Locale pLocale, String pKey) {
+	public @Nullable String lookupResourceString(Scope pScope, @Nullable Locale pLocale, String pKey) {
 		return getPersistenceLayer(pScope).lookupResourceString(this, pScope, pLocale, pKey);
 	}
 
@@ -378,7 +382,7 @@ public class GenericToolkit implements Toolkit {
 	 *      java.util.Locale)
 	 */
 	@Override
-	public void setGlobalDefaultLocale(Scope pScope, Locale pLocale) {
+	public void setGlobalDefaultLocale(@Nullable Scope pScope, Locale pLocale) {
 		if (pScope != null)
 			getPersistenceLayer(pScope).setGlobalDefaultLocale(this, pScope, pLocale);
 		else {
@@ -392,7 +396,7 @@ public class GenericToolkit implements Toolkit {
 	 *      java.util.Locale)
 	 */
 	@Override
-	public void setThreadLocale(Scope pScope, Locale pLocale) {
+	public void setThreadLocale(@Nullable Scope pScope, @Nullable Locale pLocale) {
 		if (pScope != null)
 			getPersistenceLayer(pScope).setThreadLocale(this, pScope, pLocale);
 		else {

@@ -15,9 +15,9 @@ public interface PropertyDefinition
 
 	/* Name */
 
-	public @Nullable String getName();
+	public String getName();
 
-	public PropertyDefinition setName(String pValue);
+//	public PropertyDefinition setName(String pValue);
 
 	/* Label */
 
@@ -33,9 +33,9 @@ public interface PropertyDefinition
 
 	/* Type */
 
-	public @Nullable PropertyType getType();
+	public PropertyType getType();
 
-	public PropertyDefinition setType(PropertyType pValue);
+//	public PropertyDefinition setType(PropertyType pValue);
 
 	/* Validation Script */
 
@@ -129,9 +129,9 @@ public interface PropertyDefinition
 	 */
 	public PropertyDefinition setPrimaryKeyOrder(int pOrder);
 
-	public @Nullable PropertyPattern getPropertyPattern();
+	public PropertyPattern getPropertyPattern();
 
-	public PropertyDefinition setPropertyPattern(@Nullable PropertyPattern pValue);
+	public PropertyDefinition setPropertyPattern(PropertyPattern pValue);
 
 	public Scope getScope();
 }

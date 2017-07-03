@@ -16,7 +16,7 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 
 	/* displayType */
 
-	public EditorDisplayType getDisplayType();
+	public @Nullable EditorDisplayType getDisplayType();
 
 	public EditorPropertyDefinition setDisplayType(EditorDisplayType pValue);
 
@@ -28,7 +28,7 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 
 	/* enabledIfValueEquals */
 
-	public Collection<String> getEnabledIfValueEquals();
+	public @Nullable Collection<String> getEnabledIfValueEquals();
 
 	public EditorPropertyDefinition addEnabledIfValueEquals(String pValue);
 
@@ -86,7 +86,7 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
 
 	/* tableDisplayProperties */
 
-	public List<PropertyDefinitionRef> getTableDisplayProperties();
+	public @Nullable List<PropertyDefinitionRef> getTableDisplayProperties();
 
 	public EditorPropertyDefinition addTableDisplayProperty(int pIndex, PropertyDefinitionRef pValue);
 

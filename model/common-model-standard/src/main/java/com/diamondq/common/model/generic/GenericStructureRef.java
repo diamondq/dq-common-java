@@ -4,6 +4,8 @@ import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureRef;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class GenericStructureRef extends AbstractRef<Structure> implements StructureRef {
 
 	public GenericStructureRef(Scope pScope, String pName) {
@@ -14,7 +16,7 @@ public class GenericStructureRef extends AbstractRef<Structure> implements Struc
 	 * @see com.diamondq.common.model.interfaces.Ref#resolve()
 	 */
 	@Override
-	public Structure resolve() {
+	public @Nullable Structure resolve() {
 		return mScope.getToolkit().lookupStructureBySerializedRef(mScope, mId);
 	}
 
