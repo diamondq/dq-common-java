@@ -31,13 +31,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceLayer<Properties> {
 
-	private final File	mStructureBaseDir;
+	private final @Nullable File	mStructureBaseDir;
 
 	@SuppressWarnings("unused")
-	private final File	mStructureDefBaseDir;
+	private final @Nullable File	mStructureDefBaseDir;
 
 	@SuppressWarnings("unused")
-	private final File	mEditorStructureDefBaseDir;
+	private final @Nullable File	mEditorStructureDefBaseDir;
 
 	/**
 	 * Default constructor
@@ -47,8 +47,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 * @param pStructureDefBaseDir the directory for structure definitions
 	 * @param pEditorStructureDefBaseDir the directory for editor structure definitions
 	 */
-	public PropertiesFilePersistenceLayer(Scope pScope, File pStructureBaseDir, File pStructureDefBaseDir,
-		File pEditorStructureDefBaseDir) {
+	public PropertiesFilePersistenceLayer(Scope pScope, @Nullable File pStructureBaseDir,
+		@Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
 		super(pScope, pStructureBaseDir != null, true, pStructureDefBaseDir != null, true,
 			pEditorStructureDefBaseDir != null, true, false, true);
 		mStructureBaseDir = pStructureBaseDir;
@@ -61,6 +61,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		String[] parts = pKey.split("/");
 		parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
 		File structureFile = mStructureBaseDir;
+		if (structureFile == null)
+			throw new IllegalStateException("Constructor was called with a null structureFile");
 		for (String p : parts)
 			structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
 		if (structureFile.exists() == false) {
@@ -76,6 +78,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		@NonNull
 		String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
 		File structureFile = mStructureBaseDir;
+		if (structureFile == null)
+			throw new IllegalStateException("Constructor was called with a null structureFile");
 		for (String p : parts)
 			structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
 		if (structureFile.exists() == false)

@@ -167,10 +167,26 @@ public class GenericStructure implements Structure {
 	/**
 	 * @see com.diamondq.common.model.interfaces.Structure#lookupPropertyByName(java.lang.String)
 	 */
+	@SuppressWarnings("cast")
 	@Override
 	public <@Nullable T> @Nullable Property<T> lookupPropertyByName(String pName) {
 		Property<?> prop = mProperties.get(pName);
-		@SuppressWarnings({"unchecked", "rawtypes", "cast"})
+		@SuppressWarnings({"unchecked", "rawtypes"})
+		Property<T> result = (Property<T>) (Property) prop;
+		return result;
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Structure#lookupMandatoryPropertyByName(java.lang.String)
+	 */
+	@SuppressWarnings("cast")
+	@Override
+	public <@Nullable T> Property<T> lookupMandatoryPropertyByName(String pName) {
+		Property<?> prop = mProperties.get(pName);
+		if (prop == null)
+			throw new IllegalArgumentException(
+				"The mandatory property " + pName + " was not found in the Structure " + mDefinition.getName());
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		Property<T> result = (Property<T>) (Property) prop;
 		return result;
 	}

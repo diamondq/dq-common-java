@@ -59,6 +59,15 @@ public interface Structure extends Resolvable<Structure, StructureRef> {
 	public <@Nullable T> @Nullable Property<T> lookupPropertyByName(String pName);
 
 	/**
+	 * Returns a property with the given name. If the property doesn't exist then an IllegalArgumentException is thrown
+	 * indicating that the property is mandatory.
+	 * 
+	 * @param pName the name of the property
+	 * @return the Property
+	 */
+	public <@Nullable T> Property<T> lookupMandatoryPropertyByName(String pName);
+
+	/**
 	 * Returns back the set of Property's that match the given keyword
 	 * 
 	 * @param pKey the key
