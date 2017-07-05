@@ -7,6 +7,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 
 public class GenericSDNameProperty implements Property<@Nullable String> {
 
@@ -37,6 +38,14 @@ public class GenericSDNameProperty implements Property<@Nullable String> {
 	 */
 	@Override
 	public Property<@Nullable String> setValue(@Nullable String pValue) {
+		throw new IllegalArgumentException();
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Property#clearValueSet()
+	 */
+	@Override
+	public @NonNull Property<@Nullable String> clearValueSet() {
 		throw new IllegalArgumentException();
 	}
 

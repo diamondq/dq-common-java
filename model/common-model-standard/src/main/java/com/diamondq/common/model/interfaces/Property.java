@@ -23,6 +23,19 @@ public interface Property<@Nullable TYPE> {
 	 */
 	public boolean isValueSet();
 
+	/**
+	 * Clears the value set boolean (which also implicitly clears the underlying value if there is one)
+	 * 
+	 * @return the Property
+	 */
+	public Property<TYPE> clearValueSet();
+
+	/**
+	 * Sets a new value (which also implicitly sets the 'value set')
+	 * 
+	 * @param pValue the new value (can be null)
+	 * @return the Property
+	 */
 	public Property<TYPE> setValue(TYPE pValue);
 
 	/* Definition */

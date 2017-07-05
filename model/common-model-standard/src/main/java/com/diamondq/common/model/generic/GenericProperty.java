@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 
 public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 
@@ -225,6 +226,14 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 		}
 
 		return new GenericProperty<TYPE>(mPropertyDefinition, true, pValue);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Property#clearValueSet()
+	 */
+	@Override
+	public @NonNull Property<@Nullable TYPE> clearValueSet() {
+		return new GenericProperty<TYPE>(mPropertyDefinition, false, null);
 	}
 
 	/**
