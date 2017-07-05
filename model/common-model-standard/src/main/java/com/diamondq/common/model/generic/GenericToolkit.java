@@ -187,7 +187,8 @@ public class GenericToolkit implements Toolkit {
 	}
 
 	/**
-	 * @see com.diamondq.common.model.interfaces.Toolkit#createNewPropertyDefinition(com.diamondq.common.model.interfaces.Scope, java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
+	 * @see com.diamondq.common.model.interfaces.Toolkit#createNewPropertyDefinition(com.diamondq.common.model.interfaces.Scope,
+	 *      java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
 	 */
 	@Override
 	public PropertyDefinition createNewPropertyDefinition(Scope pScope, String pName, PropertyType pType) {
@@ -199,7 +200,7 @@ public class GenericToolkit implements Toolkit {
 	 *      java.util.List)
 	 */
 	@Override
-	public String collapsePrimaryKeys(Scope pScope, List<Object> pNames) {
+	public String collapsePrimaryKeys(Scope pScope, List<@Nullable Object> pNames) {
 		return getPersistenceLayer(pScope).collapsePrimaryKeys(this, pScope, pNames);
 	}
 
@@ -219,7 +220,7 @@ public class GenericToolkit implements Toolkit {
 	 */
 	@Override
 	public StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure,
-		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<Object> pPrimaryKeys) {
+		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys) {
 		return getPersistenceLayer(pScope).createStructureRefFromParts(this, pScope, pStructure, pPropName, pDef,
 			pPrimaryKeys);
 	}

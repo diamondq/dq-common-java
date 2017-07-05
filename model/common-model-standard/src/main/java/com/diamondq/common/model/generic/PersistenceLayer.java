@@ -58,7 +58,7 @@ public interface PersistenceLayer {
 	public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope, String pName,
 		PropertyType pType);
 
-	public String collapsePrimaryKeys(Toolkit pToolkit, Scope pScope, List<Object> pNames);
+	public String collapsePrimaryKeys(Toolkit pToolkit, Scope pScope, List<@Nullable Object> pNames);
 
 	/* Structure */
 
@@ -133,7 +133,7 @@ public interface PersistenceLayer {
 	public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope);
 
 	public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
-		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<Object> pPrimaryKeys);
+		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys);
 
 	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized);
 

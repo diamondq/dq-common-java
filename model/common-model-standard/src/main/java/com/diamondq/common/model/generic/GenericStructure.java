@@ -108,14 +108,11 @@ public class GenericStructure implements Structure {
 
 	private String internalGetLocalName() {
 		List<String> propNames = mDefinition.lookupPrimaryKeyNames();
-		List<Object> names = Lists.transform(propNames, (n) -> {
-			Property<?> property = lookupPropertyByName(n);
+		List<@Nullable Object> names = Lists.transform(propNames, (n) -> {
+			Property<@Nullable ?> property = lookupPropertyByName(n);
 			if (property == null)
 				throw new IllegalArgumentException("Unable to find the primary key property " + n);
-			Object value = property.getValue(GenericStructure.this);
-			if (value == null)
-				return "";
-			return value;
+			return property.getValue(GenericStructure.this);
 		});
 		return mScope.getToolkit().collapsePrimaryKeys(mScope, names);
 	}

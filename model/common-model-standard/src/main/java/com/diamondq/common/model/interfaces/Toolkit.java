@@ -134,7 +134,8 @@ public interface Toolkit {
 	 * @return the reference
 	 */
 
-	public <@Nullable T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable, Structure pContaining);
+	public <@Nullable T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
+		Structure pContaining);
 
 	/**
 	 * Looks up a StructureDefinition by name
@@ -164,7 +165,7 @@ public interface Toolkit {
 	 * @param pNames the names
 	 * @return the collapsed primary key
 	 */
-	public String collapsePrimaryKeys(Scope pScope, List<Object> pNames);
+	public String collapsePrimaryKeys(Scope pScope, List<@Nullable Object> pNames);
 
 	/**
 	 * Looks up a Structure by the full serialized reference string. This is actually called by the
@@ -306,7 +307,7 @@ public interface Toolkit {
 	 * @return the StructureRef
 	 */
 	public StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure,
-		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<Object> pPrimaryKeys);
+		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys);
 
 	/**
 	 * Creates a new PropertyRef from a serialized string

@@ -174,7 +174,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
-		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<Object> pPrimaryKeys) {
+		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys) {
 		StringBuilder sb = new StringBuilder();
 		if (pStructure != null) {
 			if ((pDef == null) && (pPropName == null) && (pPrimaryKeys == null))
@@ -311,7 +311,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.List)
 	 */
 	@Override
-	public String collapsePrimaryKeys(Toolkit pToolkit, Scope pScope, List<Object> pNames) {
+	public String collapsePrimaryKeys(Toolkit pToolkit, Scope pScope, List<@Nullable Object> pNames) {
 		StringJoiner sj = new StringJoiner("$");
 		for (Object o : pNames)
 			if (o != null) {
