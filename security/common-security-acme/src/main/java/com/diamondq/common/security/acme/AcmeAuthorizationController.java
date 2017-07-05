@@ -4,7 +4,6 @@ import com.diamondq.common.security.acme.model.ACMEConfig;
 import com.diamondq.common.security.acme.model.ActivateResponse;
 import com.diamondq.common.security.acme.model.ChallengeState;
 import com.diamondq.common.security.acme.model.PersistedState;
-import com.diamondq.common.security.acme.model.QPersistedState;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -32,11 +31,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.jdo.JDOQLTypedQuery;
-import javax.jdo.PersistenceManager;
-import javax.jdo.PersistenceManagerFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -70,14 +65,13 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags = {"SSL"})
 public class AcmeAuthorizationController {
 
-	private static final Logger			sLogger	= LoggerFactory.getLogger(AcmeAuthorizationController.class);
+	private static final Logger	sLogger	= LoggerFactory.getLogger(AcmeAuthorizationController.class);
 
 	@Inject
-	private ACMEConfig					mConfig;
+	private ACMEConfig			mConfig;
 
 	@Inject
-	@Named("acme")
-	private PersistenceManagerFactory	mPMF;
+	private DataService			mDataService;
 
 	public AcmeAuthorizationController() {
 	}
@@ -89,31 +83,27 @@ public class AcmeAuthorizationController {
 	 * @throws IOException
 	 * @throws AcmeException
 	 */
-	private void getRegistration(PersistenceManager pManager, State pState) throws IOException, AcmeException {
+	private void getRegistration(State pState) throws IOException, AcmeException {
 
 		/* Get the state information */
 
-		try (JDOQLTypedQuery<PersistedState> query = pManager.newJDOQLTypedQuery(PersistedState.class)) {
-			// TODO: Temporary holder
-			query.getFetchPlan();
-			pState.savedState = query.filter(QPersistedState.candidate().id.eq(mConfig.getDomain())).executeUnique();
-		}
+		pState.savedState = mDataService.lookupPersistedState(mConfig.getDomain());
 		PersistedState savedState = pState.savedState;
 		if ((savedState != null) && (mConfig.getConnectUrl().equals(savedState.getAcmeServer()) == false)) {
 
 			/* The server URI's have changed. We'll need to fully restart this process */
 
-			pManager.deletePersistent(savedState);
+			mDataService.deletePersistedState(savedState);
 			pState.savedState = null;
 			savedState = null;
 		}
 
 		if (savedState == null) {
-			pState.savedState = new PersistedState();
+			pState.savedState = mDataService.createPersistedState();
 			savedState = pState.savedState;
-			savedState.setId(mConfig.getDomain());
-			savedState.setAcmeServer(mConfig.getConnectUrl());
-			pManager.makePersistent(pState.savedState);
+			pState.savedState = savedState = savedState.setId(mConfig.getDomain());
+			pState.savedState = savedState = savedState.setAcmeServer(mConfig.getConnectUrl());
+			mDataService.writePersistedState(savedState);
 		}
 
 		/* First, if the user key file exists, then read it in */
@@ -129,7 +119,7 @@ public class AcmeAuthorizationController {
 
 			String configUserKeyPairStr = mConfig.getUserKeyPair().orElse(null);
 			if ((configUserKeyPairStr != null) && (configUserKeyPairStr.isEmpty() == false)) {
-				savedState.setUserKeyPair(configUserKeyPairStr);
+				pState.savedState = savedState = savedState.setUserKeyPair(configUserKeyPairStr);
 				try (StringReader sr = new StringReader(savedState.getUserKeyPair())) {
 					userKeyPair = KeyPairUtils.readKeyPair(sr);
 				}
@@ -149,7 +139,7 @@ public class AcmeAuthorizationController {
 				try (StringWriter fw = new StringWriter()) {
 					KeyPairUtils.writeKeyPair(userKeyPair, fw);
 					fw.flush();
-					savedState.setUserKeyPair(fw.toString());
+					pState.savedState = savedState = savedState.setUserKeyPair(fw.toString());
 					sLogger.info("User key pair for future use:\n{}", savedState.getUserKeyPair());
 				}
 			}
@@ -175,14 +165,15 @@ public class AcmeAuthorizationController {
 				sLogger.debug("Attempting registration of keypair with the ACME server...");
 				registration = new RegistrationBuilder().create(pState.session);
 				pState.registration = registration;
-				savedState.setRegistrationLocation(registration.getLocation().toString());
+				pState.savedState =
+					savedState = savedState.setRegistrationLocation(registration.getLocation().toString());
 				sLogger.debug("Registration succeeded at {}", registration.getLocation());
 			}
 			catch (AcmeConflictException ex) {
 				if (ex.getLocation() == null)
 					throw ex;
 
-				savedState.setRegistrationLocation(ex.getLocation().toString());
+				pState.savedState = savedState = savedState.setRegistrationLocation(ex.getLocation().toString());
 
 				registration = Registration.bind(pState.session, ex.getLocation());
 				pState.registration = registration;
@@ -294,18 +285,14 @@ public class AcmeAuthorizationController {
 
 		/* Store the challenge information into the store, so that any server can get the information */
 
-		ChallengeState challengeState = new ChallengeState();
-		challengeState.setToken(challenge.getToken());
+		ChallengeState challengeState = mDataService.createChallengeState();
+		challengeState = challengeState.setToken(challenge.getToken());
 		String challengeAuthorization = challenge.getAuthorization();
 		if (challengeAuthorization == null)
 			throw new IllegalArgumentException();
-		challengeState.setResponse(challengeAuthorization);
+		challengeState = challengeState.setResponse(challengeAuthorization);
 
-		try (PersistenceManager manager = mPMF.getPersistenceManager()) {
-			manager.currentTransaction().begin();
-			manager.makePersistent(challengeState);
-			manager.currentTransaction().commit();
-		}
+		mDataService.writeChallengeState(challengeState);
 
 		sLogger.debug("Triggering challenge");
 
@@ -362,7 +349,7 @@ public class AcmeAuthorizationController {
 				KeyPairUtils.writeKeyPair(domainKeyPair, sw);
 				sw.flush();
 				domainKeyPairStr = sw.toString();
-				savedState.setDomainKeyPair(domainKeyPairStr);
+				pState.savedState = savedState = savedState.setDomainKeyPair(domainKeyPairStr);
 			}
 		}
 
@@ -382,9 +369,9 @@ public class AcmeAuthorizationController {
 
 				/* The certificate has expired, request a new one */
 
-				savedState.setDomainCert(null);
-				savedState.setCertChain(null);
-				savedState.setCertificateLocation(null);
+				pState.savedState = savedState = savedState.setDomainCert(null);
+				pState.savedState = savedState = savedState.setCertChain(null);
+				pState.savedState = savedState = savedState.setCertificateLocation(null);
 			}
 			else {
 
@@ -424,7 +411,7 @@ public class AcmeAuthorizationController {
 				csrb.sign(domainKeyPair);
 
 				csrBytes = csrb.getEncoded();
-				savedState.setCsr(Base64.getEncoder().encodeToString(csrBytes));
+				pState.savedState = savedState = savedState.setCsr(Base64.getEncoder().encodeToString(csrBytes));
 			}
 
 			sLogger.debug("Asking ACME server for certificate...");
@@ -438,7 +425,7 @@ public class AcmeAuthorizationController {
 				certificate.getChainLocation());
 
 			certLocation = certificate.getLocation().toString();
-			savedState.setCertificateLocation(certLocation);
+			pState.savedState = savedState = savedState.setCertificateLocation(certLocation);
 		}
 
 		// Download the certificate
@@ -448,7 +435,7 @@ public class AcmeAuthorizationController {
 		try (StringWriter sw = new StringWriter()) {
 			CertificateUtils.writeX509Certificate(cert, sw);
 			sw.flush();
-			savedState.setDomainCert(sw.toString());
+			pState.savedState = savedState = savedState.setDomainCert(sw.toString());
 		}
 
 		/* Debug */
@@ -466,7 +453,7 @@ public class AcmeAuthorizationController {
 		try (StringWriter sw = new StringWriter()) {
 			CertificateUtils.writeX509CertificateChain(chain, sw);
 			sw.flush();
-			savedState.setCertChain(sw.toString());
+			pState.savedState = savedState = savedState.setCertChain(sw.toString());
 		}
 
 		/* Debug */
@@ -584,77 +571,58 @@ public class AcmeAuthorizationController {
 
 		sLogger.debug("Starting authorization processs...");
 
-		try (PersistenceManager manager = mPMF.getPersistenceManager()) {
-			boolean persistenceSuccess = false;
-			manager.currentTransaction().begin();
-			try {
-				State state = new State();
+		State state = new State();
 
-				/* Attempt the registration */
+		/* Attempt the registration */
 
-				getRegistration(manager, state);
-				ActivateResponse response = state.response;
-				if (response != null) {
-					persistenceSuccess = true;
-					return response;
-				}
-
-				if ((pState == WorkflowEventState.AFTER_REGISTRATION) && (pFunction != null))
-					pFunction.accept(state);
-
-				/* Now start the authorization */
-
-				getAuthorization(state);
-				response = state.response;
-				if (response != null) {
-					persistenceSuccess = true;
-					return response;
-				}
-
-				if ((pState == WorkflowEventState.NEW_AUTHORIZATION) && (pFunction != null))
-					pFunction.accept(state);
-
-				/* Challenge */
-
-				getChallenge(state);
-				response = state.response;
-				if (response != null) {
-					persistenceSuccess = true;
-					return response;
-				}
-
-				/* Request Certificate */
-
-				getCert(state);
-				response = state.response;
-				if (response != null) {
-					persistenceSuccess = true;
-					return response;
-				}
-
-				/* Store the certificates into the keystore */
-
-				storeCerts(state);
-				response = state.response;
-				if (response != null) {
-					persistenceSuccess = true;
-					return response;
-				}
-
-				response = ActivateResponse.builder().build();
-				state.response = response;
-
-				persistenceSuccess = true;
-				return response;
-			}
-			finally {
-				if (persistenceSuccess == true)
-					manager.currentTransaction().commit();
-				else
-					manager.currentTransaction().rollback();
-			}
+		getRegistration(state);
+		ActivateResponse response = state.response;
+		if (response != null) {
+			return response;
 		}
 
+		if ((pState == WorkflowEventState.AFTER_REGISTRATION) && (pFunction != null))
+			pFunction.accept(state);
+
+		/* Now start the authorization */
+
+		getAuthorization(state);
+		response = state.response;
+		if (response != null) {
+			return response;
+		}
+
+		if ((pState == WorkflowEventState.NEW_AUTHORIZATION) && (pFunction != null))
+			pFunction.accept(state);
+
+		/* Challenge */
+
+		getChallenge(state);
+		response = state.response;
+		if (response != null) {
+			return response;
+		}
+
+		/* Request Certificate */
+
+		getCert(state);
+		response = state.response;
+		if (response != null) {
+			return response;
+		}
+
+		/* Store the certificates into the keystore */
+
+		storeCerts(state);
+		response = state.response;
+		if (response != null) {
+			return response;
+		}
+
+		response = ActivateResponse.builder().build();
+		state.response = response;
+
+		return response;
 	}
 
 	@Path("acceptAgreement")

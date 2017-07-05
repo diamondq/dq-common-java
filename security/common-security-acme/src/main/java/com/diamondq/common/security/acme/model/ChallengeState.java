@@ -1,34 +1,60 @@
 package com.diamondq.common.security.acme.model;
 
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
+import com.diamondq.common.model.interfaces.Structure;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@PersistenceCapable
 public class ChallengeState {
 
-	@Persistent(primaryKey = "true")
-	@Nullable
-	private String	token;
+	private final Structure mStructure;
 
-	@Nullable
-	private String	response;
-
-	public @Nullable String getToken() {
-		return token;
+	public ChallengeState(Structure pStructure) {
+		mStructure = pStructure;
 	}
 
-	public void setToken(String pToken) {
-		token = pToken;
+	public Structure getStructure() {
+		return mStructure;
+	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return mStructure.hashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(@Nullable Object pObj) {
+		if (this == pObj)
+			return true;
+		if (pObj == null)
+			return false;
+		if (getClass() != pObj.getClass())
+			return false;
+		ChallengeState other = (ChallengeState) pObj;
+		return mStructure.equals(other.mStructure);
+	}
+
+	public @Nullable String getToken() {
+		return (String) mStructure.lookupMandatoryPropertyByName("token").getValue(mStructure);
+	}
+
+	public ChallengeState setToken(String pValue) {
+		return new ChallengeState(
+			mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("token").setValue(pValue)));
 	}
 
 	public @Nullable String getResponse() {
-		return response;
+		return (String) mStructure.lookupMandatoryPropertyByName("response").getValue(mStructure);
 	}
 
-	public void setResponse(String pResponse) {
-		response = pResponse;
+	public ChallengeState setResponse(String pValue) {
+		return new ChallengeState(
+			mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("response").setValue(pValue)));
 	}
 
 }
