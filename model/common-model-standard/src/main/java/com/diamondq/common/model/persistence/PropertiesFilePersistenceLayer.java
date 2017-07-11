@@ -31,6 +31,76 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceLayer<Properties> {
 
+	/**
+	 * The builder (generally used for the Config system)
+	 */
+	public static class PropertiesFilePersistenceLayerBuilder {
+
+		private @Nullable Scope	mScope;
+
+		private @Nullable File	mStructureDir;
+
+		private @Nullable File	mStructureDefDir;
+
+		private @Nullable File	mEditorStructureDefDir;
+
+		/**
+		 * Sets the scope
+		 * 
+		 * @param pScope the scope
+		 * @return the builder
+		 */
+		public PropertiesFilePersistenceLayerBuilder scope(Scope pScope) {
+			mScope = pScope;
+			return this;
+		}
+
+		/**
+		 * Sets the structure directory
+		 * 
+		 * @param pValue the directory
+		 * @return the builder
+		 */
+		public PropertiesFilePersistenceLayerBuilder structureDir(String pValue) {
+			mStructureDir = new File(pValue);
+			return this;
+		}
+
+		/**
+		 * Sets the structure def directory
+		 * 
+		 * @param pValue the directory
+		 * @return the builder
+		 */
+		public PropertiesFilePersistenceLayerBuilder structureDefDir(String pValue) {
+			mStructureDefDir = new File(pValue);
+			return this;
+		}
+
+		/**
+		 * Sets the editor structure def directory
+		 * 
+		 * @param pValue the directory
+		 * @return the builder
+		 */
+		public PropertiesFilePersistenceLayerBuilder editorStructureDefDir(String pValue) {
+			mEditorStructureDefDir = new File(pValue);
+			return this;
+		}
+
+		/**
+		 * Builds the layer
+		 * 
+		 * @return the layer
+		 */
+		public PropertiesFilePersistenceLayer build() {
+			Scope scope = mScope;
+			if (scope == null)
+				throw new IllegalArgumentException("The mandatory field scope was not set");
+			return new PropertiesFilePersistenceLayer(scope, mStructureDir, mStructureDefDir, mEditorStructureDefDir);
+		}
+	}
+
 	private final @Nullable File	mStructureBaseDir;
 
 	@SuppressWarnings("unused")
@@ -404,6 +474,10 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			}
 		}
 		return;
+	}
+
+	public static PropertiesFilePersistenceLayerBuilder builder() {
+		return new PropertiesFilePersistenceLayerBuilder();
 	}
 
 }
