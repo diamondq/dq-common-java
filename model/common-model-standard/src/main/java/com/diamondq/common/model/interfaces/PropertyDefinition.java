@@ -17,8 +17,6 @@ public interface PropertyDefinition
 
 	public String getName();
 
-//	public PropertyDefinition setName(String pValue);
-
 	/* Label */
 
 	public @Nullable TranslatableString getLabel();
@@ -34,8 +32,6 @@ public interface PropertyDefinition
 	/* Type */
 
 	public PropertyType getType();
-
-//	public PropertyDefinition setType(PropertyType pValue);
 
 	/* Validation Script */
 

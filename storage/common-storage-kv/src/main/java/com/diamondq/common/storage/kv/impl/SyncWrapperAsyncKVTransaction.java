@@ -35,11 +35,9 @@ public class SyncWrapperAsyncKVTransaction extends AbstractKVTransaction impleme
 	@Override
 	public <@Nullable O, @Nullable CONTEXT> ExtendedCompletableFuture<@NonNull Pair<O, CONTEXT>> getByKey(String pTable,
 		String pKey1, @Nullable String pKey2, Class<O> pClass, CONTEXT pContext) {
-		@SuppressWarnings("null")
-		ExtendedCompletableFuture<@NonNull Pair<O, CONTEXT>> result =
-			(ExtendedCompletableFuture<@NonNull Pair<O, CONTEXT>>) LambdaExceptionUtil.wrapSyncSupplierResult(() -> {
-				return Pair.with(mTransaction.getByKey(pTable, pKey1, pKey2, pClass), pContext);
-			});
+		ExtendedCompletableFuture<Pair<O, CONTEXT>> result = LambdaExceptionUtil.wrapSyncSupplierResult(() -> {
+			return Pair.with(mTransaction.getByKey(pTable, pKey1, pKey2, pClass), pContext);
+		});
 		return result;
 	}
 

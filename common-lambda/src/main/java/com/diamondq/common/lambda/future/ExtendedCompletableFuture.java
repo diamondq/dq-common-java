@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
@@ -13,6 +14,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -350,6 +352,54 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	private ExtendedCompletableFuture(CompletableFuture<T> pFuture) {
 		mDelegate = pFuture;
+	}
+
+	/**
+	 * Returns a new CompletableFuture that is asynchronously completed by a task running in the
+	 * {@link ForkJoinPool#commonPool()} with the value obtained by calling the given Supplier.
+	 *
+	 * @param supplier a function returning the value to be used to complete the returned CompletableFuture
+	 * @param <U> the function's return type
+	 * @return the new CompletableFuture
+	 */
+	public static <U> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier) {
+		return ExtendedCompletableFuture.of(CompletableFuture.supplyAsync(supplier));
+	}
+
+	/**
+	 * Returns a new CompletableFuture that is asynchronously completed by a task running in the given executor with the
+	 * value obtained by calling the given Supplier.
+	 *
+	 * @param supplier a function returning the value to be used to complete the returned CompletableFuture
+	 * @param executor the executor to use for asynchronous execution
+	 * @param <U> the function's return type
+	 * @return the new CompletableFuture
+	 */
+	public static <U> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor) {
+		return ExtendedCompletableFuture.of(CompletableFuture.supplyAsync(supplier, executor));
+	}
+
+	/**
+	 * Returns a new CompletableFuture that is asynchronously completed by a task running in the
+	 * {@link ForkJoinPool#commonPool()} after it runs the given action.
+	 *
+	 * @param runnable the action to run before completing the returned CompletableFuture
+	 * @return the new CompletableFuture
+	 */
+	public static ExtendedCompletableFuture<@Nullable Void> runAsync(Runnable runnable) {
+		return ExtendedCompletableFuture.of(CompletableFuture.runAsync(runnable));
+	}
+
+	/**
+	 * Returns a new CompletableFuture that is asynchronously completed by a task running in the given executor after it
+	 * runs the given action.
+	 *
+	 * @param runnable the action to run before completing the returned CompletableFuture
+	 * @param executor the executor to use for asynchronous execution
+	 * @return the new CompletableFuture
+	 */
+	public static ExtendedCompletableFuture<@Nullable Void> runAsync(Runnable runnable, Executor executor) {
+		return ExtendedCompletableFuture.of(CompletableFuture.runAsync(runnable, executor));
 	}
 
 	public static ExtendedCompletableFuture<@Nullable Void> allOf(@NonNull CompletableFuture<?>... cfs) {
