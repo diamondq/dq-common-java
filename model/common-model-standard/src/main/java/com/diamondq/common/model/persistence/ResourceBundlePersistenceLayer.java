@@ -21,6 +21,53 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLayer {
 
+	/**
+	 * The builder (generally used for the Config system)
+	 */
+	public static class ResourceBundlePersistenceLayerBuilder {
+
+		private @Nullable Scope		mScope;
+
+		private @Nullable String	mResourceBaseName;
+
+		/**
+		 * Sets the scope
+		 * 
+		 * @param pScope the scope
+		 * @return the builder
+		 */
+		public ResourceBundlePersistenceLayerBuilder scope(Scope pScope) {
+			mScope = pScope;
+			return this;
+		}
+
+		/**
+		 * Sets the resource base name
+		 * 
+		 * @param pValue the base name
+		 * @return the builder
+		 */
+		public ResourceBundlePersistenceLayerBuilder resourceBaseName(String pValue) {
+			mResourceBaseName = pValue;
+			return this;
+		}
+
+		/**
+		 * Builds the layer
+		 * 
+		 * @return the layer
+		 */
+		public ResourceBundlePersistenceLayer build() {
+			Scope scope = mScope;
+			if (scope == null)
+				throw new IllegalArgumentException("The mandatory field scope was not set");
+			String resourceBaseName = mResourceBaseName;
+			if (resourceBaseName == null)
+				throw new IllegalArgumentException("The mandatory field resourceBaseName was not set");
+			return new ResourceBundlePersistenceLayer(scope, resourceBaseName);
+		}
+	}
+
 	protected final String mBaseName;
 
 	public ResourceBundlePersistenceLayer(Scope pScope, String pResourceBaseName) {
@@ -33,7 +80,8 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
 	 */
 	@Override
-	protected @Nullable String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
+	protected @Nullable String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
+		String pKey) {
 		try {
 			ResourceBundle bundle = ResourceBundle.getBundle(mBaseName, pLocale);
 			return bundle.getString(pKey);
@@ -98,7 +146,8 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String)
 	 */
 	@Override
-	protected @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName, String pKey) {
+	protected @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName,
+		String pKey) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -188,4 +237,9 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	protected void internalDeleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
 		throw new UnsupportedOperationException();
 	}
+
+	public static ResourceBundlePersistenceLayerBuilder builder() {
+		return new ResourceBundlePersistenceLayerBuilder();
+	}
+
 }
