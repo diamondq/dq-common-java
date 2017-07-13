@@ -1,0 +1,62 @@
+package com.diamondq.common.model.persistence;
+
+import com.diamondq.common.config.Config;
+import com.diamondq.common.model.generic.GenericToolkit;
+import com.diamondq.common.model.generic.PersistenceLayer;
+import com.diamondq.common.model.interfaces.Scope;
+import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.model.interfaces.ToolkitFactory;
+import com.diamondq.common.model.persistence.CombinedPersistenceLayer;
+import com.diamondq.common.model.persistence.MemoryPersistenceLayer;
+import com.google.common.collect.ImmutableList;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Singleton;
+
+public class ToolkitProvider {
+
+	@Produces
+	@Singleton
+	public Toolkit createToolkit(Config pConfig, BeanManager pManager) {
+		ToolkitFactory factory = ToolkitFactory.newInstance();
+		Toolkit toolkit = factory.newToolkit();
+		GenericToolkit gt = (GenericToolkit) toolkit;
+
+		@SuppressWarnings("unchecked")
+		Collection<String> scopes = pConfig.bind("persistence.scopes", Collection.class);
+		if (scopes != null) {
+			for (String scopeName : scopes) {
+				Scope scope = toolkit.getOrCreateScope(scopeName);
+
+				/* Now attempt to get the list of structures */
+
+				@SuppressWarnings("unchecked")
+				List<PersistenceLayer> structureLayers = pConfig.bind("persistence.scope-" + scopeName + ".structures",
+					List.class, Collections.singletonMap("scope", scope));
+				if ((structureLayers == null) || (structureLayers.isEmpty() == true))
+					throw new IllegalArgumentException("The config key persistence.scope-" + scopeName
+						+ ".structures requires at least one definition");
+
+				@SuppressWarnings("unchecked")
+				List<PersistenceLayer> resourceLayers = pConfig.bind("persistence.scope-" + scopeName + ".resources",
+					List.class, Collections.singletonMap("scope", scope));
+				if ((resourceLayers == null) || (resourceLayers.isEmpty() == true))
+					throw new IllegalArgumentException("The config key persistence.scope-" + scopeName
+						+ ".resources requires at least one definition");
+
+				gt.addPersistenceLayer(scope,
+					new CombinedPersistenceLayer(scope, structureLayers,
+						ImmutableList.<PersistenceLayer> builder().add(new MemoryPersistenceLayer(scope))
+							.addAll(structureLayers).build(),
+						Collections.singletonList(new MemoryPersistenceLayer(scope)), resourceLayers));
+			}
+		}
+		return toolkit;
+	}
+
+}
