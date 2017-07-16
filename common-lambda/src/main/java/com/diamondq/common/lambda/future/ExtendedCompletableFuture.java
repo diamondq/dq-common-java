@@ -283,17 +283,17 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> handle(BiFunction<? super T, Throwable, ? extends U> pFn) {
+	public <U> ExtendedCompletableFuture<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.handle(pFn));
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, Throwable, ? extends U> pFn) {
+	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.handleAsync(pFn));
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, Throwable, ? extends U> pFn,
+	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn,
 		@Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture.of(mDelegate.handleAsync(pFn, pExecutor));
 	}
