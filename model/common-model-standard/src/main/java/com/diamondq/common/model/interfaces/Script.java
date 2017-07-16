@@ -1,7 +1,9 @@
 package com.diamondq.common.model.interfaces;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public interface Script {
 
-	public Object evaluate(Property<?> pProperty);
+	public @Nullable Object evaluate(Property<?> pProperty);
 
 }

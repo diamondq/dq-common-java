@@ -7,16 +7,17 @@ import com.diamondq.common.security.xacml.model.IFunctionArgument;
 
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.jdo.JDOQLTypedQuery;
 import javax.jdo.query.BooleanExpression;
 
 import org.apache.openaz.pepapi.PepAgent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Singleton
+@ApplicationScoped
 public class AuthQueryExtenderImpl implements AuthenticationQueryExtender {
 
 	@SuppressWarnings("unused")
@@ -41,7 +42,7 @@ public class AuthQueryExtenderImpl implements AuthenticationQueryExtender {
 	 */
 	@Override
 	public BooleanExpression extendForAccessControl(JDOQLTypedQuery<?> pTypedQuery, BooleanExpression pExpression,
-		List<?> pAssociations, Object... pObjects) {
+		List<?> pAssociations, Object @Nullable ... pObjects) {
 
 		Object[] expand = new Object[(pObjects != null ? pObjects.length + 1 : 1)];
 		if (pObjects != null)
