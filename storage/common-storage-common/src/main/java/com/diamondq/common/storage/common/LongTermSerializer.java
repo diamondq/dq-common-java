@@ -5,15 +5,15 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Helper to move a class into and out of long term serialization format (which is currently Kryo)
  */
-@Singleton
+@ApplicationScoped
 public class LongTermSerializer {
 
 	private final KryoPool mPool;

@@ -4,15 +4,15 @@ import com.esotericsoftware.kryo.Kryo;
 
 import java.util.LinkedList;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * CDI helper for managing the Kryo Pool
  */
-@Singleton
+@ApplicationScoped
 public class KryoPool {
 
 	private final LinkedList<@NonNull Kryo> mKryoPool;

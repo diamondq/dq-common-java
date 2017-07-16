@@ -12,10 +12,12 @@ import com.diamondq.common.security.acme.model.PersistedState;
 
 import java.util.Collections;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@ApplicationScoped
 public class DataService {
 
 	private Toolkit				mToolkit;

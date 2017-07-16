@@ -5,13 +5,14 @@ import com.diamondq.common.security.acl.api.AuthenticationEngine;
 
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.apache.openaz.pepapi.PepAgent;
 import org.apache.openaz.pepapi.PepResponse;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-@Singleton
+@ApplicationScoped
 public class AuthEngineImpl implements AuthenticationEngine {
 
 	private final PepAgent	mPepAgent;
@@ -31,7 +32,7 @@ public class AuthEngineImpl implements AuthenticationEngine {
 	 * @see com.diamondq.common.security.acl.api.AuthenticationEngine#decide(java.lang.Object[])
 	 */
 	@Override
-	public boolean decide(Object... pObjects) {
+	public boolean decide(Object @Nullable... pObjects) {
 		Object[] expand = new Object[(pObjects != null ? pObjects.length + 1 : 1)];
 		if (pObjects != null)
 			System.arraycopy(pObjects, 0, expand, 1, pObjects.length);
@@ -41,7 +42,7 @@ public class AuthEngineImpl implements AuthenticationEngine {
 	}
 
 	@Override
-	public boolean[] bulkDecide(List<?> pAssociations, Object... pCommonObjects) {
+	public boolean[] bulkDecide(List<?> pAssociations, Object @Nullable... pCommonObjects) {
 		Object[] expand = new Object[(pCommonObjects != null ? pCommonObjects.length + 1 : 1)];
 		if (pCommonObjects != null)
 			System.arraycopy(pCommonObjects, 0, expand, 1, pCommonObjects.length);

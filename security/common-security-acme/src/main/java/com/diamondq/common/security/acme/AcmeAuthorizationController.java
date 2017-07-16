@@ -30,8 +30,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Singleton
+@ApplicationScoped
 @Path("/acme-authorization")
 @Api(tags = {"SSL"})
 public class AcmeAuthorizationController {

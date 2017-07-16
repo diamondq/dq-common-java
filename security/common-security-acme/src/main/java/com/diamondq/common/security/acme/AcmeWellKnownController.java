@@ -4,8 +4,8 @@ import com.diamondq.common.security.acme.model.ChallengeState;
 
 import java.io.IOException;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import io.swagger.annotations.Api;
 
 @Path("/.well-known/acme-challenge")
-@Singleton
+@ApplicationScoped
 @Api(tags = {"SSL"})
 public class AcmeWellKnownController {
 

@@ -1,11 +1,16 @@
 package com.diamondq.common.security.jwt;
 
+import com.diamondq.common.config.Config;
+import com.diamondq.common.security.acl.api.IdentityEngine;
+import com.diamondq.common.security.acl.model.UserInfo;
+import com.diamondq.common.security.jwt.model.JWTConfigProperties;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -17,12 +22,7 @@ import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.lang.JoseException;
 
-import com.diamondq.common.config.Config;
-import com.diamondq.common.security.acl.api.IdentityEngine;
-import com.diamondq.common.security.acl.model.UserInfo;
-import com.diamondq.common.security.jwt.model.JWTConfigProperties;
-
-@Singleton
+@ApplicationScoped
 public class JWTIdentityEngine implements IdentityEngine {
 
 	private final String		mJWTHeader;
