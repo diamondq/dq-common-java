@@ -89,7 +89,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 			throw new IllegalStateException("The resourceCache is mandatory for the MemoryPersistenceLayer");
 		for (Map.Entry<String, String> pair : resourceCache.asMap().entrySet()) {
 			String key = pair.getKey();
-			if ((key != null) && (key.startsWith(prefix) == true))
+			if (key.startsWith(prefix) == true)
 				builder.put(key.substring(prefix.length()), pair.getValue());
 		}
 		return builder.build();

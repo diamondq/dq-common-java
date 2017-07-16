@@ -74,11 +74,8 @@ public class GenericStructureDefinition implements StructureDefinition {
 		});
 	}
 
-	@SuppressWarnings("unused")
 	public void validate() {
 
-		if (mName == null)
-			throw new IllegalArgumentException("The StructureDefinition must have a name.");
 		if (sValidNamePattern.matcher(mName).matches() == false)
 			throw new IllegalArgumentException(
 				"The StructureDefinition must have a valid name, which can only be the characters 0-9, a-z, A-Z, . and -.");

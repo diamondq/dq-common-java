@@ -200,13 +200,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 							/* If it's a Container reference to the parent, then we don't include it */
 
 							Collection<String> containerValue = pd.getKeywords().get(CommonKeywordKeys.CONTAINER);
-							if ((containerValue != null)
-								&& (containerValue.contains(CommonKeywordValues.CONTAINER_PARENT))) {
+							if (containerValue.contains(CommonKeywordValues.CONTAINER_PARENT)) {
 								continue;
 							}
 
-							if ((containerValue != null)
-								&& (containerValue.contains(CommonKeywordValues.CONTAINER_CHILDREN))) {
+							if (containerValue.contains(CommonKeywordValues.CONTAINER_CHILDREN)) {
 
 								Collection<StructureDefinitionRef> types = pd.getReferenceTypes();
 								for (StructureDefinitionRef type : types) {

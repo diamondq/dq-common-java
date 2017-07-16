@@ -141,7 +141,7 @@ public class Parser {
 
 		Iterator<Request> iterRequestsIndividualDecision =
 			stdIndividualDecisionRequestGenerator.getIndividualDecisionRequests();
-		if (iterRequestsIndividualDecision == null || !iterRequestsIndividualDecision.hasNext())
+		if (!iterRequestsIndividualDecision.hasNext())
 			throw new RuntimeException("");
 
 		Set<IFunctionArgument> policySet = new HashSet<>();

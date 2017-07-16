@@ -235,8 +235,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 			if (list == null)
 				list = ImmutableList.of();
 			ImmutableList<EditorStructureDefinition> updatedList = ImmutableList.<EditorStructureDefinition> builder()
-				.addAll(Collections2.filter(list,
-					Predicates.not((a) -> a == null ? false : a.getName().equals(pValue.getName()))))
+				.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName()))))
 				.add(pValue).build();
 			editorStructureDefinitionCacheByRef.put(key, updatedList);
 		}
@@ -256,7 +255,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 		String key = pRef.getSerializedString();
 		Cache<String, List<EditorStructureDefinition>> editorStructureDefinitionCacheByRef =
 			mEditorStructureDefinitionCacheByRef;
-		@Nullable List<EditorStructureDefinition> result = (editorStructureDefinitionCacheByRef != null
+		@Nullable
+		List<EditorStructureDefinition> result = (editorStructureDefinitionCacheByRef != null
 			? editorStructureDefinitionCacheByRef.getIfPresent(key) : null);
 		if (result != null)
 			return result;
@@ -270,8 +270,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 		return result;
 	}
 
-	protected abstract @Nullable List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(Toolkit pToolkit,
-		Scope pScope, StructureDefinitionRef pRef);
+	protected abstract @Nullable List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(
+		Toolkit pToolkit, Scope pScope, StructureDefinitionRef pRef);
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#deleteEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
@@ -286,8 +286,9 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 			List<EditorStructureDefinition> list = editorStructureDefinitionCacheByRef.getIfPresent(key);
 			if (list != null) {
 				ImmutableList<EditorStructureDefinition> updatedList =
-					ImmutableList.<EditorStructureDefinition> builder().addAll(Collections2.filter(list,
-						Predicates.not((a) -> a == null ? false : a.getName().equals(pValue.getName())))).build();
+					ImmutableList.<EditorStructureDefinition> builder()
+						.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName()))))
+						.build();
 				if (updatedList.isEmpty() == true)
 					editorStructureDefinitionCacheByRef.invalidate(key);
 				else
@@ -305,7 +306,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
 	 */
 	@Override
-	protected @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
+	protected @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
+		String pKey) {
 		Cache<String, String> resourceCache = mResourceCache;
 		if (resourceCache != null) {
 			StringBuilder sb = new StringBuilder(pLocale.toString());

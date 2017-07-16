@@ -28,7 +28,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -220,7 +219,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
 	 */
 	@Override
-	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope, String pValue) {
+	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope,
+		String pValue) {
 		return new GenericPropertyRef<>(mScope, pValue);
 	}
 
@@ -262,8 +262,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	public PropertyDefinitionRef createPropertyDefinitionRef(Toolkit pToolkit, Scope pScope,
 		PropertyDefinition pResolvable, StructureDefinition pContaining) {
 		StringBuilder sb = new StringBuilder();
-		if (pContaining != null)
-			sb.append(pContaining.getReference().getSerializedString());
+		sb.append(pContaining.getReference().getSerializedString());
 		sb.append('#');
 		sb.append(pResolvable.getName());
 		return new GenericPropertyDefinitionRef(mScope, sb.toString());
@@ -300,8 +299,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	public <@Nullable T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope, @Nullable Property<T> pResolvable,
-		Structure pContaining) {
+	public <@Nullable T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope,
+		@Nullable Property<T> pResolvable, Structure pContaining) {
 		return new GenericPropertyRef<T>(mScope, pContaining.getReference(),
 			(pResolvable == null ? null : pResolvable.getDefinition().getName()));
 	}
@@ -413,7 +412,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 			getAllStructuresByDefinition(pToolkit, pScope, pStructureDefinition.getReference());
 		List<Structure> results = Lists.newArrayList();
 		GenericQueryBuilder gqb = (GenericQueryBuilder) pBuilder;
-		List<GenericWhereInfo> whereList = (gqb == null ? Collections.emptyList() : gqb.getWhereList());
+		List<GenericWhereInfo> whereList = gqb.getWhereList();
 		for (Structure test : allStructures) {
 
 			boolean matches = true;
@@ -527,7 +526,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 * @param pKey the key
 	 * @return the result or null if there is no match
 	 */
-	protected abstract @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey);
+	protected abstract @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
+		String pKey);
 
 	/**
 	 * Converts a given string into characters that are valid. To guarantee uniqueness, it will escape unsupported
