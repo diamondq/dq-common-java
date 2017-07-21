@@ -10,6 +10,15 @@
 	<artifactId>common-security-openaz</artifactId>
 	<packaging>jar</packaging>
 	<name>DiamondQ Common: Security: OpenAZ</name>
+	<repositories>
+		<repository>
+			<id>dq-snapshot</id>
+			<url>https://nexus.diamondq.com/repository/maven-snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.diamondq.common.java.security</groupId>
