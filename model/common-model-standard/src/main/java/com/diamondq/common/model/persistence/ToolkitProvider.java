@@ -6,22 +6,21 @@ import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
-import com.diamondq.common.model.persistence.CombinedPersistenceLayer;
-import com.diamondq.common.model.persistence.MemoryPersistenceLayer;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Singleton;
 
+@ApplicationScoped
 public class ToolkitProvider {
 
 	@Produces
-	@Singleton
+	@ApplicationScoped
 	public Toolkit createToolkit(Config pConfig, BeanManager pManager) {
 		ToolkitFactory factory = ToolkitFactory.newInstance();
 		Toolkit toolkit = factory.newToolkit();

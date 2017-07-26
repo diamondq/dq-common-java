@@ -5,13 +5,12 @@ import java.util.concurrent.Executors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
-import javax.inject.Singleton;
 
 @ApplicationScoped
 public class TestExecutors {
 
 	@Produces
-	@Singleton
+	@ApplicationScoped
 	public ExecutorService getExecutor() {
 		return Executors.newScheduledThreadPool(0);
 	}
