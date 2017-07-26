@@ -67,7 +67,7 @@ public abstract class AbstractStructureTests implements StandardTest {
 			toolkit.createNewPropertyDefinition(scope, propName, PropertyType.String).setPrimaryKey(true));
 
 		newDef = newDef
-			.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, parentName, PropertyType.StructureRef)
+			.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, parentName, PropertyType.PropertyRef)
 				.addKeyword(CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT));
 
 		/* Write */
@@ -103,6 +103,8 @@ public abstract class AbstractStructureTests implements StandardTest {
 		StructureRef childRefObj = toolkit.createStructureRefFromSerialized(scope, childRef);
 		child = childRefObj.resolve();
 		Assert.assertNotNull(child);
+		childProperty = child.lookupPropertyByName(propName);
+		Assert.assertNotNull(childProperty);
 		Assert.assertEquals("CHILD", childProperty.getValue(child));
 
 		/* Verify the destruction of the parent destroys the child */
