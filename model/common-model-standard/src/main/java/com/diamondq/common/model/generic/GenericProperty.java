@@ -198,8 +198,13 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 				break;
 			}
 			case StructureRef: {
-				if (pValue instanceof String)
+				if (pValue instanceof StructureRef)
 					break;
+				if (pValue instanceof String) {
+					pValue = (TYPE) mPropertyDefinition.getScope().getToolkit()
+						.createStructureRefFromSerialized(mPropertyDefinition.getScope(), (String) pValue);
+					break;
+				}
 				throw new IllegalArgumentException("A StructureRef Property must be passed a String");
 			}
 			case StructureRefList: {
