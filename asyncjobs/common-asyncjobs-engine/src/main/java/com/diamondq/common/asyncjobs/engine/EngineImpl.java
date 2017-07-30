@@ -16,6 +16,8 @@ import java.util.function.Supplier;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 @ApplicationScoped
 public class EngineImpl implements Engine {
 
@@ -35,7 +37,7 @@ public class EngineImpl implements Engine {
 	 * @see com.diamondq.common.asyncjobs.api.Engine#submit(java.lang.Class, java.lang.Class)
 	 */
 	@Override
-	public <T> ExtendedCompletableFuture<T> submit(Class<?> pClass, Class<T> pResultClass) {
+	public <T> ExtendedCompletableFuture<T> submit(@Nullable Class<?> pClass, Class<T> pResultClass) {
 		Job<T> job = Job.of(pClass, pResultClass);
 		JobInstance<T> instance = new JobInstance<T>();
 		submit(job, instance);

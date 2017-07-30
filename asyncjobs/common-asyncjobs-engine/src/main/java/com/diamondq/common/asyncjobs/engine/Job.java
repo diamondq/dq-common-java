@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * @param <R> the expected return type
  */
@@ -109,8 +111,8 @@ public class Job<R> {
 	 * @param pResultClass the expected result class
 	 * @return the job
 	 */
-	public static <T> Job<T> of(Class<?> pClass, Class<T> pResultClass) {
-		String jobKey = pClass.getName();
+	public static <T> Job<T> of(@Nullable Class<?> pClass, Class<T> pResultClass) {
+		String jobKey = (pClass == null ? "__NULL__" : pClass.getName());
 
 		Job<?> existingJob = sCachableJobs.get(jobKey);
 		if (existingJob != null) {
@@ -118,6 +120,9 @@ public class Job<R> {
 			Job<T> result = (Job<T>) existingJob;
 			return result;
 		}
+
+		if (pClass == null)
+			throw new IllegalArgumentException("The class cannot be null if it hasn't already been registered.");
 
 		/* Find the method */
 		Set<Method> methods = scanForMethods(pClass, pResultClass);
