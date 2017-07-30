@@ -28,6 +28,10 @@ public class XMPPServerLookup {
 
 	private final Config		mConfig;
 
+	public XMPPServerLookup() {
+		throw new IllegalArgumentException();
+	}
+
 	@Inject
 	public XMPPServerLookup(Config pConfig) {
 		mConfig = pConfig;
