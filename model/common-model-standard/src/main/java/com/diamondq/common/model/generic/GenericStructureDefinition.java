@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.lambda.Memoizer;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.Scope;

@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.lambda.Memoizer;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.CommonKeywordValues;
 import com.diamondq.common.model.interfaces.Property;
@@ -12,7 +13,6 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.google.common.base.Predicates;
-import com.google.common.base.Supplier;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

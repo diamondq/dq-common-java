@@ -1,16 +1,17 @@
-package com.diamondq.common.model.generic;
+package com.diamondq.common.lambda;
 
-import com.google.common.base.Supplier;
-import com.google.common.collect.Maps;
+import com.diamondq.common.lambda.interfaces.Function3;
 
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Memoizer {
 
-	private final ConcurrentMap<String, Optional<Object>> mData = Maps.newConcurrentMap();
+	private final ConcurrentMap<String, Optional<Object>> mData = new ConcurrentHashMap<>();
 
 	public Memoizer() {
 	}
@@ -89,7 +90,7 @@ public class Memoizer {
 		return castedResult;
 	}
 
-	public <F1, F2, F3, T> T memoize(TriFunction<F1, F2, F3, T> pSupplier, F1 pInput1, F2 pInput2, F3 pInput3,
+	public <F1, F2, F3, T> T memoize(Function3<F1, F2, F3, T> pSupplier, F1 pInput1, F2 pInput2, F3 pInput3,
 		String pPrefix) {
 
 		/* Check the memoizer */

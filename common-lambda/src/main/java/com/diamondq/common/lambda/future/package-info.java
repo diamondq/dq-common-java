@@ -1,5 +1,5 @@
 /**
- * Information about the config package
+ * Information about the lambda.future package
  */
 @org.checkerframework.framework.qual.DefaultQualifier(value=org.checkerframework.checker.nullness.qual.NonNull.class)
 @org.eclipse.jdt.annotation.NonNullByDefault
