@@ -1,6 +1,5 @@
 package com.diamondq.common.reaction.engine.tests.simple_trigger;
 
-import com.diamondq.common.asyncjobs.tests.simple.TestSubmit;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.reaction.api.Action;
 import com.diamondq.common.reaction.api.Engine;
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class TestSimpleAddToCollection {
 
-	private static Logger	sLogger	= LoggerFactory.getLogger(TestSubmit.class);
+	private static Logger	sLogger	= LoggerFactory.getLogger(TestSimpleAddToCollection.class);
 
 	@Rule
 	public WeldInitiator	weld	= WeldInitiator.of(new Weld());

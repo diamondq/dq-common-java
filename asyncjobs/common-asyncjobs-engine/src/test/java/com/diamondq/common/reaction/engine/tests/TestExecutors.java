@@ -1,4 +1,4 @@
-package com.diamondq.common.asyncjobs.tests;
+package com.diamondq.common.reaction.engine.tests;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
