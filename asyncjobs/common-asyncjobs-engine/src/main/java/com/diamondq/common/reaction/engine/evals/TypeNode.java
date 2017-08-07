@@ -1,0 +1,32 @@
+package com.diamondq.common.reaction.engine.evals;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public class TypeNode {
+
+	public final String								type;
+
+	private final ConcurrentMap<String, NameNode>	names;
+
+	public TypeNode(String pType) {
+		type = pType;
+		names = new ConcurrentHashMap<>();
+	}
+
+	public NameNode getOrAddName(String pName) {
+		NameNode nameNode = names.get(pName);
+		if (nameNode != null)
+			return nameNode;
+		NameNode newNameNode = new NameNode(pName);
+		if ((nameNode = names.putIfAbsent(pName, newNameNode)) == null)
+			nameNode = newNameNode;
+		return nameNode;
+	}
+
+	public @Nullable NameNode getName(String pName) {
+		return names.get(pName);
+	}
+}

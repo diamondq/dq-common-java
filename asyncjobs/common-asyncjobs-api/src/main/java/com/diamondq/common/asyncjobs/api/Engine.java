@@ -8,7 +8,7 @@ public interface Engine {
 
 	/**
 	 * Issue a request to retrieve a result. The result requested is based on the result class and the job class. If the
-	 * job class is not provided, then it's just the result class. All @AsyncJob's are scanned to see if they can
+	 * job class is not provided, then it's just the result class. All @ConfigureReaction's are scanned to see if they can
 	 * provide the necessary result, and what their dependencies are. This occurs recursively. Some jobs make take
 	 * significant time before they complete (or error).
 	 * 

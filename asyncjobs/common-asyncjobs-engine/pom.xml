@@ -21,12 +21,30 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>typetools</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.diamondq.common.java.config</groupId>
 			<artifactId>common-config-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.diamondq.common.java.asyncjobs</groupId>
 			<artifactId>common-asyncjobs-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.diamondq.common.java.model</groupId>
+			<artifactId>common-model-standard</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.diamondq.common.java.config</groupId>
+			<artifactId>common-config-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.diamondq.common.java.config</groupId>
+			<artifactId>common-config-format-snake-yaml</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

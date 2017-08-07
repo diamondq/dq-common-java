@@ -128,7 +128,7 @@ public class Job<R> {
 		Set<Method> methods = scanForMethods(pClass, pResultClass);
 		if (methods.size() != 1)
 			throw new IllegalArgumentException(
-				"Only one method annotated with @AsyncJob is supported when only passing a Class");
+				"Only one method annotated with @ConfigureReaction is supported when only passing a Class");
 		Method method = Iterables.get(methods, 0);
 
 		/* Now scan for all the dependencies on the method */
