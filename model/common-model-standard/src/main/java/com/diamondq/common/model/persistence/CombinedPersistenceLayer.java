@@ -113,11 +113,27 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	}
 
 	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructure(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+	 *      com.diamondq.common.model.interfaces.Structure)
+	 */
+	@Override
+	public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
+		@Nullable Structure pOldStructure) {
+		for (PersistenceLayer l : mStructurePersistenceLayer) {
+			if (l.writeStructure(pToolkit, pScope, pStructure, pOldStructure) == false)
+				return false;
+		}
+		return true;
+	}
+
+	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureBySerializedRef(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
 	 */
 	@Override
-	public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope, String pSerializedRef) {
+	public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope,
+		String pSerializedRef) {
 		if (mStructurePersistenceLayerIsSingleton == true)
 			return mStructurePersistenceLayer.get(0).lookupStructureBySerializedRef(pGenericToolkit, pScope,
 				pSerializedRef);
@@ -135,8 +151,12 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	public void deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue) {
-		mStructurePersistenceLayer.forEach((l) -> l.deleteStructure(pToolkit, pScope, pValue));
+	public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue) {
+		for (PersistenceLayer l : mStructurePersistenceLayer) {
+			if (l.deleteStructure(pToolkit, pScope, pValue) == false)
+				return false;
+		}
+		return true;
 	}
 
 	/**
@@ -261,7 +281,8 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
 	 */
 	@Override
-	public @Nullable String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey) {
+	public @Nullable String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale,
+		String pKey) {
 		if (mResourcePersistenceLayerIsSingleton == true)
 			return mResourcePersistenceLayer.get(0).lookupResourceString(pToolkit, pScope, pLocale, pKey);
 
@@ -278,7 +299,8 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
 	 */
 	@Override
-	protected @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
+	protected @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
+		String pKey) {
 		throw new UnsupportedOperationException();
 	}
 

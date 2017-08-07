@@ -29,6 +29,37 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
 	/**
+	 * The builder (generally used for the Config system)
+	 */
+	public static class MemoryPersistenceLayerBuilder {
+
+		private @Nullable Scope mScope;
+
+		/**
+		 * Sets the scope
+		 * 
+		 * @param pScope the scope
+		 * @return the builder
+		 */
+		public MemoryPersistenceLayerBuilder scope(Scope pScope) {
+			mScope = pScope;
+			return this;
+		}
+
+		/**
+		 * Builds the layer
+		 * 
+		 * @return the layer
+		 */
+		public MemoryPersistenceLayer build() {
+			Scope scope = mScope;
+			if (scope == null)
+				throw new IllegalArgumentException("The mandatory field scope was not set");
+			return new MemoryPersistenceLayer(scope);
+		}
+	}
+
+	/**
 	 * Default constructor
 	 * 
 	 * @param pScope the scope
@@ -98,28 +129,60 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteStructure(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.Structure)
+	 *      com.diamondq.common.model.interfaces.Structure, boolean, com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	protected void internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Structure pStructure) {
+	protected boolean internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure, boolean pMustMatchOldStructure, @Nullable Structure pOldStructure) {
+
+		if (pMustMatchOldStructure == true) {
+			Cache<String, Structure> structureCache = mStructureCache;
+			if (structureCache == null)
+				throw new IllegalStateException("The structureCache is mandatory for the MemoryPersistenceLayer");
+
+			/* Check to see if the structure matches */
+
+			Structure oldStructure = structureCache.getIfPresent(pKey);
+			if (oldStructure == null) {
+				if (pOldStructure != null)
+					return false;
+			}
+			else {
+				if (oldStructure.equals(pOldStructure) == false)
+					return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
 	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	protected void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure) {
+	protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure) {
 
-		/* Handle the recursive deleting */
 		Cache<String, Structure> structureCache = mStructureCache;
 		if (structureCache == null)
 			throw new IllegalStateException("The structureCache is mandatory for the MemoryPersistenceLayer");
+
+		/* Check to see if the structure matches */
+
+		Structure oldStructure = structureCache.getIfPresent(pKey);
+		if (oldStructure == null)
+			return false;
+		if (oldStructure.equals(pStructure) == false)
+			return false;
+
+		/* Handle the recursive deleting of all children */
+
 		Set<String> set = ImmutableSet.copyOf(Sets.filter(structureCache.asMap().keySet(), (k) -> k.startsWith(pKey)));
 		set.forEach((k) -> structureCache.invalidate(k));
 
+		return true;
 	}
 
 	/**
@@ -221,6 +284,10 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 */
 	@Override
 	protected void internalDeleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
+	}
+
+	public static MemoryPersistenceLayerBuilder builder() {
+		return new MemoryPersistenceLayerBuilder();
 	}
 
 }

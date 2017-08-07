@@ -73,28 +73,76 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 		else
 			typeName = key.substring(nextLastOffset + 1, lastOffset);
 
-		internalWriteStructure(pToolkit, pScope, typeName, key, pStructure);
+		internalWriteStructure(pToolkit, pScope, typeName, key, pStructure, false, null);
 	}
 
-	protected abstract void internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Structure pStructure);
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructure(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+	 *      com.diamondq.common.model.interfaces.Structure)
+	 */
+	@Override
+	public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
+		@Nullable Structure pOldStructure) {
+		String key = pToolkit.createStructureRefStr(pScope, pStructure);
+
+		/* Now write the data to disk */
+
+		int lastOffset = key.lastIndexOf('/');
+		if (lastOffset == -1)
+			throw new IllegalArgumentException("The Structure reference is not the right format: " + key);
+		int nextLastOffset = key.lastIndexOf('/', lastOffset - 1);
+		String typeName;
+		if (lastOffset == -1)
+			typeName = key.substring(0, lastOffset);
+		else
+			typeName = key.substring(nextLastOffset + 1, lastOffset);
+
+		if (internalWriteStructure(pToolkit, pScope, typeName, key, pStructure, true, pOldStructure) == false)
+			return false;
+
+		if (mStructureCache != null)
+			mStructureCache.put(key, pStructure);
+
+		return true;
+	}
+
+	protected abstract boolean internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure, boolean pMustMatchOldStructure, @Nullable Structure pOldStructure);
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#deleteStructure(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	public void deleteStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
+	public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
 		String key = pToolkit.createStructureRefStr(pScope, pStructure);
-		if (mStructureCache != null)
-			mStructureCache.invalidate(key);
 
 		/* Now write the data to disk */
 
-		internalDeleteStructure(pToolkit, pScope, key, pStructure);
+		int lastOffset = key.lastIndexOf('/');
+		if (lastOffset == -1)
+			throw new IllegalArgumentException("The Structure reference is not the right format: " + key);
+		int nextLastOffset = key.lastIndexOf('/', lastOffset - 1);
+		String typeName;
+		if (lastOffset == -1)
+			typeName = key.substring(0, lastOffset);
+		else
+			typeName = key.substring(nextLastOffset + 1, lastOffset);
+
+		/* Now write the data to disk */
+
+		if (internalDeleteStructure(pToolkit, pScope, typeName, key, pStructure) == false)
+			return false;
+
+		if (mStructureCache != null)
+			mStructureCache.invalidate(key);
+
+		return true;
 	}
 
-	protected abstract void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure);
+	protected abstract boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure);
 
 	protected void invalidateStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
 		String key = pToolkit.createStructureRefStr(pScope, pStructure);

@@ -18,4 +18,6 @@ public abstract class CommonKeywordKeys {
 
 	public static final String	WITHIN_STRUCTURE_CHOOSER	= "STWithinStructureChooser";
 
+	public static final String	REVISION					= "STRevision";
+
 }

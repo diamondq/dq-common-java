@@ -6,6 +6,7 @@ import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
+import com.diamondq.common.model.interfaces.Revision;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
@@ -26,7 +27,7 @@ import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class GenericStructure implements Structure {
+public class GenericStructure implements Structure, Revision<String> {
 
 	private final Scope								mScope;
 
@@ -75,6 +76,43 @@ public class GenericStructure implements Structure {
 		String firstName = Iterables.getFirst((Collection<@Nullable String>) names, null);
 		Property<@Nullable PropertyRef<T>> first = firstName == null ? null : lookupPropertyByName(firstName);
 		return first == null ? null : first.getValue(this);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Revision#supportsRevisions()
+	 */
+	@Override
+	public boolean supportsRevisions() {
+		Collection<String> revisionProperties =
+			mDefinition.lookupPropertyDefinitionNamesByKeyword(CommonKeywordKeys.REVISION, null, null);
+		return revisionProperties.isEmpty() == false;
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Revision#getRevision()
+	 */
+	@Override
+	public String getRevision() {
+		StringBuilder sb = new StringBuilder();
+		boolean isFirst = true;
+		for (Property<?> prop : lookupPropertiesByKeyword(CommonKeywordKeys.REVISION, null, null)) {
+			if (isFirst == true)
+				isFirst = false;
+			else
+				sb.append('/');
+			Object value = prop.getValue(this);
+			if (value != null)
+				sb.append(value.toString());
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Revision#compareToRevision(java.lang.Object)
+	 */
+	@Override
+	public boolean compareToRevision(String pOtherRevision) {
+		return pOtherRevision.equals(getRevision());
 	}
 
 	/**

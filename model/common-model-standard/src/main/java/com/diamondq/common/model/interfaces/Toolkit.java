@@ -197,12 +197,25 @@ public interface Toolkit {
 	public void writeStructure(Scope pScope, Structure pStructure);
 
 	/**
+	 * Writes a Structure to the persistence layer if the old structure is what was previously in the persistence layer
+	 * (used to provide optimistic transactions)
+	 * 
+	 * @param pScope the scope
+	 * @param pStructure the structure
+	 * @param pOldStructure the old structure or null if there shouldn't be a matching structure
+	 * @return true if the structure was written or false if it wasn't written because it didn't match the old structure
+	 */
+	public boolean writeStructure(Scope pScope, Structure pStructure, @Nullable Structure pOldStructure);
+
+	/**
 	 * Deletes an existing Structure from permanent storage.
 	 * 
 	 * @param pScope the scope
-	 * @param pValue the Structure to delete.
+	 * @param pOldStructure the Structure to delete.
+	 * @return true if the structure was deleted or false if it wasn't deleted because there wasn't a structure that
+	 *         matches the old structure.
 	 */
-	public void deleteStructure(Scope pScope, Structure pValue);
+	public boolean deleteStructure(Scope pScope, Structure pOldStructure);
 
 	/**
 	 * Creates a new Property given a PropertyDefinition. NOTE: The PropertyDefinition must be in the same scope as that

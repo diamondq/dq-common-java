@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A Persistence Layer that stores the information in a Storage KV store
  */
-public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<Map<String, Object>> {
+public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<Map<String, Object>, String> {
 
 	/**
 	 * The builder (generally used for the Config system)
@@ -512,14 +512,26 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	}
 
 	/**
+	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#constructOptimisticObj(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.Structure)
+	 */
+	@Override
+	protected @Nullable String constructOptimisticObj(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		@Nullable Structure pStructure) {
+		return constructOptimisticStringObj(pToolkit, pScope, pDefName, pKey, pStructure);
+	}
+
+	/**
 	 * The provided key must be in the format of [PARENT_DEF/PARENT_KEY/]DEF/PRIMARY_KEY.
 	 * 
 	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object)
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
+	 *      java.lang.Object)
 	 */
 	@Override
-	protected void saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Map<String, Object> pConfig) {
+	protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Map<String, Object> pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
 		IKVTransaction transaction = mStructureStore.startTransaction();
 		boolean success = false;
 		try {
@@ -571,6 +583,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			else
 				transaction.rollback();
 		}
+		return true;
 	}
 
 	private String unescape(String pValue) {
@@ -593,11 +606,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
 	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	protected void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure) {
+	protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure) {
 		IKVTransaction transaction = mStructureStore.startTransaction();
 		boolean success = false;
 		try {
@@ -615,6 +629,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			else
 				transaction.rollback();
 		}
+		return true;
 	}
 
 	/**

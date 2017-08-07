@@ -50,8 +50,8 @@ public interface PersistenceLayer {
 
 	public String createStructureRefStr(Toolkit pToolkit, Scope pScope, Structure pResolvable);
 
-	public <@Nullable T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope, @Nullable Property<T> pResolvable,
-		Structure pContaining);
+	public <@Nullable T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope,
+		@Nullable Property<T> pResolvable, Structure pContaining);
 
 	/* PropertyDefinition */
 
@@ -66,15 +66,17 @@ public interface PersistenceLayer {
 
 	public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure);
 
+	public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure, @Nullable Structure pOldStructure);
+
 	public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope,
 		String pSerializedRef);
 
-	public void deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue);
+	public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue);
 
 	/* Property */
 
-	public <@Nullable T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope, PropertyDefinition pPropertyDefinition,
-		boolean pIsValueSet, T pValue);
+	public <@Nullable T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope,
+		PropertyDefinition pPropertyDefinition, boolean pIsValueSet, T pValue);
 
 	/* TranslatableString */
 
@@ -103,7 +105,8 @@ public interface PersistenceLayer {
 
 	public StructureRef createStructureRefFromSerialized(Toolkit pToolkit, Scope pScope, String pValue);
 
-	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope, String pValue);
+	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope,
+		String pValue);
 
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
 		StructureDefinitionRef pRef);

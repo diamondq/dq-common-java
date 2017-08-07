@@ -10,6 +10,7 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList.Builder;
 
 import java.io.File;
@@ -20,7 +21,9 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Base64;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -29,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A Persistence Layer that stores the information in Properties files.
  */
-public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceLayer<Properties> {
+public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceLayer<Properties, String> {
 
 	/**
 	 * The builder (generally used for the Config system)
@@ -234,7 +237,10 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			return result;
 		}
 		case Binary: {
-			throw new UnsupportedOperationException();
+			byte[] data = (value == null ? new byte[0] : Base64.getDecoder().decode(value));
+			@SuppressWarnings("unchecked")
+			R result = (R) data;
+			return result;
 		}
 		case EmbeddedStructureList: {
 			throw new UnsupportedOperationException();
@@ -336,7 +342,13 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			break;
 		}
 		case Binary: {
-			throw new UnsupportedOperationException();
+			byte[] bytes;
+			if ((pValue instanceof byte[]) == false)
+				bytes = pValue.toString().getBytes(Charsets.UTF_8);
+			else
+				bytes = (byte[]) pValue;
+			pConfig.setProperty(pKey, Base64.getEncoder().encodeToString(bytes));
+			break;
 		}
 		case EmbeddedStructureList: {
 			throw new UnsupportedOperationException();
@@ -352,13 +364,34 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	}
 
 	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object)
+	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#constructOptimisticObj(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	protected void saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Properties pConfig) {
+	protected @Nullable String constructOptimisticObj(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		@Nullable Structure pStructure) {
+		return constructOptimisticStringObj(pToolkit, pScope, pDefName, pKey, pStructure);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
+	 *      java.lang.Object)
+	 */
+	@Override
+	protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Properties pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
 		File structureFile = getStructureFile(pKey, true);
+
+		if (pMustMatchOptimisticObj == true) {
+			@Nullable
+			Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
+			@Nullable
+			String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
+			if (Objects.equals(pOptimisticObj, oldOptimistic) == false)
+				return false;
+		}
 
 		try {
 			try (FileOutputStream fos = new FileOutputStream(structureFile)) {
@@ -368,6 +401,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}
+
+		return true;
 	}
 
 	private String unescape(String pValue) {
@@ -390,15 +425,25 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
 	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	protected void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure) {
+	protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure) {
 		File structureFile = getStructureFile(pKey, false);
 		if (structureFile == null)
-			return;
+			return false;
+
+		String optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pStructure);
+		Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
+		String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
+		if (Objects.equals(optimisticObj, oldOptimistic) == false)
+			return false;
+
 		structureFile.delete();
+
+		return true;
 	}
 
 	/**

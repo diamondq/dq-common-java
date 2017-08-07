@@ -7,6 +7,7 @@ import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
+import com.diamondq.common.model.interfaces.Revision;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureAndProperty;
@@ -26,14 +27,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeSet;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * @param <STRUCTURECONFIGOBJ>
+ * @param <STRUCTUREOPTIMISTICOBJ>
  */
-public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> extends AbstractCachingPersistenceLayer {
+public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUCTUREOPTIMISTICOBJ>
+	extends AbstractCachingPersistenceLayer {
 
 	protected final boolean	mPersistStructures;
 
@@ -57,6 +61,9 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	protected abstract @Nullable STRUCTURECONFIGOBJ loadStructureConfigObject(Toolkit pToolkit, Scope pScope,
 		String pDefName, String pKey, boolean pCreateIfMissing);
 
+	protected abstract @Nullable STRUCTUREOPTIMISTICOBJ constructOptimisticObj(Toolkit pToolkit, Scope pScope,
+		String pDefName, String pKey, @Nullable Structure pStructure);
+
 	protected abstract <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
 		STRUCTURECONFIGOBJ pConfig, boolean pIsMeta, String pKey, PropertyType pType, R pValue);
 
@@ -69,8 +76,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	protected abstract boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
 		STRUCTURECONFIGOBJ pConfig, boolean pIsMeta, String pKey, PropertyType pType);
 
-	protected abstract void saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		STRUCTURECONFIGOBJ pConfig);
+	protected abstract boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		STRUCTURECONFIGOBJ pConfig, boolean pMustMatchOptimisticObj, @Nullable STRUCTUREOPTIMISTICOBJ pOptimisticObj);
 
 	protected abstract boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig);
 
@@ -82,18 +89,45 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteStructure(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.Structure)
+	 *      com.diamondq.common.model.interfaces.Structure, boolean, com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	protected void internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Structure pStructure) {
+	protected boolean internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure, boolean pMustMatchOldStructure, @Nullable Structure pOldStructure) {
 		if (mPersistStructures == false)
-			return;
+			return true;
 
+		STRUCTURECONFIGOBJ config;
 		@Nullable
-		STRUCTURECONFIGOBJ config = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
-		if (config == null)
-			throw new IllegalStateException("The config should always exist since createIfMissing was set");
+		STRUCTUREOPTIMISTICOBJ optimisticObj;
+		if (pMustMatchOldStructure == true) {
+			optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pOldStructure);
+			@Nullable
+			STRUCTURECONFIGOBJ loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
+			if (pOldStructure == null) {
+				if (loadedConfig == null) {
+					loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
+					if (loadedConfig == null)
+						throw new IllegalStateException("The config should always exist since createIfMissing was set");
+					config = loadedConfig;
+				}
+				else
+					config = loadedConfig;
+			}
+			else {
+				if (loadedConfig == null)
+					return false;
+				config = loadedConfig;
+			}
+		}
+		else {
+			@Nullable
+			STRUCTURECONFIGOBJ loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
+			if (loadedConfig == null)
+				throw new IllegalStateException("The config should always exist since createIfMissing was set");
+			config = loadedConfig;
+			optimisticObj = null;
+		}
 
 		boolean changed = false;
 
@@ -322,7 +356,24 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 				throw new UnsupportedOperationException();
 			}
 			case Binary: {
-				throw new UnsupportedOperationException();
+				if (p.isValueSet() == true) {
+					Object value =
+						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary);
+					Object newValue = p.getValue(pStructure);
+					if (newValue == null)
+						newValue = new byte[0];
+					if (Objects.equals(value, newValue) == false) {
+						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary,
+							newValue);
+						changed = true;
+					}
+				}
+				else {
+					if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+						PropertyType.Binary) == true)
+						changed = true;
+				}
+				break;
 			}
 			case Timestamp: {
 				if (p.isValueSet() == true) {
@@ -349,7 +400,9 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 		}
 
 		if ((changed == true) || (isStructureConfigChanged(pToolkit, pScope, config) == true))
-			saveStructureConfigObject(pToolkit, pScope, pDefName, pKey, config);
+			return saveStructureConfigObject(pToolkit, pScope, pDefName, pKey, config, pMustMatchOldStructure,
+				optimisticObj);
+		return true;
 	}
 
 	/**
@@ -544,7 +597,12 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 			}
 			case Binary: {
 				if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-					throw new UnsupportedOperationException();
+					byte @Nullable [] bytes =
+						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary);
+					@SuppressWarnings("unchecked")
+					Property<byte @Nullable []> ap = (Property<byte @Nullable []>) p;
+					ap = ap.setValue(bytes);
+					structure = structure.updateProperty(ap);
 				}
 				break;
 			}
@@ -714,5 +772,42 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ> exten
 		if (mPersistEditorStructureDefinitions == false)
 			return;
 		throw new UnsupportedOperationException();
+	}
+
+	protected @Nullable String constructOptimisticStringObj(Toolkit pToolkit, Scope pScope, String pDefName,
+		String pKey, @Nullable Structure pStructure) {
+		if (pStructure instanceof Revision) {
+
+			Revision<?> r = (Revision<?>) pStructure;
+			if (r.supportsRevisions() == true) {
+				Object revision = r.getRevision();
+				if (revision instanceof String)
+					return (String) revision;
+				return revision.toString();
+			}
+		}
+
+		/* Generate a unique key representing the entire object */
+
+		if (pStructure == null)
+			return null;
+
+		StringBuilder sb = new StringBuilder();
+		boolean isFirst = true;
+		for (String propName : new TreeSet<String>(pStructure.getDefinition().getAllProperties().keySet())) {
+			if (isFirst == true)
+				isFirst = false;
+			else
+				sb.append('/');
+			@Nullable
+			Property<@Nullable Object> prop = pStructure.lookupPropertyByName(propName);
+			if (prop != null) {
+				@Nullable
+				Object value = prop.getValue(pStructure);
+				if (value != null)
+					sb.append(value);
+			}
+		}
+		return sb.toString();
 	}
 }

@@ -256,6 +256,15 @@ public class GenericToolkit implements Toolkit {
 	}
 
 	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#writeStructure(com.diamondq.common.model.interfaces.Scope,
+	 *      com.diamondq.common.model.interfaces.Structure, com.diamondq.common.model.interfaces.Structure)
+	 */
+	@Override
+	public boolean writeStructure(Scope pScope, Structure pStructure, @Nullable Structure pOldStructure) {
+		return getPersistenceLayer(pScope).writeStructure(this, pScope, pStructure, pOldStructure);
+	}
+
+	/**
 	 * @see com.diamondq.common.model.interfaces.Toolkit#createNewProperty(com.diamondq.common.model.interfaces.Scope,
 	 *      com.diamondq.common.model.interfaces.PropertyDefinition, boolean, java.lang.Object)
 	 */
@@ -324,8 +333,8 @@ public class GenericToolkit implements Toolkit {
 	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	public void deleteStructure(Scope pScope, Structure pValue) {
-		getPersistenceLayer(pScope).deleteStructure(this, pScope, pValue);
+	public boolean deleteStructure(Scope pScope, Structure pValue) {
+		return getPersistenceLayer(pScope).deleteStructure(this, pScope, pValue);
 	}
 
 	/**

@@ -123,21 +123,22 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteStructure(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.Structure)
+	 *      com.diamondq.common.model.interfaces.Structure, boolean, com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	protected void internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Structure pStructure) {
+	protected boolean internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure, boolean pMustMatchOldStructure, @Nullable Structure pOldStructure) {
 		throw new UnsupportedOperationException();
 	}
 
 	/**
 	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
 	 *      com.diamondq.common.model.interfaces.Structure)
 	 */
 	@Override
-	protected void internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pKey, Structure pStructure) {
+	protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+		Structure pStructure) {
 		throw new UnsupportedOperationException();
 	}
 
