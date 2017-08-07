@@ -1,7 +1,7 @@
-package com.diamondq.common.asyncjobs.api.methods;
+package com.diamondq.common.lambda.interfaces;
 
 @FunctionalInterface
-public interface Consumer4<T1, T2, T3, T4> {
+public interface Function4<T1, T2, T3, T4, R> {
 
 	/**
 	 * Performs this operation on the given argument.
@@ -10,6 +10,7 @@ public interface Consumer4<T1, T2, T3, T4> {
 	 * @param t2 the input argument
 	 * @param t3 the input argument
 	 * @param t4 the input argument
+	 * @return the result
 	 */
-	void accept(T1 t1, T2 t2, T3 t3, T4 t4);
+	R apply(T1 t1, T2 t2, T3 t3, T4 t4);
 }

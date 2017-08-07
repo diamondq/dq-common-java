@@ -1,4 +1,4 @@
-package com.diamondq.common.asyncjobs.api.methods;
+package com.diamondq.common.lambda.interfaces;
 
 @FunctionalInterface
 public interface Function1<T1, R> {

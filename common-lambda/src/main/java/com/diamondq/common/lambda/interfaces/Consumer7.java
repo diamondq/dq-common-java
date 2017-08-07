@@ -1,4 +1,4 @@
-package com.diamondq.common.asyncjobs.api.methods;
+package com.diamondq.common.lambda.interfaces;
 
 @FunctionalInterface
 public interface Consumer7<T1, T2, T3, T4, T5, T6, T7> {
