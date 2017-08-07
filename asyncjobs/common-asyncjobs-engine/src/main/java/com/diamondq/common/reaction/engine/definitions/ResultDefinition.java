@@ -22,19 +22,22 @@ public class ResultDefinition<T> {
 
 	public final @Nullable String		name;
 
+	public final @Nullable String		nameByVariable;
+
 	public final boolean				resultIsParam;
 
 	ResultDefinition(ResultBuilderImpl<T> pBuilder) {
 		this(pBuilder.getParamClass(), pBuilder.getRequiredStates(), pBuilder.getVariables(), pBuilder.getName(),
-			pBuilder.getResultIsParam());
+			pBuilder.getNameByVariable(), pBuilder.getResultIsParam());
 	}
 
 	public ResultDefinition(Class<T> pClazz, Set<StateCriteria> pRequiredStates, Set<VariableCriteria> pVariables,
-		@Nullable String pName, boolean pResultIsParam) {
+		@Nullable String pName, @Nullable String pNameByVariable, boolean pResultIsParam) {
 		clazz = pClazz;
 		requiredStates = ImmutableSet.copyOf(pRequiredStates);
 		variables = ImmutableSet.copyOf(pVariables);
 		name = pName;
+		nameByVariable = pNameByVariable;
 		resultIsParam = pResultIsParam;
 		Boolean persist = null;
 		for (StateCriteria criteria : pRequiredStates)

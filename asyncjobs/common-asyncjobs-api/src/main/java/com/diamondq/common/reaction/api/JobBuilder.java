@@ -1,24 +1,25 @@
 package com.diamondq.common.reaction.api;
 
-import com.diamondq.common.asyncjobs.api.methods.Consumer1;
-import com.diamondq.common.asyncjobs.api.methods.Consumer2;
-import com.diamondq.common.asyncjobs.api.methods.Consumer3;
-import com.diamondq.common.asyncjobs.api.methods.Consumer4;
-import com.diamondq.common.asyncjobs.api.methods.Consumer5;
-import com.diamondq.common.asyncjobs.api.methods.Consumer6;
-import com.diamondq.common.asyncjobs.api.methods.Consumer7;
-import com.diamondq.common.asyncjobs.api.methods.Consumer8;
-import com.diamondq.common.asyncjobs.api.methods.Consumer9;
-import com.diamondq.common.asyncjobs.api.methods.Function0;
-import com.diamondq.common.asyncjobs.api.methods.Function1;
-import com.diamondq.common.asyncjobs.api.methods.Function2;
-import com.diamondq.common.asyncjobs.api.methods.Function3;
-import com.diamondq.common.asyncjobs.api.methods.Function4;
-import com.diamondq.common.asyncjobs.api.methods.Function5;
-import com.diamondq.common.asyncjobs.api.methods.Function6;
-import com.diamondq.common.asyncjobs.api.methods.Function7;
-import com.diamondq.common.asyncjobs.api.methods.Function8;
-import com.diamondq.common.asyncjobs.api.methods.Function9;
+import com.diamondq.common.lambda.interfaces.Consumer1;
+import com.diamondq.common.lambda.interfaces.Consumer2;
+import com.diamondq.common.lambda.interfaces.Consumer3;
+import com.diamondq.common.lambda.interfaces.Consumer4;
+import com.diamondq.common.lambda.interfaces.Consumer5;
+import com.diamondq.common.lambda.interfaces.Consumer6;
+import com.diamondq.common.lambda.interfaces.Consumer7;
+import com.diamondq.common.lambda.interfaces.Consumer8;
+import com.diamondq.common.lambda.interfaces.Consumer9;
+import com.diamondq.common.lambda.interfaces.Function0;
+import com.diamondq.common.lambda.interfaces.Function1;
+import com.diamondq.common.lambda.interfaces.Function2;
+import com.diamondq.common.lambda.interfaces.Function3;
+import com.diamondq.common.lambda.interfaces.Function4;
+import com.diamondq.common.lambda.interfaces.Function5;
+import com.diamondq.common.lambda.interfaces.Function6;
+import com.diamondq.common.lambda.interfaces.Function7;
+import com.diamondq.common.lambda.interfaces.Function8;
+import com.diamondq.common.lambda.interfaces.Function9;
+import com.diamondq.common.reaction.api.impl.JobBuilderImpl;
 
 /**
  * This is a builder used to define and set up a job
@@ -69,6 +70,14 @@ public interface JobBuilder {
 
 	public <T1, T2, T3, T4, T5, T6, T7, T8, T9, R> JobBuilder method(
 		Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, R> pConsumer);
+
+	/* name */
+
+	public JobBuilderImpl name(String pName);
+
+	/* info */
+
+	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> JobBuilderImpl info(T pJobInfo);
 
 	/* Params */
 

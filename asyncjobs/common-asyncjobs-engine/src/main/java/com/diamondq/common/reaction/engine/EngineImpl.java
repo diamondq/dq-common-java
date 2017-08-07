@@ -5,8 +5,12 @@ import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.reaction.api.Action;
 import com.diamondq.common.reaction.api.Engine;
+import com.diamondq.common.reaction.api.EngineInitializedEvent;
 import com.diamondq.common.reaction.api.JobContext;
 import com.diamondq.common.reaction.api.JobDefinition;
+import com.diamondq.common.reaction.api.JobInfo;
+import com.diamondq.common.reaction.api.JobParamsBuilder;
+import com.diamondq.common.reaction.api.MissingDependentException;
 import com.diamondq.common.reaction.api.impl.StateCriteria;
 import com.diamondq.common.reaction.api.impl.StateValueCriteria;
 import com.diamondq.common.reaction.api.impl.StateVariableCriteria;
@@ -18,6 +22,8 @@ import com.diamondq.common.reaction.engine.definitions.TriggerDefinition;
 import com.diamondq.common.reaction.engine.evals.ActionNode;
 import com.diamondq.common.reaction.engine.evals.NameNode;
 import com.diamondq.common.reaction.engine.evals.TypeNode;
+import com.diamondq.common.reaction.engine.evals.VariableNameNode;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -35,45 +41,62 @@ import java.util.function.Supplier;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.eclipse.jdt.annotation.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.jodah.typetools.TypeResolver;
 
 @ApplicationScoped
 public class EngineImpl implements Engine {
 
-	private static final String								sUNDEFINED			= "__UNDEFINED__";
+	private static final Logger									sLogger				=
+		LoggerFactory.getLogger(EngineImpl.class);
 
-	private static final String								sPERSISTENT_STATE	= "persistent";
+	private static final String									sUNDEFINED			= "__UNDEFINED__";
 
-	private final Store										mPersistentStore;
+	public static final String									sVARIABLE			= "__VARIABLE__";
 
-	private final Store										mTransientStore;
+	private static final String									sPERSISTENT_STATE	= "persistent";
 
-	private final CopyOnWriteArraySet<JobDefinitionImpl>	mJobs;
+	private final Store											mPersistentStore;
+
+	private final Store											mTransientStore;
+
+	private final CopyOnWriteArraySet<JobDefinitionImpl>		mJobs;
+
+	private final ConcurrentMap<String, JobDefinitionImpl>		mJobByName;
+
+	private final ConcurrentMap<Class<?>, JobDefinitionImpl>	mJobByInfoClass;
 
 	/* Trigger tree */
 
-	private final ConcurrentMap<String, ActionNode>			mTriggers;
+	private final ConcurrentMap<String, ActionNode>				mTriggers;
 
-	private final ConcurrentMap<String, TypeNode>			mResultTree;
+	private final ConcurrentMap<String, TypeNode>				mResultTree;
 
-	private final CDIObservingExtension						mObservations;
+	private final CDIObservingExtension							mObservations;
 
-	private final ExecutorService							mExecutorService;
+	private final ExecutorService								mExecutorService;
+
+	private final Event<EngineInitializedEvent>					mInitializedEvent;
 
 	@Inject
 	public EngineImpl(Toolkit pToolkit, Config pConfig, ExecutorService pExecutorService,
-		CDIObservingExtension pExtension) {
+		CDIObservingExtension pExtension, Event<EngineInitializedEvent> pInitializedEvent) {
 		mTriggers = Maps.newConcurrentMap();
 		mResultTree = Maps.newConcurrentMap();
 		mExecutorService = pExecutorService;
 		mObservations = pExtension;
+		mJobByName = Maps.newConcurrentMap();
 		mJobs = Sets.newCopyOnWriteArraySet();
+		mJobByInfoClass = Maps.newConcurrentMap();
+		mInitializedEvent = pInitializedEvent;
 
 		/* Persistent */
 
@@ -95,6 +118,8 @@ public class EngineImpl implements Engine {
 
 	public void init(@Observes @Initialized(ApplicationScoped.class) Object init) {
 
+		sLogger.debug("Initializing all Reaction jobs...");
+		
 		/* Process each possible job configuration */
 
 		JobContext jc = new JobContextImpl(this);
@@ -103,6 +128,26 @@ public class EngineImpl implements Engine {
 			setupClass(jc, pair);
 
 		}
+
+		sLogger.debug("Firing EngineInitializedEvent...");
+
+		mInitializedEvent.fire(new EngineInitializedEvent());
+	}
+
+	/**
+	 * @see com.diamondq.common.reaction.api.Engine
+	 */
+	@Override
+	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> T findMandatoryJob(Class<T> pJobInfoClass) {
+		JobDefinitionImpl jobDef = mJobByInfoClass.get(pJobInfoClass);
+		if (jobDef == null)
+			throw new IllegalArgumentException("The provided job class " + pJobInfoClass.getName() + " can't be found");
+		if (pJobInfoClass.isInstance(jobDef.jobInfo) == false)
+			throw new IllegalArgumentException(
+				"The provided job class " + pJobInfoClass.getName() + " isn't the same as the registered one");
+		@SuppressWarnings("unchecked")
+		T result = (T) jobDef.jobInfo;
+		return result;
 	}
 
 	private <C> void setupClass(JobContext pContext, CDIObservingExtension.MethodSupplierPair<C> pair) {
@@ -121,6 +166,12 @@ public class EngineImpl implements Engine {
 			throw new IllegalArgumentException("Only JobDefinitionImpl is supported");
 		JobDefinitionImpl definition = (JobDefinitionImpl) pDefinition;
 		mJobs.add(definition);
+
+		if (definition.name != null)
+			mJobByName.putIfAbsent(definition.name, definition);
+
+		if (definition.jobInfo != null)
+			mJobByInfoClass.putIfAbsent(definition.jobInfo.getClass(), definition);
 
 		/* Register against the trigger tree */
 
@@ -156,6 +207,11 @@ public class EngineImpl implements Engine {
 				NameNode nameNode = typeNode.getOrAddName(name);
 				nameNode.addCriteria(Iterables.concat(rd.requiredStates, rd.variables), definition);
 			}
+			String nameByVariable = rd.nameByVariable;
+			if (nameByVariable != null) {
+				NameNode nameNode = typeNode.getOrAddVariableName(nameByVariable);
+				nameNode.addCriteria(Iterables.concat(rd.requiredStates, rd.variables), definition);
+			}
 			NameNode nameNode = typeNode.getOrAddName(sUNDEFINED);
 			nameNode.addCriteria(Iterables.concat(rd.requiredStates, rd.variables), definition);
 		}
@@ -167,6 +223,20 @@ public class EngineImpl implements Engine {
 	@Override
 	public <T> @NonNull ExtendedCompletableFuture<T> submit(@NonNull Class<T> pResultClass) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @see com.diamondq.common.reaction.api.Engine#submit(com.diamondq.common.reaction.api.JobInfo,
+	 *      com.diamondq.common.reaction.api.JobParamsBuilder)
+	 */
+	@Override
+	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> ExtendedCompletableFuture<@Nullable Void> submit(
+		T pJob, JPB pBuilder) {
+		JobDefinitionImpl definition = mJobByInfoClass.get(pJob.getClass());
+		if (definition == null)
+			throw new IllegalArgumentException("The job info " + pJob.getClass().getName() + " could not be found");
+		JobRequest request = new JobRequest(definition, null);
+		return submit(request);
 	}
 
 	/**
@@ -246,34 +316,48 @@ public class EngineImpl implements Engine {
 		List<Object> dependents = Lists.newArrayList();
 		for (ParamDefinition<?> param : pJob.jobDefinition.params) {
 			Object dependent = null;
-			if (param.persistent != null) {
-				Store store = (param.persistent == true ? mPersistentStore : mTransientStore);
-				Set<Object> storeDependents = store.resolve(param);
-				// TODO: For now, just take the first
-				if (storeDependents.isEmpty() == false)
-					dependent = storeDependents.iterator().next();
+			if (param.valueByVariable != null) {
+				String value = pJob.variables.get(param.valueByVariable);
+				if (param.clazz.equals(String.class) == false)
+					throw new IllegalStateException(
+						"Only a param of String.class is allowed to use the valueByVariable");
+				dependent = value;
 			}
-			else {
-				Set<Object> storeDependents = mTransientStore.resolve(param);
-				// TODO: For now, just take the first
-				if (storeDependents.isEmpty() == false)
-					dependent = storeDependents.iterator().next();
-				if (dependent == null) {
-					storeDependents = mPersistentStore.resolve(param);
+			if (dependent == null) {
+				if (param.persistent != null) {
+					Store store = (param.persistent == true ? mPersistentStore : mTransientStore);
+					Set<Object> storeDependents = store.resolve(param);
 					// TODO: For now, just take the first
 					if (storeDependents.isEmpty() == false)
 						dependent = storeDependents.iterator().next();
 				}
+				else {
+					Set<Object> storeDependents = mTransientStore.resolve(param);
+					// TODO: For now, just take the first
+					if (storeDependents.isEmpty() == false)
+						dependent = storeDependents.iterator().next();
+					if (dependent == null) {
+						storeDependents = mPersistentStore.resolve(param);
+						// TODO: For now, just take the first
+						if (storeDependents.isEmpty() == false)
+							dependent = storeDependents.iterator().next();
+					}
+				}
 			}
-
 			if (dependent == null) {
 
 				/* Find the list of jobs that can produce it */
 
 				Set<JobRequest> possibleJobs = resolveParams(param);
 				JobRequest bestJob = sortJobs(possibleJobs);
-				if (bestJob == null)
-					throw new IllegalStateException("There is no possible job to produce the needed dependent");
+				if (bestJob == null) {
+					StringBuilder sb = new StringBuilder();
+					sb.append("The job ");
+					sb.append(pJob.jobDefinition.getShortName());
+					sb.append(" can never be executed because there are no solution on how to construct the param ");
+					sb.append(param.getShortName());
+					throw new MissingDependentException(sb.toString());
+				}
 
 				/* Execute the job */
 
@@ -335,11 +419,34 @@ public class EngineImpl implements Engine {
 			}
 
 			Map<String, String> states = Maps.newHashMap();
-			// TODO: Determine the states
+			for (StateCriteria sc : rd.requiredStates) {
+				if (sc instanceof StateValueCriteria) {
+					StateValueCriteria svc = (StateValueCriteria) sc;
+					if (svc.isEqual == false)
+						throw new IllegalArgumentException("A Result state criteria cannot be a not equal");
+					states.put(svc.state, svc.value);
+				}
+				else if (sc instanceof StateVariableCriteria) {
+					throw new UnsupportedOperationException();
+				}
+				else if (sc instanceof VariableCriteria) {
+					throw new UnsupportedOperationException();
+				}
+				else {
+					throw new UnsupportedOperationException();
+				}
+			}
 
 			String name = rd.name;
-			if (name == null)
-				throw new UnsupportedOperationException();
+			if (name == null) {
+				String nameByVariable = rd.nameByVariable;
+				if (nameByVariable == null)
+					throw new UnsupportedOperationException();
+
+				name = pJob.variables.get(nameByVariable);
+				if (name == null)
+					throw new IllegalArgumentException("Unable to find the name");
+			}
 
 			Store store = (rd.persistent == null ? mTransientStore
 				: (rd.persistent == true ? mPersistentStore : mTransientStore));
@@ -350,6 +457,22 @@ public class EngineImpl implements Engine {
 		/* We're done */
 
 		pResult.complete(null);
+	}
+
+	private static class VNN {
+		public final @Nullable String	variableName;
+
+		public final @Nullable String	variableValue;
+
+		public final NameNode			nameNode;
+
+		public VNN(@Nullable String pVariableName, @Nullable String pVariableValue, NameNode pNameNode) {
+			super();
+			variableName = pVariableName;
+			variableValue = pVariableValue;
+			nameNode = pNameNode;
+		}
+
 	}
 
 	/**
@@ -370,33 +493,56 @@ public class EngineImpl implements Engine {
 
 		/* Names */
 
-		Set<NameNode> nameNodes = Sets.newIdentityHashSet();
+		Set<VNN> nameNodes = Sets.newIdentityHashSet();
 		for (TypeNode typeNode : typeNodes) {
 			NameNode possibleNameNode;
 			String name = pParam.name;
 			if (name != null) {
 				possibleNameNode = typeNode.getName(name);
 				if (possibleNameNode != null)
-					nameNodes.add(possibleNameNode);
+					nameNodes.add(new VNN(null, null, possibleNameNode));
+
+				/*
+				 * If we have a name, and there is a result tree element that needs a variabled name, then include that
+				 */
+
+				possibleNameNode = typeNode.getName(sVARIABLE);
+				if (possibleNameNode != null) {
+					VariableNameNode vnn = (VariableNameNode) possibleNameNode;
+					for (Map.Entry<String, NameNode> pair : vnn.getByVariableNames()) {
+						nameNodes.add(new VNN(pair.getKey(), name, pair.getValue()));
+					}
+				}
 			}
-			possibleNameNode = typeNode.getName(sUNDEFINED);
-			if (possibleNameNode != null)
-				nameNodes.add(possibleNameNode);
+			else {
+				possibleNameNode = typeNode.getName(sUNDEFINED);
+				if (possibleNameNode != null)
+					nameNodes.add(new VNN(null, null, possibleNameNode));
+			}
 		}
 
 		/* States */
 
 		Set<JobRequest> jobs = Sets.newIdentityHashSet();
-		for (NameNode nameNode : nameNodes) {
-			Set<StateCriteria[]> criteriasSet = nameNode.getCriterias();
+		for (VNN nameNode : nameNodes) {
+			Set<StateCriteria[]> criteriasSet = nameNode.nameNode.getCriterias();
+			// TODO: Resolve criteria (currently just include them all)
 			for (StateCriteria[] criterias : criteriasSet) {
-				Set<JobDefinitionImpl> jobsByCriteria = nameNode.getJobsByCriteria(criterias);
+				Set<JobDefinitionImpl> jobsByCriteria = nameNode.nameNode.getJobsByCriteria(criterias);
 				if (jobsByCriteria != null)
-					for (JobDefinitionImpl job : jobsByCriteria)
-						jobs.add(new JobRequest(job, null));
+					for (JobDefinitionImpl job : jobsByCriteria) {
+						ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+						if ((nameNode.variableName != null) && (nameNode.variableValue != null))
+							builder.put(nameNode.variableName, nameNode.variableValue);
+						jobs.add(new JobRequest(job, null, builder.build()));
+					}
 			}
-			for (JobDefinitionImpl job : nameNode.getNoCriteriaJobs())
-				jobs.add(new JobRequest(job, null));
+			for (JobDefinitionImpl job : nameNode.nameNode.getNoCriteriaJobs()) {
+				ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+				if ((nameNode.variableName != null) && (nameNode.variableValue != null))
+					builder.put(nameNode.variableName, nameNode.variableValue);
+				jobs.add(new JobRequest(job, null, builder.build()));
+			}
 		}
 
 		return jobs;

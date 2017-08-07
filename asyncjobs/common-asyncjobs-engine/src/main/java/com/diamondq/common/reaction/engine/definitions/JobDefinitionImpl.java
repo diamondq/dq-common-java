@@ -1,6 +1,8 @@
 package com.diamondq.common.reaction.engine.definitions;
 
+import com.diamondq.common.lambda.Memoizer;
 import com.diamondq.common.reaction.api.JobDefinition;
+import com.diamondq.common.reaction.api.JobInfo;
 import com.diamondq.common.reaction.api.impl.JobBuilderImpl;
 import com.diamondq.common.reaction.api.impl.MethodWrapper;
 import com.diamondq.common.reaction.api.impl.ParamBuilderImpl;
@@ -13,9 +15,13 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class JobDefinitionImpl implements JobDefinition {
 
 	public final MethodWrapper					method;
+
+	public final @Nullable String				name;
 
 	public final List<ParamDefinition<?>>		params;
 
@@ -25,7 +31,13 @@ public class JobDefinitionImpl implements JobDefinition {
 
 	public final Set<TriggerDefinition<?>>		triggers;
 
+	public final @Nullable JobInfo<?>			jobInfo;
+
+	private final Memoizer						mMemoizer;
+
 	public JobDefinitionImpl(JobBuilderImpl pBuilder) {
+
+		mMemoizer = new Memoizer();
 
 		/* method */
 
@@ -33,6 +45,10 @@ public class JobDefinitionImpl implements JobDefinition {
 		if (possibleMethod == null)
 			throw new IllegalArgumentException("The mandatory method is not defined");
 		method = possibleMethod;
+
+		/* name */
+
+		name = pBuilder.getName();
 
 		/* params */
 
@@ -62,6 +78,30 @@ public class JobDefinitionImpl implements JobDefinition {
 			triggerSetBuilder.add(new TriggerDefinition<>(triggerBuilder));
 		triggers = triggerSetBuilder.build();
 
+		/* jobinfo */
+
+		jobInfo = pBuilder.getInfo();
+	}
+
+	/**
+	 * This returns a short 'name' that can be used to identify this JobDefinition. It is usually used for debugging or
+	 * error purposes.
+	 * 
+	 * @return the name
+	 */
+	public String getShortName() {
+		return mMemoizer.memoize(() -> {
+			StringBuilder sb = new StringBuilder();
+			JobInfo<?> ji = JobDefinitionImpl.this.jobInfo;
+			if (JobDefinitionImpl.this.name != null)
+				sb.append(JobDefinitionImpl.this.name);
+			else if (ji != null) {
+				sb.append(ji.getClass().getSimpleName());
+			}
+			else
+				sb.append(JobDefinitionImpl.this.toString());
+			return sb.toString();
+		}, "shortName");
 	}
 
 }

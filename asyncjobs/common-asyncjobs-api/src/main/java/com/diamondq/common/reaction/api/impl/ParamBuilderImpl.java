@@ -6,9 +6,13 @@ import com.diamondq.common.reaction.api.ParamBuilder;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class ParamBuilderImpl<PT> extends CommonBuilderImpl<PT, ParamBuilder<PT>> implements ParamBuilder<PT> {
 
-	private Set<StateCriteria> mMissingStates;
+	private Set<StateCriteria>	mMissingStates;
+
+	private @Nullable String	mValueByVariable;
 
 	public ParamBuilderImpl(JobBuilderImpl pJobSetup, Class<PT> pClass) {
 		super(pJobSetup, pClass);
@@ -44,6 +48,19 @@ public class ParamBuilderImpl<PT> extends CommonBuilderImpl<PT, ParamBuilder<PT>
 	public ParamBuilderImpl<PT> stateByVariable(String pVariable) {
 		mRequiredStates.add(new StateVariableCriteria(pVariable, true));
 		return this;
+	}
+
+	/**
+	 * @see com.diamondq.common.reaction.api.ParamBuilder#valueByVariable(java.lang.String)
+	 */
+	@Override
+	public ParamBuilder<PT> valueByVariable(String pVariableName) {
+		mValueByVariable = pVariableName;
+		return this;
+	}
+
+	public @Nullable String getValueByVariable() {
+		return mValueByVariable;
 	}
 
 	/**

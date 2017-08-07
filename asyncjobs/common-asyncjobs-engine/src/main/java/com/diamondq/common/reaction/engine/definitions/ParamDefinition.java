@@ -1,5 +1,6 @@
 package com.diamondq.common.reaction.engine.definitions;
 
+import com.diamondq.common.lambda.Memoizer;
 import com.diamondq.common.reaction.api.impl.ParamBuilderImpl;
 import com.diamondq.common.reaction.api.impl.StateCriteria;
 import com.diamondq.common.reaction.api.impl.StateValueCriteria;
@@ -22,20 +23,26 @@ public class ParamDefinition<T> {
 
 	public final @Nullable String		name;
 
+	public final @Nullable String		valueByVariable;
+
 	public final Set<StateCriteria>		missingStates;
+
+	private final Memoizer				mMemoizer;
 
 	ParamDefinition(ParamBuilderImpl<T> pBuilder) {
 		this(pBuilder.getParamClass(), pBuilder.getRequiredStates(), pBuilder.getVariables(), pBuilder.getName(),
-			pBuilder.getMissingStates());
+			pBuilder.getValueByVariable(), pBuilder.getMissingStates());
 	}
 
 	public ParamDefinition(Class<T> pClazz, Set<StateCriteria> pRequiredStates, Set<VariableCriteria> pVariables,
-		@Nullable String pName, Set<StateCriteria> pMissingStates) {
+		@Nullable String pName, @Nullable String pValueByVariable, Set<StateCriteria> pMissingStates) {
+		mMemoizer = new Memoizer();
 		clazz = pClazz;
 		requiredStates = ImmutableSet.copyOf(pRequiredStates);
 		variables = ImmutableSet.copyOf(pVariables);
 		name = pName;
 		missingStates = ImmutableSet.copyOf(pMissingStates);
+		valueByVariable = pValueByVariable;
 		Boolean persist = null;
 		for (StateCriteria criteria : pRequiredStates)
 			if ("persistent".equals(criteria.state)) {
@@ -54,6 +61,18 @@ public class ParamDefinition<T> {
 			}
 
 		persistent = persist;
+	}
+
+	public String getShortName() {
+		return mMemoizer.memoize(() -> {
+			StringBuilder sb = new StringBuilder();
+			if (ParamDefinition.this.name != null) {
+				sb.append(ParamDefinition.this.name);
+				sb.append('/');
+			}
+			sb.append(ParamDefinition.this.clazz.getName());
+			return sb.toString();
+		}, "shortName");
 	}
 
 }

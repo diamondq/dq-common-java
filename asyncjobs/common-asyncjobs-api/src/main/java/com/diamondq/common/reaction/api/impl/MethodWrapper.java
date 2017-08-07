@@ -1,24 +1,24 @@
 package com.diamondq.common.reaction.api.impl;
 
-import com.diamondq.common.asyncjobs.api.methods.Consumer1;
-import com.diamondq.common.asyncjobs.api.methods.Consumer2;
-import com.diamondq.common.asyncjobs.api.methods.Consumer3;
-import com.diamondq.common.asyncjobs.api.methods.Consumer4;
-import com.diamondq.common.asyncjobs.api.methods.Consumer5;
-import com.diamondq.common.asyncjobs.api.methods.Consumer6;
-import com.diamondq.common.asyncjobs.api.methods.Consumer7;
-import com.diamondq.common.asyncjobs.api.methods.Consumer8;
-import com.diamondq.common.asyncjobs.api.methods.Consumer9;
-import com.diamondq.common.asyncjobs.api.methods.Function0;
-import com.diamondq.common.asyncjobs.api.methods.Function1;
-import com.diamondq.common.asyncjobs.api.methods.Function2;
-import com.diamondq.common.asyncjobs.api.methods.Function3;
-import com.diamondq.common.asyncjobs.api.methods.Function4;
-import com.diamondq.common.asyncjobs.api.methods.Function5;
-import com.diamondq.common.asyncjobs.api.methods.Function6;
-import com.diamondq.common.asyncjobs.api.methods.Function7;
-import com.diamondq.common.asyncjobs.api.methods.Function8;
-import com.diamondq.common.asyncjobs.api.methods.Function9;
+import com.diamondq.common.lambda.interfaces.Consumer1;
+import com.diamondq.common.lambda.interfaces.Consumer2;
+import com.diamondq.common.lambda.interfaces.Consumer3;
+import com.diamondq.common.lambda.interfaces.Consumer4;
+import com.diamondq.common.lambda.interfaces.Consumer5;
+import com.diamondq.common.lambda.interfaces.Consumer6;
+import com.diamondq.common.lambda.interfaces.Consumer7;
+import com.diamondq.common.lambda.interfaces.Consumer8;
+import com.diamondq.common.lambda.interfaces.Consumer9;
+import com.diamondq.common.lambda.interfaces.Function0;
+import com.diamondq.common.lambda.interfaces.Function1;
+import com.diamondq.common.lambda.interfaces.Function2;
+import com.diamondq.common.lambda.interfaces.Function3;
+import com.diamondq.common.lambda.interfaces.Function4;
+import com.diamondq.common.lambda.interfaces.Function5;
+import com.diamondq.common.lambda.interfaces.Function6;
+import com.diamondq.common.lambda.interfaces.Function7;
+import com.diamondq.common.lambda.interfaces.Function8;
+import com.diamondq.common.lambda.interfaces.Function9;
 
 import java.lang.reflect.Method;
 

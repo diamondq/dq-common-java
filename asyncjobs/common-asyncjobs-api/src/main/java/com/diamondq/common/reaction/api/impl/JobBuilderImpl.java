@@ -1,27 +1,29 @@
 package com.diamondq.common.reaction.api.impl;
 
-import com.diamondq.common.asyncjobs.api.methods.Consumer1;
-import com.diamondq.common.asyncjobs.api.methods.Consumer2;
-import com.diamondq.common.asyncjobs.api.methods.Consumer3;
-import com.diamondq.common.asyncjobs.api.methods.Consumer4;
-import com.diamondq.common.asyncjobs.api.methods.Consumer5;
-import com.diamondq.common.asyncjobs.api.methods.Consumer6;
-import com.diamondq.common.asyncjobs.api.methods.Consumer7;
-import com.diamondq.common.asyncjobs.api.methods.Consumer8;
-import com.diamondq.common.asyncjobs.api.methods.Consumer9;
-import com.diamondq.common.asyncjobs.api.methods.Function0;
-import com.diamondq.common.asyncjobs.api.methods.Function1;
-import com.diamondq.common.asyncjobs.api.methods.Function2;
-import com.diamondq.common.asyncjobs.api.methods.Function3;
-import com.diamondq.common.asyncjobs.api.methods.Function4;
-import com.diamondq.common.asyncjobs.api.methods.Function5;
-import com.diamondq.common.asyncjobs.api.methods.Function6;
-import com.diamondq.common.asyncjobs.api.methods.Function7;
-import com.diamondq.common.asyncjobs.api.methods.Function8;
-import com.diamondq.common.asyncjobs.api.methods.Function9;
+import com.diamondq.common.lambda.interfaces.Consumer1;
+import com.diamondq.common.lambda.interfaces.Consumer2;
+import com.diamondq.common.lambda.interfaces.Consumer3;
+import com.diamondq.common.lambda.interfaces.Consumer4;
+import com.diamondq.common.lambda.interfaces.Consumer5;
+import com.diamondq.common.lambda.interfaces.Consumer6;
+import com.diamondq.common.lambda.interfaces.Consumer7;
+import com.diamondq.common.lambda.interfaces.Consumer8;
+import com.diamondq.common.lambda.interfaces.Consumer9;
+import com.diamondq.common.lambda.interfaces.Function0;
+import com.diamondq.common.lambda.interfaces.Function1;
+import com.diamondq.common.lambda.interfaces.Function2;
+import com.diamondq.common.lambda.interfaces.Function3;
+import com.diamondq.common.lambda.interfaces.Function4;
+import com.diamondq.common.lambda.interfaces.Function5;
+import com.diamondq.common.lambda.interfaces.Function6;
+import com.diamondq.common.lambda.interfaces.Function7;
+import com.diamondq.common.lambda.interfaces.Function8;
+import com.diamondq.common.lambda.interfaces.Function9;
 import com.diamondq.common.reaction.api.JobBuilder;
 import com.diamondq.common.reaction.api.JobContext;
 import com.diamondq.common.reaction.api.JobDefinition;
+import com.diamondq.common.reaction.api.JobInfo;
+import com.diamondq.common.reaction.api.JobParamsBuilder;
 import com.diamondq.common.reaction.api.ParamBuilder;
 import com.diamondq.common.reaction.api.PrepResultBuilder;
 import com.diamondq.common.reaction.api.ResultBuilder;
@@ -37,17 +39,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class JobBuilderImpl implements JobBuilder {
 
-	private JobContext						mJobContext;
+	private JobContext										mJobContext;
 
-	private @Nullable MethodWrapper			mMethod;
+	private @Nullable MethodWrapper							mMethod;
 
-	private Set<ParamBuilderImpl<?>>		mParams;
+	private @Nullable String								mName;
 
-	private Set<ResultBuilderImpl<?>>		mResults;
+	private Set<ParamBuilderImpl<?>>						mParams;
 
-	private Set<PrepResultBuilderImpl<?>>	mPrepResults;
+	private Set<ResultBuilderImpl<?>>						mResults;
 
-	private Set<TriggerBuilderImpl<?>>		mTriggers;
+	private Set<PrepResultBuilderImpl<?>>					mPrepResults;
+
+	private Set<TriggerBuilderImpl<?>>						mTriggers;
+
+	private @Nullable JobInfo<? extends JobParamsBuilder>	mInfo;
 
 	public JobBuilderImpl(JobContext pJobContext) {
 		mJobContext = pJobContext;
@@ -176,6 +182,30 @@ public class JobBuilderImpl implements JobBuilder {
 		Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, R> pConsumer) {
 		mMethod = new MethodWrapper(pConsumer);
 		return this;
+	}
+
+	/* name */
+
+	@Override
+	public JobBuilderImpl name(String pName) {
+		mName = pName;
+		return this;
+	}
+
+	public @Nullable String getName() {
+		return mName;
+	}
+
+	/* info */
+
+	@Override
+	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> JobBuilderImpl info(T pJobInfo) {
+		mInfo = pJobInfo;
+		return this;
+	}
+
+	public @Nullable JobInfo<? extends JobParamsBuilder> getInfo() {
+		return mInfo;
 	}
 
 	/* Params */
