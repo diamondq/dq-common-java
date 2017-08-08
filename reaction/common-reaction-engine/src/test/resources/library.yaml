@@ -21,7 +21,7 @@ persistence:
   scope-transientscope:
     structures:
     - _dqconfig_meta_:
-        type: com.diamondq.common.model.persistence.MemoryPersistenceLayer
+        type: com.diamondq.common.model.persistence.NewMemoryPersistenceLayer
       structureDir: "data-transient"
     resources:
     - _dqconfig_meta_:
