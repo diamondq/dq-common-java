@@ -1,12 +1,12 @@
 package com.diamondq.common.reaction.engine;
 
 import com.diamondq.common.reaction.engine.definitions.JobDefinitionImpl;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Collections;
 import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.jboss.weld.util.collections.ImmutableMap;
 
 public class JobRequest {
 
