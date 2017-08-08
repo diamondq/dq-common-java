@@ -31,12 +31,14 @@ import com.google.common.collect.Sets;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -119,7 +121,7 @@ public class EngineImpl implements Engine {
 	public void init(@Observes @Initialized(ApplicationScoped.class) Object init) {
 
 		sLogger.debug("Initializing all Reaction jobs...");
-		
+
 		/* Process each possible job configuration */
 
 		JobContext jc = new JobContextImpl(this);
@@ -138,7 +140,7 @@ public class EngineImpl implements Engine {
 	 * @see com.diamondq.common.reaction.api.Engine
 	 */
 	@Override
-	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> T findMandatoryJob(Class<T> pJobInfoClass) {
+	public <T extends JobInfo<?, ? extends JobParamsBuilder>> T findMandatoryJob(Class<T> pJobInfoClass) {
 		JobDefinitionImpl jobDef = mJobByInfoClass.get(pJobInfoClass);
 		if (jobDef == null)
 			throw new IllegalArgumentException("The provided job class " + pJobInfoClass.getName() + " can't be found");
@@ -164,7 +166,11 @@ public class EngineImpl implements Engine {
 	public void registerJob(JobDefinition pDefinition) {
 		if (pDefinition instanceof JobDefinitionImpl == false)
 			throw new IllegalArgumentException("Only JobDefinitionImpl is supported");
+
 		JobDefinitionImpl definition = (JobDefinitionImpl) pDefinition;
+
+		sLogger.debug("Registering job {}", definition.getShortName());
+
 		mJobs.add(definition);
 
 		if (definition.name != null)
@@ -230,12 +236,18 @@ public class EngineImpl implements Engine {
 	 *      com.diamondq.common.reaction.api.JobParamsBuilder)
 	 */
 	@Override
-	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> ExtendedCompletableFuture<@Nullable Void> submit(
+	@SuppressWarnings("null")
+	public <RESULT, JPB extends JobParamsBuilder, T extends JobInfo<RESULT, JPB>> ExtendedCompletableFuture<RESULT> submit(
 		T pJob, JPB pBuilder) {
 		JobDefinitionImpl definition = mJobByInfoClass.get(pJob.getClass());
-		if (definition == null)
+		if (definition == null) {
+			sLogger.debug("Couldn't find " + pJob.getClass().getName());
 			throw new IllegalArgumentException("The job info " + pJob.getClass().getName() + " could not be found");
-		JobRequest request = new JobRequest(definition, null);
+		}
+
+		sLogger.debug("Receiving job submission for {}", definition.getShortName());
+
+		JobRequest request = new JobRequest(definition, null, Collections.emptyMap(), pBuilder);
 		return submit(request);
 	}
 
@@ -288,18 +300,23 @@ public class EngineImpl implements Engine {
 	 * @param pJob the job to execute
 	 * @return the future
 	 */
-	private ExtendedCompletableFuture<@Nullable Void> submit(JobRequest pJob) {
+	private <RESULT> ExtendedCompletableFuture<RESULT> submit(JobRequest pJob) {
 
-		ExtendedCompletableFuture<@Nullable Void> result = new ExtendedCompletableFuture<>();
+		ExtendedCompletableFuture<RESULT> result = new ExtendedCompletableFuture<>();
 		ExtendedCompletableFuture.runAsync(new Runnable() {
 
 			@Override
 			public void run() {
+				sLogger.debug("Calling executeIfDepends from submit(JobRequest)");
 				executeIfDepends(pJob, result);
 			}
 		}, mExecutorService).whenComplete((v, ex) -> {
-			if (ex != null)
+			if (ex != null) {
+				sLogger.debug("submitJob(" + pJob.jobDefinition.getShortName() + ") failed", ex);
 				result.completeExceptionally(ex);
+				return;
+			}
+			sLogger.debug("submit({}) completed", pJob.jobDefinition.getShortName());
 		});
 		return result;
 	}
@@ -311,7 +328,9 @@ public class EngineImpl implements Engine {
 	 * @param pJob the job
 	 * @param pResult the result
 	 */
-	private void executeIfDepends(JobRequest pJob, ExtendedCompletableFuture<@Nullable Void> pResult) {
+	private <RESULT> void executeIfDepends(JobRequest pJob, ExtendedCompletableFuture<RESULT> pResult) {
+
+		sLogger.debug("executeIfDepends: {}", pJob.jobDefinition.getShortName());
 
 		List<Object> dependents = Lists.newArrayList();
 		for (ParamDefinition<?> param : pJob.jobDefinition.params) {
@@ -322,6 +341,11 @@ public class EngineImpl implements Engine {
 					throw new IllegalStateException(
 						"Only a param of String.class is allowed to use the valueByVariable");
 				dependent = value;
+			}
+			Function<JobParamsBuilder, ?> valueByInput = param.valueByInput;
+			JobParamsBuilder paramsBuilder = pJob.paramsBuilder;
+			if ((dependent == null) && (valueByInput != null) && (paramsBuilder != null)) {
+				dependent = valueByInput.apply(paramsBuilder);
 			}
 			if (dependent == null) {
 				if (param.persistent != null) {
@@ -356,38 +380,56 @@ public class EngineImpl implements Engine {
 					sb.append(pJob.jobDefinition.getShortName());
 					sb.append(" can never be executed because there are no solution on how to construct the param ");
 					sb.append(param.getShortName());
+					sLogger.warn(sb.toString());
 					throw new MissingDependentException(sb.toString());
 				}
 
 				/* Execute the job */
 
+				sLogger.debug("queuing param job {}", bestJob.jobDefinition.getShortName());
 				ExtendedCompletableFuture.runAsync(new Runnable() {
 
 					@Override
 					public void run() {
-						ExtendedCompletableFuture<@Nullable Void> result = new ExtendedCompletableFuture<>();
+						ExtendedCompletableFuture<Object> result = new ExtendedCompletableFuture<>();
 
 						/*
 						 * If the job fails, then we fail. if the job succeeds, then re-run ourselves to see if all our
 						 * dependencies are available
 						 */
 						result.whenComplete((v, ex) -> {
+							sLogger.debug("Here");
 							if (ex != null) {
+								sLogger.debug("param job(" + bestJob.jobDefinition.getShortName() + ") failed", ex);
 								pResult.completeExceptionally(ex);
 								return;
 							}
+							sLogger.debug("re-queuing job {}", pJob.jobDefinition.getShortName());
+
 							ExtendedCompletableFuture.runAsync(() -> executeIfDepends(pJob, pResult), mExecutorService)
 								.whenComplete((v2, ex2) -> {
-									if (ex2 != null)
+									if (ex2 != null) {
+										sLogger.debug("re-running job " + pJob.jobDefinition.getShortName() + " failed",
+											ex2);
 										pResult.completeExceptionally(ex2);
+										return;
+									}
+									sLogger.debug("executeIfDepends({}) completed - 3",
+										pJob.jobDefinition.getShortName());
 								});
 						});
+						sLogger.debug("Calling executeIfDepends({}) from queued runnable",
+							bestJob.jobDefinition.getShortName());
 						executeIfDepends(bestJob, result);
 
 					}
 				}, mExecutorService).whenComplete((v, ex) -> {
-					if (ex != null)
+					if (ex != null) {
+						sLogger.debug("job " + bestJob.jobDefinition.getShortName() + " failed", ex);
 						pResult.completeExceptionally(ex);
+						return;
+					}
+					sLogger.debug("executeIfDepends({}) completed - 2", bestJob.jobDefinition.getShortName());
 				});
 
 				/* Exit now, so that the dependent can be built */
@@ -399,10 +441,39 @@ public class EngineImpl implements Engine {
 
 		/* Now execute the job */
 
+		sLogger.debug("Received all parameters. Executing...");
+
 		Object result = execute(pJob, pJob.jobDefinition.params.toArray(new ParamDefinition<?>[0]),
 			dependents.toArray(new Object[0]));
 
+		/* If the method returned a future, then set up a callback to continue processing when it actually finishes */
+
+		if (result instanceof ExtendedCompletableFuture) {
+			@SuppressWarnings("unchecked")
+			ExtendedCompletableFuture<@Nullable Object> resultFuture =
+				(ExtendedCompletableFuture<@Nullable Object>) result;
+			resultFuture.whenComplete((resolvedResult, ex) -> {
+				if (ex != null) {
+					sLogger.debug("execution of job(" + pJob.jobDefinition.getShortName() + ") failed", ex);
+					pResult.completeExceptionally(ex);
+					return;
+				}
+				sLogger.debug("execution of job(" + pJob.jobDefinition.getShortName() + ") succeeded", ex);
+				processResult(pJob, pResult, resolvedResult);
+			});
+		}
+		else {
+			processResult(pJob, pResult, result);
+		}
+	}
+
+	@SuppressWarnings("null")
+	private <RESULT> void processResult(JobRequest pJob, ExtendedCompletableFuture<RESULT> pResult,
+		@Nullable Object result) {
 		/* Store the results and trigger anything that needs it */
+
+		@Nullable
+		RESULT resultObj = null;
 
 		for (ResultDefinition<?> rd : pJob.jobDefinition.results) {
 
@@ -413,50 +484,58 @@ public class EngineImpl implements Engine {
 				if (result == null)
 					throw new IllegalArgumentException("The result must not be null");
 				rdObject = result;
+				@SuppressWarnings("unchecked")
+				RESULT r = (RESULT) result;
+				resultObj = r;
 			}
 			else {
 				throw new UnsupportedOperationException();
 			}
 
-			Map<String, String> states = Maps.newHashMap();
-			for (StateCriteria sc : rd.requiredStates) {
-				if (sc instanceof StateValueCriteria) {
-					StateValueCriteria svc = (StateValueCriteria) sc;
-					if (svc.isEqual == false)
-						throw new IllegalArgumentException("A Result state criteria cannot be a not equal");
-					states.put(svc.state, svc.value);
+			if (rd.persistent != null) {
+				Map<String, String> states = Maps.newHashMap();
+				for (StateCriteria sc : rd.requiredStates) {
+					if (sc instanceof StateValueCriteria) {
+						StateValueCriteria svc = (StateValueCriteria) sc;
+						if (svc.isEqual == false)
+							throw new IllegalArgumentException("A Result state criteria cannot be a not equal");
+						states.put(svc.state, svc.value);
+					}
+					else if (sc instanceof StateVariableCriteria) {
+						throw new UnsupportedOperationException();
+					}
+					else if (sc instanceof VariableCriteria) {
+						throw new UnsupportedOperationException();
+					}
+					else {
+						if (sc.isEqual == false)
+							throw new IllegalArgumentException("A Result state criteria cannot be a not equal");
+						states.put(sc.state, "true");
+					}
 				}
-				else if (sc instanceof StateVariableCriteria) {
-					throw new UnsupportedOperationException();
+
+				String name = rd.name;
+				if (name == null) {
+					String nameByVariable = rd.nameByVariable;
+					if (nameByVariable == null)
+						throw new UnsupportedOperationException();
+
+					name = pJob.variables.get(nameByVariable);
+					if (name == null)
+						throw new IllegalArgumentException("Unable to find the name");
 				}
-				else if (sc instanceof VariableCriteria) {
-					throw new UnsupportedOperationException();
-				}
-				else {
-					throw new UnsupportedOperationException();
-				}
+
+				Store store = (rd.persistent == null ? mTransientStore
+					: (rd.persistent == true ? mPersistentStore : mTransientStore));
+				storeAndTrigger(store, rdObject, Action.CHANGE, rd.clazz.getName(), name, states);
 			}
-
-			String name = rd.name;
-			if (name == null) {
-				String nameByVariable = rd.nameByVariable;
-				if (nameByVariable == null)
-					throw new UnsupportedOperationException();
-
-				name = pJob.variables.get(nameByVariable);
-				if (name == null)
-					throw new IllegalArgumentException("Unable to find the name");
-			}
-
-			Store store = (rd.persistent == null ? mTransientStore
-				: (rd.persistent == true ? mPersistentStore : mTransientStore));
-			storeAndTrigger(store, rdObject, Action.CHANGE, rd.clazz.getName(), name, states);
-
 		}
 
 		/* We're done */
 
-		pResult.complete(null);
+		sLogger.debug("Job is complete");
+
+		pResult.complete(resultObj);
 	}
 
 	private static class VNN {
@@ -528,20 +607,108 @@ public class EngineImpl implements Engine {
 			Set<StateCriteria[]> criteriasSet = nameNode.nameNode.getCriterias();
 			// TODO: Resolve criteria (currently just include them all)
 			for (StateCriteria[] criterias : criteriasSet) {
-				Set<JobDefinitionImpl> jobsByCriteria = nameNode.nameNode.getJobsByCriteria(criterias);
-				if (jobsByCriteria != null)
-					for (JobDefinitionImpl job : jobsByCriteria) {
-						ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-						if ((nameNode.variableName != null) && (nameNode.variableValue != null))
-							builder.put(nameNode.variableName, nameNode.variableValue);
-						jobs.add(new JobRequest(job, null, builder.build()));
+
+				/* Handle the required states */
+
+				boolean match = true;
+				for (StateCriteria reqSC : pParam.requiredStates) {
+					if (reqSC instanceof StateValueCriteria) {
+						StateValueCriteria reqSVC = (StateValueCriteria) reqSC;
+						boolean found = !reqSC.isEqual;
+						for (StateCriteria sc : criterias) {
+							if (sc instanceof StateValueCriteria == false)
+								continue;
+
+							StateValueCriteria svc = (StateValueCriteria) sc;
+
+							/* Check to see if this criteria matches the state */
+
+							if (svc.state.equals(reqSVC.state)) {
+
+								if (svc.value.equals(reqSVC.value)) {
+
+									/*
+									 * If it does, but we're not supposed to find it, then we're done. This one won't
+									 * match
+									 */
+
+									if (reqSC.isEqual == false) {
+										match = false;
+										break;
+									}
+
+									found = true;
+									break;
+								}
+							}
+						}
+
+						if (found == false)
+							match = false;
+						if (match == false)
+							break;
 					}
+					else if (reqSC instanceof StateVariableCriteria) {
+						throw new UnsupportedOperationException();
+					}
+					else if (reqSC instanceof VariableCriteria) {
+						throw new UnsupportedOperationException();
+					}
+					else {
+						/* The parameter criteria is just if a State exists (or not) */
+
+						boolean found = !reqSC.isEqual;
+						for (StateCriteria sc : criterias) {
+							if (sc instanceof VariableCriteria)
+								continue;
+
+							/* Check to see if this criteria matches the state */
+
+							if (sc.state.equals(reqSC.state)) {
+
+								/*
+								 * If it does, but we're not supposed to find it, then we're done. This one won't match
+								 */
+
+								if (reqSC.isEqual == false) {
+									match = false;
+									break;
+								}
+
+								found = true;
+								break;
+							}
+						}
+
+						if (found == false)
+							match = false;
+						if (match == false)
+							break;
+
+					}
+				}
+
+				if (match == true) {
+					Set<JobDefinitionImpl> jobsByCriteria = nameNode.nameNode.getJobsByCriteria(criterias);
+					if (jobsByCriteria != null)
+						for (JobDefinitionImpl job : jobsByCriteria) {
+							ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+							if ((nameNode.variableName != null) && (nameNode.variableValue != null))
+								builder.put(nameNode.variableName, nameNode.variableValue);
+							jobs.add(new JobRequest(job, null, builder.build(), null));
+						}
+				}
 			}
-			for (JobDefinitionImpl job : nameNode.nameNode.getNoCriteriaJobs()) {
-				ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-				if ((nameNode.variableName != null) && (nameNode.variableValue != null))
-					builder.put(nameNode.variableName, nameNode.variableValue);
-				jobs.add(new JobRequest(job, null, builder.build()));
+
+			/* If the parameter has any required states or variables, then the no criteria jobs don't comply */
+
+			if ((pParam.requiredStates.isEmpty() == true) && (pParam.variables.isEmpty() == true)) {
+				for (JobDefinitionImpl job : nameNode.nameNode.getNoCriteriaJobs()) {
+					ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+					if ((nameNode.variableName != null) && (nameNode.variableValue != null))
+						builder.put(nameNode.variableName, nameNode.variableValue);
+					jobs.add(new JobRequest(job, null, builder.build(), null));
+				}
 			}
 		}
 

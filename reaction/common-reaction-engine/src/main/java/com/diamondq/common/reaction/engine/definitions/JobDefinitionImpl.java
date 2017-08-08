@@ -31,7 +31,7 @@ public class JobDefinitionImpl implements JobDefinition {
 
 	public final Set<TriggerDefinition<?>>		triggers;
 
-	public final @Nullable JobInfo<?>			jobInfo;
+	public final @Nullable JobInfo<?, ?>		jobInfo;
 
 	private final Memoizer						mMemoizer;
 
@@ -92,7 +92,7 @@ public class JobDefinitionImpl implements JobDefinition {
 	public String getShortName() {
 		return mMemoizer.memoize(() -> {
 			StringBuilder sb = new StringBuilder();
-			JobInfo<?> ji = JobDefinitionImpl.this.jobInfo;
+			JobInfo<?, ?> ji = JobDefinitionImpl.this.jobInfo;
 			if (JobDefinitionImpl.this.name != null)
 				sb.append(JobDefinitionImpl.this.name);
 			else if (ji != null) {

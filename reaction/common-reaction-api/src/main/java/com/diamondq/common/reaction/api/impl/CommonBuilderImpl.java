@@ -54,7 +54,7 @@ public abstract class CommonBuilderImpl<T, AS extends CommonBuilder<T, AS>> impl
 	@Override
 	@SuppressWarnings("unchecked")
 	public AS state(String pState) {
-		mRequiredStates.add(new StateValueCriteria(pState, true, "true"));
+		mRequiredStates.add(new StateCriteria(pState, true));
 		return (AS) this;
 	}
 

@@ -32,6 +32,7 @@ import com.diamondq.common.reaction.api.TriggerBuilder;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -39,21 +40,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class JobBuilderImpl implements JobBuilder {
 
-	private JobContext										mJobContext;
+	private JobContext											mJobContext;
 
-	private @Nullable MethodWrapper							mMethod;
+	private @Nullable MethodWrapper								mMethod;
 
-	private @Nullable String								mName;
+	private @Nullable String									mName;
 
-	private Set<ParamBuilderImpl<?>>						mParams;
+	private Set<ParamBuilderImpl<?>>							mParams;
 
-	private Set<ResultBuilderImpl<?>>						mResults;
+	private Set<ResultBuilderImpl<?>>							mResults;
 
-	private Set<PrepResultBuilderImpl<?>>					mPrepResults;
+	private Set<PrepResultBuilderImpl<?>>						mPrepResults;
 
-	private Set<TriggerBuilderImpl<?>>						mTriggers;
+	private Set<TriggerBuilderImpl<?>>							mTriggers;
 
-	private @Nullable JobInfo<? extends JobParamsBuilder>	mInfo;
+	private @Nullable JobInfo<?, ? extends JobParamsBuilder>	mInfo;
 
 	public JobBuilderImpl(JobContext pJobContext) {
 		mJobContext = pJobContext;
@@ -199,12 +200,12 @@ public class JobBuilderImpl implements JobBuilder {
 	/* info */
 
 	@Override
-	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> JobBuilderImpl info(T pJobInfo) {
+	public <T extends JobInfo<?, ?>> JobBuilderImpl info(@NonNull T pJobInfo) {
 		mInfo = pJobInfo;
 		return this;
 	}
 
-	public @Nullable JobInfo<? extends JobParamsBuilder> getInfo() {
+	public @Nullable JobInfo<?, ? extends JobParamsBuilder> getInfo() {
 		return mInfo;
 	}
 

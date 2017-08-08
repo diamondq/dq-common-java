@@ -1,6 +1,6 @@
 package com.diamondq.common.reaction.api;
 
-public interface JobInfo<JPB extends JobParamsBuilder> {
+public interface JobInfo<RESULT, JPB extends JobParamsBuilder> {
 
 	/**
 	 * Create a new params builder

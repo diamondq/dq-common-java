@@ -21,6 +21,8 @@ import com.diamondq.common.lambda.interfaces.Function8;
 import com.diamondq.common.lambda.interfaces.Function9;
 import com.diamondq.common.reaction.api.impl.JobBuilderImpl;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 /**
  * This is a builder used to define and set up a job
  */
@@ -77,7 +79,7 @@ public interface JobBuilder {
 
 	/* info */
 
-	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> JobBuilderImpl info(T pJobInfo);
+	public <T extends JobInfo<?, ?>> JobBuilderImpl info(@NonNull T pJobInfo);
 
 	/* Params */
 

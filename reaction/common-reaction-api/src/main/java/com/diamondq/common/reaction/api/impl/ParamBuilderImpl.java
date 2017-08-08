@@ -1,22 +1,21 @@
 package com.diamondq.common.reaction.api.impl;
 
 import com.diamondq.common.reaction.api.JobBuilder;
+import com.diamondq.common.reaction.api.JobParamsBuilder;
 import com.diamondq.common.reaction.api.ParamBuilder;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.function.Function;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ParamBuilderImpl<PT> extends CommonBuilderImpl<PT, ParamBuilder<PT>> implements ParamBuilder<PT> {
 
-	private Set<StateCriteria>	mMissingStates;
+	private @Nullable String						mValueByVariable;
 
-	private @Nullable String	mValueByVariable;
+	private @Nullable Function<JobParamsBuilder, ?>	mValueByInput;
 
 	public ParamBuilderImpl(JobBuilderImpl pJobSetup, Class<PT> pClass) {
 		super(pJobSetup, pClass);
-		mMissingStates = new HashSet<>();
 	}
 
 	/**
@@ -27,7 +26,7 @@ public class ParamBuilderImpl<PT> extends CommonBuilderImpl<PT, ParamBuilder<PT>
 	 */
 	@Override
 	public ParamBuilderImpl<PT> missingState(String pState) {
-		mMissingStates.add(new StateValueCriteria(pState, true, "true"));
+		mRequiredStates.add(new StateCriteria(pState, false));
 		return this;
 	}
 
@@ -40,7 +39,7 @@ public class ParamBuilderImpl<PT> extends CommonBuilderImpl<PT, ParamBuilder<PT>
 	 */
 	@Override
 	public ParamBuilderImpl<PT> missingStateEquals(String pState, String pValue) {
-		mMissingStates.add(new StateValueCriteria(pState, true, pValue));
+		mRequiredStates.add(new StateValueCriteria(pState, false, pValue));
 		return this;
 	}
 
@@ -64,6 +63,20 @@ public class ParamBuilderImpl<PT> extends CommonBuilderImpl<PT, ParamBuilder<PT>
 	}
 
 	/**
+	 * @see com.diamondq.common.reaction.api.ParamBuilder#valueByInput(java.util.function.Function)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <A extends JobParamsBuilder, B> ParamBuilder<PT> valueByInput(Function<A, B> pSupplier) {
+		mValueByInput = (Function<JobParamsBuilder, B>) pSupplier;
+		return this;
+	}
+
+	public @Nullable Function<JobParamsBuilder, ?> getValueByInput() {
+		return mValueByInput;
+	}
+
+	/**
 	 * Finish this param and return back to the job
 	 * 
 	 * @return the job builder
@@ -74,7 +87,4 @@ public class ParamBuilderImpl<PT> extends CommonBuilderImpl<PT, ParamBuilder<PT>
 		return mJobSetup;
 	}
 
-	public Set<StateCriteria> getMissingStates() {
-		return mMissingStates;
-	}
 }

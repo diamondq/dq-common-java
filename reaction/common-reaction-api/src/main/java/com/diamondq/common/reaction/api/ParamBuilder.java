@@ -1,5 +1,7 @@
 package com.diamondq.common.reaction.api;
 
+import java.util.function.Function;
+
 public interface ParamBuilder<PT> extends CommonBuilder<PT, ParamBuilder<PT>> {
 
 	/**
@@ -29,6 +31,14 @@ public interface ParamBuilder<PT> extends CommonBuilder<PT, ParamBuilder<PT>> {
 	 * @return the param builder
 	 */
 	public ParamBuilder<PT> valueByVariable(String pVariableName);
+
+	/**
+	 * Defines that the value of the param is defined by a supplier function
+	 * 
+	 * @param pSupplier the supplier
+	 * @return the param builder
+	 */
+	public <A extends JobParamsBuilder, B> ParamBuilder<PT> valueByInput(Function<A, B> pSupplier);
 
 	/**
 	 * Finish this param and return back to the job

@@ -11,4 +11,17 @@ public class StateCriteria {
 		isEqual = pIsEqual;
 	}
 
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("StateCriteria(");
+		sb.append(state);
+		sb.append(isEqual == true ? "=" : "!=");
+		sb.append(")");
+		return sb.toString();
+	}
+
 }

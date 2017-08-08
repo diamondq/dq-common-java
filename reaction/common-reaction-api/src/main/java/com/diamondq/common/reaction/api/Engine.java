@@ -26,7 +26,7 @@ public interface Engine {
 	 * @param pBuilder
 	 * @return a future
 	 */
-	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> ExtendedCompletableFuture<@Nullable Void> submit(
+	public <RESULT, JPB extends JobParamsBuilder, T extends JobInfo<RESULT, JPB>> ExtendedCompletableFuture<RESULT> submit(
 		T pJob, JPB pBuilder);
 
 	/**
@@ -35,7 +35,7 @@ public interface Engine {
 	 * @param pJobInfoClass the job info class
 	 * @return the job info or null
 	 */
-	public <JPB extends JobParamsBuilder, T extends JobInfo<JPB>> T findMandatoryJob(Class<T> pJobInfoClass);
+	public <T extends JobInfo<?, ? extends JobParamsBuilder>> T findMandatoryJob(Class<T> pJobInfoClass);
 
 	/* model changes */
 
