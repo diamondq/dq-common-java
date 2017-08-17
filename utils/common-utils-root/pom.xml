@@ -13,5 +13,6 @@
 	<name>DiamondQ Common: Utils: Root</name>
 	<modules>
 		<module>../common-utils-sync</module>
+		<module>../common-utils-parsing</module>
 	</modules>
 </project>
