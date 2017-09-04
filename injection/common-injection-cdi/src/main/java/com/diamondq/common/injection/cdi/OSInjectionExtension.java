@@ -6,7 +6,9 @@ import javax.enterprise.inject.spi.Extension;
 
 public class OSInjectionExtension implements Extension {
 
-	private static final String[] sOSList = new String[] {"Windows", "MacOS", "Unix", "SunOS"};
+	private static final String[]	sOSList		= new String[] {"Windows", "MacOS", "Unix", "SunOS"};
+
+	private static final String[]	sARCHList	= new String[] {"arm", "x86"};
 
 	public void beforeDiscovery(@Observes BeforeBeanDiscovery pBefore) {
 		String property = System.getProperty("os.name");
@@ -30,5 +32,17 @@ public class OSInjectionExtension implements Extension {
 			if (os.equals(actualOS) == false)
 				System.setProperty("os.not-" + os, "true");
 		}
+
+		/* architecture */
+
+		property = System.getProperty("os.arch");
+		if (property == null)
+			throw new IllegalStateException("The os.arch System.property should never be null");
+		property = property.toLowerCase();
+		String actualARCH = property;
+
+		for (String arch : sARCHList)
+			if (arch.equals(actualARCH) == false)
+				System.setProperty("os.not-" + arch, "true");
 	}
 }
