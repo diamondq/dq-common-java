@@ -148,6 +148,8 @@ public class GenericStructure implements Structure, Revision<String> {
 	private String internalGetLocalName() {
 		List<String> propNames = mDefinition.lookupPrimaryKeyNames();
 		List<@Nullable Object> names = Lists.transform(propNames, (n) -> {
+			if (n == null)
+				throw new IllegalArgumentException("The name must not be null");
 			Property<@Nullable ?> property = lookupPropertyByName(n);
 			if (property == null)
 				throw new IllegalArgumentException("Unable to find the primary key property " + n);
@@ -235,9 +237,9 @@ public class GenericStructure implements Structure, Revision<String> {
 	public <@Nullable T> Collection<Property<T>> lookupPropertiesByKeyword(String pKey, @Nullable String pValue,
 		@Nullable PropertyType pType) {
 		Collection<String> names = mDefinition.lookupPropertyDefinitionNamesByKeyword(pKey, pValue, pType);
-		Collection<@Nullable Property<T>> list = Collections2.filter(
-			Collections2.<@NonNull String, @Nullable Property<T>> transform(names, (n) -> lookupPropertyByName(n)),
-			Predicates.notNull());
+		Collection<@Nullable Property<T>> list =
+			Collections2.filter(Collections2.<@NonNull String, @Nullable Property<T>> transform(names,
+				(n) -> n == null ? null : lookupPropertyByName(n)), Predicates.notNull());
 		@SuppressWarnings("null")
 		Collection<Property<T>> result = (Collection<Property<T>>) list;
 		return result;
@@ -245,7 +247,7 @@ public class GenericStructure implements Structure, Revision<String> {
 
 	/**
 	 * Internal function that calculates the hash code for this object
-	 * 
+	 *
 	 * @return the hash code
 	 */
 	private Integer internalHashCode() {

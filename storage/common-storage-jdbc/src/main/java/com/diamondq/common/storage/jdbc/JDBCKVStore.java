@@ -166,7 +166,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 	/**
 	 * Validates that the specified table is present and configured to the right structure
-	 * 
+	 *
 	 * @param pConnection the connection
 	 * @param pTable the table name
 	 * @param pClass the class that will be stored in the table
@@ -397,7 +397,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 	/**
 	 * Makes sure that the table name is a valid table name by escaping any illegal characters
-	 * 
+	 *
 	 * @param pTable the unescaped name
 	 * @return the escaped name
 	 */
@@ -407,7 +407,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 	/**
 	 * Returns the table schema to be used
-	 * 
+	 *
 	 * @return the table schema
 	 */
 	public @Nullable String getTableSchema() {
@@ -591,8 +591,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			StringBuilder sb = new StringBuilder();
 			sb.append("SELECT ");
-			sb.append(String.join(",",
-				Iterables.transform(pDefinition.getColumnDefinitions(), (cd) -> escapeColumnName(cd.getName()))));
+			sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
+				(cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
 			sb.append(" FROM ");
 			if (tableSchema != null)
 				sb.append(tableSchema).append('.');
@@ -630,8 +630,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			sb.append('(');
 			sb.append(sPRIMARY_KEY_1).append(',');
 			sb.append(sPRIMARY_KEY_2).append(',');
-			sb.append(String.join(",",
-				Iterables.transform(pDefinition.getColumnDefinitions(), (cd) -> escapeColumnName(cd.getName()))));
+			sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
+				(cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
 			sb.append(") VALUES (?, ?, ");
 			sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(), (cd) -> "?")));
 			sb.append(")");
@@ -646,7 +646,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			sb.append(mungedTableName);
 			sb.append(" SET ");
 			sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
-				(cd) -> escapeColumnName(cd.getName()) + "=?")));
+				(cd) -> cd == null ? null : escapeColumnName(cd.getName()) + "=?")));
 			sb.append(" WHERE ");
 			sb.append(sPRIMARY_KEY_1).append("=? AND ");
 			sb.append(sPRIMARY_KEY_2).append("=?");

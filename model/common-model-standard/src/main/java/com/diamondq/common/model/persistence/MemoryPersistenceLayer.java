@@ -11,6 +11,7 @@ import com.google.common.cache.Cache;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Sets;
 
 import java.util.Collection;
@@ -20,7 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -37,7 +37,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
 		/**
 		 * Sets the scope
-		 * 
+		 *
 		 * @param pScope the scope
 		 * @return the builder
 		 */
@@ -48,7 +48,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
 		/**
 		 * Builds the layer
-		 * 
+		 *
 		 * @return the layer
 		 */
 		public MemoryPersistenceLayer build() {
@@ -61,7 +61,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param pScope the scope
 	 */
 	public MemoryPersistenceLayer(Scope pScope) {
@@ -79,7 +79,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 		if (structureCache == null)
 			throw new IllegalStateException("The structureCache is mandatory for the MemoryPersistenceLayer");
 		return Collections2.filter(structureCache.asMap().values(),
-			(s) -> s.getDefinition().getReference().equals(pRef));
+			(s) -> s != null && s.getDefinition().getReference().equals(pRef));
 	}
 
 	/**
@@ -100,11 +100,18 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 		Cache<String, String> resourceCache = mResourceCache;
 		if (resourceCache == null)
 			throw new IllegalStateException("The resourceCache is mandatory for the MemoryPersistenceLayer");
-		return ImmutableSet.<Locale> builder().addAll(
-			Collections2.<@NonNull String, @NonNull Locale> transform(resourceCache.asMap().keySet(), (String k) -> {
-				int offset = k.indexOf(':');
-				return Locale.forLanguageTag(k.substring(0, offset));
-			})).build();
+		Builder<Locale> builder = ImmutableSet.<Locale> builder();
+		for (String k : resourceCache.asMap().keySet()) {
+			int offset = k.indexOf(':');
+			builder.add(Locale.forLanguageTag(k.substring(0, offset)));
+		}
+		// mmansell: The following code causes the 4.7.0 Eclipse compiler to freak out. Rewritten as the above
+		// return ImmutableSet.<Locale> builder().addAll(
+		// Collections2.<@NonNull String, @NonNull Locale> transform(resourceCache.asMap().keySet(), (String k) -> {
+		// int offset = k.indexOf(':');
+		// return Locale.forLanguageTag(k.substring(0, offset));
+		// })).build();
+		return builder.build();
 	}
 
 	/**
@@ -179,7 +186,8 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
 		/* Handle the recursive deleting of all children */
 
-		Set<String> set = ImmutableSet.copyOf(Sets.filter(structureCache.asMap().keySet(), (k) -> k.startsWith(pKey)));
+		Set<String> set =
+			ImmutableSet.copyOf(Sets.filter(structureCache.asMap().keySet(), (k) -> k != null && k.startsWith(pKey)));
 		set.forEach((k) -> structureCache.invalidate(k));
 
 		return true;

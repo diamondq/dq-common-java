@@ -21,7 +21,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An extension to the standard CompletableFuture to add a few extra functions
- * 
+ *
  * @param <T>
  */
 public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
@@ -56,7 +56,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	}
 
 	@Override
-	public T get() throws InterruptedException, ExecutionException {
+	public @Nullable T get() throws InterruptedException, ExecutionException {
 		return mDelegate.get();
 	}
 
@@ -112,8 +112,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	}
 
 	@Override
-	public ExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction,
-		@Nullable Executor pExecutor) {
+	public ExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction, Executor pExecutor) {
 		return ExtendedCompletableFuture.of(mDelegate.thenAcceptAsync(pAction, pExecutor));
 	}
 
@@ -140,108 +139,104 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	@Override
 	public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-		@Nullable BiFunction<? super T, ? super U, ? extends V> pFn) {
+		BiFunction<? super T, ? super U, ? extends V> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), pFn));
 	}
 
 	@Override
 	public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-		@Nullable BiFunction<? super T, ? super U, ? extends V> pFn, @Nullable Executor pExecutor) {
+		BiFunction<? super T, ? super U, ? extends V> pFn, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), pFn, pExecutor));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(CompletionStage<? extends U> pOther,
-		@Nullable BiConsumer<? super T, ? super U> pAction) {
+		BiConsumer<? super T, ? super U> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.thenAcceptBoth(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
-		@Nullable BiConsumer<? super T, ? super U> pAction) {
+		BiConsumer<? super T, ? super U> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.thenAcceptBothAsync(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
-		@Nullable BiConsumer<? super T, ? super U> pAction, @Nullable Executor pExecutor) {
+		BiConsumer<? super T, ? super U> pAction, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.thenAcceptBothAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(CompletionStage<?> pOther,
-		@Nullable Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(CompletionStage<?> pOther, Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.runAfterBoth(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther,
-		@Nullable Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther, Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.runAfterBothAsync(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther,
-		@Nullable Runnable pAction, @Nullable Executor pExecutor) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther, Runnable pAction,
+		Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.runAfterBothAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEither(CompletionStage<? extends T> pOther,
-		@Nullable Function<? super T, U> pFn) {
+		Function<? super T, U> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), pFn));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
-		@Nullable Function<? super T, U> pFn) {
+		Function<? super T, U> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), pFn));
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
-		@Nullable Function<? super T, U> pFn, @Nullable Executor pExecutor) {
+		Function<? super T, U> pFn, @Nullable Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), pFn, pExecutor));
 	}
 
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> acceptEither(CompletionStage<? extends T> pOther,
-		@Nullable Consumer<? super T> pAction) {
+		Consumer<? super T> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.acceptEither(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
-		@Nullable Consumer<? super T> pAction) {
+		Consumer<? super T> pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.acceptEitherAsync(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
-		@Nullable Consumer<? super T> pAction, @Nullable Executor pExecutor) {
+		Consumer<? super T> pAction, Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.acceptEitherAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<@Nullable Void> runAfterEither(CompletionStage<?> pOther,
-		@Nullable Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterEither(CompletionStage<?> pOther, Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther,
-		@Nullable Runnable pAction) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction) {
 		return ExtendedCompletableFuture.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), pAction));
 	}
 
 	@Override
-	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther,
-		@Nullable Runnable pAction, @Nullable Executor pExecutor) {
+	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction,
+		Executor pExecutor) {
 		return ExtendedCompletableFuture
 			.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
 	}
@@ -283,7 +278,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
+	public <U> ExtendedCompletableFuture<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> pFn) {
 		return ExtendedCompletableFuture.of(mDelegate.handle(pFn));
 	}
 
@@ -412,7 +407,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Generates an allOf future
-	 * 
+	 *
 	 * @param cfs the collection of futures
 	 * @return the future
 	 */
@@ -440,7 +435,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Generates a new ExtendedCompletableFuture from an existing CompletableFuture
-	 * 
+	 *
 	 * @param pFuture the existing CompletableFuture
 	 * @return the new ExtendedCompletableFuture
 	 */
@@ -450,7 +445,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Continues if the result is null
-	 * 
+	 *
 	 * @param pFunc the function
 	 * @return the future
 	 */
@@ -464,7 +459,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Continues the compose if null
-	 * 
+	 *
 	 * @param pFunc the function
 	 * @return the future
 	 */
@@ -483,7 +478,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Continues async if null
-	 * 
+	 *
 	 * @param pFunc the function
 	 * @return the future
 	 */
@@ -497,7 +492,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Marks a completed failure
-	 * 
+	 *
 	 * @param pEx the exception
 	 * @return the future
 	 */
@@ -509,7 +504,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Continues to compose if
-	 * 
+	 *
 	 * @param pClass the class
 	 * @param pFunc the function
 	 * @return the future
@@ -530,7 +525,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Continues if
-	 * 
+	 *
 	 * @param pClass the class
 	 * @param pFunc the function
 	 * @return the future
@@ -550,7 +545,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Splits a compose into two tracks
-	 * 
+	 *
 	 * @param pBoolFunc the boolean function
 	 * @param pTrueFunc the true side
 	 * @param pFalseFunc the false side
@@ -569,7 +564,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * Split based apply
-	 * 
+	 *
 	 * @param pBoolFunc the boolean function
 	 * @param pTrueFunc the true result
 	 * @param pFalseFunc the false result
@@ -587,7 +582,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 	/**
 	 * The state object for these 'future' based loops
-	 * 
+	 *
 	 * @param <INPUT>
 	 * @param <STARTPRE>
 	 * @param <STARTRESULT>
@@ -672,7 +667,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> {
 
 		/**
 		 * The default constructor
-		 * 
+		 *
 		 * @param pInput the input
 		 */
 		@SuppressWarnings("null")

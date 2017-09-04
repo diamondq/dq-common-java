@@ -34,7 +34,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 
 	/**
 	 * The main constructor
-	 * 
+	 *
 	 * @param pScope the scope
 	 * @param pCacheStructures true if the class should cache structures
 	 * @param pCacheStructureDefinitions true if the class should cache structure definitions
@@ -260,7 +260,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 					structureDefinitionCache.put(sd.getName(), sd);
 			}
 
-			return Collections2.transform(structureDefinitionCache.asMap().values(), (sd) -> sd.getReference());
+			return Collections2.transform(structureDefinitionCache.asMap().values(),
+				(sd) -> sd == null ? null : sd.getReference());
 		}
 		else
 			return internalGetAllMissingStructureDefinitionRefs(pToolkit, pScope, null);
@@ -283,7 +284,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 			if (list == null)
 				list = ImmutableList.of();
 			ImmutableList<EditorStructureDefinition> updatedList = ImmutableList.<EditorStructureDefinition> builder()
-				.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName()))))
+				.addAll(
+					Collections2.filter(list, Predicates.not((a) -> a != null && a.getName().equals(pValue.getName()))))
 				.add(pValue).build();
 			editorStructureDefinitionCacheByRef.put(key, updatedList);
 		}
@@ -334,9 +336,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 			List<EditorStructureDefinition> list = editorStructureDefinitionCacheByRef.getIfPresent(key);
 			if (list != null) {
 				ImmutableList<EditorStructureDefinition> updatedList =
-					ImmutableList.<EditorStructureDefinition> builder()
-						.addAll(Collections2.filter(list, Predicates.not((a) -> a.getName().equals(pValue.getName()))))
-						.build();
+					ImmutableList.<EditorStructureDefinition> builder().addAll(Collections2.filter(list,
+						Predicates.not((a) -> a != null && a.getName().equals(pValue.getName())))).build();
 				if (updatedList.isEmpty() == true)
 					editorStructureDefinitionCacheByRef.invalidate(key);
 				else

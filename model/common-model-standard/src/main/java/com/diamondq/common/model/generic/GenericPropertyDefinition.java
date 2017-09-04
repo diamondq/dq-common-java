@@ -306,8 +306,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 			mFinal, mPropertyPattern,
 			ImmutableMultimap.<String, String> builder()
 				.putAll(Multimaps.filterEntries(mKeywords,
-					Predicates
-						.<Entry<String, String>> not((e) -> pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
+					Predicates.<Entry<String, String>> not(
+						(e) -> e != null && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
 				.put(pKey, pValue).build());
 	}
 
@@ -318,8 +318,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 	public PropertyDefinition removeKeyword(String pKey, String pValue) {
 		return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
 			mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength,
-			mFinal, mPropertyPattern, Multimaps.filterEntries(mKeywords,
-				Predicates.<Entry<String, String>> not((e) -> pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
+			mFinal, mPropertyPattern, Multimaps.filterEntries(mKeywords, Predicates.<Entry<String, String>> not(
+				(e) -> e != null && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
 	}
 
 	/**

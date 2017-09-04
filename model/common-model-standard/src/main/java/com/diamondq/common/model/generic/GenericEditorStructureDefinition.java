@@ -93,11 +93,12 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
 	 */
 	@Override
 	public EditorStructureDefinition addKeyword(String pKey, String pValue) {
-		return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef, mComponents, ImmutableMultimap
-			.<String, String> builder()
-			.putAll(Multimaps.filterEntries(mKeywords,
-				Predicates.<Entry<String, String>> not((e) -> pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
-			.put(pKey, pValue).build());
+		return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef, mComponents,
+			ImmutableMultimap.<String, String> builder()
+				.putAll(Multimaps.filterEntries(mKeywords,
+					Predicates.<Entry<String, String>> not(
+						(e) -> e != null && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
+				.put(pKey, pValue).build());
 	}
 
 	/**
@@ -106,8 +107,8 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
 	@Override
 	public EditorStructureDefinition removeKeyword(String pKey, String pValue) {
 		return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef, mComponents,
-			Multimaps.filterEntries(mKeywords,
-				Predicates.<Entry<String, String>> not((e) -> pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
+			Multimaps.filterEntries(mKeywords, Predicates.<Entry<String, String>> not(
+				(e) -> e != null && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
 	}
 
 }

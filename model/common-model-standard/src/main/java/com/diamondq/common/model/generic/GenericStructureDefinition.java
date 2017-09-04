@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * 
+ *
  */
 public class GenericStructureDefinition implements StructureDefinition {
 
@@ -184,7 +184,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 		/* Add all the parent properties */
 
-		Iterables.transform(mParentDefinitions, (sdr) -> sdr.resolve()).forEach((sd) -> {
+		Iterables.transform(mParentDefinitions, (sdr) -> sdr == null ? null : sdr.resolve()).forEach((sd) -> {
 			if (sd != null)
 				builder.putAll(sd.getAllProperties());
 		});
@@ -245,7 +245,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 		/* Add all the parent properties */
 
-		Iterables.transform(mParentDefinitions, (sdr) -> sdr.resolve()).forEach((sd) -> {
+		Iterables.transform(mParentDefinitions, (sdr) -> sdr == null ? null : sdr.resolve()).forEach((sd) -> {
 			if (sd != null)
 				builder.putAll(sd.getAllKeywords());
 		});
@@ -269,8 +269,8 @@ public class GenericStructureDefinition implements StructureDefinition {
 		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance, mProperties, mParentDefinitions,
 			ImmutableMultimap.<String, String> builder()
 				.putAll(Multimaps.filterEntries(mKeywords,
-					Predicates
-						.<Entry<String, String>> not((e) -> pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
+					Predicates.<Entry<String, String>> not(
+						(e) -> e != null && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
 				.put(pKey, pValue).build());
 	}
 
@@ -280,14 +280,14 @@ public class GenericStructureDefinition implements StructureDefinition {
 	@Override
 	public StructureDefinition removeKeyword(String pKey, String pValue) {
 		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance, mProperties, mParentDefinitions,
-			Multimaps.filterEntries(mKeywords,
-				Predicates.<Entry<String, String>> not((e) -> pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
+			Multimaps.filterEntries(mKeywords, Predicates.<Entry<String, String>> not(
+				(e) -> e != null && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
 	}
 
 	/**
 	 * Internal helper function that finds the PropertyDefinition names that match a given keyword key/value and
 	 * optionally the PropertyType.
-	 * 
+	 *
 	 * @param pKey the key
 	 * @param pValue the value (or null if it matches all values)
 	 * @param pType the type (or null if it matches all types)
@@ -320,13 +320,14 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 *      java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
 	 */
 	@Override
-	public Collection<String> lookupPropertyDefinitionNamesByKeyword(String pKey, @Nullable String pValue, @Nullable PropertyType pType) {
+	public Collection<String> lookupPropertyDefinitionNamesByKeyword(String pKey, @Nullable String pValue,
+		@Nullable PropertyType pType) {
 		return mMemoizer.memoize(this::internalLookupPropertyDefinitionNamesByKeyword, pKey, pValue, pType, "pdnbk");
 	}
 
 	/**
 	 * Internal helper function for doing the actual work of looking up the primaryKeyNames
-	 * 
+	 *
 	 * @return the list of primary key PropertyDescription names
 	 */
 	private List<String> internalLookupPrimaryKeyNames() {
@@ -354,7 +355,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 	/**
 	 * Internal function that calculates the hash code for this object
-	 * 
+	 *
 	 * @return the hash code
 	 */
 	private Integer internalHashCode() {

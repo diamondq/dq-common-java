@@ -56,7 +56,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 		/**
 		 * Sets the scope
-		 * 
+		 *
 		 * @param pScope the scope
 		 * @return the builder
 		 */
@@ -67,7 +67,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 		/**
 		 * Sets the store
-		 * 
+		 *
 		 * @param pStore the store
 		 * @return the builder
 		 */
@@ -78,7 +78,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 		/**
 		 * Builds the layer
-		 * 
+		 *
 		 * @return the layer
 		 */
 		public StorageKVPersistenceLayer build() {
@@ -122,7 +122,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param pScope the scope
 	 * @param pStructureStore the KV store for structures
 	 */
@@ -182,7 +182,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 						/* Determine if there is multiple primary keys */
 
 						int primaryKeyCount =
-							Iterables.size(Iterables.filter(allProperties.values(), (pd) -> pd.isPrimaryKey()));
+							Iterables.size(Iterables.filter(allProperties.values(), (pd) -> pd != null && pd.isPrimaryKey()));
 
 						for (PropertyDefinition pd : allProperties.values()) {
 
@@ -310,7 +310,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 	/**
 	 * The provided key must be in the format of [PARENT_DEF/PARENT_KEY/]DEF/PRIMARY_KEY.
-	 * 
+	 *
 	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#loadStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
 	 */
@@ -524,7 +524,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 	/**
 	 * The provided key must be in the format of [PARENT_DEF/PARENT_KEY/]DEF/PRIMARY_KEY.
-	 * 
+	 *
 	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
 	 *      java.lang.Object)
