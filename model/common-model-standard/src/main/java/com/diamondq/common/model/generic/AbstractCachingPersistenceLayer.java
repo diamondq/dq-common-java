@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,11 +45,14 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	public AbstractCachingPersistenceLayer(Scope pScope, boolean pCacheStructures, boolean pCacheStructureDefinitions,
 		boolean pCacheEditorStructureDefinitions, boolean pCacheResources) {
 		super(pScope);
-		mStructureCache = (pCacheStructures == true ? CacheBuilder.newBuilder().build() : null);
-		mStructureDefinitionCache = (pCacheStructureDefinitions == true ? CacheBuilder.newBuilder().build() : null);
-		mEditorStructureDefinitionCacheByRef =
-			(pCacheEditorStructureDefinitions == true ? CacheBuilder.newBuilder().build() : null);
-		mResourceCache = (pCacheResources == true ? CacheBuilder.newBuilder().build() : null);
+		mStructureCache =
+			(pCacheStructures == true ? CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build() : null);
+		mStructureDefinitionCache = (pCacheStructureDefinitions == true
+			? CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build() : null);
+		mEditorStructureDefinitionCacheByRef = (pCacheEditorStructureDefinitions == true
+			? CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build() : null);
+		mResourceCache =
+			(pCacheResources == true ? CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build() : null);
 	}
 
 	/**
