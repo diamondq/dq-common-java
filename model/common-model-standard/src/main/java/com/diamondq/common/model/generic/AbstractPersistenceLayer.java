@@ -109,7 +109,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 		PropertyDefinition pPropertyDefinition, boolean pIsValueSet, T pValue) {
 		switch (pPropertyDefinition.getPropertyPattern()) {
 		case Normal:
-			return new GenericProperty<T>(pPropertyDefinition, pIsValueSet, pValue);
+			return new GenericProperty<T>(pPropertyDefinition, pIsValueSet, pValue, null);
 		case StructureDefinitionName:
 			@SuppressWarnings("unchecked")
 			Property<T> result = (Property<T>) new GenericSDNameProperty(pPropertyDefinition);
@@ -400,7 +400,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	/**
 	 * This is a highly inefficient implementation that simply scans through all structures until it finds one that
 	 * matches. A better implementation would use indexes to do a more directed search.
-	 * 
+	 *
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition,
 	 *      com.diamondq.common.model.interfaces.QueryBuilder, java.util.Map)
@@ -408,10 +408,18 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope,
 		StructureDefinition pStructureDefinition, QueryBuilder pBuilder, Map<String, Object> pParamValues) {
-		Collection<Structure> allStructures =
-			getAllStructuresByDefinition(pToolkit, pScope, pStructureDefinition.getReference());
-		List<Structure> results = Lists.newArrayList();
+
 		GenericQueryBuilder gqb = (GenericQueryBuilder) pBuilder;
+		String parentParamKey = gqb.getParentParamKey();
+		PropertyDefinition parentPropertyDefinition = gqb.getParentPropertyDefinition();
+		String parentKey;
+		if (parentParamKey == null)
+			parentKey = null;
+		else
+			parentKey = (String) pParamValues.get(parentParamKey);
+		Collection<Structure> allStructures = getAllStructuresByDefinition(pToolkit, pScope,
+			pStructureDefinition.getReference(), parentKey, parentPropertyDefinition);
+		List<Structure> results = Lists.newArrayList();
 		List<GenericWhereInfo> whereList = gqb.getWhereList();
 		for (Structure test : allStructures) {
 
@@ -442,9 +450,9 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 				case gte:
 				case lt:
 				case lte: {
+					Comparable<?> testDec;
+					Comparable<?> actDec;
 					if ((testValue instanceof Number) && (actValue instanceof Number)) {
-						BigDecimal testDec;
-						BigDecimal actDec;
 						if (testValue instanceof BigInteger)
 							testDec = new BigDecimal((BigInteger) testValue);
 						else if (testValue instanceof Byte)
@@ -477,7 +485,24 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 							actDec = new BigDecimal((Short) actValue);
 						else
 							throw new UnsupportedOperationException();
-						int compareResult = testDec.compareTo(actDec);
+
+					}
+					else if ((testValue instanceof String) && (actValue instanceof String)) {
+						testDec = (String) testValue;
+						actDec = (String) actValue;
+					}
+					else {
+						testDec = null;
+						actDec = null;
+					}
+					if ((testDec == null) || (actDec == null))
+						matches = false;
+					else {
+						@SuppressWarnings("unchecked")
+						Comparable<Object> testDecObj = (Comparable<Object>) testDec;
+						@SuppressWarnings("unchecked")
+						Comparable<Object> actDecObj = (Comparable<Object>) actDec;
+						int compareResult = testDecObj.compareTo(actDecObj);
 						if (w.operator == WhereOperator.gt)
 							matches = compareResult > 0;
 						else if (w.operator == WhereOperator.gte)
@@ -489,8 +514,6 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 						else
 							throw new UnsupportedOperationException();
 					}
-					else
-						matches = false;
 				}
 				}
 
@@ -514,12 +537,12 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope) {
-		return new GenericQueryBuilder(null);
+		return new GenericQueryBuilder(null, null, null);
 	}
 
 	/**
 	 * This internal method is used to look up a string directly against a locale (don't attempt fallbacks)
-	 * 
+	 *
 	 * @param pToolkit the 'primary' toolkit
 	 * @param pScope the 'primary' scope
 	 * @param pLocale the locale
@@ -532,7 +555,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	/**
 	 * Converts a given string into characters that are valid. To guarantee uniqueness, it will escape unsupported
 	 * characters
-	 * 
+	 *
 	 * @param pValue
 	 * @param pValid
 	 * @param pInvalid

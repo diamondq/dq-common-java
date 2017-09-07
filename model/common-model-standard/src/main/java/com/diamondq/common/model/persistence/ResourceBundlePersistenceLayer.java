@@ -2,6 +2,7 @@ package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractCachingPersistenceLayer;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
+import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
@@ -32,7 +33,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
 		/**
 		 * Sets the scope
-		 * 
+		 *
 		 * @param pScope the scope
 		 * @return the builder
 		 */
@@ -43,7 +44,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
 		/**
 		 * Sets the resource base name
-		 * 
+		 *
 		 * @param pValue the base name
 		 * @return the builder
 		 */
@@ -54,7 +55,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
 		/**
 		 * Builds the layer
-		 * 
+		 *
 		 * @return the layer
 		 */
 		public ResourceBundlePersistenceLayer build() {
@@ -112,11 +113,12 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
+	 *      java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
 	 */
 	@Override
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
-		StructureDefinitionRef pRef) {
+		StructureDefinitionRef pRef, @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef) {
 		throw new UnsupportedOperationException();
 	}
 

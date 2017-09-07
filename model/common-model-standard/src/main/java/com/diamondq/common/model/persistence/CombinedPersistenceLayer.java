@@ -3,6 +3,7 @@ package com.diamondq.common.model.persistence;
 import com.diamondq.common.model.generic.AbstractPersistenceLayer;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
+import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
@@ -199,17 +200,19 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
+	 *      java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
 	 */
 	@Override
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
-		StructureDefinitionRef pRef) {
+		StructureDefinitionRef pRef, @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef) {
 		if (mStructurePersistenceLayerIsSingleton == true)
-			return mStructurePersistenceLayer.get(0).getAllStructuresByDefinition(pToolkit, pScope, pRef);
+			return mStructurePersistenceLayer.get(0).getAllStructuresByDefinition(pToolkit, pScope, pRef, pParentKey,
+				pParentPropertyDef);
 
 		ImmutableSet.Builder<Structure> results = ImmutableSet.builder();
-		mStructurePersistenceLayer
-			.forEach((l) -> results.addAll(l.getAllStructuresByDefinition(pToolkit, pScope, pRef)));
+		mStructurePersistenceLayer.forEach((l) -> results
+			.addAll(l.getAllStructuresByDefinition(pToolkit, pScope, pRef, pParentKey, pParentPropertyDef)));
 		return results.build();
 	}
 

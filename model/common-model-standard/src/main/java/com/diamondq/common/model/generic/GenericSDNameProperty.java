@@ -5,6 +5,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.Structure;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.eclipse.jdt.annotation.NonNull;
@@ -46,6 +47,14 @@ public class GenericSDNameProperty implements Property<@Nullable String> {
 	 */
 	@Override
 	public @NonNull Property<@Nullable String> clearValueSet() {
+		throw new IllegalArgumentException();
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Property#setLazyLoadSupplier(java.util.function.Supplier)
+	 */
+	@Override
+	public Property<@Nullable String> setLazyLoadSupplier(@Nullable Supplier<@Nullable String> pSupplier) {
 		throw new IllegalArgumentException();
 	}
 

@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.lambda.MemoizedSupplier;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
@@ -11,23 +12,28 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.eclipse.jdt.annotation.NonNull;
 
 public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 
-	private final PropertyDefinition	mPropertyDefinition;
+	private final PropertyDefinition				mPropertyDefinition;
 
-	private final boolean				mValueSet;
+	private final boolean							mValueSet;
 
-	private final TYPE					mValue;
+	private final TYPE								mValue;
 
-	public GenericProperty(PropertyDefinition pPropertyDefinition, boolean pValueSet, TYPE pValue) {
+	private final @Nullable MemoizedSupplier<TYPE>	mSupplier;
+
+	public GenericProperty(PropertyDefinition pPropertyDefinition, boolean pValueSet, TYPE pValue,
+		@Nullable Supplier<TYPE> pSupplier) {
 		super();
 		mPropertyDefinition = pPropertyDefinition;
 		mValueSet = pValueSet;
 		mValue = pValue;
+		mSupplier = (pSupplier == null ? null : new MemoizedSupplier<TYPE>(pSupplier));
 	}
 
 	/**
@@ -35,8 +41,12 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 	 */
 	@Override
 	public TYPE getValue(Structure pContainer) {
-		if (mValueSet == true)
-			return mValue;
+		if (mValueSet == true) {
+			if (mSupplier != null)
+				return mSupplier.getValue();
+			else
+				return mValue;
+		}
 
 		if (mPropertyDefinition.getKeywords().containsKey(CommonKeywordKeys.INHERIT_PARENT) == false) {
 			StructureRef parentRef = pContainer.getParentRef();
@@ -230,7 +240,7 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 			}
 		}
 
-		return new GenericProperty<TYPE>(mPropertyDefinition, true, pValue);
+		return new GenericProperty<TYPE>(mPropertyDefinition, true, pValue, null);
 	}
 
 	/**
@@ -238,7 +248,16 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 	 */
 	@Override
 	public @NonNull Property<@Nullable TYPE> clearValueSet() {
-		return new GenericProperty<TYPE>(mPropertyDefinition, false, null);
+		return new GenericProperty<TYPE>(mPropertyDefinition, false, null, null);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Property#setLazyLoadSupplier(java.util.function.Supplier)
+	 */
+	@Override
+	public Property<TYPE> setLazyLoadSupplier(@Nullable Supplier<TYPE> pSupplier) {
+		return new GenericProperty<TYPE>(mPropertyDefinition, (pSupplier == null ? mValueSet : true), mValue,
+			pSupplier);
 	}
 
 	/**
@@ -254,7 +273,7 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(mPropertyDefinition, mValue, mValueSet);
+		return Objects.hash(mPropertyDefinition, mValue, mValueSet, mSupplier);
 	}
 
 	/**
@@ -270,6 +289,6 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 			return false;
 		GenericProperty<?> other = (GenericProperty<?>) pObj;
 		return Objects.equals(mPropertyDefinition, other.mPropertyDefinition) && Objects.equals(mValue, other.mValue)
-			&& Objects.equals(mValueSet, other.mValueSet);
+			&& Objects.equals(mValueSet, other.mValueSet) && Objects.equals(mSupplier, other.mSupplier);
 	}
 }

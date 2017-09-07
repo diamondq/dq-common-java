@@ -54,16 +54,18 @@ public class GenericStructure implements Structure, Revision<String> {
 		}
 		else {
 			for (Map.Entry<String, Property<?>> pair : pProperties.entrySet()) {
-				Property<?> existingProperty = pair.getValue();
-				boolean isSet = existingProperty.isValueSet();
-				PropertyDefinition pd =
-					pDefinition.lookupPropertyDefinitionByName(existingProperty.getDefinition().getName());
-				if (pd == null)
-					throw new IllegalArgumentException(
-						"Unable to find the property definition " + existingProperty.getDefinition().getName());
-				Property<?> newProp = mScope.getToolkit().createNewProperty(mScope, pd, isSet,
-					isSet == true ? existingProperty.getValue(this) : null);
-				b.put(pair.getKey(), newProp);
+				b.put(pair.getKey(), pair.getValue());
+				// mmansell: Making a copy shouldn't be necessary, since Property's are immutable. And making a copy can screw up the MemoizedSupplier
+				// Property<?> existingProperty = pair.getValue();
+				// boolean isSet = existingProperty.isValueSet();
+				// PropertyDefinition pd =
+				// pDefinition.lookupPropertyDefinitionByName(existingProperty.getDefinition().getName());
+				// if (pd == null)
+				// throw new IllegalArgumentException(
+				// "Unable to find the property definition " + existingProperty.getDefinition().getName());
+				// Property<?> newProp = mScope.getToolkit().createNewProperty(mScope, pd, isSet,
+				// isSet == true ? existingProperty.getValue(this) : null);
+				// b.put(pair.getKey(), newProp);
 			}
 		}
 		mProperties = b.build();

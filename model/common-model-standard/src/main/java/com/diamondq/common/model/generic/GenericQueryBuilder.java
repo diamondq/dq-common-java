@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.WhereOperator;
 import com.google.common.collect.ImmutableList;
@@ -31,19 +32,36 @@ public class GenericQueryBuilder implements QueryBuilder {
 		}
 	}
 
-	private final ImmutableList<GenericWhereInfo> mWhereList;
+	private final ImmutableList<GenericWhereInfo>	mWhereList;
 
-	public GenericQueryBuilder(@Nullable List<GenericWhereInfo> pWhereList) {
+	private final @Nullable String					mParentParamKey;
+
+	private final @Nullable PropertyDefinition		mParentPropertyDefinition;
+
+	public GenericQueryBuilder(@Nullable List<GenericWhereInfo> pWhereList, @Nullable String pParentParamKey,
+		@Nullable PropertyDefinition pParentPropertyDefinition) {
 		mWhereList = (pWhereList == null ? ImmutableList.of() : ImmutableList.copyOf(pWhereList));
+		mParentParamKey = pParentParamKey;
+		mParentPropertyDefinition = pParentPropertyDefinition;
 	}
 
 	/**
 	 * Returns the where list
-	 * 
+	 *
 	 * @return the list
 	 */
 	List<GenericWhereInfo> getWhereList() {
 		return mWhereList;
+	}
+
+	@Nullable
+	String getParentParamKey() {
+		return mParentParamKey;
+	}
+
+	@Nullable
+	PropertyDefinition getParentPropertyDefinition() {
+		return mParentPropertyDefinition;
 	}
 
 	/**
@@ -52,8 +70,10 @@ public class GenericQueryBuilder implements QueryBuilder {
 	 */
 	@Override
 	public GenericQueryBuilder andWhereConstant(String pKey, WhereOperator pOperator, Object pValue) {
-		return new GenericQueryBuilder(ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
-			.add(new GenericWhereInfo(pKey, pOperator, pValue, null)).build());
+		return new GenericQueryBuilder(
+			ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
+				.add(new GenericWhereInfo(pKey, pOperator, pValue, null)).build(),
+			mParentParamKey, mParentPropertyDefinition);
 	}
 
 	/**
@@ -62,8 +82,18 @@ public class GenericQueryBuilder implements QueryBuilder {
 	 */
 	@Override
 	public GenericQueryBuilder andWhereParam(String pKey, WhereOperator pOperator, String pParamKey) {
-		return new GenericQueryBuilder(ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
-			.add(new GenericWhereInfo(pKey, pOperator, null, pParamKey)).build());
+		return new GenericQueryBuilder(
+			ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
+				.add(new GenericWhereInfo(pKey, pOperator, null, pParamKey)).build(),
+			mParentParamKey, mParentPropertyDefinition);
 	}
 
+	/**
+	 * @see com.diamondq.common.model.interfaces.QueryBuilder#andWhereParentIs(java.lang.String,
+	 *      com.diamondq.common.model.interfaces.PropertyDefinition)
+	 */
+	@Override
+	public QueryBuilder andWhereParentIs(String pParentParamKey, PropertyDefinition pParentPropertyDef) {
+		return new GenericQueryBuilder(mWhereList, pParentParamKey, pParentPropertyDef);
+	}
 }

@@ -20,4 +20,5 @@ public abstract class CommonKeywordKeys {
 
 	public static final String	REVISION					= "STRevision";
 
+	public static final String	LAZY_LOAD					= "STLazyLoad";
 }

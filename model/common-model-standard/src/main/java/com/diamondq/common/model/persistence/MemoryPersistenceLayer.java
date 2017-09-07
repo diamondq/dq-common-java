@@ -2,6 +2,7 @@ package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractCachingPersistenceLayer;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
+import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
@@ -70,14 +71,18 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
+	 *      java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
 	 */
 	@Override
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
-		StructureDefinitionRef pRef) {
+		StructureDefinitionRef pRef, @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef) {
 		Cache<String, Structure> structureCache = mStructureCache;
 		if (structureCache == null)
 			throw new IllegalStateException("The structureCache is mandatory for the MemoryPersistenceLayer");
+		if ((pParentKey != null) || (pParentPropertyDef != null))
+			throw new UnsupportedOperationException(
+				"MemoryPersistenceLayer doesn't current support searching all by parent");
 		return Collections2.filter(structureCache.asMap().values(),
 			(s) -> s != null && s.getDefinition().getReference().equals(pRef));
 	}

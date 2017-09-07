@@ -70,7 +70,7 @@ public class GenericToolkit implements Toolkit {
 
 	/**
 	 * Adds the persistence layer for a given scope
-	 * 
+	 *
 	 * @param pScope the scope
 	 * @param pLayer the persistence layer
 	 */
@@ -81,7 +81,7 @@ public class GenericToolkit implements Toolkit {
 	/**
 	 * Internal helper method that either returns a PersistenceLayer or throws an exception explaining that the scope is
 	 * unknown.
-	 * 
+	 *
 	 * @param pScope the scope
 	 * @return the persistence layer, never null.
 	 */
@@ -371,11 +371,14 @@ public class GenericToolkit implements Toolkit {
 
 	/**
 	 * @see com.diamondq.common.model.interfaces.Toolkit#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Scope,
-	 *      com.diamondq.common.model.interfaces.StructureDefinitionRef)
+	 *      com.diamondq.common.model.interfaces.StructureDefinitionRef, java.lang.String,
+	 *      com.diamondq.common.model.interfaces.PropertyDefinition)
 	 */
 	@Override
-	public Collection<Structure> getAllStructuresByDefinition(Scope pScope, StructureDefinitionRef pRef) {
-		return getPersistenceLayer(pScope).getAllStructuresByDefinition(this, pScope, pRef);
+	public Collection<Structure> getAllStructuresByDefinition(Scope pScope, StructureDefinitionRef pRef,
+		@Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef) {
+		return getPersistenceLayer(pScope).getAllStructuresByDefinition(this, pScope, pRef, pParentKey,
+			pParentPropertyDef);
 	}
 
 	/**

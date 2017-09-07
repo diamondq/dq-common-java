@@ -66,7 +66,8 @@ public interface PersistenceLayer {
 
 	public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure);
 
-	public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure, @Nullable Structure pOldStructure);
+	public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
+		@Nullable Structure pOldStructure);
 
 	public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope,
 		String pSerializedRef);
@@ -109,7 +110,7 @@ public interface PersistenceLayer {
 		String pValue);
 
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
-		StructureDefinitionRef pRef);
+		StructureDefinitionRef pRef, @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef);
 
 	public @Nullable String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey);
 

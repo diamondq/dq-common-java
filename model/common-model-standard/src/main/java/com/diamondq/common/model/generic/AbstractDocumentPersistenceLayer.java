@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -407,7 +408,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 
 	/**
 	 * Checks whether this Property which has the CONTAINER keyword attached to it, should be persisted.
-	 * 
+	 *
 	 * @param pToolkit the toolkit
 	 * @param pScope the scope
 	 * @param pStructure the structure
@@ -419,11 +420,12 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
+	 *      java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
 	 */
 	@Override
 	public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope,
-		StructureDefinitionRef pRef) {
+		StructureDefinitionRef pRef, @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef) {
 		if (mPersistStructures == false)
 			return Collections.emptyList();
 
@@ -432,7 +434,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 		StructureDefinition sd = pRef.resolve();
 		if (sd != null) {
 			ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
-			internalPopulateChildStructureList(pToolkit, pScope, null, sd, sd.getName(), null, null, builder);
+			internalPopulateChildStructureList(pToolkit, pScope, null, sd, sd.getName(), pParentKey, pParentPropertyDef,
+				builder);
 			for (StructureRef ref : builder.build()) {
 				Structure resolution = ref.resolve();
 				if (resolution != null)
@@ -488,12 +491,33 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			for (String childrenPropName : childrenPropNames) {
 				PropertyDefinition propDef = structureDef.lookupPropertyDefinitionByName(childrenPropName);
 				Property<@Nullable List<StructureRef>> childProp = structure.lookupPropertyByName(childrenPropName);
-				if (childProp == null)
+				if ((propDef == null) || (childProp == null))
 					continue;
-				ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
-				internalPopulateChildStructureList(pToolkit, pScope, config, structureDef, structureDefName, pKey,
-					propDef, builder);
-				structure = structure.updateProperty(childProp.setValue(builder.build()));
+				String lazyLoadStr = Iterables.getFirst(propDef.getKeywords().get(CommonKeywordKeys.LAZY_LOAD),
+					CommonKeywordValues.FALSE);
+				boolean lazyLoad = CommonKeywordValues.TRUE.equals(lazyLoadStr);
+				if (lazyLoad == true) {
+					Supplier<List<StructureRef>> lazySupplier = new Supplier<List<StructureRef>>() {
+
+						/**
+						 * @see java.util.function.Supplier#get()
+						 */
+						@Override
+						public List<StructureRef> get() {
+							ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
+							internalPopulateChildStructureList(pToolkit, pScope, null, structureDef, structureDefName,
+								pKey, propDef, builder);
+							return builder.build();
+						}
+					};
+					structure = structure.updateProperty(childProp.setLazyLoadSupplier(lazySupplier));
+				}
+				else {
+					ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
+					internalPopulateChildStructureList(pToolkit, pScope, config, structureDef, structureDefName, pKey,
+						propDef, builder);
+					structure = structure.updateProperty(childProp.setValue(builder.build()));
+				}
 			}
 		}
 
