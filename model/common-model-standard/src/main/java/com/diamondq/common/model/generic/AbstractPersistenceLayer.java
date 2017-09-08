@@ -75,7 +75,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName) {
-		return new GenericStructureDefinition(mScope, pName, null, false, null, null, null);
+		return new GenericStructureDefinition(pScope, pName, null, false, null, null, null);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope, String pName,
 		PropertyType pType) {
-		return new GenericPropertyDefinition(mScope, pName, null, false, 0, pType, null, null, null, null, null, null,
+		return new GenericPropertyDefinition(pScope, pName, null, false, 0, pType, null, null, null, null, null, null,
 			null, false, PropertyPattern.Normal, null);
 	}
 
@@ -96,7 +96,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public Structure createNewStructure(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition) {
-		return new GenericStructure(mScope, pStructureDefinition, null);
+		return new GenericStructure(pScope, pStructureDefinition, null);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public TranslatableString createNewTranslatableString(Toolkit pToolkit, Scope pScope, String pKey) {
-		return new GenericTranslatableString(mScope, pKey);
+		return new GenericTranslatableString(pScope, pKey);
 	}
 
 	/**
@@ -163,7 +163,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public StructureRef createStructureRefFromSerialized(Toolkit pToolkit, Scope pScope, String pValue) {
-		return new GenericStructureRef(mScope, pValue);
+		return new GenericStructureRef(pScope, pValue);
 	}
 
 	/**
@@ -211,7 +211,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 					"If StructureDefinition is provided, then only the Primary Keys can be provided.");
 		}
 		String key = sb.toString();
-		return new GenericStructureRef(mScope, key);
+		return new GenericStructureRef(pScope, key);
 	}
 
 	/**
@@ -221,7 +221,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope,
 		String pValue) {
-		return new GenericPropertyRef<>(mScope, pValue);
+		return new GenericPropertyRef<>(pScope, pValue);
 	}
 
 	/**
@@ -231,7 +231,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public EditorStructureDefinition createDynamicEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
 		StructureDefinition pStructureDefinition) {
-		return new DynamicEditorStructureDefinition(mScope, pStructureDefinition);
+		return new DynamicEditorStructureDefinition(pScope, pStructureDefinition);
 	}
 
 	/**
@@ -241,7 +241,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public StructureDefinitionRef createStructureDefinitionRef(Toolkit pToolkit, Scope pScope,
 		StructureDefinition pResolvable) {
-		return new GenericStructureDefinitionRef(mScope, pResolvable.getName());
+		return new GenericStructureDefinitionRef(pScope, pResolvable.getName());
 	}
 
 	/**
@@ -250,7 +250,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized) {
-		return new GenericStructureDefinitionRef(mScope, pSerialized);
+		return new GenericStructureDefinitionRef(pScope, pSerialized);
 	}
 
 	/**
@@ -265,7 +265,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 		sb.append(pContaining.getReference().getSerializedString());
 		sb.append('#');
 		sb.append(pResolvable.getName());
-		return new GenericPropertyDefinitionRef(mScope, sb.toString());
+		return new GenericPropertyDefinitionRef(pScope, sb.toString());
 	}
 
 	/**
@@ -274,7 +274,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public StructureRef createStructureRef(Toolkit pToolkit, Scope pScope, Structure pResolvable) {
-		return new GenericStructureRef(mScope, pToolkit.createStructureRefStr(pScope, pResolvable));
+		return new GenericStructureRef(pScope, pToolkit.createStructureRefStr(pScope, pResolvable));
 	}
 
 	/**
@@ -301,7 +301,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public <@Nullable T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope,
 		@Nullable Property<T> pResolvable, Structure pContaining) {
-		return new GenericPropertyRef<T>(mScope, pContaining.getReference(),
+		return new GenericPropertyRef<T>(pScope, pContaining.getReference(),
 			(pResolvable == null ? null : pResolvable.getDefinition().getName()));
 	}
 

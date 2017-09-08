@@ -664,7 +664,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 						refBuilder.setLength(refOffset);
 						refBuilder.append(primaryKey);
 						pStructureRefListBuilder
-							.add(mScope.getToolkit().createStructureRefFromSerialized(mScope, refBuilder.toString()));
+							.add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
 
 					}
 				}
@@ -705,7 +705,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 						refBuilder.setLength(finalRefBuilderLength);
 						refBuilder.append(childKey);
 						pStructureRefListBuilder
-							.add(mScope.getToolkit().createStructureRefFromSerialized(mScope, refBuilder.toString()));
+							.add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
 					}
 
 				}

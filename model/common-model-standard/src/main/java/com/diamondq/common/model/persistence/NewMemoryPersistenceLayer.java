@@ -33,7 +33,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 		/**
 		 * Sets the scope
-		 * 
+		 *
 		 * @param pScope the scope
 		 * @return the builder
 		 */
@@ -44,7 +44,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 		/**
 		 * Builds the layer
-		 * 
+		 *
 		 * @return the layer
 		 */
 		public NewMemoryPersistenceLayer build() {
@@ -68,7 +68,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param pScope the scope
 	 */
 	public NewMemoryPersistenceLayer(Scope pScope) {
@@ -303,7 +303,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 				refBuilder.setLength(preNameOffset);
 				refBuilder.append(name);
 				pStructureRefListBuilder
-					.add(mScope.getToolkit().createStructureRefFromSerialized(mScope, refBuilder.toString()));
+					.add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
 			}
 		}
 		return;

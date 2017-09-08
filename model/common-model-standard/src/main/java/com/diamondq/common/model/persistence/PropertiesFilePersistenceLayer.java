@@ -49,7 +49,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
 		/**
 		 * Sets the scope
-		 * 
+		 *
 		 * @param pScope the scope
 		 * @return the builder
 		 */
@@ -60,7 +60,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
 		/**
 		 * Sets the structure directory
-		 * 
+		 *
 		 * @param pValue the directory
 		 * @return the builder
 		 */
@@ -71,7 +71,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
 		/**
 		 * Sets the structure def directory
-		 * 
+		 *
 		 * @param pValue the directory
 		 * @return the builder
 		 */
@@ -82,7 +82,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
 		/**
 		 * Sets the editor structure def directory
-		 * 
+		 *
 		 * @param pValue the directory
 		 * @return the builder
 		 */
@@ -93,7 +93,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
 		/**
 		 * Builds the layer
-		 * 
+		 *
 		 * @return the layer
 		 */
 		public PropertiesFilePersistenceLayer build() {
@@ -114,7 +114,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param pScope the scope
 	 * @param pStructureBaseDir the directory for structures
 	 * @param pStructureDefBaseDir the directory for structure definitions
@@ -515,7 +515,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 				refBuilder.setLength(preNameOffset);
 				refBuilder.append(name);
 				pStructureRefListBuilder
-					.add(mScope.getToolkit().createStructureRefFromSerialized(mScope, refBuilder.toString()));
+					.add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
 			}
 		}
 		return;

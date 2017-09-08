@@ -465,12 +465,12 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 		if (structureDefName == null)
 			throw new IllegalArgumentException("The mandatory property structureDef doesn't exist");
 		StructureDefinition structureDef =
-			mScope.getToolkit().lookupStructureDefinitionByName(mScope, structureDefName);
+			pScope.getToolkit().lookupStructureDefinitionByName(pScope, structureDefName);
 		if (structureDef == null)
 			throw new IllegalArgumentException("The structure at " + pKey + " refers to a StructureDefinition "
 				+ structureDefName + " that does not exist");
 
-		Structure structure = mScope.getToolkit().createNewStructure(mScope, structureDef);
+		Structure structure = pScope.getToolkit().createNewStructure(pScope, structureDef);
 		int lastSlash = pKey.lastIndexOf('/');
 		int secondLastSlash = pKey.lastIndexOf('/', lastSlash - 1);
 		String parentRef = null;
@@ -480,7 +480,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			Collection<Property<@Nullable PropertyRef<?>>> parentProps = structure.lookupPropertiesByKeyword(
 				CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT, PropertyType.PropertyRef);
 			structure = structure.updateProperty(Iterables.get(parentProps, 0)
-				.setValue(mScope.getToolkit().createPropertyRefFromSerialized(mScope, parentRef)));
+				.setValue(pScope.getToolkit().createPropertyRefFromSerialized(pScope, parentRef)));
 		}
 
 		/* See if there are children */
