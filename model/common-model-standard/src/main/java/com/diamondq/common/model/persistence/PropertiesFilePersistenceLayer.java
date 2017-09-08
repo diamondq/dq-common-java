@@ -39,13 +39,15 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 */
 	public static class PropertiesFilePersistenceLayerBuilder {
 
-		private @Nullable Scope	mScope;
+		private @Nullable Scope		mScope;
 
-		private @Nullable File	mStructureDir;
+		private @Nullable File		mStructureDir;
 
-		private @Nullable File	mStructureDefDir;
+		private @Nullable Integer	mCacheStructuresSeconds;
 
-		private @Nullable File	mEditorStructureDefDir;
+		private @Nullable File		mStructureDefDir;
+
+		private @Nullable File		mEditorStructureDefDir;
 
 		/**
 		 * Sets the scope
@@ -66,6 +68,17 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		 */
 		public PropertiesFilePersistenceLayerBuilder structureDir(String pValue) {
 			mStructureDir = new File(pValue);
+			return this;
+		}
+
+		/**
+		 * Sets the number of seconds to cache structures.
+		 *
+		 * @param pValue the number of seconds
+		 * @return the builder
+		 */
+		public PropertiesFilePersistenceLayerBuilder cacheStructuresSeconds(Integer pValue) {
+			mCacheStructuresSeconds = pValue;
 			return this;
 		}
 
@@ -100,7 +113,11 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			Scope scope = mScope;
 			if (scope == null)
 				throw new IllegalArgumentException("The mandatory field scope was not set");
-			return new PropertiesFilePersistenceLayer(scope, mStructureDir, mStructureDefDir, mEditorStructureDefDir);
+			Integer cacheStructuresSeconds = mCacheStructuresSeconds;
+			if (cacheStructuresSeconds == null)
+				cacheStructuresSeconds = -1;
+			return new PropertiesFilePersistenceLayer(scope, mStructureDir, cacheStructuresSeconds, mStructureDefDir,
+				mEditorStructureDefDir);
 		}
 	}
 
@@ -117,13 +134,14 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	 *
 	 * @param pScope the scope
 	 * @param pStructureBaseDir the directory for structures
+	 * @param pCacheStructuresSeconds the number of seconds to cache
 	 * @param pStructureDefBaseDir the directory for structure definitions
 	 * @param pEditorStructureDefBaseDir the directory for editor structure definitions
 	 */
-	public PropertiesFilePersistenceLayer(Scope pScope, @Nullable File pStructureBaseDir,
+	public PropertiesFilePersistenceLayer(Scope pScope, @Nullable File pStructureBaseDir, int pCacheStructuresSeconds,
 		@Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
-		super(pScope, pStructureBaseDir != null, true, pStructureDefBaseDir != null, true,
-			pEditorStructureDefBaseDir != null, true, false, true);
+		super(pScope, pStructureBaseDir != null, true, pCacheStructuresSeconds, pStructureDefBaseDir != null, true, -1,
+			pEditorStructureDefBaseDir != null, true, -1, false, true, -1);
 		mStructureBaseDir = pStructureBaseDir;
 		mStructureDefBaseDir = pStructureDefBaseDir;
 		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;

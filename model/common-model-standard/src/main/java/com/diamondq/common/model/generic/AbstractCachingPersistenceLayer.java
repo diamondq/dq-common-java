@@ -38,21 +38,51 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 *
 	 * @param pScope the scope
 	 * @param pCacheStructures true if the class should cache structures
+	 * @param pCacheStructuresSeconds the number of seconds to cache (-1 is forever)
 	 * @param pCacheStructureDefinitions true if the class should cache structure definitions
+	 * @param pCacheStructureDefinitionsSeconds the number of seconds to cache (-1 is forever)
 	 * @param pCacheEditorStructureDefinitions true if the class should cache editor structure definitions
+	 * @param pCacheEditorStructureDefinitionsSeconds the number of seconds to cache (-1 is forever)
 	 * @param pCacheResources true if the class should cache resources
+	 * @param pCacheResourcesSeconds the number of seconds to cache (-1 is forever)
 	 */
-	public AbstractCachingPersistenceLayer(Scope pScope, boolean pCacheStructures, boolean pCacheStructureDefinitions,
-		boolean pCacheEditorStructureDefinitions, boolean pCacheResources) {
+	public AbstractCachingPersistenceLayer(Scope pScope, boolean pCacheStructures, int pCacheStructuresSeconds,
+		boolean pCacheStructureDefinitions, int pCacheStructureDefinitionsSeconds,
+		boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds, boolean pCacheResources,
+		int pCacheResourcesSeconds) {
 		super(pScope);
-		mStructureCache =
-			(pCacheStructures == true ? CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build() : null);
-		mStructureDefinitionCache = (pCacheStructureDefinitions == true
-			? CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build() : null);
-		mEditorStructureDefinitionCacheByRef = (pCacheEditorStructureDefinitions == true
-			? CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build() : null);
-		mResourceCache =
-			(pCacheResources == true ? CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build() : null);
+		if (pCacheStructures == true) {
+			CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+			if (pCacheStructuresSeconds > 0)
+				builder = builder.expireAfterWrite(pCacheStructuresSeconds, TimeUnit.SECONDS);
+			mStructureCache = builder.build();
+		}
+		else
+			mStructureCache = null;
+		if (pCacheStructureDefinitions == true) {
+			CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+			if (pCacheStructureDefinitionsSeconds > 0)
+				builder = builder.expireAfterWrite(pCacheStructureDefinitionsSeconds, TimeUnit.SECONDS);
+			mStructureDefinitionCache = builder.build();
+		}
+		else
+			mStructureDefinitionCache = null;
+		if (pCacheEditorStructureDefinitions == true) {
+			CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+			if (pCacheEditorStructureDefinitionsSeconds > 0)
+				builder = builder.expireAfterWrite(pCacheEditorStructureDefinitionsSeconds, TimeUnit.SECONDS);
+			mEditorStructureDefinitionCacheByRef = builder.build();
+		}
+		else
+			mEditorStructureDefinitionCacheByRef = null;
+		if (pCacheResources == true) {
+			CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+			if (pCacheResourcesSeconds > 0)
+				builder = builder.expireAfterWrite(pCacheResourcesSeconds, TimeUnit.SECONDS);
+			mResourceCache = builder.build();
+		}
+		else
+			mResourceCache = null;
 	}
 
 	/**

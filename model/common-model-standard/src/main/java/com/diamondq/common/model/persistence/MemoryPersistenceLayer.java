@@ -66,7 +66,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 * @param pScope the scope
 	 */
 	public MemoryPersistenceLayer(Scope pScope) {
-		super(pScope, true, true, true, true);
+		super(pScope, true, -1, true, -1, true, -1, true, -1);
 	}
 
 	/**

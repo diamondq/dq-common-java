@@ -49,10 +49,13 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 	protected final boolean	mPersistResources;
 
 	public AbstractDocumentPersistenceLayer(Scope pScope, boolean pPersistStructures, boolean pCacheStructures,
-		boolean pPersistStructureDefinitions, boolean pCacheStructureDefinitions,
-		boolean pPersistEditorStructureDefinitions, boolean pCacheEditorStructureDefinitions, boolean pPersistResources,
-		boolean pCacheResources) {
-		super(pScope, pCacheStructures, pCacheStructureDefinitions, pCacheEditorStructureDefinitions, pCacheResources);
+		int pCacheStructuresSeconds, boolean pPersistStructureDefinitions, boolean pCacheStructureDefinitions,
+		int pCacheStructureDefinitionsSeconds, boolean pPersistEditorStructureDefinitions,
+		boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds,
+		boolean pPersistResources, boolean pCacheResources, int pCacheResourcesSeconds) {
+		super(pScope, pCacheStructures, pCacheStructuresSeconds, pCacheStructureDefinitions,
+			pCacheStructureDefinitionsSeconds, pCacheEditorStructureDefinitions,
+			pCacheEditorStructureDefinitionsSeconds, pCacheResources, pCacheResourcesSeconds);
 		mPersistStructures = pPersistStructures;
 		mPersistStructureDefinitions = pPersistStructureDefinitions;
 		mPersistEditorStructureDefinitions = pPersistEditorStructureDefinitions;

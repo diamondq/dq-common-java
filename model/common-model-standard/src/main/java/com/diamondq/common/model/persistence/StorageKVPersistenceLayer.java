@@ -127,7 +127,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 * @param pStructureStore the KV store for structures
 	 */
 	public StorageKVPersistenceLayer(Scope pScope, IKVStore pStructureStore) {
-		super(pScope, true, false, false, false, false, false, false, false);
+		super(pScope, true, false, -1, false, false, -1, false, false, -1, false, false, -1);
 		mStructureStore = pStructureStore;
 
 		mConfiguredTableDefinitions = Maps.newConcurrentMap();
@@ -181,8 +181,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 						/* Determine if there is multiple primary keys */
 
-						int primaryKeyCount =
-							Iterables.size(Iterables.filter(allProperties.values(), (pd) -> pd != null && pd.isPrimaryKey()));
+						int primaryKeyCount = Iterables
+							.size(Iterables.filter(allProperties.values(), (pd) -> pd != null && pd.isPrimaryKey()));
 
 						for (PropertyDefinition pd : allProperties.values()) {
 

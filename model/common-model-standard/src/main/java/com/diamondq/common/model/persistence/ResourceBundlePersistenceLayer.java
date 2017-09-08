@@ -72,7 +72,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	protected final String mBaseName;
 
 	public ResourceBundlePersistenceLayer(Scope pScope, String pResourceBaseName) {
-		super(pScope, false, false, false, true);
+		super(pScope, false, -1, false, -1, false, -1, true, -1);
 		mBaseName = pResourceBaseName;
 	}
 

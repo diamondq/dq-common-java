@@ -72,7 +72,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 * @param pScope the scope
 	 */
 	public NewMemoryPersistenceLayer(Scope pScope) {
-		super(pScope, true, true, false, false, false, false, true, true);
+		super(pScope, true, true, -1, false, false, -1, false, false, -1, true, true, -1);
 		mDataCache = Maps.newConcurrentMap();
 	}
 
