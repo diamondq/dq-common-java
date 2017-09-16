@@ -21,6 +21,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.diamondq.common.java</groupId>
+			<artifactId>common-lambda</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.diamondq.common.java.storage</groupId>
 			<artifactId>common-storage-kv</artifactId>
 			<optional>true</optional>
