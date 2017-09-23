@@ -2,29 +2,21 @@ package com.diamondq.common.tracing.opentracing.wrappers;
 
 import java.util.function.Function;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.opentracing.ActiveSpan;
 import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerFunction<A, B> implements Function<A, B> {
+public class TracerFunction<A, B> extends AbstractTracerWrapper implements Function<A, B>, AbortableContinuation {
 
-	private final @Nullable Continuation	mSpanContinuation;
-
-	private final Function<A, B>			mDelegate;
+	private final Function<A, B> mDelegate;
 
 	public TracerFunction(Function<A, B> pDelegate) {
 		this(GlobalTracer.get(), pDelegate);
 	}
 
 	public TracerFunction(Tracer pTracer, Function<A, B> pDelegate) {
-		ActiveSpan activeSpan = pTracer.activeSpan();
-		if (activeSpan != null)
-			mSpanContinuation = activeSpan.capture();
-		else
-			mSpanContinuation = null;
+		super(pTracer);
 		mDelegate = pDelegate;
 	}
 
@@ -33,10 +25,10 @@ public class TracerFunction<A, B> implements Function<A, B> {
 	 */
 	@Override
 	public B apply(A pT) {
-		if (mSpanContinuation == null)
+		Continuation c = mSpanContinuation.getAndSet(null);
+		if (c == null)
 			return mDelegate.apply(pT);
-		try (@SuppressWarnings("null")
-		ActiveSpan span = mSpanContinuation.activate()) {
+		try (ActiveSpan span = c.activate()) {
 			return mDelegate.apply(pT);
 		}
 	}

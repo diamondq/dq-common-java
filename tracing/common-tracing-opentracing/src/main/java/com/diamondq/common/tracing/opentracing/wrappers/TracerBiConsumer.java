@@ -2,29 +2,21 @@ package com.diamondq.common.tracing.opentracing.wrappers;
 
 import java.util.function.BiConsumer;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.opentracing.ActiveSpan;
 import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerBiConsumer<A, B> implements BiConsumer<A, B> {
+public class TracerBiConsumer<A, B> extends AbstractTracerWrapper implements BiConsumer<A, B>, AbortableContinuation {
 
-	private final @Nullable Continuation	mSpanContinuation;
-
-	private final BiConsumer<A, B>			mDelegate;
+	private final BiConsumer<A, B> mDelegate;
 
 	public TracerBiConsumer(BiConsumer<A, B> pDelegate) {
 		this(GlobalTracer.get(), pDelegate);
 	}
 
 	public TracerBiConsumer(Tracer pTracer, BiConsumer<A, B> pDelegate) {
-		ActiveSpan activeSpan = pTracer.activeSpan();
-		if (activeSpan != null)
-			mSpanContinuation = activeSpan.capture();
-		else
-			mSpanContinuation = null;
+		super(pTracer);
 		mDelegate = pDelegate;
 	}
 
@@ -33,12 +25,12 @@ public class TracerBiConsumer<A, B> implements BiConsumer<A, B> {
 	 */
 	@Override
 	public void accept(A pA, B pB) {
-		if (mSpanContinuation == null) {
+		Continuation c = mSpanContinuation.getAndSet(null);
+		if (c == null) {
 			mDelegate.accept(pA, pB);
 			return;
 		}
-		try (@SuppressWarnings("null")
-		ActiveSpan span = mSpanContinuation.activate()) {
+		try (ActiveSpan span = c.activate()) {
 			mDelegate.accept(pA, pB);
 		}
 	}
