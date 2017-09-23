@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
@@ -17,17 +18,19 @@ public class ExecutorsProvider {
 
 	/**
 	 * Creates 'long-lived' executor service that will generate threads on demand.
-	 * 
+	 *
 	 * @param pConfig the config
 	 * @return the long lived executor service
 	 */
 	@Produces
 	@ApplicationScoped
 	@Named("long-lived")
-	public ScheduledExecutorService createScheduledExecutorService(Config pConfig) {
+	public ScheduledExecutorService createScheduledExecutorService(Instance<Config> pConfig) {
 
 		ThreadFactory threadFactory = Executors.defaultThreadFactory();
-		Integer corePoolSize = pConfig.bind("executors.core-pool-size", Integer.class);
+		Integer corePoolSize = null;
+		if (pConfig.isResolvable() == true)
+			corePoolSize = pConfig.get().bind("executors.core-pool-size", Integer.class);
 		if (corePoolSize == null)
 			corePoolSize = 0;
 		ScheduledExecutorService scheduledExecutorService =
