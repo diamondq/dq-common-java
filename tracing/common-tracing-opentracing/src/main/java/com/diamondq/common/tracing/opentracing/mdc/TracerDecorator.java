@@ -5,6 +5,7 @@ import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 import javax.annotation.Priority;
 import javax.decorator.Decorator;
 import javax.decorator.Delegate;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -17,14 +18,14 @@ import io.opentracing.util.GlobalTracer;
 @Priority(1)
 public abstract class TracerDecorator implements Tracer {
 
-	private final Tracer			mTracer;
+	private final Tracer						mTracer;
 
-	private final TraceIdExtractor	mExtractor;
+	private final @Nullable TraceIdExtractor	mExtractor;
 
 	@Inject
-	public TracerDecorator(@Delegate Tracer pTracer, TraceIdExtractor pExtractor) {
+	public TracerDecorator(@Delegate Tracer pTracer, Instance<TraceIdExtractor> pExtractor) {
 		mTracer = pTracer;
-		mExtractor = pExtractor;
+		mExtractor = pExtractor.isResolvable() == true ? pExtractor.get() : null;
 		GlobalTracer.register(this);
 	}
 
@@ -33,14 +34,25 @@ public abstract class TracerDecorator implements Tracer {
 	 */
 	@Override
 	public SpanBuilder buildSpan(String pOperationName) {
-		return new MDCSpanBuilder(mTracer.buildSpan(pOperationName), mExtractor);
+		TraceIdExtractor extractor = mExtractor;
+		if (extractor == null)
+			return mTracer.buildSpan(pOperationName);
+		else
+			return new MDCSpanBuilder(mTracer.buildSpan(pOperationName), extractor);
 	}
 
+	/**
+	 * @see io.opentracing.ActiveSpanSource#activeSpan()
+	 */
 	@Override
 	public @Nullable ActiveSpan activeSpan() {
 		ActiveSpan result = mTracer.activeSpan();
 		if (result == null)
+			return null;
+		TraceIdExtractor extractor = mExtractor;
+		if (extractor == null)
 			return result;
-		return new MDCActiveSpan(result, mExtractor);
+		else
+			return new MDCActiveSpan(result, extractor);
 	}
 }

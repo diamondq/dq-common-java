@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
@@ -26,6 +28,8 @@ import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
 
 @ApplicationScoped
+@Alternative
+@Priority(100)
 public class JaegerTracer implements Tracer {
 
 	private static final Logger		sLogger	= LoggerFactory.getLogger(JaegerTracer.class);
