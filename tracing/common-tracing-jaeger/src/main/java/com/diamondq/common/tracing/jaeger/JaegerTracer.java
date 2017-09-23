@@ -26,6 +26,7 @@ import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
+import io.opentracing.util.GlobalTracer;
 
 @ApplicationScoped
 @Alternative
@@ -56,6 +57,7 @@ public class JaegerTracer implements Tracer {
 		mDelegate = new com.uber.jaeger.Tracer.Builder(appName, remoteReporter, sampler)
 			.registerInjector(Format.Builtin.HTTP_HEADERS, b3Codec)
 			.registerExtractor(Format.Builtin.HTTP_HEADERS, b3Codec).build();
+		GlobalTracer.register(this);
 	}
 
 	/**

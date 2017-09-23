@@ -13,6 +13,7 @@ import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
+import io.opentracing.util.GlobalTracer;
 
 @ApplicationScoped
 @Alternative
@@ -24,6 +25,7 @@ public class NoopTracer implements Tracer {
 	@Inject
 	public NoopTracer() {
 		mDelegate = NoopTracerFactory.create();
+		GlobalTracer.register(this);
 	}
 
 	/**

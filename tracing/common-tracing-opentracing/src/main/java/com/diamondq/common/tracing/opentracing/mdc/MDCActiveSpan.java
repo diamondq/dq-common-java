@@ -27,6 +27,10 @@ public class MDCActiveSpan extends MDCBaseSpan<ActiveSpan> implements ActiveSpan
 		MDC.remove("traceId");
 	}
 
+	public void cleanup() {
+		MDC.remove("traceId");
+	}
+
 	@Override
 	public Continuation capture() {
 		return new MDCContinuation(mDelegate.capture(), mExtractor);

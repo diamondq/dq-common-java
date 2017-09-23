@@ -12,7 +12,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import io.opentracing.ActiveSpan;
 import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
 
 @Decorator
 @Priority(1)
@@ -26,7 +25,6 @@ public abstract class TracerDecorator implements Tracer {
 	public TracerDecorator(@Delegate Tracer pTracer, Instance<TraceIdExtractor> pExtractor) {
 		mTracer = pTracer;
 		mExtractor = pExtractor.isResolvable() == true ? pExtractor.get() : null;
-		GlobalTracer.register(this);
 	}
 
 	/**
