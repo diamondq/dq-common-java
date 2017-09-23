@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import io.opentracing.ActiveSpan;
 import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
 
 public class ExtendedCompletableFutureTest {
 

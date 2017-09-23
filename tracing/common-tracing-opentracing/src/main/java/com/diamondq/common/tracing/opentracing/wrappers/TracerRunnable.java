@@ -30,6 +30,7 @@ public class TracerRunnable implements Runnable {
 	public void run() {
 		if (mSpanContinuation == null) {
 			mDelegate.run();
+			return;
 		}
 		try (@SuppressWarnings("null")
 		ActiveSpan span = mSpanContinuation.activate()) {

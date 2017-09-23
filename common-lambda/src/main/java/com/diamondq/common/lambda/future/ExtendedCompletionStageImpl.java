@@ -1,5 +1,11 @@
 package com.diamondq.common.lambda.future;
 
+import com.diamondq.common.tracing.opentracing.wrappers.TracerBiConsumer;
+import com.diamondq.common.tracing.opentracing.wrappers.TracerBiFunction;
+import com.diamondq.common.tracing.opentracing.wrappers.TracerConsumer;
+import com.diamondq.common.tracing.opentracing.wrappers.TracerFunction;
+import com.diamondq.common.tracing.opentracing.wrappers.TracerRunnable;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
@@ -40,210 +46,222 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 
 	@Override
 	public <U> ExtendedCompletionStage<U> thenApply(Function<? super T, ? extends U> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.thenApply(pFn));
+		return ExtendedCompletionStage.of(mDelegate.thenApply(new TracerFunction<>(pFn)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> thenApplyAsync(Function<? super T, ? extends U> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.thenApplyAsync(pFn));
+		return ExtendedCompletionStage.of(mDelegate.thenApplyAsync(new TracerFunction<>(pFn)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> thenApplyAsync(Function<? super T, ? extends U> pFn,
 		@Nullable Executor pExecutor) {
-		return ExtendedCompletionStage.of(mDelegate.thenApplyAsync(pFn, pExecutor));
+		return ExtendedCompletionStage.of(mDelegate.thenApplyAsync(new TracerFunction<>(pFn), pExecutor));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> thenAccept(Consumer<? super T> pAction) {
-		return ExtendedCompletionStage.of(mDelegate.thenAccept(pAction));
+		return ExtendedCompletionStage.of(mDelegate.thenAccept(new TracerConsumer<>(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction) {
-		return ExtendedCompletionStage.of(mDelegate.thenAcceptAsync(pAction));
+		return ExtendedCompletionStage.of(mDelegate.thenAcceptAsync(new TracerConsumer<>(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction, Executor pExecutor) {
-		return ExtendedCompletionStage.of(mDelegate.thenAcceptAsync(pAction, pExecutor));
+		return ExtendedCompletionStage.of(mDelegate.thenAcceptAsync(new TracerConsumer<>(pAction), pExecutor));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> thenRun(Runnable pAction) {
-		return ExtendedCompletionStage.of(mDelegate.thenRun(pAction));
+		return ExtendedCompletionStage.of(mDelegate.thenRun(new TracerRunnable(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> thenRunAsync(Runnable pAction) {
-		return ExtendedCompletionStage.of(mDelegate.thenRunAsync(pAction));
+		return ExtendedCompletionStage.of(mDelegate.thenRunAsync(new TracerRunnable(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> thenRunAsync(Runnable pAction, Executor pExecutor) {
-		return ExtendedCompletionStage.of(mDelegate.thenRunAsync(pAction, pExecutor));
+		return ExtendedCompletionStage.of(mDelegate.thenRunAsync(new TracerRunnable(pAction), pExecutor));
 	}
 
 	@Override
 	public <U, V> ExtendedCompletionStage<V> thenCombine(CompletionStage<? extends U> pOther,
 		BiFunction<? super T, ? super U, ? extends V> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), pFn));
+		return ExtendedCompletionStage
+			.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), new TracerBiFunction<>(pFn)));
 	}
 
 	@Override
 	public <U, V> ExtendedCompletionStage<V> thenCombineAsync(CompletionStage<? extends U> pOther,
 		BiFunction<? super T, ? super U, ? extends V> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), pFn));
+		return ExtendedCompletionStage
+			.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), new TracerBiFunction<>(pFn)));
 	}
 
 	@Override
 	public <U, V> ExtendedCompletionStage<V> thenCombineAsync(CompletionStage<? extends U> pOther,
 		BiFunction<? super T, ? super U, ? extends V> pFn, @Nullable Executor pExecutor) {
 		return ExtendedCompletionStage
-			.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), pFn, pExecutor));
+			.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), new TracerBiFunction<>(pFn), pExecutor));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<@Nullable Void> thenAcceptBoth(CompletionStage<? extends U> pOther,
 		BiConsumer<? super T, ? super U> pAction) {
-		return ExtendedCompletionStage.of(mDelegate.thenAcceptBoth(decomposeToCompletionStage(pOther), pAction));
+		return ExtendedCompletionStage
+			.of(mDelegate.thenAcceptBoth(decomposeToCompletionStage(pOther), new TracerBiConsumer<>(pAction)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
 		BiConsumer<? super T, ? super U> pAction) {
-		return ExtendedCompletionStage.of(mDelegate.thenAcceptBothAsync(decomposeToCompletionStage(pOther), pAction));
+		return ExtendedCompletionStage
+			.of(mDelegate.thenAcceptBothAsync(decomposeToCompletionStage(pOther), new TracerBiConsumer<>(pAction)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
 		BiConsumer<? super T, ? super U> pAction, @Nullable Executor pExecutor) {
-		return ExtendedCompletionStage
-			.of(mDelegate.thenAcceptBothAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
+		return ExtendedCompletionStage.of(mDelegate.thenAcceptBothAsync(decomposeToCompletionStage(pOther),
+			new TracerBiConsumer<>(pAction), pExecutor));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> runAfterBoth(CompletionStage<?> pOther, Runnable pAction) {
-		return ExtendedCompletionStage.of(mDelegate.runAfterBoth(decomposeToCompletionStage(pOther), pAction));
+		return ExtendedCompletionStage
+			.of(mDelegate.runAfterBoth(decomposeToCompletionStage(pOther), new TracerRunnable(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther, Runnable pAction) {
-		return ExtendedCompletionStage.of(mDelegate.runAfterBothAsync(decomposeToCompletionStage(pOther), pAction));
+		return ExtendedCompletionStage
+			.of(mDelegate.runAfterBothAsync(decomposeToCompletionStage(pOther), new TracerRunnable(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther, Runnable pAction,
 		Executor pExecutor) {
-		return ExtendedCompletionStage
-			.of(mDelegate.runAfterBothAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
+		return ExtendedCompletionStage.of(
+			mDelegate.runAfterBothAsync(decomposeToCompletionStage(pOther), new TracerRunnable(pAction), pExecutor));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> applyToEither(CompletionStage<? extends T> pOther,
 		Function<? super T, U> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), pFn));
+		return ExtendedCompletionStage
+			.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), new TracerFunction<>(pFn)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
 		Function<? super T, U> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), pFn));
+		return ExtendedCompletionStage
+			.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), new TracerFunction<>(pFn)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
 		Function<? super T, U> pFn, @Nullable Executor pExecutor) {
 		return ExtendedCompletionStage
-			.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), pFn, pExecutor));
+			.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), new TracerFunction<>(pFn), pExecutor));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> acceptEither(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction) {
-		return ExtendedCompletionStage.of(mDelegate.acceptEither(decomposeToCompletionStage(pOther), pAction));
+		return ExtendedCompletionStage
+			.of(mDelegate.acceptEither(decomposeToCompletionStage(pOther), new TracerConsumer<>(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction) {
-		return ExtendedCompletionStage.of(mDelegate.acceptEitherAsync(decomposeToCompletionStage(pOther), pAction));
+		return ExtendedCompletionStage
+			.of(mDelegate.acceptEitherAsync(decomposeToCompletionStage(pOther), new TracerConsumer<>(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction, Executor pExecutor) {
-		return ExtendedCompletionStage
-			.of(mDelegate.acceptEitherAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
+		return ExtendedCompletionStage.of(
+			mDelegate.acceptEitherAsync(decomposeToCompletionStage(pOther), new TracerConsumer<>(pAction), pExecutor));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> runAfterEither(CompletionStage<?> pOther, Runnable pAction) {
-		return ExtendedCompletionStage.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), pAction));
+		return ExtendedCompletionStage
+			.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), new TracerRunnable(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction) {
-		return ExtendedCompletionStage.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), pAction));
+		return ExtendedCompletionStage
+			.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), new TracerRunnable(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction,
 		Executor pExecutor) {
-		return ExtendedCompletionStage
-			.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), pAction, pExecutor));
+		return ExtendedCompletionStage.of(
+			mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), new TracerRunnable(pAction), pExecutor));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> thenCompose(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.thenCompose(pFn));
+		return ExtendedCompletionStage.of(mDelegate.thenCompose(new TracerFunction<>(pFn)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> thenComposeAsync(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.thenComposeAsync(pFn));
+		return ExtendedCompletionStage.of(mDelegate.thenComposeAsync(new TracerFunction<>(pFn)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> thenComposeAsync(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn, Executor pExecutor) {
-		return ExtendedCompletionStage.of(mDelegate.thenComposeAsync(pFn, pExecutor));
+		return ExtendedCompletionStage.of(mDelegate.thenComposeAsync(new TracerFunction<>(pFn), pExecutor));
 	}
 
 	@Override
 	public ExtendedCompletionStage<T> whenComplete(
 		BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction) {
-		return ExtendedCompletionStage.of(mDelegate.whenComplete(pAction));
+		return ExtendedCompletionStage.of(mDelegate.whenComplete(new TracerBiConsumer<>(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<T> whenCompleteAsync(
 		BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction) {
-		return ExtendedCompletionStage.of(mDelegate.whenCompleteAsync(pAction));
+		return ExtendedCompletionStage.of(mDelegate.whenCompleteAsync(new TracerBiConsumer<>(pAction)));
 	}
 
 	@Override
 	public ExtendedCompletionStage<T> whenCompleteAsync(
 		BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction, @Nullable Executor pExecutor) {
-		return ExtendedCompletionStage.of(mDelegate.whenCompleteAsync(pAction, pExecutor));
+		return ExtendedCompletionStage.of(mDelegate.whenCompleteAsync(new TracerBiConsumer<>(pAction), pExecutor));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.handle(pFn));
+		return ExtendedCompletionStage.of(mDelegate.handle(new TracerBiFunction<>(pFn)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.handleAsync(pFn));
+		return ExtendedCompletionStage.of(mDelegate.handleAsync(new TracerBiFunction<>(pFn)));
 	}
 
 	@Override
 	public <U> ExtendedCompletionStage<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn,
 		@Nullable Executor pExecutor) {
-		return ExtendedCompletionStage.of(mDelegate.handleAsync(pFn, pExecutor));
+		return ExtendedCompletionStage.of(mDelegate.handleAsync(new TracerBiFunction<>(pFn), pExecutor));
 	}
 
 	@Override
@@ -253,7 +271,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 
 	@Override
 	public ExtendedCompletionStage<T> exceptionally(Function<Throwable, ? extends T> pFn) {
-		return ExtendedCompletionStage.of(mDelegate.exceptionally(pFn));
+		return ExtendedCompletionStage.of(mDelegate.exceptionally(new TracerFunction<>(pFn)));
 	}
 
 	@Override
@@ -338,10 +356,10 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	 * @return the future
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "null"})
 	public <C, U> ExtendedCompletionStage<?> continueComposeIf(Class<C> pClass,
 		Function<C, @NonNull ? extends @NonNull CompletionStage<U>> pFunc) {
-		return ExtendedCompletionStage.of(mDelegate.thenCompose(result -> {
+		return thenCompose(result -> {
 			if (result != null) {
 				if (pClass.isInstance(result) == true) {
 					C input = (C) result;
@@ -349,7 +367,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 				}
 			}
 			return (CompletionStage<Object>) result;
-		}));
+		});
 	}
 
 	/**
@@ -362,7 +380,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	@SuppressWarnings("unchecked")
 	public <C, U> ExtendedCompletionStage<?> continueIf(Class<C> pClass, Function<C, U> pFunc) {
-		return ExtendedCompletionStage.of(mDelegate.thenApply(result -> {
+		return thenApply(result -> {
 			if (result != null) {
 				if (pClass.isInstance(result) == true) {
 					C input = (C) result;
@@ -370,7 +388,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 				}
 			}
 			return result;
-		}));
+		});
 	}
 
 	/**
@@ -385,12 +403,12 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	public <R> ExtendedCompletionStage<R> splitCompose(Predicate<T> pBoolFunc,
 		Function<T, @NonNull ? extends @NonNull CompletionStage<R>> pTrueFunc,
 		Function<T, @NonNull ? extends @NonNull CompletionStage<R>> pFalseFunc) {
-		return ExtendedCompletionStage.of(mDelegate.thenCompose((input) -> {
+		return thenCompose((input) -> {
 			if (pBoolFunc.test(input) == true)
 				return pTrueFunc.apply(input);
 			else
 				return pFalseFunc.apply(input);
-		}));
+		});
 	}
 
 	/**
@@ -404,11 +422,11 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	public <R> ExtendedCompletionStage<R> splitApply(Predicate<T> pBoolFunc, Function<T, ? extends R> pTrueFunc,
 		Function<T, ? extends R> pFalseFunc) {
-		return ExtendedCompletionStage.of(mDelegate.thenApply((input) -> {
+		return thenApply((input) -> {
 			if (pBoolFunc.test(input) == true)
 				return pTrueFunc.apply(input);
 			else
 				return pFalseFunc.apply(input);
-		}));
+		});
 	}
 }
