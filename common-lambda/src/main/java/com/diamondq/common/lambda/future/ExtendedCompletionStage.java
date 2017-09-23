@@ -303,7 +303,16 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the new CompletableFuture
 	 */
 	public static <U> ExtendedCompletionStage<U> supplyAsync(Supplier<U> supplier) {
-		return ExtendedCompletionStage.of(CompletableFuture.supplyAsync(new TracerSupplier<>(supplier)));
+		TracerSupplier<U> ab = new TracerSupplier<>(supplier);
+		try {
+			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(CompletableFuture.supplyAsync(ab));
+			ab = null;
+			return result;
+		}
+		finally {
+			if (ab != null)
+				ab.abortContinuation();
+		}
 	}
 
 	/**
@@ -316,7 +325,16 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the new CompletableFuture
 	 */
 	public static <U> ExtendedCompletionStage<U> supplyAsync(Supplier<U> supplier, Executor executor) {
-		return ExtendedCompletionStage.of(CompletableFuture.supplyAsync(new TracerSupplier<>(supplier), executor));
+		TracerSupplier<U> ab = new TracerSupplier<>(supplier);
+		try {
+			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(CompletableFuture.supplyAsync(ab, executor));
+			ab = null;
+			return result;
+		}
+		finally {
+			if (ab != null)
+				ab.abortContinuation();
+		}
 	}
 
 	/**
@@ -327,7 +345,16 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the new CompletableFuture
 	 */
 	public static ExtendedCompletionStage<@Nullable Void> runAsync(Runnable runnable) {
-		return ExtendedCompletionStage.of(CompletableFuture.runAsync(new TracerRunnable(runnable)));
+		TracerRunnable ab = new TracerRunnable(runnable);
+		try {
+			ExtendedCompletionStage<@Nullable Void> result = ExtendedCompletionStage.of(CompletableFuture.runAsync(ab));
+			ab = null;
+			return result;
+		}
+		finally {
+			if (ab != null)
+				ab.abortContinuation();
+		}
 	}
 
 	/**
@@ -339,7 +366,16 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the new CompletableFuture
 	 */
 	public static ExtendedCompletionStage<@Nullable Void> runAsync(Runnable runnable, Executor executor) {
-		return ExtendedCompletionStage.of(CompletableFuture.runAsync(new TracerRunnable(runnable), executor));
+		TracerRunnable ab = new TracerRunnable(runnable);
+		try {
+			ExtendedCompletionStage<@Nullable Void> result = ExtendedCompletionStage.of(CompletableFuture.runAsync(ab, executor));
+			ab = null;
+			return result;
+		}
+		finally {
+			if (ab != null)
+				ab.abortContinuation();
+		}
 	}
 
 	/**
@@ -799,10 +835,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
 			(ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
 
-		current = ExtendedCompletionStage.startLoop(current,
-			(pStartPreFunction == null ? null : new TracerFunction<>(pStartPreFunction)),
-			(pStartFunction == null ? null : new TracerFunction<>(pStartFunction)),
-			(pStartPostFunction == null ? null : new TracerFunction<>(pStartPostFunction)), null);
+		current = ExtendedCompletionStage.startLoop(current, pStartPreFunction, pStartFunction, pStartPostFunction, null);
 
 		ExtendedCompletionStage.performDoWhile(current, pActionPreFunction, pActionFunction, pActionPostFunction,
 			pTestPreFunction, pTestFunction, pTestPostFunction, pEndPreFunction, pEndFunction, pEndPostFunction,
