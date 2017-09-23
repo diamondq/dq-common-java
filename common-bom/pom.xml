@@ -126,6 +126,21 @@
 				<version>0.1.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
+				<groupId>com.diamondq.common.java.tracing</groupId>
+				<artifactId>common-tracing-jaeger</artifactId>
+				<version>0.1.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.diamondq.common.java.tracing</groupId>
+				<artifactId>common-tracing-opentracing</artifactId>
+				<version>0.1.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.diamondq.common.java.utils</groupId>
+				<artifactId>common-utils-log4j2</artifactId>
+				<version>0.1.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
 				<groupId>com.diamondq.common.java.utils</groupId>
 				<artifactId>common-utils-parsing</artifactId>
 				<version>0.1.0-SNAPSHOT</version>
