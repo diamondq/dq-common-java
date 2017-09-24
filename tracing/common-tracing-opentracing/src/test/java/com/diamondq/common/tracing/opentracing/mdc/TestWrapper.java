@@ -14,6 +14,7 @@ import io.opentracing.util.GlobalTracer;
 
 public class TestWrapper {
 
+	@SuppressWarnings("null")
 	private MockTracer mockTracker;
 
 	@Before
