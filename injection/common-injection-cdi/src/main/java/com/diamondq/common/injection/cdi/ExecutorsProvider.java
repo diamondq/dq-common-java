@@ -32,7 +32,7 @@ public class ExecutorsProvider {
 		if (pConfig.isResolvable() == true)
 			corePoolSize = pConfig.get().bind("executors.core-pool-size", Integer.class);
 		if (corePoolSize == null)
-			corePoolSize = 0;
+			corePoolSize = Runtime.getRuntime().availableProcessors();
 		ScheduledExecutorService scheduledExecutorService =
 			Executors.newScheduledThreadPool(corePoolSize, threadFactory);
 
