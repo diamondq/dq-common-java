@@ -23,5 +23,10 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.diamondq.common.java.tracing</groupId>
+			<artifactId>common-tracing-opentracing</artifactId>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 </project>
