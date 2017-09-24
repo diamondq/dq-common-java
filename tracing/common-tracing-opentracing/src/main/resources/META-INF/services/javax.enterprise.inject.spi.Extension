@@ -1,1 +1,2 @@
 com.diamondq.common.tracing.opentracing.CleanupGlobalTracer
+com.diamondq.common.tracing.opentracing.SetupGlobalTracer
