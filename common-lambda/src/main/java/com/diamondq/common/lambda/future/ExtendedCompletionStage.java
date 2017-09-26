@@ -917,9 +917,9 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 *            returns true, the loop ends, if false, then the loop continues.
 	 * @return a future that will return the first non-null V or null if none are available.
 	 */
-	public default <U, @Nullable V> ExtendedCompletionStage<V> thenIterateToFirst(
+	public default <U, @Nullable V> ExtendedCompletionStage<V> thenIterateToFirstAsync(
 		Function<T, @Nullable Iterable<U>> pGetIterableFunction, Function<U, CompletionStage<V>> pPerformActionFunction,
-		@Nullable Function<V, Boolean> pBreakFunction) {
+		@Nullable Function<V, Boolean> pBreakFunction, Executor pExecutor) {
 
 		/* Get the iterable */
 
@@ -977,12 +977,12 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		Function<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V>, V> pEndPostFunction =
 			(loopState) -> loopState.actionResult;
 		return this
-			.<@Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V> thenDoWhile(
+			.<@Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V> thenDoWhileAsync(
 				pStartPreFunction, null, pStartPostFunction, null, pActionFunction, null, null, null, pTestPostFunction,
-				null, null, pEndPostFunction);
+				null, null, pEndPostFunction, pExecutor);
 	}
 
-	public default <U> ExtendedCompletionStage<U> thenLoop(int pStart, int pEnd, int pIncrement,
+	public default <U> ExtendedCompletionStage<U> thenLoopAsync(int pStart, int pEnd, int pIncrement,
 		BiFunction<T, @NonNull Integer, CompletionStage<U>> pPerformFunction,
 		@Nullable BiFunction<U, Integer, Boolean> pCheckFunction) {
 
