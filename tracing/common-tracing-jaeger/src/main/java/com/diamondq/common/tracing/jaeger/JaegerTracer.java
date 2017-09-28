@@ -37,6 +37,10 @@ public class JaegerTracer implements Tracer {
 
 	private com.uber.jaeger.Tracer	mDelegate;
 
+	public JaegerTracer() {
+		mDelegate = new com.uber.jaeger.Tracer.Builder("placeholder", null, null).build();
+	}
+
 	@Inject
 	public JaegerTracer(Instance<Reporter> pReporters) {
 		B3TextMapCodec b3Codec = new B3TextMapCodec();
