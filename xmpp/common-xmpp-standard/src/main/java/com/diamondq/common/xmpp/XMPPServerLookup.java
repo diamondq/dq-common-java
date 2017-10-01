@@ -28,18 +28,19 @@ public class XMPPServerLookup {
 
 	private final Config		mConfig;
 
-	public XMPPServerLookup() {
-		throw new IllegalArgumentException();
+	@SuppressWarnings("null")
+	XMPPServerLookup() {
+		mConfig = null;
 	}
 
 	@Inject
-	public XMPPServerLookup(Config pConfig) {
+	private XMPPServerLookup(Config pConfig) {
 		mConfig = pConfig;
 	}
 
 	/**
 	 * Find the list of XMPP Servers both from Config and from DNS Lookup
-	 * 
+	 *
 	 * @param pDNSDomain the DNS Domain to search (if null, don't search)
 	 * @return the list of servers, sorted in access order
 	 */
