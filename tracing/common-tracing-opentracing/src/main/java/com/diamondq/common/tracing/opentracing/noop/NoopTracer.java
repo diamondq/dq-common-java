@@ -6,6 +6,8 @@ import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.opentracing.ActiveSpan;
 import io.opentracing.NoopTracerFactory;
@@ -20,12 +22,18 @@ import io.opentracing.util.GlobalTracer;
 @Priority(1)
 public class NoopTracer implements Tracer {
 
-	private Tracer mDelegate;
+	private static final Logger	sLogger	= LoggerFactory.getLogger(NoopTracer.class);
+
+	private Tracer				mDelegate;
 
 	@Inject
 	public NoopTracer() {
 		mDelegate = NoopTracerFactory.create();
-		GlobalTracer.register(this);
+		if (GlobalTracer.isRegistered() == false)
+			GlobalTracer.register(this);
+		else
+			sLogger.warn("Skipping attempt to register a second GlobalTracer. The existing tracer was {}",
+				GlobalTracer.get().getClass().getName());
 	}
 
 	/**
