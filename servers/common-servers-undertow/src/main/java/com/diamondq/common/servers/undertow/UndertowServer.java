@@ -54,7 +54,7 @@ public abstract class UndertowServer {
 
 	/**
 	 * Configures the undertow builder. This method enables the HTTP and/or the HTTPS listeners.
-	 * 
+	 *
 	 * @param pBuilder the builder
 	 * @return the builder
 	 */
@@ -81,8 +81,9 @@ public abstract class UndertowServer {
 		/* Handle HTTPS */
 
 		Boolean httpsEnabled = mConfig.bind("web.https.enabled", Boolean.class);
+		Boolean httpsProxied = mConfig.bind("web.https.proxied", Boolean.class);
 
-		if ((httpsEnabled != null) && (httpsEnabled == true)) {
+		if ((httpsEnabled != null) && (httpsEnabled == true) && ((httpsProxied == null) || (httpsProxied == false))) {
 			Integer httpsPort = mConfig.bind("web.https.port", Integer.class);
 			String httpsHost = mConfig.bind("web.https.bindhost", String.class);
 
@@ -100,7 +101,8 @@ public abstract class UndertowServer {
 			if (keystoreFile == null)
 				throw new IllegalArgumentException("The mandatory web.https.keystore-file config entry was not set");
 			if (keystorePassword == null)
-				throw new IllegalArgumentException("The mandatory web.https.keystore-password config entry was not set");
+				throw new IllegalArgumentException(
+					"The mandatory web.https.keystore-password config entry was not set");
 
 			SSLContext sslContext =
 				createSSLContext(loadKeyStore(keystoreFile, keystorePassword), null, keystorePassword);
@@ -164,8 +166,8 @@ public abstract class UndertowServer {
 		}
 	}
 
-	private static SSLContext createSSLContext(final KeyStore pKeyStore, @Nullable final KeyStore pTrustStore,
-		String pKeystorePassword) {
+	private static SSLContext createSSLContext(final KeyStore pKeyStore, @Nullable
+	final KeyStore pTrustStore, String pKeystorePassword) {
 		try {
 			KeyManager[] keyManagers;
 			KeyManagerFactory keyManagerFactory =
