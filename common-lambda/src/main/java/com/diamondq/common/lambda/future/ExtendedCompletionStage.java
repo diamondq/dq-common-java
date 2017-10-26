@@ -50,38 +50,38 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @see java.util.concurrent.CompletionStage#thenAccept(java.util.function.Consumer)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> thenAccept(Consumer<? super T> action);
+	public ExtendedCompletionStage<@Nullable Void> thenAccept(Consumer<? super T> action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#thenAcceptAsync(java.util.function.Consumer)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> thenAcceptAsync(Consumer<? super T> action);
+	public ExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer<? super T> action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#thenAcceptAsync(java.util.function.Consumer,
 	 *      java.util.concurrent.Executor)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> thenAcceptAsync(Consumer<? super T> action, Executor executor);
+	public ExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer<? super T> action, Executor executor);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#thenRun(java.lang.Runnable)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> thenRun(Runnable action);
+	public ExtendedCompletionStage<@Nullable Void> thenRun(Runnable action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#thenRunAsync(java.lang.Runnable)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> thenRunAsync(Runnable action);
+	public ExtendedCompletionStage<@Nullable Void> thenRunAsync(Runnable action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#thenRunAsync(java.lang.Runnable, java.util.concurrent.Executor)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> thenRunAsync(Runnable action, Executor executor);
+	public ExtendedCompletionStage<@Nullable Void> thenRunAsync(Runnable action, Executor executor);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#thenCombine(java.util.concurrent.CompletionStage,
@@ -112,7 +112,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 *      java.util.function.BiConsumer)
 	 */
 	@Override
-	public <U> ExtendedCompletionStage<Void> thenAcceptBoth(CompletionStage<? extends U> other,
+	public <U> ExtendedCompletionStage<@Nullable Void> thenAcceptBoth(CompletionStage<? extends U> other,
 		BiConsumer<? super T, ? super U> action);
 
 	/**
@@ -120,7 +120,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 *      java.util.function.BiConsumer)
 	 */
 	@Override
-	public <U> ExtendedCompletionStage<Void> thenAcceptBothAsync(CompletionStage<? extends U> other,
+	public <U> ExtendedCompletionStage<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> other,
 		BiConsumer<? super T, ? super U> action);
 
 	/**
@@ -128,28 +128,28 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 *      java.util.function.BiConsumer, java.util.concurrent.Executor)
 	 */
 	@Override
-	public <U> ExtendedCompletionStage<Void> thenAcceptBothAsync(CompletionStage<? extends U> other,
+	public <U> ExtendedCompletionStage<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> other,
 		BiConsumer<? super T, ? super U> action, @SuppressWarnings("null") Executor executor);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#runAfterBoth(java.util.concurrent.CompletionStage, java.lang.Runnable)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> runAfterBoth(CompletionStage<?> other, Runnable action);
+	public ExtendedCompletionStage<@Nullable Void> runAfterBoth(CompletionStage<?> other, Runnable action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#runAfterBothAsync(java.util.concurrent.CompletionStage,
 	 *      java.lang.Runnable)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> runAfterBothAsync(CompletionStage<?> other, Runnable action);
+	public ExtendedCompletionStage<@Nullable Void> runAfterBothAsync(CompletionStage<?> other, Runnable action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#runAfterBothAsync(java.util.concurrent.CompletionStage,
 	 *      java.lang.Runnable, java.util.concurrent.Executor)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> runAfterBothAsync(CompletionStage<?> other, Runnable action,
+	public ExtendedCompletionStage<@Nullable Void> runAfterBothAsync(CompletionStage<?> other, Runnable action,
 		Executor executor);
 
 	/**
@@ -180,14 +180,14 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 *      java.util.function.Consumer)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> acceptEither(CompletionStage<? extends T> other, Consumer<? super T> action);
+	public ExtendedCompletionStage<@Nullable Void> acceptEither(CompletionStage<? extends T> other, Consumer<? super T> action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#acceptEitherAsync(java.util.concurrent.CompletionStage,
 	 *      java.util.function.Consumer)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> acceptEitherAsync(CompletionStage<? extends T> other,
+	public ExtendedCompletionStage<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> other,
 		Consumer<? super T> action);
 
 	/**
@@ -195,7 +195,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 *      java.util.function.Consumer, java.util.concurrent.Executor)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> acceptEitherAsync(CompletionStage<? extends T> other,
+	public ExtendedCompletionStage<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> other,
 		Consumer<? super T> action, Executor executor);
 
 	/**
@@ -203,21 +203,21 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 *      java.lang.Runnable)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> runAfterEither(CompletionStage<?> other, Runnable action);
+	public ExtendedCompletionStage<@Nullable Void> runAfterEither(CompletionStage<?> other, Runnable action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#runAfterEitherAsync(java.util.concurrent.CompletionStage,
 	 *      java.lang.Runnable)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> runAfterEitherAsync(CompletionStage<?> other, Runnable action);
+	public ExtendedCompletionStage<@Nullable Void> runAfterEitherAsync(CompletionStage<?> other, Runnable action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#runAfterEitherAsync(java.util.concurrent.CompletionStage,
 	 *      java.lang.Runnable, java.util.concurrent.Executor)
 	 */
 	@Override
-	public ExtendedCompletionStage<Void> runAfterEitherAsync(CompletionStage<?> other, Runnable action,
+	public ExtendedCompletionStage<@Nullable Void> runAfterEitherAsync(CompletionStage<?> other, Runnable action,
 		Executor executor);
 
 	/**
