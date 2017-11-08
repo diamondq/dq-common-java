@@ -1,10 +1,11 @@
 package com.diamondq.common.lambda.future;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.diamondq.common.tracing.opentracing.testhelpers.MockTracing;
 import com.diamondq.common.tracing.opentracing.testhelpers.TracingAssertions;
 
+import java.util.concurrent.Executor;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.After;
@@ -16,10 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.opentracing.ActiveSpan;
-import io.opentracing.Tracer;
 import io.opentracing.mock.MockTracer;
-
-import java.util.concurrent.Executor;
 
 public class ExtendedCompletionStageTest {
 
@@ -28,6 +26,7 @@ public class ExtendedCompletionStageTest {
 	@Rule
 	public WeldInitiator		weld	= WeldInitiator.of(new Weld());
 
+	@SuppressWarnings("null")
 	private MockTracer mockTracker;
 
 	@Before
@@ -60,8 +59,8 @@ public class ExtendedCompletionStageTest {
 		TracingAssertions.assertCompletedSpans("Span should have completed", 1, mockTracker);
 		sLogger.info("----- testThenApply");
 	}
-	
-	
+
+
 	@Test
 	public void testThenCombine() throws Exception {
 		sLogger.info("***** testThenCombine");
@@ -89,13 +88,14 @@ public class ExtendedCompletionStageTest {
 		TracingAssertions.assertNoActiveSpan("No active span after block");
 		TracingAssertions.assertCompletedSpans("No spans should have completed", 0, mockTracker);
 		f2.complete(true);
-		boolean result = f3.get();
+		Boolean result = f3.get();
 		TracingAssertions.assertNoActiveSpan("No active span after block");
 		TracingAssertions.assertCompletedSpans("Span should have completed", 1, mockTracker);
 		Assert.assertEquals("Should have gotten the combine", false, result);
 		sLogger.info("----- testThenCombine");
 	}
-	
+
+	@SuppressWarnings("null")
 	@Test
 	public void testRunAsync() {
 		try (ActiveSpan span = mockTracker.buildSpan("testRunAsync").startActive()) {
@@ -108,11 +108,11 @@ public class ExtendedCompletionStageTest {
 		TracingAssertions.assertNoActiveSpan("No active span after block");
 		TracingAssertions.assertCompletedSpans("Span should have completed", 1, mockTracker);
 	}
-	
+
 	@Test
 	public void testRunAsyncExecutor() throws Exception {
 		Executor executor = weld.select(Executor.class).get();
-		ExtendedCompletableFuture<@Nullable Void> f;		
+		ExtendedCompletableFuture<@Nullable Void> f;
 		try (ActiveSpan span = mockTracker.buildSpan("testRunAsyncExecutor").startActive()) {
 			final String threadName = Thread.currentThread().getName();
 			f = new ExtendedCompletableFuture<@Nullable Void>().applyToEither(ExtendedCompletionStage.runAsync(()-> {

@@ -1,14 +1,15 @@
 package com.diamondq.common.lambda.future;
 
-import com.diamondq.common.tracing.opentracing.wrappers.TracerBiConsumer;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerBiFunction;
-import com.diamondq.common.tracing.opentracing.wrappers.TracerConsumer;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerFunction;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerRunnable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -49,7 +50,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handle((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			return pFn.apply(t);
@@ -61,7 +62,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			return pFn.apply(t);
@@ -74,7 +75,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			return pFn.apply(t);
@@ -86,7 +87,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handle((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.accept(t);
@@ -99,7 +100,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.accept(t);
@@ -112,7 +113,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.accept(t);
@@ -125,7 +126,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handle((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.run();
@@ -138,7 +139,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.run();
@@ -151,7 +152,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.run();
@@ -164,13 +165,13 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		BiFunction<? super T, ? super U, ? extends V> pFn) {
 		TracerBiFunction<? super T, ? super U, ? extends V> ab = new TracerBiFunction<>(pFn);
 		try {
-			ExtendedCompletionStage<V> result = ExtendedCompletionStage
-				.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletionStage<V> result =
+				ExtendedCompletionStage.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
 			final TracerBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -187,13 +188,13 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		BiFunction<? super T, ? super U, ? extends V> pFn) {
 		TracerBiFunction<? super T, ? super U, ? extends V> ab = new TracerBiFunction<>(pFn);
 		try {
-			ExtendedCompletionStage<V> result = ExtendedCompletionStage
-				.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletionStage<V> result =
+				ExtendedCompletionStage.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
 			final TracerBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -216,7 +217,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -285,13 +286,13 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		Function<? super T, U> pFn) {
 		TracerFunction<? super T, U> ab = new TracerFunction<>(pFn);
 		try {
-			ExtendedCompletionStage<U> result = ExtendedCompletionStage
-				.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletionStage<U> result =
+				ExtendedCompletionStage.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
 			final TracerFunction<? super T, U> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -308,13 +309,13 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		Function<? super T, U> pFn) {
 		TracerFunction<? super T, U> ab = new TracerFunction<>(pFn);
 		try {
-			ExtendedCompletionStage<U> result = ExtendedCompletionStage
-				.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletionStage<U> result =
+				ExtendedCompletionStage.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
 			final TracerFunction<? super T, U> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -337,7 +338,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -352,7 +353,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> acceptEither(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction) {
-		return applyToEither(pOther, (t)-> {
+		return applyToEither(pOther, (t) -> {
 			pAction.accept(t);
 			return null;
 		});
@@ -361,7 +362,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction) {
-		return applyToEitherAsync(pOther, (t)-> {
+		return applyToEitherAsync(pOther, (t) -> {
 			pAction.accept(t);
 			return null;
 		});
@@ -370,7 +371,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	public ExtendedCompletionStage<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction, Executor pExecutor) {
-		return applyToEitherAsync(pOther, (t)-> {
+		return applyToEitherAsync(pOther, (t) -> {
 			pAction.accept(t);
 			return null;
 		}, pExecutor);
@@ -380,13 +381,13 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	public ExtendedCompletionStage<@Nullable Void> runAfterEither(CompletionStage<?> pOther, Runnable pAction) {
 		TracerRunnable ab = new TracerRunnable(pAction);
 		try {
-			ExtendedCompletionStage<@Nullable Void> result = ExtendedCompletionStage
-				.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletionStage<@Nullable Void> result =
+				ExtendedCompletionStage.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
 			final TracerRunnable cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -402,13 +403,13 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	public ExtendedCompletionStage<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction) {
 		TracerRunnable ab = new TracerRunnable(pAction);
 		try {
-			ExtendedCompletionStage<@Nullable Void> result = ExtendedCompletionStage
-				.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletionStage<@Nullable Void> result =
+				ExtendedCompletionStage.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
 			final TracerRunnable cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -431,7 +432,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -446,14 +447,14 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	public <U> ExtendedCompletionStage<U> thenCompose(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
-		TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
 		try {
 			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.thenCompose(ab));
-			final TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -468,14 +469,14 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	public <U> ExtendedCompletionStage<U> thenComposeAsync(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
-		TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
 		try {
 			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.thenComposeAsync(ab));
-			final TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -490,14 +491,14 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	public <U> ExtendedCompletionStage<U> thenComposeAsync(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn, Executor pExecutor) {
-		TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
 		try {
 			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.thenComposeAsync(ab, pExecutor));
-			final TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -537,8 +538,8 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	}
 
 	@Override
-	public <U> ExtendedCompletionStage<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> pFn) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> ab = new TracerBiFunction<>(pFn);
+	public <U> ExtendedCompletionStage<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
+		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
 		try {
 			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.handle(ab));
 			ab = null;
@@ -552,7 +553,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 
 	@Override
 	public <U> ExtendedCompletionStage<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> ab = new TracerBiFunction<>(pFn);
+		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
 		try {
 			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.handleAsync(ab));
 			ab = null;
@@ -567,7 +568,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 	@Override
 	public <U> ExtendedCompletionStage<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn,
 		@Nullable Executor pExecutor) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> ab = new TracerBiFunction<>(pFn);
+		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
 		try {
 			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.handleAsync(ab, pExecutor));
 			ab = null;
@@ -748,4 +749,29 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 				return pFalseFunc.apply(input);
 		});
 	}
+
+	/**
+	 * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#orTimeoutAsync(long,
+	 *      java.util.concurrent.TimeUnit, java.util.concurrent.ScheduledExecutorService)
+	 */
+	@Override
+	public ExtendedCompletionStage<T> orTimeoutAsync(long pTimeout, TimeUnit pUnit, ScheduledExecutorService pService) {
+		CompletableFuture<T> result = new CompletableFuture<T>();
+		pService.schedule(() -> result.completeExceptionally(new TimeoutException()), pTimeout, pUnit);
+		return applyToEitherAsync(result, (v) -> v, pService);
+	}
+
+	/**
+	 * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#completeOnTimeout​Async(java.lang.Object, long,
+	 *      java.util.concurrent.TimeUnit, java.util.concurrent.ScheduledExecutorService)
+	 */
+	@SuppressWarnings("javadoc")
+	@Override
+	public ExtendedCompletionStage<T> completeOnTimeout​Async(T pValue, long pTimeout, TimeUnit pUnit,
+		ScheduledExecutorService pService) {
+		CompletableFuture<T> result = new CompletableFuture<T>();
+		pService.schedule(() -> result.complete(pValue), pTimeout, pUnit);
+		return applyToEitherAsync(result, (v) -> v, pService);
+	}
+
 }

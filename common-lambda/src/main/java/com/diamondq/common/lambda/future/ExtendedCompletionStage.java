@@ -1,6 +1,5 @@
 package com.diamondq.common.lambda.future;
 
-import com.diamondq.common.tracing.opentracing.wrappers.TracerFunction;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerRunnable;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerSupplier;
 
@@ -9,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -180,7 +181,8 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 *      java.util.function.Consumer)
 	 */
 	@Override
-	public ExtendedCompletionStage<@Nullable Void> acceptEither(CompletionStage<? extends T> other, Consumer<? super T> action);
+	public ExtendedCompletionStage<@Nullable Void> acceptEither(CompletionStage<? extends T> other,
+		Consumer<? super T> action);
 
 	/**
 	 * @see java.util.concurrent.CompletionStage#acceptEitherAsync(java.util.concurrent.CompletionStage,
@@ -368,7 +370,8 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	public static ExtendedCompletionStage<@Nullable Void> runAsync(Runnable runnable, Executor executor) {
 		TracerRunnable ab = new TracerRunnable(runnable);
 		try {
-			ExtendedCompletionStage<@Nullable Void> result = ExtendedCompletionStage.of(CompletableFuture.runAsync(ab, executor));
+			ExtendedCompletionStage<@Nullable Void> result =
+				ExtendedCompletionStage.of(CompletableFuture.runAsync(ab, executor));
 			ab = null;
 			return result;
 		}
@@ -835,7 +838,8 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
 			(ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
 
-		current = ExtendedCompletionStage.startLoop(current, pStartPreFunction, pStartFunction, pStartPostFunction, null);
+		current =
+			ExtendedCompletionStage.startLoop(current, pStartPreFunction, pStartFunction, pStartPostFunction, null);
 
 		ExtendedCompletionStage.performDoWhile(current, pActionPreFunction, pActionFunction, pActionPostFunction,
 			pTestPreFunction, pTestFunction, pTestPostFunction, pEndPreFunction, pEndFunction, pEndPostFunction,
@@ -915,6 +919,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @param pPerformActionFunction the function that returns a CompletionStage<V> from a U.
 	 * @param pBreakFunction the optional function to check the non-null result from the pPerformActionFunction. If it
 	 *            returns true, the loop ends, if false, then the loop continues.
+	 * @param pExecutor the executor
 	 * @return a future that will return the first non-null V or null if none are available.
 	 */
 	public default <U, @Nullable V> ExtendedCompletionStage<V> thenIterateToFirstAsync(
@@ -1065,4 +1070,9 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 				pStartPreFunction, null, null, null, pActionFunction, null, null, null, pTestPostFunction, null, null,
 				pEndPostFunction, pExecutor);
 	}
+
+	public ExtendedCompletionStage<T> orTimeoutAsync(long pTimeout, TimeUnit pUnit, ScheduledExecutorService pService);
+
+	public ExtendedCompletionStage<T> completeOnTimeout​Async(T value, long timeout, TimeUnit unit,
+		ScheduledExecutorService pService);
 }

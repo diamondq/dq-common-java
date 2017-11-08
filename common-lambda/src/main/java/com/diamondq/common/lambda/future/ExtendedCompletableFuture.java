@@ -1,9 +1,6 @@
 package com.diamondq.common.lambda.future;
 
-import com.diamondq.common.tracing.opentracing.wrappers.AbortableContinuation;
-import com.diamondq.common.tracing.opentracing.wrappers.TracerBiConsumer;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerBiFunction;
-import com.diamondq.common.tracing.opentracing.wrappers.TracerConsumer;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerFunction;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerRunnable;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerSupplier;
@@ -15,6 +12,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
@@ -98,7 +96,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handle((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			return pFn.apply(t);
@@ -110,7 +108,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			return pFn.apply(t);
@@ -123,7 +121,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			return pFn.apply(t);
@@ -135,7 +133,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handle((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.accept(t);
@@ -148,7 +146,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.accept(t);
@@ -161,7 +159,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.accept(t);
@@ -174,7 +172,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handle((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.run();
@@ -187,7 +185,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.run();
@@ -200,7 +198,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return handleAsync((t, ex) -> {
 			if (ex != null) {
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			}
 			pAction.run();
@@ -213,13 +211,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		BiFunction<? super T, ? super U, ? extends V> pFn) {
 		TracerBiFunction<? super T, ? super U, ? extends V> ab = new TracerBiFunction<>(pFn);
 		try {
-			ExtendedCompletableFuture<V> result = ExtendedCompletableFuture
-				.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletableFuture<V> result =
+				ExtendedCompletableFuture.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
 			final TracerBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -236,13 +234,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		BiFunction<? super T, ? super U, ? extends V> pFn) {
 		TracerBiFunction<? super T, ? super U, ? extends V> ab = new TracerBiFunction<>(pFn);
 		try {
-			ExtendedCompletableFuture<V> result = ExtendedCompletableFuture
-				.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletableFuture<V> result =
+				ExtendedCompletableFuture.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
 			final TracerBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -265,7 +263,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -334,13 +332,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		Function<? super T, U> pFn) {
 		TracerFunction<? super T, U> ab = new TracerFunction<>(pFn);
 		try {
-			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture
-				.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletableFuture<U> result =
+				ExtendedCompletableFuture.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
 			final TracerFunction<? super T, U> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -357,13 +355,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		Function<? super T, U> pFn) {
 		TracerFunction<? super T, U> ab = new TracerFunction<>(pFn);
 		try {
-			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture
-				.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletableFuture<U> result =
+				ExtendedCompletableFuture.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
 			final TracerFunction<? super T, U> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -386,7 +384,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -401,7 +399,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> acceptEither(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction) {
-		return applyToEither(pOther, (t)-> {
+		return applyToEither(pOther, (t) -> {
 			pAction.accept(t);
 			return null;
 		});
@@ -410,7 +408,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction) {
-		return applyToEitherAsync(pOther, (t)-> {
+		return applyToEitherAsync(pOther, (t) -> {
 			pAction.accept(t);
 			return null;
 		});
@@ -419,7 +417,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
 		Consumer<? super T> pAction, Executor pExecutor) {
-		return applyToEitherAsync(pOther, (t)-> {
+		return applyToEitherAsync(pOther, (t) -> {
 			pAction.accept(t);
 			return null;
 		}, pExecutor);
@@ -429,13 +427,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	public ExtendedCompletableFuture<@Nullable Void> runAfterEither(CompletionStage<?> pOther, Runnable pAction) {
 		TracerRunnable ab = new TracerRunnable(pAction);
 		try {
-			ExtendedCompletableFuture<@Nullable Void> result = ExtendedCompletableFuture
-				.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletableFuture<@Nullable Void> result =
+				ExtendedCompletableFuture.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
 			final TracerRunnable cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -451,13 +449,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction) {
 		TracerRunnable ab = new TracerRunnable(pAction);
 		try {
-			ExtendedCompletableFuture<@Nullable Void> result = ExtendedCompletableFuture
-				.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
+			ExtendedCompletableFuture<@Nullable Void> result =
+				ExtendedCompletableFuture.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
 			final TracerRunnable cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -480,7 +478,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -494,15 +492,15 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> thenCompose(
-		Function<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
-		TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
+		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.thenCompose(ab));
-			final TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -517,14 +515,14 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	@Override
 	public <U> ExtendedCompletableFuture<U> thenComposeAsync(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
-		TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(ab));
-			final TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -539,14 +537,15 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	@Override
 	public <U> ExtendedCompletableFuture<U> thenComposeAsync(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn, Executor pExecutor) {
-		TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
 		try {
-			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(ab, pExecutor));
-			final TracerFunction<@Nullable ? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			ExtendedCompletableFuture<U> result =
+				ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(ab, pExecutor));
+			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
 				cleanup.abortContinuation();
 				if (ex instanceof RuntimeException)
-					throw (RuntimeException)ex;
+					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
 			});
 			ab = null;
@@ -586,9 +585,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	}
 
 	@Override
-	public <U> ExtendedCompletableFuture<U> handle(
-		BiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> pFn) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> ab = new TracerBiFunction<>(pFn);
+	public <U> ExtendedCompletableFuture<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
+		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handle(ab));
 			ab = null;
@@ -602,7 +600,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> ab = new TracerBiFunction<>(pFn);
+		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handleAsync(ab));
 			ab = null;
@@ -617,7 +615,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	@Override
 	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn,
 		@Nullable Executor pExecutor) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends @NonNull U> ab = new TracerBiFunction<>(pFn);
+		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handleAsync(ab, pExecutor));
 			ab = null;
@@ -722,7 +720,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	public static <U> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor) {
 		TracerSupplier<U> ab = new TracerSupplier<>(supplier);
 		try {
-			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(CompletableFuture.supplyAsync(ab, executor));
+			ExtendedCompletableFuture<U> result =
+				ExtendedCompletableFuture.of(CompletableFuture.supplyAsync(ab, executor));
 			ab = null;
 			return result;
 		}
@@ -742,7 +741,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	public static ExtendedCompletableFuture<@Nullable Void> runAsync(Runnable runnable) {
 		TracerRunnable ab = new TracerRunnable(runnable);
 		try {
-			ExtendedCompletableFuture<@Nullable Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab));
+			ExtendedCompletableFuture<@Nullable Void> result =
+				ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab));
 			ab = null;
 			return result;
 		}
@@ -763,7 +763,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	public static ExtendedCompletableFuture<@Nullable Void> runAsync(Runnable runnable, Executor executor) {
 		TracerRunnable ab = new TracerRunnable(runnable);
 		try {
-			ExtendedCompletableFuture<@Nullable Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab, executor));
+			ExtendedCompletableFuture<@Nullable Void> result =
+				ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab, executor));
 			ab = null;
 			return result;
 		}
@@ -889,7 +890,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	public <C, U> ExtendedCompletableFuture<?> continueComposeIf(Class<C> pClass,
 		Function<C, @NonNull ? extends @NonNull CompletionStage<U>> pFunc) {
 		@SuppressWarnings("null")
-		Function<? super T, @NonNull ? extends CompletionStage<Object>> fn = (result) -> {
+		Function<? super T, @NonNull ? extends @NonNull CompletionStage<Object>> fn = (result) -> {
 			if (result != null) {
 				if (pClass.isInstance(result) == true) {
 					C input = (C) result;
@@ -964,4 +965,27 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return thenApply(fn);
 	}
 
+	/**
+	 * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#orTimeoutAsync(long,
+	 *      java.util.concurrent.TimeUnit, java.util.concurrent.ScheduledExecutorService)
+	 */
+	@Override
+	public ExtendedCompletionStage<T> orTimeoutAsync(long pTimeout, TimeUnit pUnit, ScheduledExecutorService pService) {
+		CompletableFuture<T> result = new CompletableFuture<T>();
+		pService.schedule(() -> result.completeExceptionally(new TimeoutException()), pTimeout, pUnit);
+		return applyToEitherAsync(result, (v) -> v, pService);
+	}
+
+	/**
+	 * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#completeOnTimeout​Async(java.lang.Object, long,
+	 *      java.util.concurrent.TimeUnit, java.util.concurrent.ScheduledExecutorService)
+	 */
+	@SuppressWarnings("javadoc")
+	@Override
+	public ExtendedCompletionStage<T> completeOnTimeout​Async(T pValue, long pTimeout, TimeUnit pUnit,
+		ScheduledExecutorService pService) {
+		CompletableFuture<T> result = new CompletableFuture<T>();
+		pService.schedule(() -> result.complete(pValue), pTimeout, pUnit);
+		return applyToEitherAsync(result, (v) -> v, pService);
+	}
 }
