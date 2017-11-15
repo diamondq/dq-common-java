@@ -28,10 +28,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Pair;
 
 /**
  * @param <STRUCTURECONFIGOBJ>
@@ -137,8 +139,10 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 
 		String oldStructureDefName =
 			getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
-		if (Objects.equals(oldStructureDefName, pDefName) == false) {
-			setStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String, pDefName);
+		String newStructureDefName = pStructure.getDefinition().getReference().getSerializedString();
+		if (Objects.equals(oldStructureDefName, newStructureDefName) == false) {
+			setStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String,
+				newStructureDefName);
 			changed = true;
 		}
 
@@ -463,15 +467,26 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 		if (config == null)
 			return null;
 
-		String structureDefName =
+		String fullStructureDefName =
 			getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
-		if (structureDefName == null)
+		if (fullStructureDefName == null)
 			throw new IllegalArgumentException("The mandatory property structureDef doesn't exist");
+		int revisionOffset = fullStructureDefName.lastIndexOf(':');
+		int revision;
+		String structureDefName;
+		if (revisionOffset == -1) {
+			revision = 1;
+			structureDefName = fullStructureDefName;
+		}
+		else {
+			revision = Integer.parseInt(fullStructureDefName.substring(revisionOffset + 1));
+			structureDefName = fullStructureDefName.substring(0, revisionOffset);
+		}
 		StructureDefinition structureDef =
-			pScope.getToolkit().lookupStructureDefinitionByName(pScope, structureDefName);
+			pScope.getToolkit().lookupStructureDefinitionByNameAndRevision(pScope, structureDefName, revision);
 		if (structureDef == null)
 			throw new IllegalArgumentException("The structure at " + pKey + " refers to a StructureDefinition "
-				+ structureDefName + " that does not exist");
+				+ structureDefName + ":" + String.valueOf(revision) + " that does not exist");
 
 		Structure structure = pScope.getToolkit().createNewStructure(pScope, structureDef);
 		int lastSlash = pKey.lastIndexOf('/');
@@ -646,16 +661,54 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			}
 		}
+
+		/* If the revision is not the latest, then we need to do a migration */
+
+		Integer latestRevision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, structureDefName);
+		if (latestRevision == null)
+			throw new IllegalArgumentException();
+
+		if (revision != latestRevision) {
+			if (revision > latestRevision)
+				throw new IllegalArgumentException();
+
+			/* We need to find the migration path to move us from one to the other */
+
+			List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> migrationPath =
+				pToolkit.determineMigrationPath(pScope, structureDefName, revision, latestRevision);
+			if (migrationPath == null)
+				throw new IllegalArgumentException();
+
+			Structure oldStructure = structure;
+			for (Pair<Integer, List<BiFunction<Structure, Structure, Structure>>> pair : migrationPath) {
+
+				StructureDefinition newStructureDef =
+					pToolkit.lookupStructureDefinitionByNameAndRevision(pScope, structureDefName, pair.getValue0());
+				if (newStructureDef == null)
+					throw new IllegalArgumentException();
+				Structure newStructure = pToolkit.createNewStructure(pScope, newStructureDef);
+				for (BiFunction<@NonNull Structure, @NonNull Structure, @NonNull Structure> migrator : pair
+					.getValue1()) {
+					@SuppressWarnings("null")
+					Structure replaceStructure = migrator.apply(oldStructure, newStructure);
+					newStructure = replaceStructure;
+				}
+
+				oldStructure = newStructure;
+			}
+
+			structure = oldStructure;
+		}
 		return structure;
 	}
 
 	/**
-	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
 	 */
 	@Override
-	protected @Nullable StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
-		String pName) {
+	protected @Nullable StructureDefinition internalLookupStructureDefinitionByNameAndRevision(Toolkit pToolkit,
+		Scope pScope, String pName, @Nullable Integer pRevision) {
 		if (mPersistStructureDefinitions == false)
 			return null;
 

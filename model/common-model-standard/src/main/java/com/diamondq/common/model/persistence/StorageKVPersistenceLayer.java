@@ -328,7 +328,10 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			if ((configMap == null) && (pCreateIfMissing == true))
 				configMap = Maps.newHashMap();
 			if (configMap != null) {
-				configMap.put("structureDef", pDefName);
+				Integer revision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, pDefName);
+				if (revision == null)
+					throw new IllegalArgumentException();
+				configMap.put("structureDef", new StringBuilder(pDefName).append(':').append(revision).toString());
 				String primaryKey = mConfiguredTableDefinitions.get(pDefName);
 				if ((primaryKey != null) && (primaryKey.isEmpty() == false))
 					configMap.put(primaryKey, unescapeValue(containerAndPrimaryKey.primary));

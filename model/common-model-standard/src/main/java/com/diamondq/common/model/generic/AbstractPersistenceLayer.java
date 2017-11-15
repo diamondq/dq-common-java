@@ -13,6 +13,7 @@ import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Ref;
 import com.diamondq.common.model.interfaces.Scope;
+import com.diamondq.common.model.interfaces.StandardMigrations;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
@@ -21,32 +22,46 @@ import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
 import com.diamondq.common.model.interfaces.WhereOperator;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Pair;
 
 public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
-	protected final Scope				mScope;
+	protected final Scope																														mScope;
 
-	protected volatile Locale			mGlobalDefaultLocale	= Locale.US;
+	protected volatile Locale																													mGlobalDefaultLocale	=
+		Locale.US;
 
-	protected final ThreadLocal<Locale>	mDefaultLocale			= ThreadLocal.withInitial(() -> mGlobalDefaultLocale);
+	protected final ThreadLocal<Locale>																											mDefaultLocale			=
+		ThreadLocal.withInitial(() -> mGlobalDefaultLocale);
 
-	protected static final BitSet		sValidFileNamesBitSet;
+	protected static final BitSet																												sValidFileNamesBitSet;
 
-	protected static final BitSet		sInvalidPrimayKeyBitSet;
+	protected static final BitSet																												sInvalidPrimayKeyBitSet;
+
+	protected final ConcurrentMap<String, ConcurrentMap<Integer, ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>>>>	mMigrationFunctions;
+
+	protected final Cache<String, List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>>>										mMigrationCache;
 
 	static {
 		BitSet b = new BitSet();
@@ -67,15 +82,19 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	public AbstractPersistenceLayer(Scope pScope) {
 		super();
 		mScope = pScope;
+		mMigrationFunctions = Maps.newConcurrentMap();
+		CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+		mMigrationCache = builder.build();
 	}
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#createNewStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, int)
 	 */
 	@Override
-	public StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName) {
-		return new GenericStructureDefinition(pScope, pName, null, false, null, null, null);
+	public StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName,
+		int pRevision) {
+		return new GenericStructureDefinition(pScope, pName, pRevision, null, false, null, null, null);
 	}
 
 	/**
@@ -236,12 +255,14 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
 	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#createStructureDefinitionRef(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition,
+	 *      boolean)
 	 */
 	@Override
 	public StructureDefinitionRef createStructureDefinitionRef(Toolkit pToolkit, Scope pScope,
-		StructureDefinition pResolvable) {
-		return new GenericStructureDefinitionRef(pScope, pResolvable.getName());
+		StructureDefinition pResolvable, boolean pWildcard) {
+		return new GenericStructureDefinitionRef(pScope, pResolvable.getName(),
+			pWildcard == true ? null : pResolvable.getRevision());
 	}
 
 	/**
@@ -250,7 +271,15 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized) {
-		return new GenericStructureDefinitionRef(pScope, pSerialized);
+		int revisionOffset = pSerialized.indexOf(':');
+		Integer revision;
+		if (revisionOffset == -1)
+			revision = null;
+		else {
+			revision = Integer.parseInt(pSerialized.substring(revisionOffset + 1));
+			pSerialized = pSerialized.substring(0, revisionOffset);
+		}
+		return new GenericStructureDefinitionRef(pScope, pSerialized, revision);
 	}
 
 	/**
@@ -418,7 +447,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 		else
 			parentKey = (String) pParamValues.get(parentParamKey);
 		Collection<Structure> allStructures = getAllStructuresByDefinition(pToolkit, pScope,
-			pStructureDefinition.getReference(), parentKey, parentPropertyDefinition);
+			pStructureDefinition.getWildcardReference(), parentKey, parentPropertyDefinition);
 		List<Structure> results = Lists.newArrayList();
 		List<GenericWhereInfo> whereList = gqb.getWhereList();
 		for (Structure test : allStructures) {
@@ -606,4 +635,130 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#createStandardMigration(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StandardMigrations,
+	 *      java.lang.Object[])
+	 */
+	@Override
+	public BiFunction<Structure, Structure, Structure> createStandardMigration(Toolkit pToolkit, Scope pScope,
+		StandardMigrations pMigrationType, @NonNull Object @Nullable [] pParams) {
+		switch (pMigrationType) {
+		case RENAME_COLUMN: {
+			if (pParams == null)
+				throw new IllegalArgumentException();
+			if (pParams.length != 2)
+				throw new IllegalArgumentException();
+			if ((pParams[0] instanceof String) == false)
+				throw new IllegalArgumentException();
+			String oldName = (String) pParams[0];
+			if ((pParams[1] instanceof String) == false)
+				throw new IllegalArgumentException();
+			String newName = (String) pParams[1];
+			return new StandardRenameColumnMigration(oldName, newName);
+		}
+		case COPY_COLUMNS: {
+			if (pParams == null)
+				pParams = new String[0];
+			@SuppressWarnings("null")
+			@NonNull
+			String[] sParams = new String[pParams.length];
+			for (int i = 0; i < sParams.length; i++) {
+				if ((pParams[i] instanceof String) == false)
+					throw new IllegalArgumentException();
+				sParams[i] = (String) pParams[i];
+			}
+			return new StandardCopyColumnMigration(sParams);
+		}
+		default:
+			throw new IllegalArgumentException();
+		}
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#addMigration(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, int, int, java.util.function.BiFunction)
+	 */
+	@Override
+	public void addMigration(Toolkit pToolkit, Scope pScope, String pStructureDefinitionName, int pFromRevision,
+		int pToRevision, BiFunction<Structure, Structure, Structure> pMigrationFunction) {
+		ConcurrentMap<Integer, ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>>> nameMap =
+			mMigrationFunctions.get(pStructureDefinitionName);
+		if (nameMap == null) {
+			ConcurrentMap<Integer, ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>>> newNameMap =
+				Maps.newConcurrentMap();
+			if ((nameMap = mMigrationFunctions.putIfAbsent(pStructureDefinitionName, newNameMap)) == null)
+				nameMap = newNameMap;
+		}
+		ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>> fromMap = nameMap.get(pFromRevision);
+		if (fromMap == null) {
+			ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>> newFromMap =
+				Maps.newConcurrentMap();
+			if ((fromMap = nameMap.putIfAbsent(pFromRevision, newFromMap)) == null)
+				fromMap = newFromMap;
+		}
+		List<BiFunction<Structure, Structure, Structure>> toList = fromMap.get(pToRevision);
+		if (toList == null) {
+			List<BiFunction<Structure, Structure, Structure>> newToList = Lists.newCopyOnWriteArrayList();
+			if ((toList = fromMap.putIfAbsent(pToRevision, newToList)) == null)
+				toList = newToList;
+		}
+		toList.add(pMigrationFunction);
+		mMigrationCache.invalidateAll();
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#determineMigrationPath(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, int, int)
+	 */
+	@Override
+	public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
+		Toolkit pToolkit, Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision) {
+
+		String cacheKey = new StringBuilder().append(pFromRevision).append('-').append(pToRevision).toString();
+		List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> cachedResults =
+			mMigrationCache.getIfPresent(cacheKey);
+		if (cachedResults != null)
+			return cachedResults;
+
+		ConcurrentMap<Integer, ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>>> defMap =
+			mMigrationFunctions.get(pStructureDefName);
+		if (defMap == null)
+			return null;
+
+		ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>> fromMap = defMap.get(pFromRevision);
+		if (fromMap == null)
+			return null;
+
+		/* See if we can get directly to the requested revision */
+
+		List<BiFunction<Structure, Structure, Structure>> list = fromMap.get(pToRevision);
+		if (list == null) {
+
+			/* We can't. Try each possible descent and see if we can recursively find it */
+
+			List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> bestPath = null;
+			int bestPathLen = Integer.MAX_VALUE;
+			for (Integer testFrom : fromMap.keySet()) {
+				List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> path =
+					pToolkit.determineMigrationPath(pScope, pStructureDefName, testFrom, pToRevision);
+				if (path != null) {
+					int pathLen = path.size();
+					if (pathLen < bestPathLen) {
+						bestPathLen = pathLen;
+						bestPath = path;
+					}
+				}
+			}
+			cachedResults = bestPath;
+		}
+		else
+			cachedResults = Collections.singletonList(Pair.with(pToRevision, list));
+
+		if (cachedResults != null)
+			mMigrationCache.put(cacheKey, cachedResults);
+		return cachedResults;
+	}
+
 }

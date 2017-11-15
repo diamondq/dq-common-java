@@ -16,11 +16,15 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	/**
 	 * Returns the unique, primary identifier of this StructureDefinition. All StructureDefinitions exist in a 'flat'
 	 * namespace, and must have a unique name.
-	 * 
+	 *
 	 * @return the name
 	 */
 
 	public String getName();
+
+	/* Revision */
+
+	public int getRevision();
 
 	/* Label */
 
@@ -47,7 +51,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	/**
 	 * Returns the set of StructureDefinition References that represent the set of parents whose Properties are merged
 	 * together to make the complete set of Properties within this StructureDefinition.
-	 * 
+	 *
 	 * @return the set of StructureDefinitionRef's
 	 */
 
@@ -56,6 +60,14 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	public StructureDefinition addParentDefinition(StructureDefinitionRef pValue);
 
 	public StructureDefinition removeParentDefinition(StructureDefinitionRef pValue);
+
+	/**
+	 * Returns a reference to this StructureDefinition without the revision. This can then be used to match against
+	 * multiple revisions of this StructureDefinition (and usually the latest).
+	 *
+	 * @return the reference
+	 */
+	public StructureDefinitionRef getWildcardReference();
 
 	/* Complete Properties (virtual) */
 
@@ -68,7 +80,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	 * StructureDefinition only holds StructureDefinitionRef's and not StructureDefinitions of their parents, and thus,
 	 * those parents can change independently of this StructureDefinition. Thus, each call to getAllProperties may
 	 * return a different map. The map returned, however, is still immutable.
-	 * 
+	 *
 	 * @return a Map of PropertyDefinitions using their name as the key
 	 */
 
@@ -78,7 +90,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 
 	/**
 	 * Returns back the set of PropertyDefinition names that match the given keyword
-	 * 
+	 *
 	 * @param pKey the key
 	 * @param pValue the value (or null if any value is valid)
 	 * @param pType the type (or null if any type is valid)
@@ -90,7 +102,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	/**
 	 * Returns the ordered list of names of PropertyDescriptions that represent the primary key for this
 	 * StructureDefinition.
-	 * 
+	 *
 	 * @return the list, may be empty, but not null
 	 */
 	public List<String> lookupPrimaryKeyNames();
@@ -98,7 +110,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	/**
 	 * Creates a new Structure from this StructureDefinition. NOTE: This Structure is NOT automatically written to the
 	 * toolkit.
-	 * 
+	 *
 	 * @return the new, empty, Structure
 	 */
 	public Structure createNewStructure();
@@ -108,7 +120,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	/**
 	 * Returns the Multimap of keywords (ie. key=value pairs). NOTE: This map only includes those keywords attached to
 	 * this specific StructureDefinition and not any of the parents.
-	 * 
+	 *
 	 * @return the multimap
 	 */
 	public Multimap<String, String> getKeywords();
@@ -116,14 +128,14 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 	/**
 	 * Returns the Multimap of keywords (ie. key=value pairs). NOTE: This map includes merged keywords between this
 	 * StructureDefinition and all parents (recursively).
-	 * 
+	 *
 	 * @return the multimap
 	 */
 	public Multimap<String, String> getAllKeywords();
 
 	/**
 	 * Adds a new keyword to this StructureDefinition
-	 * 
+	 *
 	 * @param pKey the key
 	 * @param pValue the value
 	 * @return the updated StructureDefinition
@@ -132,7 +144,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 
 	/**
 	 * Removes a keyword from this StructureDefinition
-	 * 
+	 *
 	 * @param pKey the key
 	 * @param pValue the value
 	 * @return the updated StructureDefinition

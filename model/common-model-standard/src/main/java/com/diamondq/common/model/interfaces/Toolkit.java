@@ -4,8 +4,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiFunction;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Pair;
 
 /**
  * The toolkit represents the top of the model chain. Get access to a Toolkit via the {@link ToolkitFactory}.
@@ -47,7 +50,7 @@ public interface Toolkit {
 	public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Scope pScope);
 
 	/**
-	 * Creates a new StructureDefinition that is not yet persisted.
+	 * Creates a new StructureDefinition that is not yet persisted. NOTE: The revision is assumed to be 1.
 	 *
 	 * @param pScope the scope
 	 * @param pName the name for the StructureDefinition
@@ -55,6 +58,16 @@ public interface Toolkit {
 	 */
 
 	public StructureDefinition createNewStructureDefinition(Scope pScope, String pName);
+
+	/**
+	 * Creates a new StructureDefinition that is not yet persisted.
+	 *
+	 * @param pScope the scope
+	 * @param pName the name for the StructureDefinition
+	 * @param pRevision the revision
+	 * @return the blank StructureDefinition
+	 */
+	public StructureDefinition createNewStructureDefinition(Scope pScope, String pName, int pRevision);
 
 	/**
 	 * Writes a StructureDefinition back to persistent storage. Future queries will return the persisted value, but
@@ -78,10 +91,11 @@ public interface Toolkit {
 	 *
 	 * @param pScope the scope
 	 * @param pResolvable the StructureDefinition
+	 * @param pWildcard true of the reference should be a wildcard reference or false if not
 	 * @return the reference
 	 */
-
-	public StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable);
+	public StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable,
+		boolean pWildcard);
 
 	/**
 	 * Creates a reference for StructureDefinition
@@ -145,6 +159,17 @@ public interface Toolkit {
 	 * @return the StructureDefinition or null
 	 */
 	public @Nullable StructureDefinition lookupStructureDefinitionByName(Scope pScope, String pName);
+
+	/**
+	 * Looks up a StructureDefinition by name and revision
+	 *
+	 * @param pScope the scope
+	 * @param pName the name
+	 * @param pRevision the revision (if null then find the latest)
+	 * @return the StructureDefinition or null
+	 */
+	public @Nullable StructureDefinition lookupStructureDefinitionByNameAndRevision(Scope pScope, String pName,
+		@Nullable Integer pRevision);
 
 	/**
 	 * Creates a new blank PropertyDefinition.
@@ -418,4 +443,49 @@ public interface Toolkit {
 	public List<Structure> lookupStructuresByQuery(Scope pScope, StructureDefinition pStructureDefinition,
 		QueryBuilder pBuilder, Map<String, Object> pParamValues);
 
+	/**
+	 * Creates a new standard migration
+	 *
+	 * @param pScope the scope
+	 * @param pMigrationType the type of migration
+	 * @param pParams parameters needed for that migration type
+	 * @return the migration function
+	 */
+	public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
+		StandardMigrations pMigrationType, @NonNull Object @Nullable... pParams);
+
+	/**
+	 * Adds a migration between two revisions of a Structure's Definition
+	 *
+	 * @param pScope the scope
+	 * @param pStructureDefinitionName the StructureDefinition name
+	 * @param pFromRevision the older revision of the StructureDefinition
+	 * @param pToRevision the newer revision of the StructureDefinition
+	 * @param pMigrationFunction the function that takes the older Structure and migrates it to the new Structure. The
+	 *            starting point of the new Structure is passed in as the second parameter, and must be returned as the
+	 *            result.
+	 */
+	public void addMigration(Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
+		BiFunction<Structure, Structure, Structure> pMigrationFunction);
+
+	/**
+	 * Determines the migration path from one revision to another
+	 *
+	 * @param pScope the scope
+	 * @param pStructureDefName the StructureDefinition name
+	 * @param pFromRevision the starting revision
+	 * @param pToRevision the ending revision
+	 * @return the path or null if there is no possible path
+	 */
+	public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
+		Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
+
+	/**
+	 * Returns the latest revision of a given structure definition name
+	 *
+	 * @param pScope the scope
+	 * @param pDefName the definition name
+	 * @return the revision (or null if the definition doesn't exist)
+	 */
+	public @Nullable Integer lookupLatestStructureDefinitionRevision(Scope pScope, String pDefName);
 }

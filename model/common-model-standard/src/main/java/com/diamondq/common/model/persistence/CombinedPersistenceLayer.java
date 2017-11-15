@@ -105,6 +105,43 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	}
 
 	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
+	 */
+	@Override
+	public @Nullable StructureDefinition lookupStructureDefinitionByNameAndRevision(Toolkit pToolkit, Scope pScope,
+		String pName, @Nullable Integer pRevision) {
+		if (mStructureDefinitionPersistenceLayerIsSingleton == true)
+			return mStructureDefinitionPersistenceLayer.get(0).lookupStructureDefinitionByNameAndRevision(pToolkit,
+				pScope, pName, pRevision);
+
+		for (PersistenceLayer l : mStructureDefinitionPersistenceLayer) {
+			StructureDefinition sd = l.lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, pRevision);
+			if (sd != null)
+				return sd;
+		}
+		return null;
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#lookupLatestStructureDefinitionRevision(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+	 */
+	@Override
+	public @Nullable Integer lookupLatestStructureDefinitionRevision(Toolkit pToolkit, Scope pScope, String pDefName) {
+		if (mStructureDefinitionPersistenceLayerIsSingleton == true)
+			return mStructureDefinitionPersistenceLayer.get(0).lookupLatestStructureDefinitionRevision(pToolkit, pScope,
+				pDefName);
+
+		for (PersistenceLayer l : mStructureDefinitionPersistenceLayer) {
+			Integer revision = l.lookupLatestStructureDefinitionRevision(pToolkit, pScope, pDefName);
+			if (revision != null)
+				return revision;
+		}
+		return null;
+	}
+
+	/**
 	 * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructure(com.diamondq.common.model.interfaces.Toolkit,
 	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
 	 */

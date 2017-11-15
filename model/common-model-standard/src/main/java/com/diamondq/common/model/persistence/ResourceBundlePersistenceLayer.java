@@ -164,12 +164,12 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	}
 
 	/**
-	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
 	 */
 	@Override
-	protected @Nullable StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
-		String pName) {
+	protected @Nullable StructureDefinition internalLookupStructureDefinitionByNameAndRevision(Toolkit pToolkit,
+		Scope pScope, String pName, @Nullable Integer pRevision) {
 		throw new UnsupportedOperationException();
 	}
 

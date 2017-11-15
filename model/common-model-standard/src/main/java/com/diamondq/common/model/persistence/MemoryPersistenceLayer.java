@@ -83,8 +83,12 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 		if ((pParentKey != null) || (pParentPropertyDef != null))
 			throw new UnsupportedOperationException(
 				"MemoryPersistenceLayer doesn't current support searching all by parent");
-		return Collections2.filter(structureCache.asMap().values(),
-			(s) -> s != null && s.getDefinition().getReference().equals(pRef));
+		if (pRef.isWildcardReference() == true)
+			return Collections2.filter(structureCache.asMap().values(),
+				(s) -> s != null && s.getDefinition().getWildcardReference().equals(pRef));
+		else
+			return Collections2.filter(structureCache.asMap().values(),
+				(s) -> s != null && s.getDefinition().getReference().equals(pRef));
 	}
 
 	/**
@@ -217,12 +221,12 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	}
 
 	/**
-	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
 	 */
 	@Override
-	protected @Nullable StructureDefinition internalLookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope,
-		String pName) {
+	protected @Nullable StructureDefinition internalLookupStructureDefinitionByNameAndRevision(Toolkit pToolkit,
+		Scope pScope, String pName, @Nullable Integer pRevision) {
 		return null;
 	}
 

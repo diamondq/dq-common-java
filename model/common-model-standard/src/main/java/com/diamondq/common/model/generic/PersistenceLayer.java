@@ -10,6 +10,7 @@ import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
+import com.diamondq.common.model.interfaces.StandardMigrations;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
@@ -21,14 +22,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiFunction;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Pair;
 
 public interface PersistenceLayer {
 
 	/* StructureDefinitions */
 
-	public StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName);
+	public StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName,
+		int pRevision);
 
 	public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
@@ -38,10 +43,13 @@ public interface PersistenceLayer {
 
 	public @Nullable StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName);
 
+	public @Nullable StructureDefinition lookupStructureDefinitionByNameAndRevision(Toolkit pToolkit, Scope pScope,
+		String pName, @Nullable Integer pRevision);
+
 	/* Reference */
 
 	public StructureDefinitionRef createStructureDefinitionRef(Toolkit pToolkit, Scope pScope,
-		StructureDefinition pResolvable);
+		StructureDefinition pResolvable, boolean pWildcard);
 
 	public PropertyDefinitionRef createPropertyDefinitionRef(Toolkit pToolkit, Scope pScope,
 		PropertyDefinition pResolvable, StructureDefinition pContaining);
@@ -140,5 +148,16 @@ public interface PersistenceLayer {
 		@Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys);
 
 	public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized);
+
+	public BiFunction<Structure, Structure, Structure> createStandardMigration(Toolkit pToolkit, Scope pScope,
+		StandardMigrations pMigrationType, @NonNull Object @Nullable [] pParams);
+
+	public void addMigration(Toolkit pToolkit, Scope pScope, String pStructureDefinitionName, int pFromRevision,
+		int pToRevision, BiFunction<Structure, Structure, Structure> pMigrationFunction);
+
+	public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
+		Toolkit pToolkit, Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
+
+	public @Nullable Integer lookupLatestStructureDefinitionRevision(Toolkit pToolkit, Scope pScope, String pDefName);
 
 }

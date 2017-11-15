@@ -40,6 +40,8 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 	private final String									mName;
 
+	private final int										mRevision;
+
 	private final @Nullable TranslatableString				mLabel;
 
 	private final boolean									mSingleInstance;
@@ -54,12 +56,13 @@ public class GenericStructureDefinition implements StructureDefinition {
 
 	private static final Pattern							sValidNamePattern	= Pattern.compile("^[0-9a-zA-Z.-]+$");
 
-	public GenericStructureDefinition(Scope pScope, String pName, @Nullable TranslatableString pLabel,
+	public GenericStructureDefinition(Scope pScope, String pName, int pRevision, @Nullable TranslatableString pLabel,
 		boolean pSingleInstance, @Nullable Map<String, PropertyDefinition> pProperties,
 		@Nullable Set<StructureDefinitionRef> pParentDefinitions, @Nullable Multimap<String, String> pKeywords) {
 		super();
 		mScope = pScope;
 		mName = pName;
+		mRevision = pRevision;
 		mLabel = pLabel;
 		mSingleInstance = pSingleInstance;
 		// add virtual _type property
@@ -90,6 +93,17 @@ public class GenericStructureDefinition implements StructureDefinition {
 		return mName;
 	}
 
+	/**
+	 * @see com.diamondq.common.model.interfaces.StructureDefinition#getRevision()
+	 */
+	@Override
+	public int getRevision() {
+		return mRevision;
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.StructureDefinition#getLabel()
+	 */
 	@Override
 	public @Nullable TranslatableString getLabel() {
 		return mLabel;
@@ -100,8 +114,8 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition setLabel(@Nullable TranslatableString pValue) {
-		return new GenericStructureDefinition(mScope, mName, pValue, mSingleInstance, mProperties, mParentDefinitions,
-			mKeywords);
+		return new GenericStructureDefinition(mScope, mName, mRevision, pValue, mSingleInstance, mProperties,
+			mParentDefinitions, mKeywords);
 	}
 
 	/**
@@ -117,7 +131,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition setSingleInstance(boolean pValue) {
-		return new GenericStructureDefinition(mScope, mName, mLabel, pValue, mProperties, mParentDefinitions,
+		return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, pValue, mProperties, mParentDefinitions,
 			mKeywords);
 	}
 
@@ -135,7 +149,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	@Override
 	public StructureDefinition addPropertyDefinition(PropertyDefinition pValue) {
 		String name = pValue.getName();
-		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance,
+		return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance,
 			ImmutableMap.<String, PropertyDefinition> builder().putAll(mProperties).put(name, pValue).build(),
 			mParentDefinitions, mKeywords);
 	}
@@ -145,7 +159,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition removePropertyDefinition(PropertyDefinition pValue) {
-		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance,
+		return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance,
 			Maps.filterValues(mProperties, Predicates.not(Predicates.equalTo(pValue))), mParentDefinitions, mKeywords);
 	}
 
@@ -162,7 +176,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition addParentDefinition(StructureDefinitionRef pValue) {
-		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance, mProperties,
+		return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance, mProperties,
 			ImmutableSet.<StructureDefinitionRef> builder().addAll(mParentDefinitions).add(pValue).build(), mKeywords);
 	}
 
@@ -171,7 +185,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition removeParentDefinition(StructureDefinitionRef pValue) {
-		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance, mProperties,
+		return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance, mProperties,
 			Sets.filter(mParentDefinitions, Predicates.not(Predicates.equalTo(pValue))), mKeywords);
 	}
 
@@ -201,7 +215,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 	}
 
 	private StructureDefinitionRef internalGetReference() {
-		return mScope.getToolkit().createStructureDefinitionRef(mScope, this);
+		return mScope.getToolkit().createStructureDefinitionRef(mScope, this, false);
 	}
 
 	/**
@@ -210,6 +224,15 @@ public class GenericStructureDefinition implements StructureDefinition {
 	@Override
 	public StructureDefinitionRef getReference() {
 		return mMemoizer.memoize(this::internalGetReference, "gr");
+	}
+
+	@Override
+	public StructureDefinitionRef getWildcardReference() {
+		return mMemoizer.memoize(this::internalGetWildcardReference, "gwr");
+	}
+
+	private StructureDefinitionRef internalGetWildcardReference() {
+		return mScope.getToolkit().createStructureDefinitionRef(mScope, this, true);
 	}
 
 	/**
@@ -266,7 +289,8 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition addKeyword(String pKey, String pValue) {
-		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance, mProperties, mParentDefinitions,
+		return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance, mProperties,
+			mParentDefinitions,
 			ImmutableMultimap.<String, String> builder()
 				.putAll(Multimaps.filterEntries(mKeywords,
 					Predicates.<Entry<String, String>> not(
@@ -279,8 +303,8 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition removeKeyword(String pKey, String pValue) {
-		return new GenericStructureDefinition(mScope, mName, mLabel, mSingleInstance, mProperties, mParentDefinitions,
-			Multimaps.filterEntries(mKeywords, Predicates.<Entry<String, String>> not(
+		return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance, mProperties,
+			mParentDefinitions, Multimaps.filterEntries(mKeywords, Predicates.<Entry<String, String>> not(
 				(e) -> e != null && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
 	}
 

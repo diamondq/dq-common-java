@@ -10,6 +10,7 @@ import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
+import com.diamondq.common.model.interfaces.StandardMigrations;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
@@ -23,10 +24,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
 
 import javax.enterprise.inject.Vetoed;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Pair;
 
 @Vetoed
 public class GenericToolkit implements Toolkit {
@@ -106,7 +110,16 @@ public class GenericToolkit implements Toolkit {
 	 */
 	@Override
 	public StructureDefinition createNewStructureDefinition(Scope pScope, String pName) {
-		return getPersistenceLayer(pScope).createNewStructureDefinition(this, pScope, pName);
+		return getPersistenceLayer(pScope).createNewStructureDefinition(this, pScope, pName, 1);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#createNewStructureDefinition(com.diamondq.common.model.interfaces.Scope,
+	 *      java.lang.String, int)
+	 */
+	@Override
+	public StructureDefinition createNewStructureDefinition(Scope pScope, String pName, int pRevision) {
+		return getPersistenceLayer(pScope).createNewStructureDefinition(this, pScope, pName, pRevision);
 	}
 
 	/**
@@ -122,11 +135,12 @@ public class GenericToolkit implements Toolkit {
 
 	/**
 	 * @see com.diamondq.common.model.interfaces.Toolkit#createStructureDefinitionRef(com.diamondq.common.model.interfaces.Scope,
-	 *      com.diamondq.common.model.interfaces.StructureDefinition)
+	 *      com.diamondq.common.model.interfaces.StructureDefinition, boolean)
 	 */
 	@Override
-	public StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable) {
-		return getPersistenceLayer(pScope).createStructureDefinitionRef(this, pScope, pResolvable);
+	public StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable,
+		boolean pWildcard) {
+		return getPersistenceLayer(pScope).createStructureDefinitionRef(this, pScope, pResolvable, pWildcard);
 	}
 
 	/**
@@ -184,6 +198,16 @@ public class GenericToolkit implements Toolkit {
 	@Override
 	public @Nullable StructureDefinition lookupStructureDefinitionByName(Scope pScope, String pName) {
 		return getPersistenceLayer(pScope).lookupStructureDefinitionByName(this, pScope, pName);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Scope,
+	 *      java.lang.String, java.lang.Integer)
+	 */
+	@Override
+	public @Nullable StructureDefinition lookupStructureDefinitionByNameAndRevision(Scope pScope, String pName,
+		@Nullable Integer pRevision) {
+		return getPersistenceLayer(pScope).lookupStructureDefinitionByNameAndRevision(this, pScope, pName, pRevision);
 	}
 
 	/**
@@ -467,5 +491,46 @@ public class GenericToolkit implements Toolkit {
 	@Override
 	public QueryBuilder createNewQueryBuilder(Scope pScope) {
 		return getPersistenceLayer(pScope).createNewQueryBuilder(this, pScope);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#createStandardMigration(com.diamondq.common.model.interfaces.Scope,
+	 *      com.diamondq.common.model.interfaces.StandardMigrations, java.lang.Object[])
+	 */
+	@Override
+	public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
+		StandardMigrations pMigrationType, @NonNull Object @Nullable... pParams) {
+		return getPersistenceLayer(pScope).createStandardMigration(this, pScope, pMigrationType, pParams);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#addMigration(com.diamondq.common.model.interfaces.Scope,
+	 *      java.lang.String, int, int, java.util.function.BiFunction)
+	 */
+	@Override
+	public void addMigration(Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
+		BiFunction<Structure, Structure, Structure> pMigrationFunction) {
+		getPersistenceLayer(pScope).addMigration(this, pScope, pStructureDefinitionName, pFromRevision, pToRevision,
+			pMigrationFunction);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#determineMigrationPath(com.diamondq.common.model.interfaces.Scope,
+	 *      java.lang.String, int, int)
+	 */
+	@Override
+	public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
+		Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision) {
+		return getPersistenceLayer(pScope).determineMigrationPath(this, pScope, pStructureDefName, pFromRevision,
+			pToRevision);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#lookupLatestStructureDefinitionRevision(com.diamondq.common.model.interfaces.Scope,
+	 *      java.lang.String)
+	 */
+	@Override
+	public @Nullable Integer lookupLatestStructureDefinitionRevision(Scope pScope, String pDefName) {
+		return getPersistenceLayer(pScope).lookupLatestStructureDefinitionRevision(this, pScope, pDefName);
 	}
 }
