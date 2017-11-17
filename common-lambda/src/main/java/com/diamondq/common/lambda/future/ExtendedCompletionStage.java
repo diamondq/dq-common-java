@@ -3,6 +3,7 @@ package com.diamondq.common.lambda.future;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerRunnable;
 import com.diamondq.common.tracing.opentracing.wrappers.TracerSupplier;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -553,249 +554,6 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		}
 	}
 
-	static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> startLoop(
-		ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPRE> pStartPreFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletionStage<STARTRESULT>> pStartFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPOST> pStartPostFunction,
-		@Nullable Executor pExecutor) {
-
-		/* Perform the start pre */
-
-		if (pStartPreFunction != null) {
-			current = current.thenApply(state -> {
-				state.startPre = pStartPreFunction.apply(state);
-				return state;
-			});
-		}
-
-		/* Perform the start */
-
-		if (pStartFunction != null) {
-			if (pExecutor == null)
-				current = current.thenCompose(state -> {
-					ExtendedCompletionStage<STARTRESULT> startFunctionResult = pStartFunction.apply(state);
-					return startFunctionResult.thenApply(i -> {
-						state.startResult = i;
-						return state;
-					});
-				});
-			else
-				current = current.thenComposeAsync(state -> {
-					ExtendedCompletionStage<STARTRESULT> startFunctionResult = pStartFunction.apply(state);
-					return startFunctionResult.thenApply(i -> {
-						state.startResult = i;
-						return state;
-					});
-				}, pExecutor);
-		}
-
-		/* Perform the start post */
-
-		if (pStartPostFunction != null) {
-			current = current.thenApply(state -> {
-				state.startPost = pStartPostFunction.apply(state);
-				return state;
-			});
-		}
-
-		return current;
-	}
-
-	static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> void performDoWhile(
-		ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPRE> pActionPreFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletionStage<ACTIONRESULT>> pActionFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPOST> pActionPostFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPRE> pTestPreFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletionStage<TESTRESULT>> pTestFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPOST> pTestPostFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletionStage<ENDRESULT>> pEndFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
-		ExtendedCompletableFuture<ENDPOST> pFinalResult, @Nullable Executor pExecutor) {
-
-		/* Do the work */
-
-		/* Perform the action pre */
-
-		if (pActionPreFunction != null)
-			current = current.thenApply(state -> {
-				state.actionPre = pActionPreFunction.apply(state);
-				return state;
-			});
-
-		/* Perform the action */
-
-		if (pActionFunction != null) {
-			if (pExecutor == null)
-				current = current.thenCompose(state -> {
-					ExtendedCompletionStage<ACTIONRESULT> actionFunctionResult = pActionFunction.apply(state);
-					return actionFunctionResult.thenApply(i -> {
-						state.actionResult = i;
-						return state;
-					});
-				});
-			else
-				current = current.thenComposeAsync(state -> {
-					ExtendedCompletionStage<ACTIONRESULT> actionFunctionResult = pActionFunction.apply(state);
-					return actionFunctionResult.thenApply(i -> {
-						state.actionResult = i;
-						return state;
-					});
-				}, pExecutor);
-		}
-
-		/* Perform the action post */
-
-		if (pActionPostFunction != null)
-			current = current.thenApply(state -> {
-				state.actionPost = pActionPostFunction.apply(state);
-				return state;
-			});
-
-		/* Now check to see if we're done */
-
-		/* Perform the test pre */
-
-		if (pTestPreFunction != null)
-			current = current.thenApply(state -> {
-				state.testPre = pTestPreFunction.apply(state);
-				return state;
-			});
-
-		/* Perform the test */
-
-		if (pTestFunction != null) {
-			if (pExecutor == null)
-				current = current.thenCompose(state -> {
-					ExtendedCompletionStage<TESTRESULT> testFunctionResult = pTestFunction.apply(state);
-					return testFunctionResult.thenApply(i -> {
-						state.testResult = i;
-						return state;
-					});
-				});
-			else
-				current = current.thenComposeAsync(state -> {
-					ExtendedCompletionStage<TESTRESULT> testFunctionResult = pTestFunction.apply(state);
-					return testFunctionResult.thenApply(i -> {
-						state.testResult = i;
-						return state;
-					});
-				}, pExecutor);
-		}
-
-		/* Perform the test post */
-
-		if (pTestPostFunction != null)
-			current = current.thenApply(state -> {
-				state.testPost = pTestPostFunction.apply(state);
-				return state;
-			});
-
-		current = current.whenComplete((state, ex) -> {
-			if (ex != null) {
-				pFinalResult.completeExceptionally(ex);
-				return;
-			}
-
-			try {
-				if (((state.testPre instanceof Boolean) && (((Boolean) state.testPre) == false))
-					|| ((state.testResult instanceof Boolean) && (((Boolean) state.testResult) == false))
-					|| ((state.testPost instanceof Boolean) && (((Boolean) state.testPost) == false))) {
-
-					/* We're finished running */
-
-					ExtendedCompletableFuture<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> start =
-						ExtendedCompletableFuture.completedFuture(state);
-
-					endLoop(start, pEndPreFunction, pEndFunction, pEndPostFunction, pFinalResult, pExecutor);
-
-				}
-				else {
-
-					/* We're not finished, so schedule another run */
-
-					CompletableFuture.runAsync(() -> {
-						ExtendedCompletableFuture<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> start =
-							ExtendedCompletableFuture.completedFuture(state);
-						performDoWhile(start, pActionPreFunction, pActionFunction, pActionPostFunction,
-							pTestPreFunction, pTestFunction, pTestPostFunction, pEndPreFunction, pEndFunction,
-							pEndPostFunction, pFinalResult, pExecutor);
-					}).whenComplete((ignore2, ex2) -> {
-						if (ex2 != null)
-							pFinalResult.completeExceptionally(ex2);
-					});
-
-				}
-			}
-			catch (RuntimeException ex2) {
-				pFinalResult.completeExceptionally(ex2);
-			}
-
-		});
-	}
-
-	static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> void endLoop(
-		ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletionStage<ENDRESULT>> pEndFunction,
-		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
-		ExtendedCompletableFuture<ENDPOST> pFinalResult, @Nullable Executor pExecutor) {
-		try {
-
-			/* Perform the end pre */
-
-			if (pEndPreFunction != null)
-				current = current.thenApply(state -> {
-					state.endPre = pEndPreFunction.apply(state);
-					return state;
-				});
-
-			/* Perform the end */
-
-			if (pEndFunction != null) {
-				if (pExecutor == null)
-					current = current.thenCompose(state -> {
-						ExtendedCompletionStage<ENDRESULT> endFunctionResult = pEndFunction.apply(state);
-						return endFunctionResult.thenApply(i -> {
-							state.endResult = i;
-							return state;
-						});
-					});
-				else
-					current = current.thenComposeAsync(state -> {
-						ExtendedCompletionStage<ENDRESULT> endFunctionResult = pEndFunction.apply(state);
-						return endFunctionResult.thenApply(i -> {
-							state.endResult = i;
-							return state;
-						});
-					}, pExecutor);
-			}
-
-			/* Perform the end post */
-
-			if (pEndPostFunction != null)
-				current = current.thenApply(state -> {
-					state.endPost = pEndPostFunction.apply(state);
-					return state;
-				});
-
-			current.whenComplete((state, error) -> {
-				if (error != null) {
-					pFinalResult.completeExceptionally(error);
-					return;
-				}
-
-				pFinalResult.complete(state.endPost);
-			});
-
-		}
-		catch (RuntimeException ex) {
-			pFinalResult.completeExceptionally(ex);
-		}
-	}
-
 	/**
 	 * @param pStartPreFunction this is called first with the result of the calling future. Can be null
 	 * @param pStartFunction the result of the calling future, and the start-pre function are passed. The result is a
@@ -839,9 +597,9 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 			(ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
 
 		current =
-			ExtendedCompletionStage.startLoop(current, pStartPreFunction, pStartFunction, pStartPostFunction, null);
+			ExtendedCompletableFuture.startLoop(current, pStartPreFunction, pStartFunction, pStartPostFunction, null);
 
-		ExtendedCompletionStage.performDoWhile(current, pActionPreFunction, pActionFunction, pActionPostFunction,
+		ExtendedCompletableFuture.performDoWhile(current, pActionPreFunction, pActionFunction, pActionPostFunction,
 			pTestPreFunction, pTestFunction, pTestPostFunction, pEndPreFunction, pEndFunction, pEndPostFunction,
 			finalResult, null);
 
@@ -894,10 +652,10 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
 			(ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
 
-		current = ExtendedCompletionStage.startLoop(current, pStartPreFunction, pStartFunction, pStartPostFunction,
+		current = ExtendedCompletableFuture.startLoop(current, pStartPreFunction, pStartFunction, pStartPostFunction,
 			pExecutor);
 
-		ExtendedCompletionStage.performDoWhile(current, pActionPreFunction, pActionFunction, pActionPostFunction,
+		ExtendedCompletableFuture.performDoWhile(current, pActionPreFunction, pActionFunction, pActionPostFunction,
 			pTestPreFunction, pTestFunction, pTestPostFunction, pEndPreFunction, pEndFunction, pEndPostFunction,
 			finalResult, pExecutor);
 
@@ -987,18 +745,30 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 				null, null, pEndPostFunction, pExecutor);
 	}
 
-	public default <U> ExtendedCompletionStage<U> thenLoopAsync(int pStart, int pEnd, int pIncrement,
+	/**
+	 * This creates a loop that starts with the pStart value and increments by pIncrement until reaching pEnd. For each
+	 * value, it calls the pPerformFunction. After each perform, it calls the pCheckFunction (if provided), and if that
+	 * returns true, then it exits early.
+	 *
+	 * @param pStart the starting number
+	 * @param pEnd the ending number
+	 * @param pIncrement the increment (may be negative)
+	 * @param pPerformFunction the function to perform on each iteration
+	 * @param pCheckFunction the optional early exit check function
+	 * @return the final value from the perform function
+	 */
+	public default <U> ExtendedCompletionStage<U> thenLoop(int pStart, int pEnd, int pIncrement,
 		BiFunction<T, @NonNull Integer, CompletionStage<U>> pPerformFunction,
 		@Nullable BiFunction<U, Integer, Boolean> pCheckFunction) {
 
-		Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Integer> pStartPreFunction =
+		Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Integer> startPreFunction =
 			(loopState) -> {
 				loopState.startPost = pEnd;
 				loopState.testPre = pIncrement;
 				return pStart;
 			};
 
-		Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, ExtendedCompletionStage<U>> pActionFunction =
+		Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, ExtendedCompletionStage<U>> actionFunction =
 			(loopState) -> {
 				@SuppressWarnings("null")
 				CompletionStage<U> completionStage = pPerformFunction.apply(loopState.input, loopState.startPre);
@@ -1009,7 +779,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 
 		/* If we got an item in the action, then we're done, otherwise, check if there is there another element */
 
-		Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Boolean> pTestPostFunction =
+		Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Boolean> testPostFunction =
 			(loopState) -> {
 				loopState.startPre += loopState.testPre;
 				if (loopState.startPre >= loopState.startPost)
@@ -1021,14 +791,27 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 				return true;
 			};
 
-		Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, U> pEndPostFunction =
+		Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, U> endPostFunction =
 			(loopState) -> loopState.actionResult;
 		return this
 			.<Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U> thenDoWhile(
-				pStartPreFunction, null, null, null, pActionFunction, null, null, null, pTestPostFunction, null, null,
-				pEndPostFunction);
+				startPreFunction, null, null, null, actionFunction, null, null, null, testPostFunction, null, null,
+				endPostFunction);
 	}
 
+	/**
+	 * This creates a loop that starts with the pStart value and increments by pIncrement until reaching pEnd. For each
+	 * value, it calls the pPerformFunction. After each perform, it calls the pCheckFunction (if provided), and if that
+	 * returns true, then it exits early.
+	 *
+	 * @param pStart the starting number
+	 * @param pEnd the ending number
+	 * @param pIncrement the increment (may be negative)
+	 * @param pPerformFunction the function to perform on each iteration
+	 * @param pCheckFunction the optional early exit check function
+	 * @param pExecutor the executor
+	 * @return the final value from the perform function
+	 */
 	public default <U> ExtendedCompletionStage<U> thenLoopAsync(int pStart, int pEnd, int pIncrement,
 		BiFunction<T, @NonNull Integer, CompletionStage<U>> pPerformFunction,
 		@Nullable BiFunction<U, Integer, Boolean> pCheckFunction, Executor pExecutor) {
@@ -1075,4 +858,36 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 
 	public ExtendedCompletionStage<T> completeOnTimeout​Async(T value, long timeout, TimeUnit unit,
 		ScheduledExecutorService pService);
+
+	public static ExtendedCompletionStage<@Nullable Void> allOf(@NonNull CompletionStage<?>... cfs) {
+		@NonNull
+		CompletableFuture<?>[] args = new @NonNull CompletableFuture<?>[cfs.length];
+		for (int i = 0; i < cfs.length; i++)
+			args[i] = cfs[i].toCompletableFuture();
+		return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
+	}
+
+	/**
+	 * Generates an allOf future
+	 *
+	 * @param cfs the collection of futures
+	 * @return the future
+	 */
+	public static ExtendedCompletionStage<@Nullable Void> allOf(
+		Collection<@NonNull ? extends @NonNull CompletionStage<?>> cfs) {
+		CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
+		int count = 0;
+		for (Iterator<@NonNull ? extends @NonNull CompletionStage<?>> i = cfs.iterator(); i.hasNext();) {
+			CompletionStage<?> next = i.next();
+			args[count++] = next.toCompletableFuture();
+		}
+		return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
+	}
+
+	public static ExtendedCompletionStage<@Nullable Object> anyOf(@NonNull CompletionStage<?>... cfs) {
+		CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
+		for (int i = 0; i < cfs.length; i++)
+			args[i] = cfs[i].toCompletableFuture();
+		return ExtendedCompletableFuture.of(CompletableFuture.anyOf(args));
+	}
 }

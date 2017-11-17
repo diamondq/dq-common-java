@@ -988,4 +988,248 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		pService.schedule(() -> result.complete(pValue), pTimeout, pUnit);
 		return applyToEitherAsync(result, (v) -> v, pService);
 	}
+
+	static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> startLoop(
+		ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPRE> pStartPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletionStage<STARTRESULT>> pStartFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPOST> pStartPostFunction,
+		@Nullable Executor pExecutor) {
+
+		/* Perform the start pre */
+
+		if (pStartPreFunction != null) {
+			current = current.thenApply(state -> {
+				state.startPre = pStartPreFunction.apply(state);
+				return state;
+			});
+		}
+
+		/* Perform the start */
+
+		if (pStartFunction != null) {
+			if (pExecutor == null)
+				current = current.thenCompose(state -> {
+					ExtendedCompletionStage<STARTRESULT> startFunctionResult = pStartFunction.apply(state);
+					return startFunctionResult.thenApply(i -> {
+						state.startResult = i;
+						return state;
+					});
+				});
+			else
+				current = current.thenComposeAsync(state -> {
+					ExtendedCompletionStage<STARTRESULT> startFunctionResult = pStartFunction.apply(state);
+					return startFunctionResult.thenApply(i -> {
+						state.startResult = i;
+						return state;
+					});
+				}, pExecutor);
+		}
+
+		/* Perform the start post */
+
+		if (pStartPostFunction != null) {
+			current = current.thenApply(state -> {
+				state.startPost = pStartPostFunction.apply(state);
+				return state;
+			});
+		}
+
+		return current;
+	}
+
+	static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> void performDoWhile(
+		ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPRE> pActionPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletionStage<ACTIONRESULT>> pActionFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ACTIONPOST> pActionPostFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPRE> pTestPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletionStage<TESTRESULT>> pTestFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, TESTPOST> pTestPostFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletionStage<ENDRESULT>> pEndFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
+		ExtendedCompletableFuture<ENDPOST> pFinalResult, @Nullable Executor pExecutor) {
+
+		/* Do the work */
+
+		/* Perform the action pre */
+
+		if (pActionPreFunction != null)
+			current = current.thenApply(state -> {
+				state.actionPre = pActionPreFunction.apply(state);
+				return state;
+			});
+
+		/* Perform the action */
+
+		if (pActionFunction != null) {
+			if (pExecutor == null)
+				current = current.thenCompose(state -> {
+					ExtendedCompletionStage<ACTIONRESULT> actionFunctionResult = pActionFunction.apply(state);
+					return actionFunctionResult.thenApply(i -> {
+						state.actionResult = i;
+						return state;
+					});
+				});
+			else
+				current = current.thenComposeAsync(state -> {
+					ExtendedCompletionStage<ACTIONRESULT> actionFunctionResult = pActionFunction.apply(state);
+					return actionFunctionResult.thenApply(i -> {
+						state.actionResult = i;
+						return state;
+					});
+				}, pExecutor);
+		}
+
+		/* Perform the action post */
+
+		if (pActionPostFunction != null)
+			current = current.thenApply(state -> {
+				state.actionPost = pActionPostFunction.apply(state);
+				return state;
+			});
+
+		/* Now check to see if we're done */
+
+		/* Perform the test pre */
+
+		if (pTestPreFunction != null)
+			current = current.thenApply(state -> {
+				state.testPre = pTestPreFunction.apply(state);
+				return state;
+			});
+
+		/* Perform the test */
+
+		if (pTestFunction != null) {
+			if (pExecutor == null)
+				current = current.thenCompose(state -> {
+					ExtendedCompletionStage<TESTRESULT> testFunctionResult = pTestFunction.apply(state);
+					return testFunctionResult.thenApply(i -> {
+						state.testResult = i;
+						return state;
+					});
+				});
+			else
+				current = current.thenComposeAsync(state -> {
+					ExtendedCompletionStage<TESTRESULT> testFunctionResult = pTestFunction.apply(state);
+					return testFunctionResult.thenApply(i -> {
+						state.testResult = i;
+						return state;
+					});
+				}, pExecutor);
+		}
+
+		/* Perform the test post */
+
+		if (pTestPostFunction != null)
+			current = current.thenApply(state -> {
+				state.testPost = pTestPostFunction.apply(state);
+				return state;
+			});
+
+		current = current.whenComplete((state, ex) -> {
+			if (ex != null) {
+				pFinalResult.completeExceptionally(ex);
+				return;
+			}
+
+			try {
+				if (((state.testPre instanceof Boolean) && (((Boolean) state.testPre) == false))
+					|| ((state.testResult instanceof Boolean) && (((Boolean) state.testResult) == false))
+					|| ((state.testPost instanceof Boolean) && (((Boolean) state.testPost) == false))) {
+
+					/* We're finished running */
+
+					ExtendedCompletableFuture<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> start =
+						ExtendedCompletableFuture.completedFuture(state);
+
+					endLoop(start, pEndPreFunction, pEndFunction, pEndPostFunction, pFinalResult, pExecutor);
+
+				}
+				else {
+
+					/* We're not finished, so schedule another run */
+
+					CompletableFuture.runAsync(() -> {
+						ExtendedCompletableFuture<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> start =
+							ExtendedCompletableFuture.completedFuture(state);
+						performDoWhile(start, pActionPreFunction, pActionFunction, pActionPostFunction,
+							pTestPreFunction, pTestFunction, pTestPostFunction, pEndPreFunction, pEndFunction,
+							pEndPostFunction, pFinalResult, pExecutor);
+					}).whenComplete((ignore2, ex2) -> {
+						if (ex2 != null)
+							pFinalResult.completeExceptionally(ex2);
+					});
+
+				}
+			}
+			catch (RuntimeException ex2) {
+				pFinalResult.completeExceptionally(ex2);
+			}
+
+		});
+	}
+
+	static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> void endLoop(
+		ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, @NonNull ExtendedCompletionStage<ENDRESULT>> pEndFunction,
+		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
+		ExtendedCompletableFuture<ENDPOST> pFinalResult, @Nullable Executor pExecutor) {
+		try {
+
+			/* Perform the end pre */
+
+			if (pEndPreFunction != null)
+				current = current.thenApply(state -> {
+					state.endPre = pEndPreFunction.apply(state);
+					return state;
+				});
+
+			/* Perform the end */
+
+			if (pEndFunction != null) {
+				if (pExecutor == null)
+					current = current.thenCompose(state -> {
+						ExtendedCompletionStage<ENDRESULT> endFunctionResult = pEndFunction.apply(state);
+						return endFunctionResult.thenApply(i -> {
+							state.endResult = i;
+							return state;
+						});
+					});
+				else
+					current = current.thenComposeAsync(state -> {
+						ExtendedCompletionStage<ENDRESULT> endFunctionResult = pEndFunction.apply(state);
+						return endFunctionResult.thenApply(i -> {
+							state.endResult = i;
+							return state;
+						});
+					}, pExecutor);
+			}
+
+			/* Perform the end post */
+
+			if (pEndPostFunction != null)
+				current = current.thenApply(state -> {
+					state.endPost = pEndPostFunction.apply(state);
+					return state;
+				});
+
+			current.whenComplete((state, error) -> {
+				if (error != null) {
+					pFinalResult.completeExceptionally(error);
+					return;
+				}
+
+				pFinalResult.complete(state.endPost);
+			});
+
+		}
+		catch (RuntimeException ex) {
+			pFinalResult.completeExceptionally(ex);
+		}
+	}
+
 }
