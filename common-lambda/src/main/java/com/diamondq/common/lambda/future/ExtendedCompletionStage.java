@@ -1,7 +1,7 @@
 package com.diamondq.common.lambda.future;
 
-import com.diamondq.common.tracing.opentracing.wrappers.TracerRunnable;
-import com.diamondq.common.tracing.opentracing.wrappers.TracerSupplier;
+import com.diamondq.common.lambda.interfaces.CancelableRunnable;
+import com.diamondq.common.lambda.interfaces.CancelableSupplier;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -306,7 +306,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the new CompletableFuture
 	 */
 	public static <U> ExtendedCompletionStage<U> supplyAsync(Supplier<U> supplier) {
-		TracerSupplier<U> ab = new TracerSupplier<>(supplier);
+		CancelableSupplier<U> ab = ExtendedCompletableFuture.wrapSupplier(supplier);
 		try {
 			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(CompletableFuture.supplyAsync(ab));
 			ab = null;
@@ -314,7 +314,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -328,7 +328,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the new CompletableFuture
 	 */
 	public static <U> ExtendedCompletionStage<U> supplyAsync(Supplier<U> supplier, Executor executor) {
-		TracerSupplier<U> ab = new TracerSupplier<>(supplier);
+		CancelableSupplier<U> ab = ExtendedCompletableFuture.wrapSupplier(supplier);
 		try {
 			ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(CompletableFuture.supplyAsync(ab, executor));
 			ab = null;
@@ -336,7 +336,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -348,7 +348,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the new CompletableFuture
 	 */
 	public static ExtendedCompletionStage<@Nullable Void> runAsync(Runnable runnable) {
-		TracerRunnable ab = new TracerRunnable(runnable);
+		CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(runnable);
 		try {
 			ExtendedCompletionStage<@Nullable Void> result = ExtendedCompletionStage.of(CompletableFuture.runAsync(ab));
 			ab = null;
@@ -356,7 +356,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -369,7 +369,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the new CompletableFuture
 	 */
 	public static ExtendedCompletionStage<@Nullable Void> runAsync(Runnable runnable, Executor executor) {
-		TracerRunnable ab = new TracerRunnable(runnable);
+		CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(runnable);
 		try {
 			ExtendedCompletionStage<@Nullable Void> result =
 				ExtendedCompletionStage.of(CompletableFuture.runAsync(ab, executor));
@@ -378,7 +378,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 

@@ -1,11 +1,14 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
+import com.diamondq.common.lambda.interfaces.CancelableRunnable;
+
 import io.opentracing.ActiveSpan;
 import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerRunnable extends AbstractTracerWrapper implements Runnable, AbortableContinuation {
+public class TracerRunnable extends AbstractTracerWrapper
+	implements Runnable, AbortableContinuation, CancelableRunnable {
 
 	private final Runnable mDelegate;
 
@@ -31,6 +34,14 @@ public class TracerRunnable extends AbstractTracerWrapper implements Runnable, A
 		try (ActiveSpan span = c.activate()) {
 			mDelegate.run();
 		}
+	}
+
+	/**
+	 * @see com.diamondq.common.lambda.interfaces.CancelableRunnable#cancel()
+	 */
+	@Override
+	public void cancel() {
+		abortContinuation();
 	}
 
 }

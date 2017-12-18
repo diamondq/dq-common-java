@@ -28,5 +28,14 @@
 			<groupId>org.jboss.spec.javax.ws.rs</groupId>
 			<artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.diamondq.common.java</groupId>
+			<artifactId>common-lambda</artifactId>
+		</dependency>
 	</dependencies>
 </project>

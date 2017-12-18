@@ -1,5 +1,7 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
+import com.diamondq.common.lambda.interfaces.CancelableSupplier;
+
 import java.util.function.Supplier;
 
 import io.opentracing.ActiveSpan;
@@ -7,7 +9,8 @@ import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerSupplier<A> extends AbstractTracerWrapper implements Supplier<A>, AbortableContinuation {
+public class TracerSupplier<A> extends AbstractTracerWrapper
+	implements Supplier<A>, AbortableContinuation, CancelableSupplier<A> {
 
 	private final Supplier<A> mDelegate;
 
@@ -33,4 +36,11 @@ public class TracerSupplier<A> extends AbstractTracerWrapper implements Supplier
 		}
 	}
 
+	/**
+	 * @see com.diamondq.common.lambda.interfaces.CancelableSupplier#cancel()
+	 */
+	@Override
+	public void cancel() {
+		abortContinuation();
+	}
 }

@@ -1,5 +1,7 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
+import com.diamondq.common.lambda.interfaces.CancelableBiFunction;
+
 import java.util.function.BiFunction;
 
 import io.opentracing.ActiveSpan;
@@ -7,7 +9,8 @@ import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerBiFunction<A, B, C> extends AbstractTracerWrapper implements BiFunction<A, B, C> {
+public class TracerBiFunction<A, B, C> extends AbstractTracerWrapper
+	implements BiFunction<A, B, C>, CancelableBiFunction<A, B, C> {
 
 	private final BiFunction<A, B, C> mDelegate;
 
@@ -33,4 +36,11 @@ public class TracerBiFunction<A, B, C> extends AbstractTracerWrapper implements 
 		}
 	}
 
+	/**
+	 * @see com.diamondq.common.lambda.interfaces.CancelableBiFunction#cancel()
+	 */
+	@Override
+	public void cancel() {
+		abortContinuation();
+	}
 }

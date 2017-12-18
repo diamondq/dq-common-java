@@ -447,6 +447,7 @@
 	<modules>
 		<module>../common-bom</module>
 		<module>../common-lambda</module>
+		<module>../common-lambda-test</module>
 		<module>../deployment/common-deployment-root</module>
 		<module>../injection/common-injection-root</module>
 		<module>../jaxrs/common-jaxrs-root</module>

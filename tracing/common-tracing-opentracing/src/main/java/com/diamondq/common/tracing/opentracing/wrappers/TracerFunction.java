@@ -1,5 +1,7 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
+import com.diamondq.common.lambda.interfaces.CancelableFunction;
+
 import java.util.function.Function;
 
 import io.opentracing.ActiveSpan;
@@ -7,7 +9,8 @@ import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerFunction<A, B> extends AbstractTracerWrapper implements Function<A, B>, AbortableContinuation {
+public class TracerFunction<A, B> extends AbstractTracerWrapper
+	implements Function<A, B>, AbortableContinuation, CancelableFunction<A, B> {
 
 	private final Function<A, B> mDelegate;
 
@@ -33,4 +36,11 @@ public class TracerFunction<A, B> extends AbstractTracerWrapper implements Funct
 		}
 	}
 
+	/**
+	 * @see com.diamondq.common.lambda.interfaces.CancelableFunction#cancel()
+	 */
+	@Override
+	public void cancel() {
+		abortContinuation();
+	}
 }

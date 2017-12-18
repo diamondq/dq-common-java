@@ -1,10 +1,16 @@
 package com.diamondq.common.lambda.future;
 
-import com.diamondq.common.tracing.opentracing.wrappers.TracerBiFunction;
-import com.diamondq.common.tracing.opentracing.wrappers.TracerFunction;
-import com.diamondq.common.tracing.opentracing.wrappers.TracerRunnable;
-import com.diamondq.common.tracing.opentracing.wrappers.TracerSupplier;
+import com.diamondq.common.lambda.interfaces.CancelableBiFunction;
+import com.diamondq.common.lambda.interfaces.CancelableBiFunction.NoopCancelableBiFunction;
+import com.diamondq.common.lambda.interfaces.CancelableFunction;
+import com.diamondq.common.lambda.interfaces.CancelableFunction.NoopCancelableFunction;
+import com.diamondq.common.lambda.interfaces.CancelableRunnable;
+import com.diamondq.common.lambda.interfaces.CancelableRunnable.NoopCancelableRunnable;
+import com.diamondq.common.lambda.interfaces.CancelableSupplier;
+import com.diamondq.common.lambda.interfaces.CancelableSupplier.NoopCancelableSupplier;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
@@ -32,7 +38,142 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implements ExtendedCompletionStage<T> {
 
-	private final CompletableFuture<T> mDelegate;
+	private final CompletableFuture<T>								mDelegate;
+
+	private static final Constructor<CancelableBiFunction<?, ?, ?>>	sBiFunctionConstructor;
+
+	private static final Constructor<CancelableFunction<?, ?>>		sFunctionConstructor;
+
+	private static final Constructor<CancelableSupplier<?>>			sSupplierConstructor;
+
+	private static final Constructor<CancelableRunnable>			sRunnableConstructor;
+
+	static {
+		@NonNull
+		Constructor<CancelableBiFunction<?, ?, ?>> biFunctionConstructor;
+		@NonNull
+		Constructor<CancelableFunction<?, ?>> functionConstructor;
+		@NonNull
+		Constructor<CancelableSupplier<?>> supplierConstructor;
+		@NonNull
+		Constructor<CancelableRunnable> runnableConstructor;
+		try {
+			Class<?> c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerBiFunction");
+
+			/* BiFunction */
+
+			@SuppressWarnings({"unchecked"})
+			Constructor<CancelableBiFunction<?, ?, ?>> cbi =
+				(Constructor<CancelableBiFunction<?, ?, ?>>) c.getConstructor(BiFunction.class);
+			biFunctionConstructor = cbi;
+
+			/* Function */
+
+			c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerFunction");
+			@SuppressWarnings({"unchecked"})
+			Constructor<CancelableFunction<?, ?>> cf =
+				(Constructor<CancelableFunction<?, ?>>) c.getConstructor(Function.class);
+			functionConstructor = cf;
+
+			/* Supplier */
+
+			c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerSupplier");
+			@SuppressWarnings({"unchecked"})
+			Constructor<CancelableSupplier<?>> cs =
+				(Constructor<CancelableSupplier<?>>) c.getConstructor(Supplier.class);
+			supplierConstructor = cs;
+
+			/* Runnable */
+
+			c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerRunnable");
+			@SuppressWarnings("unchecked")
+			Constructor<CancelableRunnable> cr = (Constructor<CancelableRunnable>) c.getConstructor(Runnable.class);
+			runnableConstructor = cr;
+
+		}
+		catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
+			try {
+				@SuppressWarnings({"cast", "rawtypes", "unchecked"})
+				Constructor<CancelableBiFunction<?, ?, ?>> cbi =
+					(Constructor<CancelableBiFunction<?, ?, ?>>) (Constructor) NoopCancelableBiFunction.class
+						.getConstructor(BiFunction.class);
+				biFunctionConstructor = cbi;
+
+				@SuppressWarnings({"cast", "rawtypes", "unchecked"})
+				Constructor<CancelableFunction<?, ?>> cf =
+					(Constructor<CancelableFunction<?, ?>>) (Constructor) NoopCancelableFunction.class
+						.getConstructor(Function.class);
+				functionConstructor = cf;
+
+				@SuppressWarnings({"cast", "rawtypes", "unchecked"})
+				Constructor<CancelableSupplier<?>> cs =
+					(Constructor<CancelableSupplier<?>>) (Constructor) NoopCancelableSupplier.class
+						.getConstructor(Supplier.class);
+				supplierConstructor = cs;
+
+				@SuppressWarnings({"cast", "rawtypes", "unchecked"})
+				Constructor<CancelableRunnable> cr =
+					(Constructor<CancelableRunnable>) (Constructor) NoopCancelableRunnable.class
+						.getConstructor(Runnable.class);
+				runnableConstructor = cr;
+
+			}
+			catch (NoSuchMethodException | SecurityException ex1) {
+				throw new IllegalStateException(ex1);
+			}
+			catch (NoSuchMethodError ex2) {
+				throw new IllegalStateException(ex2);
+			}
+		}
+
+		sBiFunctionConstructor = biFunctionConstructor;
+		sFunctionConstructor = functionConstructor;
+		sSupplierConstructor = supplierConstructor;
+		sRunnableConstructor = runnableConstructor;
+	}
+
+	@SuppressWarnings("unchecked")
+	static <T, U, R> CancelableBiFunction<T, U, R> wrapBiFunction(BiFunction<T, U, R> pFn) {
+		try {
+			return (CancelableBiFunction<T, U, R>) sBiFunctionConstructor.newInstance(pFn);
+		}
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+			| InvocationTargetException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	static <T, R> CancelableFunction<T, R> wrapFunction(Function<T, R> pFn) {
+		try {
+			return (CancelableFunction<T, R>) sFunctionConstructor.newInstance(pFn);
+		}
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+			| InvocationTargetException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	static <R> CancelableSupplier<R> wrapSupplier(Supplier<R> pFn) {
+		try {
+			return (CancelableSupplier<R>) sSupplierConstructor.newInstance(pFn);
+		}
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+			| InvocationTargetException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+
+	static CancelableRunnable wrapRunnable(Runnable pFn) {
+		try {
+			return sRunnableConstructor.newInstance(pFn);
+		}
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+			| InvocationTargetException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
 
 	private static <U> CompletionStage<U> decomposeToCompletionStage(CompletionStage<U> pStage) {
 		if (pStage instanceof ExtendedCompletableFuture)
@@ -209,13 +350,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	@Override
 	public <U, V> ExtendedCompletableFuture<V> thenCombine(CompletionStage<? extends U> pOther,
 		BiFunction<? super T, ? super U, ? extends V> pFn) {
-		TracerBiFunction<? super T, ? super U, ? extends V> ab = new TracerBiFunction<>(pFn);
+		CancelableBiFunction<? super T, ? super U, ? extends V> ab = wrapBiFunction(pFn);
 		try {
 			ExtendedCompletableFuture<V> result =
 				ExtendedCompletableFuture.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
-			final TracerBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
+			final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -225,20 +366,20 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
 		BiFunction<? super T, ? super U, ? extends V> pFn) {
-		TracerBiFunction<? super T, ? super U, ? extends V> ab = new TracerBiFunction<>(pFn);
+		CancelableBiFunction<? super T, ? super U, ? extends V> ab = wrapBiFunction(pFn);
 		try {
 			ExtendedCompletableFuture<V> result =
 				ExtendedCompletableFuture.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
-			final TracerBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
+			final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -248,20 +389,20 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
 		BiFunction<? super T, ? super U, ? extends V> pFn, @Nullable Executor pExecutor) {
-		TracerBiFunction<? super T, ? super U, ? extends V> ab = new TracerBiFunction<>(pFn);
+		CancelableBiFunction<? super T, ? super U, ? extends V> ab = wrapBiFunction(pFn);
 		try {
 			ExtendedCompletableFuture<V> result = ExtendedCompletableFuture
 				.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
-			final TracerBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
+			final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -271,7 +412,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -330,13 +471,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEither(CompletionStage<? extends T> pOther,
 		Function<? super T, U> pFn) {
-		TracerFunction<? super T, U> ab = new TracerFunction<>(pFn);
+		CancelableFunction<? super T, U> ab = wrapFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result =
 				ExtendedCompletableFuture.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
-			final TracerFunction<? super T, U> cleanup = ab;
+			final CancelableFunction<? super T, U> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -346,20 +487,20 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
 		Function<? super T, U> pFn) {
-		TracerFunction<? super T, U> ab = new TracerFunction<>(pFn);
+		CancelableFunction<? super T, U> ab = wrapFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result =
 				ExtendedCompletableFuture.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
-			final TracerFunction<? super T, U> cleanup = ab;
+			final CancelableFunction<? super T, U> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -369,20 +510,20 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
 		Function<? super T, U> pFn, @Nullable Executor pExecutor) {
-		TracerFunction<? super T, U> ab = new TracerFunction<>(pFn);
+		CancelableFunction<? super T, U> ab = wrapFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture
 				.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
-			final TracerFunction<? super T, U> cleanup = ab;
+			final CancelableFunction<? super T, U> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -392,7 +533,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -425,13 +566,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> runAfterEither(CompletionStage<?> pOther, Runnable pAction) {
-		TracerRunnable ab = new TracerRunnable(pAction);
+		CancelableRunnable ab = wrapRunnable(pAction);
 		try {
 			ExtendedCompletableFuture<@Nullable Void> result =
 				ExtendedCompletableFuture.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
-			final TracerRunnable cleanup = ab;
+			final CancelableRunnable cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -441,19 +582,19 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction) {
-		TracerRunnable ab = new TracerRunnable(pAction);
+		CancelableRunnable ab = wrapRunnable(pAction);
 		try {
 			ExtendedCompletableFuture<@Nullable Void> result =
 				ExtendedCompletableFuture.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
-			final TracerRunnable cleanup = ab;
+			final CancelableRunnable cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -463,20 +604,20 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction,
 		Executor pExecutor) {
-		TracerRunnable ab = new TracerRunnable(pAction);
+		CancelableRunnable ab = wrapRunnable(pAction);
 		try {
 			ExtendedCompletableFuture<@Nullable Void> result = ExtendedCompletableFuture
 				.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
-			final TracerRunnable cleanup = ab;
+			final CancelableRunnable cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -486,19 +627,19 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> thenCompose(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
-		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = wrapFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.thenCompose(ab));
-			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -508,19 +649,19 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> thenComposeAsync(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
-		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = wrapFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(ab));
-			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -530,20 +671,20 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> thenComposeAsync(
 		Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn, Executor pExecutor) {
-		TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = new TracerFunction<>(pFn);
+		CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = wrapFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result =
 				ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(ab, pExecutor));
-			final TracerFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
+			final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
 			result = result.exceptionally((ex) -> {
-				cleanup.abortContinuation();
+				cleanup.cancel();
 				if (ex instanceof RuntimeException)
 					throw (RuntimeException) ex;
 				throw new RuntimeException(ex);
@@ -553,7 +694,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -586,7 +727,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
+		CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab = wrapBiFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handle(ab));
 			ab = null;
@@ -594,13 +735,13 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
+		CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab = wrapBiFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handleAsync(ab));
 			ab = null;
@@ -608,14 +749,14 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
 	@Override
 	public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn,
 		@Nullable Executor pExecutor) {
-		TracerBiFunction<? super T, @Nullable Throwable, ? extends U> ab = new TracerBiFunction<>(pFn);
+		CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab = wrapBiFunction(pFn);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handleAsync(ab, pExecutor));
 			ab = null;
@@ -623,7 +764,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -696,7 +837,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	 * @return the new CompletableFuture
 	 */
 	public static <U> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier) {
-		TracerSupplier<U> ab = new TracerSupplier<>(supplier);
+		CancelableSupplier<U> ab = wrapSupplier(supplier);
 		try {
 			ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(CompletableFuture.supplyAsync(ab));
 			ab = null;
@@ -704,7 +845,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -718,7 +859,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	 * @return the new CompletableFuture
 	 */
 	public static <U> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor) {
-		TracerSupplier<U> ab = new TracerSupplier<>(supplier);
+		CancelableSupplier<U> ab = wrapSupplier(supplier);
 		try {
 			ExtendedCompletableFuture<U> result =
 				ExtendedCompletableFuture.of(CompletableFuture.supplyAsync(ab, executor));
@@ -727,7 +868,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -739,7 +880,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	 * @return the new CompletableFuture
 	 */
 	public static ExtendedCompletableFuture<@Nullable Void> runAsync(Runnable runnable) {
-		TracerRunnable ab = new TracerRunnable(runnable);
+		CancelableRunnable ab = wrapRunnable(runnable);
 		try {
 			ExtendedCompletableFuture<@Nullable Void> result =
 				ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab));
@@ -748,7 +889,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
@@ -761,7 +902,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	 * @return the new CompletableFuture
 	 */
 	public static ExtendedCompletableFuture<@Nullable Void> runAsync(Runnable runnable, Executor executor) {
-		TracerRunnable ab = new TracerRunnable(runnable);
+		CancelableRunnable ab = wrapRunnable(runnable);
 		try {
 			ExtendedCompletableFuture<@Nullable Void> result =
 				ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab, executor));
@@ -770,7 +911,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		}
 		finally {
 			if (ab != null)
-				ab.abortContinuation();
+				ab.cancel();
 		}
 	}
 
