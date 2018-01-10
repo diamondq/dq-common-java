@@ -26,7 +26,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	 */
 	@Override
 	public SpanBuilder asChildOf(@Nullable SpanContext pParent) {
-		return mDelegate.asChildOf(pParent);
+		SpanBuilder result = mDelegate.asChildOf(pParent);
+		if (result == mDelegate)
+			return this;
+		return new MDCSpanBuilder(result, mExtractor);
 	}
 
 	/**
@@ -34,7 +37,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	 */
 	@Override
 	public SpanBuilder asChildOf(@Nullable BaseSpan<?> pParent) {
-		return mDelegate.asChildOf(pParent);
+		SpanBuilder result = mDelegate.asChildOf(pParent);
+		if (result == mDelegate)
+			return this;
+		return new MDCSpanBuilder(result, mExtractor);
 	}
 
 	/**
@@ -42,7 +48,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	 */
 	@Override
 	public SpanBuilder addReference(String pReferenceType, @Nullable SpanContext pReferencedContext) {
-		return mDelegate.addReference(pReferenceType, pReferencedContext);
+		SpanBuilder result = mDelegate.addReference(pReferenceType, pReferencedContext);
+		if (result == mDelegate)
+			return this;
+		return new MDCSpanBuilder(result, mExtractor);
 	}
 
 	/**
@@ -50,7 +59,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	 */
 	@Override
 	public SpanBuilder ignoreActiveSpan() {
-		return mDelegate.ignoreActiveSpan();
+		SpanBuilder result = mDelegate.ignoreActiveSpan();
+		if (result == mDelegate)
+			return this;
+		return new MDCSpanBuilder(result, mExtractor);
 	}
 
 	/**
@@ -58,7 +70,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	 */
 	@Override
 	public SpanBuilder withTag(String pKey, @Nullable String pValue) {
-		return mDelegate.withTag(pKey, pValue);
+		SpanBuilder result = mDelegate.withTag(pKey, pValue);
+		if (result == mDelegate)
+			return this;
+		return new MDCSpanBuilder(result, mExtractor);
 	}
 
 	/**
@@ -66,7 +81,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	 */
 	@Override
 	public SpanBuilder withTag(String pKey, boolean pValue) {
-		return mDelegate.withTag(pKey, pValue);
+		SpanBuilder result = mDelegate.withTag(pKey, pValue);
+		if (result == mDelegate)
+			return this;
+		return new MDCSpanBuilder(result, mExtractor);
 	}
 
 	/**
@@ -74,7 +92,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	 */
 	@Override
 	public SpanBuilder withTag(String pKey, @Nullable Number pValue) {
-		return mDelegate.withTag(pKey, pValue);
+		SpanBuilder result = mDelegate.withTag(pKey, pValue);
+		if (result == mDelegate)
+			return this;
+		return new MDCSpanBuilder(result, mExtractor);
 	}
 
 	/**
@@ -82,7 +103,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	 */
 	@Override
 	public SpanBuilder withStartTimestamp(long pMicroseconds) {
-		return mDelegate.withStartTimestamp(pMicroseconds);
+		SpanBuilder result = mDelegate.withStartTimestamp(pMicroseconds);
+		if (result == mDelegate)
+			return this;
+		return new MDCSpanBuilder(result, mExtractor);
 	}
 
 	/**
