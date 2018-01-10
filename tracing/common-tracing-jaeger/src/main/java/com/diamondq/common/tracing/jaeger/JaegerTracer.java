@@ -2,7 +2,6 @@ package com.diamondq.common.tracing.jaeger;
 
 import com.uber.jaeger.propagation.b3.B3TextMapCodec;
 import com.uber.jaeger.reporters.CompositeReporter;
-import com.uber.jaeger.reporters.LoggingReporter;
 import com.uber.jaeger.reporters.Reporter;
 import com.uber.jaeger.samplers.ConstSampler;
 import com.uber.jaeger.samplers.Sampler;
@@ -45,7 +44,18 @@ public class JaegerTracer implements Tracer {
 	public JaegerTracer(Instance<Reporter> pReporters) {
 		B3TextMapCodec b3Codec = new B3TextMapCodec();
 		List<Reporter> reporters = new ArrayList<>();
-		reporters.add(new LoggingReporter(sLogger));
+		reporters.add(new Reporter() {
+
+			@Override
+			public void report(com.uber.jaeger.Span pSpan) {
+				sLogger.trace("Span reported: {}", pSpan);
+			}
+
+			@Override
+			public void close() {
+
+			}
+		});
 		for (@SuppressWarnings("null")
 		Iterator<@Nullable Reporter> i = pReporters.iterator(); i.hasNext();) {
 			Reporter r = i.next();
