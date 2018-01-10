@@ -1,5 +1,7 @@
 package com.diamondq.common.tracing.opentracing;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import io.opentracing.BaseSpan;
 
 public interface TraceIdExtractor {
@@ -10,5 +12,5 @@ public interface TraceIdExtractor {
 	 * @param pSpan the span
 	 * @return the id
 	 */
-	public String getTraceId(BaseSpan<?> pSpan);
+	public @Nullable String getTraceId(@Nullable BaseSpan<?> pSpan);
 }

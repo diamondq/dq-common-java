@@ -114,7 +114,7 @@ public class OpenTracingExtender {
 		pClient.addInboundIQListener(inboundListener);
 	}
 
-	private static @Nullable SpanBuilder processID(String id, String pOperation) {
+	public static @Nullable SpanBuilder processID(String id) {
 		try {
 			int offset = id.indexOf(sKEYWORD);
 			if (offset != -1) {
@@ -143,6 +143,7 @@ public class OpenTracingExtender {
 
 		private final IQHandler	mDelegate;
 
+		@SuppressWarnings("unused")
 		private final String	mOperation;
 
 		public WrappedIQHandler(IQHandler pDelegate, String pOperation) {
@@ -159,7 +160,7 @@ public class OpenTracingExtender {
 			/* Let's see if there is a tracing block */
 
 			String id = pIQ.getId();
-			SpanBuilder spanBuilder = processID(id, mOperation);
+			SpanBuilder spanBuilder = processID(id);
 			if (spanBuilder == null)
 				return mDelegate.handleRequest(pIQ);
 			try (ActiveSpan span = spanBuilder.startActive()) {
