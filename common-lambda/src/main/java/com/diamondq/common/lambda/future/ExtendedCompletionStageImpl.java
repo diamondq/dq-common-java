@@ -600,6 +600,47 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 		});
 	}
 
+	private static class ExceptionMarker {
+		public final Throwable throwable;
+
+		public ExceptionMarker(Throwable ex) {
+			throwable = ex;
+		}
+	}
+
+	@Override
+	public ExtendedCompletionStage<T> exceptionallyCompose(Function<Throwable, ? extends CompletionStage<T>> pFn) {
+		return exceptionally((ex) -> {
+			ExceptionMarker em = new ExceptionMarker(ex);
+			Object emo = em;
+			@SuppressWarnings("unchecked")
+			T t = (T) emo;
+			return t;
+		}).thenCompose((x) -> {
+			if (x instanceof ExceptionMarker)
+				return pFn.apply(((ExceptionMarker) x).throwable);
+			else
+				return ExtendedCompletableFuture.completedFuture(x);
+		});
+	}
+
+	@Override
+	public ExtendedCompletionStage<T> exceptionallyCompose(Function<Throwable, ? extends CompletionStage<T>> pFn,
+		Executor pExecutor) {
+		return exceptionally((ex) -> {
+			ExceptionMarker em = new ExceptionMarker(ex);
+			Object emo = em;
+			@SuppressWarnings("unchecked")
+			T t = (T) emo;
+			return t;
+		}).thenComposeAsync((x) -> {
+			if (x instanceof ExceptionMarker)
+				return pFn.apply(((ExceptionMarker) x).throwable);
+			else
+				return ExtendedCompletableFuture.completedFuture(x);
+		}, pExecutor);
+	}
+
 	@Override
 	public String toString() {
 		return mDelegate.toString();

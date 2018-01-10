@@ -249,6 +249,11 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	@Override
 	public ExtendedCompletionStage<T> exceptionally(Function<Throwable, ? extends T> fn);
 
+	public ExtendedCompletionStage<T> exceptionallyCompose(Function<Throwable, ? extends CompletionStage<T>> fn);
+
+	public ExtendedCompletionStage<T> exceptionallyCompose(Function<Throwable, ? extends CompletionStage<T>> fn,
+		Executor executor);
+
 	/**
 	 * @see java.util.concurrent.CompletionStage#whenComplete(java.util.function.BiConsumer)
 	 */
