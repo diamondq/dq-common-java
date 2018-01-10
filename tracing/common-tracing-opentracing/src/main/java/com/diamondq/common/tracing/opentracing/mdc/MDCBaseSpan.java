@@ -20,7 +20,8 @@ public class MDCBaseSpan<S extends BaseSpan<S>> implements BaseSpan<S> {
 		mDelegate = pDelegate;
 		mExtractor = pExtractor;
 		String traceId = pExtractor.getTraceId(mDelegate);
-		MDC.put("traceId", traceId);
+		if (traceId != null)
+			MDC.put("traceId", traceId);
 	}
 
 	@Override
