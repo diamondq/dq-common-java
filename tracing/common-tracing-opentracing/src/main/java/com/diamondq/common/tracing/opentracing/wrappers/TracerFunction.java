@@ -4,6 +4,9 @@ import com.diamondq.common.lambda.interfaces.CancelableFunction;
 
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.opentracing.ActiveSpan;
 import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
@@ -12,7 +15,9 @@ import io.opentracing.util.GlobalTracer;
 public class TracerFunction<A, B> extends AbstractTracerWrapper
 	implements Function<A, B>, AbortableContinuation, CancelableFunction<A, B> {
 
-	private final Function<A, B> mDelegate;
+	private static final Logger		sLogger	= LoggerFactory.getLogger(TracerFunction.class);
+
+	private final Function<A, B>	mDelegate;
 
 	public TracerFunction(Function<A, B> pDelegate) {
 		this(GlobalTracer.get(), pDelegate);
@@ -28,11 +33,24 @@ public class TracerFunction<A, B> extends AbstractTracerWrapper
 	 */
 	@Override
 	public B apply(A pT) {
-		Continuation c = mSpanContinuation.getAndSet(null);
-		if (c == null)
-			return mDelegate.apply(pT);
-		try (ActiveSpan span = c.activate()) {
-			return mDelegate.apply(pT);
+		boolean inApply = false;
+		try {
+			Continuation c = mSpanContinuation.getAndSet(null);
+			if (c == null) {
+				inApply = true;
+				return mDelegate.apply(pT);
+			}
+			try (ActiveSpan span = c.activate()) {
+				inApply = true;
+				B result = mDelegate.apply(pT);
+				inApply = false;
+				return result;
+			}
+		}
+		catch (RuntimeException ex) {
+			if (inApply == false)
+				sLogger.error("Error during span activation or shutdown", ex);
+			throw ex;
 		}
 	}
 

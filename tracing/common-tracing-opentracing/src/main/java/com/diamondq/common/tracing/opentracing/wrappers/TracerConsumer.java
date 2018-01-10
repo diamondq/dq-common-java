@@ -2,6 +2,9 @@ package com.diamondq.common.tracing.opentracing.wrappers;
 
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.opentracing.ActiveSpan;
 import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
@@ -9,7 +12,9 @@ import io.opentracing.util.GlobalTracer;
 
 public class TracerConsumer<T> extends AbstractTracerWrapper implements Consumer<T>, AbortableContinuation {
 
-	private final Consumer<T> mDelegate;
+	private static final Logger	sLogger	= LoggerFactory.getLogger(TracerConsumer.class);
+
+	private final Consumer<T>	mDelegate;
 
 	public TracerConsumer(Consumer<T> pDelegate) {
 		this(GlobalTracer.get(), pDelegate);
@@ -22,13 +27,24 @@ public class TracerConsumer<T> extends AbstractTracerWrapper implements Consumer
 
 	@Override
 	public void accept(T pT) {
-		Continuation c = mSpanContinuation.getAndSet(null);
-		if (c == null) {
-			mDelegate.accept(pT);
-			return;
+		boolean inAccept = false;
+		try {
+			Continuation c = mSpanContinuation.getAndSet(null);
+			if (c == null) {
+				inAccept = true;
+				mDelegate.accept(pT);
+				return;
+			}
+			try (ActiveSpan span = c.activate()) {
+				inAccept = true;
+				mDelegate.accept(pT);
+				inAccept = false;
+			}
 		}
-		try (ActiveSpan span = c.activate()) {
-			mDelegate.accept(pT);
+		catch (RuntimeException ex) {
+			if (inAccept == false)
+				sLogger.error("Error during span activation or shutdown", ex);
+			throw ex;
 		}
 	}
 

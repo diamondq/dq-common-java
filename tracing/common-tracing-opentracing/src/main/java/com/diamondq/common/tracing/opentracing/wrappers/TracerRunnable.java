@@ -2,6 +2,9 @@ package com.diamondq.common.tracing.opentracing.wrappers;
 
 import com.diamondq.common.lambda.interfaces.CancelableRunnable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.opentracing.ActiveSpan;
 import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
@@ -9,8 +12,9 @@ import io.opentracing.util.GlobalTracer;
 
 public class TracerRunnable extends AbstractTracerWrapper
 	implements Runnable, AbortableContinuation, CancelableRunnable {
+	private static final Logger	sLogger	= LoggerFactory.getLogger(TracerRunnable.class);
 
-	private final Runnable mDelegate;
+	private final Runnable		mDelegate;
 
 	public TracerRunnable(Runnable pDelegate) {
 		this(GlobalTracer.get(), pDelegate);
@@ -26,13 +30,24 @@ public class TracerRunnable extends AbstractTracerWrapper
 	 */
 	@Override
 	public void run() {
-		Continuation c = mSpanContinuation.getAndSet(null);
-		if (c == null) {
-			mDelegate.run();
-			return;
+		boolean inRun = false;
+		try {
+			Continuation c = mSpanContinuation.getAndSet(null);
+			if (c == null) {
+				inRun = true;
+				mDelegate.run();
+				return;
+			}
+			try (ActiveSpan span = c.activate()) {
+				inRun = true;
+				mDelegate.run();
+				inRun = false;
+			}
 		}
-		try (ActiveSpan span = c.activate()) {
-			mDelegate.run();
+		catch (RuntimeException ex) {
+			if (inRun == false)
+				sLogger.error("Error during span activation or shutdown", ex);
+			throw ex;
 		}
 	}
 
