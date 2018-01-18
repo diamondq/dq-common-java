@@ -3,6 +3,7 @@ package com.diamondq.common.servers.undertow;
 import com.diamondq.common.config.Config;
 import com.diamondq.common.config.core.std.StandardBootstrap;
 
+import javax.enterprise.inject.spi.CDI;
 import javax.ws.rs.core.Application;
 
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -31,6 +32,8 @@ public class LaunchServer {
 			Config config = new StandardBootstrap().bootstrap();
 			@SuppressWarnings("unused")
 			UndertowRESTEasyWeldServer server = new UndertowRESTEasyWeldServer(config, pAppClass);
+
+			CDI.current().getBeanManager().getEvent().select(JAXRSServerLaunched.class).fire(new JAXRSServerLaunched());
 
 			/* Wait forever */
 
