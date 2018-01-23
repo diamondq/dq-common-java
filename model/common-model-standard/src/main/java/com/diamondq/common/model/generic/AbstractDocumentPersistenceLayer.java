@@ -258,7 +258,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 						newDec = new BigDecimal((Short) newValue);
 					else
 						throw new UnsupportedOperationException();
-					if (value.equals(newDec) == false) {
+					if (newDec.equals(value) == false) {
 						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal,
 							newDec);
 						changed = true;
