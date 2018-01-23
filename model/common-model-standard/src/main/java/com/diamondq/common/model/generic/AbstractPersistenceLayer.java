@@ -1,6 +1,7 @@
 package com.diamondq.common.model.generic;
 
 import com.diamondq.common.model.generic.GenericQueryBuilder.GenericWhereInfo;
+import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.EditorPropertyDefinition;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
@@ -49,15 +50,18 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
 	protected final Scope																														mScope;
 
-	protected volatile Locale																													mGlobalDefaultLocale	=
+	protected volatile Locale																													mGlobalDefaultLocale		=
 		Locale.US;
 
-	protected final ThreadLocal<Locale>																											mDefaultLocale			=
+	protected final ThreadLocal<Locale>																											mDefaultLocale				=
 		ThreadLocal.withInitial(() -> mGlobalDefaultLocale);
 
 	protected static final BitSet																												sValidFileNamesBitSet;
 
 	protected static final BitSet																												sInvalidPrimayKeyBitSet;
+
+	private static final String																													sTOMBSTONE_RESOURCE_STRING	=
+		"__S__TOMBSTONE__S__";
 
 	protected final ConcurrentMap<String, ConcurrentMap<Integer, ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>>>>	mMigrationFunctions;
 
@@ -116,6 +120,51 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public Structure createNewStructure(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition) {
 		return new GenericStructure(pScope, pStructureDefinition, null);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#createNewTombstoneStructure(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
+	 */
+	@Override
+	public Structure createNewTombstoneStructure(Toolkit pToolkit, Scope pScope, Structure pOldStructure) {
+		Map<String, Property<?>> oldProperties = pOldStructure.getProperties();
+		Map<String, Property<?>> newProps = Maps.transformEntries(oldProperties, (key, value) -> {
+			if (value == null)
+				return null;
+
+			/* Leave primary keys alone */
+
+			if (value.getDefinition().isPrimaryKey() == true)
+				return value;
+
+			/* Leave container references alone */
+
+			if (value.getDefinition().getKeywords().containsKey(CommonKeywordKeys.CONTAINER))
+				return value;
+
+			/* Clear out the rest */
+			return value.clearValueSet();
+		});
+		return new GenericTombstoneStructure(pScope, pOldStructure.getDefinition(), newProps);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#createNewTombstoneResourceString(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope)
+	 */
+	@Override
+	public String createNewTombstoneResourceString(Toolkit pToolkit, Scope pScope) {
+		return sTOMBSTONE_RESOURCE_STRING;
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#isTombstoneResourceString(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+	 */
+	@Override
+	public boolean isTombstoneResourceString(Toolkit pToolkit, Scope pScope, String pValue) {
+		return sTOMBSTONE_RESOURCE_STRING.equals(pValue);
 	}
 
 	/**
@@ -263,6 +312,15 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 		StructureDefinition pResolvable, boolean pWildcard) {
 		return new GenericStructureDefinitionRef(pScope, pResolvable.getName(),
 			pWildcard == true ? null : pResolvable.getRevision());
+	}
+
+	/**
+	 * @see com.diamondq.common.model.generic.PersistenceLayer#createNewTombstoneStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
+	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+	 */
+	@Override
+	public StructureDefinition createNewTombstoneStructureDefinition(Toolkit pToolkit, Scope pScope, String pName) {
+		return new GenericTombstoneStructureDefinition(pScope, pName);
 	}
 
 	/**

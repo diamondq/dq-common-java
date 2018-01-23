@@ -35,6 +35,8 @@ public interface PersistenceLayer {
 	public StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName,
 		int pRevision);
 
+	public StructureDefinition createNewTombstoneStructureDefinition(Toolkit pToolkit, Scope pScope, String pName);
+
 	public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
 	public void deleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
@@ -71,6 +73,8 @@ public interface PersistenceLayer {
 	/* Structure */
 
 	public Structure createNewStructure(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition);
+
+	public Structure createNewTombstoneStructure(Toolkit pToolkit, Scope pScope, Structure pOldStructure);
 
 	public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure);
 
@@ -131,6 +135,10 @@ public interface PersistenceLayer {
 	public void writeResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey, String pValue);
 
 	public void deleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey);
+
+	public String createNewTombstoneResourceString(Toolkit pToolkit, Scope pScope);
+
+	public boolean isTombstoneResourceString(Toolkit pToolkit, Scope pScope, String pValue);
 
 	public Collection<Locale> getResourceStringLocales(Toolkit pToolkit, Scope pScope);
 
