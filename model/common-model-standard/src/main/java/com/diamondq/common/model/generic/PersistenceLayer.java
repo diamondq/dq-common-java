@@ -148,7 +148,7 @@ public interface PersistenceLayer {
 		StructureDefinition pStructureDefinition);
 
 	public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope,
-		StructureDefinition pStructureDefinition, QueryBuilder pBuilder, Map<String, Object> pParamValues);
+		StructureDefinition pStructureDefinition, QueryBuilder pBuilder, @Nullable Map<String, Object> pParamValues);
 
 	public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope);
 

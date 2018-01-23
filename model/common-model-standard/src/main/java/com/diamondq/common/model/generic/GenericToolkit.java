@@ -256,7 +256,7 @@ public class GenericToolkit implements Toolkit {
 	 */
 	@Override
 	public List<Structure> lookupStructuresByQuery(Scope pScope, StructureDefinition pStructureDefinition,
-		QueryBuilder pBuilder, Map<String, Object> pParamValues) {
+		QueryBuilder pBuilder, @Nullable Map<String, Object> pParamValues) {
 		return getPersistenceLayer(pScope).lookupStructuresByQuery(this, pScope, pStructureDefinition, pBuilder,
 			pParamValues);
 	}

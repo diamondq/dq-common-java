@@ -28,6 +28,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
@@ -494,20 +496,46 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope,
-		StructureDefinition pStructureDefinition, QueryBuilder pBuilder, Map<String, Object> pParamValues) {
+		StructureDefinition pStructureDefinition, QueryBuilder pBuilder, @Nullable Map<String, Object> pParamValues) {
 
 		GenericQueryBuilder gqb = (GenericQueryBuilder) pBuilder;
+
+		/* Analyze the query to see if it only refers to primary keys */
+
+		List<String> primaryKeyNames = pStructureDefinition.lookupPrimaryKeyNames();
+		Set<String> primaryKeySet = Sets.newHashSet(primaryKeyNames);
+
+		List<GenericWhereInfo> whereList = gqb.getWhereList();
+		boolean onlyPrimary = true;
+		for (GenericWhereInfo wi : whereList) {
+			if (primaryKeySet.contains(wi.key) == false) {
+				onlyPrimary = false;
+				break;
+			}
+		}
+
+		/*
+		 * If we're only referring to the primary keys, then we can optimize the query since it's either a direct match
+		 * or a range query
+		 */
+
+		if (onlyPrimary == true) {
+
+		}
+
 		String parentParamKey = gqb.getParentParamKey();
 		PropertyDefinition parentPropertyDefinition = gqb.getParentPropertyDefinition();
 		String parentKey;
 		if (parentParamKey == null)
 			parentKey = null;
-		else
+		else {
+			if (pParamValues == null)
+				throw new IllegalArgumentException("Parent key provided but no parameters provided");
 			parentKey = (String) pParamValues.get(parentParamKey);
+		}
 		Collection<Structure> allStructures = getAllStructuresByDefinition(pToolkit, pScope,
 			pStructureDefinition.getWildcardReference(), parentKey, parentPropertyDefinition);
 		List<Structure> results = Lists.newArrayList();
-		List<GenericWhereInfo> whereList = gqb.getWhereList();
 		for (Structure test : allStructures) {
 
 			boolean matches = true;
@@ -517,12 +545,15 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 					continue;
 				Object testValue = prop.getValue(test);
 				Object actValue;
-				if (w.paramKey != null)
+				if (w.paramKey != null) {
+					if (pParamValues == null)
+						throw new IllegalArgumentException("Parameter key provided by no parameters provided");
 					actValue = pParamValues.get(w.paramKey);
+				}
 				else
 					actValue = w.constant;
 
-				/* Now do the comparsion based on the operator */
+				/* Now do the comparison based on the operator */
 
 				switch (w.operator) {
 				case eq: {
@@ -728,6 +759,17 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 				sParams[i] = (String) pParams[i];
 			}
 			return new StandardCopyColumnMigration(sParams);
+		}
+		case SET_VALUE: {
+			if (pParams == null)
+				throw new IllegalArgumentException();
+			if (pParams.length != 2)
+				throw new IllegalArgumentException();
+			if ((pParams[0] instanceof String) == false)
+				throw new IllegalArgumentException();
+			String paramName = (String) pParams[0];
+			Object newValue = pParams[1];
+			return new StandardSetValueMigration(paramName, newValue);
 		}
 		default:
 			throw new IllegalArgumentException();

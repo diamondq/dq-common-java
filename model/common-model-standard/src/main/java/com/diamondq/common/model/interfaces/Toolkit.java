@@ -441,7 +441,7 @@ public interface Toolkit {
 	public QueryBuilder createNewQueryBuilder(Scope pScope);
 
 	public List<Structure> lookupStructuresByQuery(Scope pScope, StructureDefinition pStructureDefinition,
-		QueryBuilder pBuilder, Map<String, Object> pParamValues);
+		QueryBuilder pBuilder, @Nullable Map<String, Object> pParamValues);
 
 	/**
 	 * Creates a new standard migration
