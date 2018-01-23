@@ -129,6 +129,9 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	@SuppressWarnings("unused")
 	private final @Nullable File	mEditorStructureDefBaseDir;
 
+	@SuppressWarnings("unused")
+	private final @Nullable File	mResourceBaseDir;
+
 	/**
 	 * Default constructor
 	 *
@@ -145,13 +148,51 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		mStructureBaseDir = pStructureBaseDir;
 		mStructureDefBaseDir = pStructureDefBaseDir;
 		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
+		mResourceBaseDir = null;
+	}
+
+	/**
+	 * Additional constructor
+	 *
+	 * @param pScope the scope
+	 * @param pStructureBaseDir the directory for structures
+	 * @param pCacheStructures
+	 * @param pCacheStructuresSeconds the number of seconds to cache
+	 * @param pStructureDefBaseDir the directory for structure definitions
+	 * @param pCacheStructureDefinitions
+	 * @param pCacheStructureDefinitionsSeconds
+	 * @param pEditorStructureDefBaseDir the directory for editor structure definitions
+	 * @param pCacheEditorStructureDefinitions
+	 * @param pCacheEditorStructureDefinitionsSeconds
+	 * @param pResourcesBaseDir
+	 * @param pCacheResources
+	 * @param pCacheResourcesSeconds
+	 */
+	public PropertiesFilePersistenceLayer(Scope pScope, @Nullable File pStructureBaseDir, boolean pCacheStructures,
+		int pCacheStructuresSeconds, @Nullable File pStructureDefBaseDir, boolean pCacheStructureDefinitions,
+		int pCacheStructureDefinitionsSeconds, @Nullable File pEditorStructureDefBaseDir,
+		boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds,
+		@Nullable File pResourcesBaseDir, boolean pCacheResources, int pCacheResourcesSeconds) {
+		super(pScope, pStructureBaseDir != null, pCacheStructures, pCacheStructuresSeconds,
+			pStructureDefBaseDir != null, pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds,
+			pEditorStructureDefBaseDir != null, pCacheEditorStructureDefinitions,
+			pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir != null, pCacheResources,
+			pCacheResourcesSeconds);
+		mStructureBaseDir = pStructureBaseDir;
+		mStructureDefBaseDir = pStructureDefBaseDir;
+		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
+		mResourceBaseDir = pResourcesBaseDir;
+	}
+
+	protected @Nullable File getStructureBaseDir() {
+		return mStructureBaseDir;
 	}
 
 	protected @Nullable File getStructureFile(String pKey, boolean pCreateIfMissing) {
 		@NonNull
 		String[] parts = pKey.split("/");
 		parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
-		File structureFile = mStructureBaseDir;
+		File structureFile = getStructureBaseDir();
 		if (structureFile == null)
 			throw new IllegalStateException("Constructor was called with a null structureFile");
 		for (String p : parts)
@@ -168,7 +209,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 	protected @Nullable File getStructureDir(@Nullable String pKey, boolean pCreateIfMissing) {
 		@NonNull
 		String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
-		File structureFile = mStructureBaseDir;
+		File structureFile = getStructureBaseDir();
 		if (structureFile == null)
 			throw new IllegalStateException("Constructor was called with a null structureFile");
 		for (String p : parts)
