@@ -13,6 +13,8 @@ import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 @ApplicationScoped
 public class ExecutorsProvider {
 
@@ -25,12 +27,26 @@ public class ExecutorsProvider {
 	@Produces
 	@ApplicationScoped
 	@Named("long-lived")
-	public ScheduledExecutorService createScheduledExecutorService(Instance<Config> pConfig) {
+	public ScheduledExecutorService createScheduledExecutorServiceViaInjection(Instance<Config> pConfig) {
+		@Nullable
+		Config config = null;
+		if (pConfig.isResolvable() == true)
+			config = pConfig.get();
+		return createScheduledExecutorService(config);
+	}
+
+	/**
+	 * Creates 'long-lived' executor service that will generate threads on demand.
+	 *
+	 * @param pConfig the config
+	 * @return the login-lived executor service
+	 */
+	public static ScheduledExecutorService createScheduledExecutorService(@Nullable Config pConfig) {
 
 		ThreadFactory threadFactory = Executors.defaultThreadFactory();
 		Integer corePoolSize = null;
-		if (pConfig.isResolvable() == true)
-			corePoolSize = pConfig.get().bind("executors.core-pool-size", Integer.class);
+		if (pConfig != null)
+			corePoolSize = pConfig.bind("executors.core-pool-size", Integer.class);
 		if (corePoolSize == null)
 			corePoolSize = Runtime.getRuntime().availableProcessors();
 		ScheduledExecutorService scheduledExecutorService =
