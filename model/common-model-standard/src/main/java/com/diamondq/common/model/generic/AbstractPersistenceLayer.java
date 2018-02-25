@@ -816,7 +816,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
 		Toolkit pToolkit, Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision) {
 
-		String cacheKey = new StringBuilder().append(pFromRevision).append('-').append(pToRevision).toString();
+		String cacheKey = new StringBuilder().append(pStructureDefName).append('-').append(pFromRevision).append('-')
+			.append(pToRevision).toString();
 		List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> cachedResults =
 			mMigrationCache.getIfPresent(cacheKey);
 		if (cachedResults != null)
