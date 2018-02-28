@@ -15,5 +15,6 @@
 		<module>../common-utils-sync</module>
 		<module>../common-utils-parsing</module>
 		<module>../common-utils-log4j2</module>
+		<module>../common-utils-misc</module>
 	</modules>
 </project>
