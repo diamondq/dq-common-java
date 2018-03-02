@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import rocks.xmpp.core.XmppException;
-import rocks.xmpp.core.session.ConnectionConfiguration;
+import rocks.xmpp.core.net.client.ClientConnectionConfiguration;
 import rocks.xmpp.core.session.ReconnectionStrategy;
 import rocks.xmpp.core.session.TcpConnectionConfiguration;
 import rocks.xmpp.core.session.XmppClient;
@@ -92,7 +92,7 @@ public class XMPPClientProducer {
 
 		for (XMPPServerInfo serverInfo : pServerInfos) {
 
-			List<ConnectionConfiguration> configurationList = Lists.newArrayList();
+			List<ClientConnectionConfiguration> configurationList = Lists.newArrayList();
 
 			/* Handle the TCP Configuration */
 
@@ -202,7 +202,8 @@ public class XMPPClientProducer {
 
 			XmppSessionConfiguration sessionConfiguration = builder.build();
 
-			ConnectionConfiguration[] configurations = configurationList.toArray(new ConnectionConfiguration[0]);
+			ClientConnectionConfiguration[] configurations =
+				configurationList.toArray(new ClientConnectionConfiguration[0]);
 
 			/* Connect to the domain */
 

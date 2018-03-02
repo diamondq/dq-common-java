@@ -42,6 +42,10 @@
 			<artifactId>xmpp-extensions-client</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>rocks.xmpp</groupId>
+			<artifactId>xmpp-debug</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.diamondq.common.java.tracing</groupId>
 			<artifactId>common-tracing-opentracing</artifactId>
 		</dependency>
