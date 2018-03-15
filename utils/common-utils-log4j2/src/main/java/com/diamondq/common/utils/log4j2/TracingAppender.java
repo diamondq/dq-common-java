@@ -15,7 +15,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Span;
 import io.opentracing.util.GlobalTracer;
 
 @Plugin(name = "OpenTracing", category = "Core", elementType = "appender", printObject = true)
@@ -49,7 +49,7 @@ public class TracingAppender extends AbstractAppender {
 
 	@Override
 	public void append(LogEvent pEvent) {
-		ActiveSpan activeSpan = GlobalTracer.get().activeSpan();
+		Span activeSpan = GlobalTracer.get().activeSpan();
 		if (activeSpan == null)
 			return;
 		Layout<? extends Serializable> layout = getLayout();
