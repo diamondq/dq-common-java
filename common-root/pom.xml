@@ -20,11 +20,13 @@
 		<common-config.version>0.1.0-SNAPSHOT</common-config.version>
 		<undertow.version>1.4.20.Final</undertow.version>
 		<resteasy.version>3.1.4.Final</resteasy.version>
-		<weld.version>3.0.0.Final</weld.version>
+		<weld.version>2.4.6.Final</weld.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<openaz.version>0.0.1-SNAPSHOT</openaz.version>
 		<rocks.xmpp.version>0.8.0.DQ-SNAPSHOT</rocks.xmpp.version>
+		<rocks.precis.version>1.1.0-DQ-SNAPSHOT</rocks.precis.version>
 		<jboss-logging.version>3.3.1.Final</jboss-logging.version>
+		<snapshot.update.policy>always</snapshot.update.policy>
 	</properties>
 	<profiles>
 		<profile>
@@ -77,7 +79,7 @@
 			<url>https://nexus.diamondq.com/repository/maven-snapshots/</url>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
+				<updatePolicy>${snapshot.update.policy}</updatePolicy>
 			</snapshots>
 			<releases>
 				<enabled>false</enabled>
@@ -95,7 +97,7 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
+				<updatePolicy>${snapshot.update.policy}</updatePolicy>
 			</snapshots>
 			<releases>
 				<enabled>false</enabled>
@@ -211,7 +213,7 @@
 			<dependency>
 				<groupId>org.jboss.weld</groupId>
 				<artifactId>weld-junit4</artifactId>
-				<version>1.1.0.Final</version>
+				<version>1.2.1.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>javax</groupId>
@@ -221,32 +223,32 @@
 			<dependency>
 				<groupId>io.opentracing</groupId>
 				<artifactId>opentracing-api</artifactId>
-				<version>0.30.0</version>
+				<version>0.31.0</version>
 			</dependency>
 			<dependency>
 				<groupId>io.opentracing</groupId>
 				<artifactId>opentracing-util</artifactId>
-				<version>0.30.0</version>
+				<version>0.31.0</version>
 			</dependency>
 			<dependency>
 				<groupId>io.opentracing</groupId>
 				<artifactId>opentracing-mock</artifactId>
-				<version>0.30.0</version>
+				<version>0.31.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.uber.jaeger</groupId>
 				<artifactId>jaeger-core</artifactId>
-				<version>0.21.0</version>
+				<version>0.24.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.uber.jaeger</groupId>
 				<artifactId>jaeger-context</artifactId>
-				<version>0.21.0</version>
+				<version>0.24.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.uber.jaeger</groupId>
 				<artifactId>jaeger-zipkin</artifactId>
-				<version>0.21.0</version>
+				<version>0.24.0</version>
 			</dependency>
 			<dependency>
 				<groupId>io.swagger</groupId>
@@ -314,7 +316,7 @@
 			<dependency>
 				<groupId>javax.enterprise</groupId>
 				<artifactId>cdi-api</artifactId>
-				<version>2.0</version>
+				<version>1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.shredzone.acme4j</groupId>
@@ -429,9 +431,19 @@
 				<version>${rocks.xmpp.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>rocks.xmpp</groupId>
+				<artifactId>precis</artifactId>
+				<version>${rocks.precis.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.ops4j.pax.cdi</groupId>
+				<artifactId>pax-cdi-api</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+			<dependency>
 				<groupId>dnsjava</groupId>
 				<artifactId>dnsjava</artifactId>
-				<version>2.1.8</version>
+				<version>2.1.8-DQ-2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -439,10 +451,12 @@
 		<dependency>
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>org.eclipse.jdt.annotation</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.checkerframework</groupId>
 			<artifactId>checker-qual</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 	<modules>
@@ -523,6 +537,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>3.6</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<version>3.5.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
