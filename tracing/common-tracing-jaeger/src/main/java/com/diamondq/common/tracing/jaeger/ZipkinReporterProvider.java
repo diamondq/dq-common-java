@@ -21,7 +21,7 @@ public class ZipkinReporterProvider {
 	@Produces
 	@Dependent
 	public @Nullable Reporter getZipkinReporter(Instance<Config> pConfig) {
-		if (pConfig.isResolvable() == false)
+		if ((pConfig.isAmbiguous() == true) || (pConfig.isUnsatisfied() == true))
 			return null;
 		Config config = pConfig.get();
 		String zipkinURL = config.bind("tracing.zipkin.url", String.class);

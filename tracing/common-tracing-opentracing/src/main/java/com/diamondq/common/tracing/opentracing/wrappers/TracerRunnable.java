@@ -5,8 +5,8 @@ import com.diamondq.common.lambda.interfaces.CancelableRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
@@ -32,13 +32,13 @@ public class TracerRunnable extends AbstractTracerWrapper
 	public void run() {
 		boolean inRun = false;
 		try {
-			Continuation c = mSpanContinuation.getAndSet(null);
+			Span c = mSpan;
 			if (c == null) {
 				inRun = true;
 				mDelegate.run();
 				return;
 			}
-			try (ActiveSpan span = c.activate()) {
+			try (Scope scope = mScopeManager.activate(mSpan, false)) {
 				inRun = true;
 				mDelegate.run();
 				inRun = false;

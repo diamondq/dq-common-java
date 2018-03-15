@@ -10,7 +10,7 @@ import javax.inject.Inject;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 
 @Decorator
@@ -24,7 +24,7 @@ public abstract class TracerDecorator implements Tracer {
 	@Inject
 	public TracerDecorator(@Delegate Tracer pTracer, Instance<TraceIdExtractor> pExtractor) {
 		mTracer = pTracer;
-		mExtractor = pExtractor.isResolvable() == true ? pExtractor.get() : null;
+		mExtractor = pExtractor.isUnsatisfied() == false && pExtractor.isAmbiguous() == false ? pExtractor.get() : null;
 	}
 
 	/**
@@ -40,17 +40,17 @@ public abstract class TracerDecorator implements Tracer {
 	}
 
 	/**
-	 * @see io.opentracing.ActiveSpanSource#activeSpan()
+	 * @see io.opentracing.Tracer#activeSpan()
 	 */
 	@Override
-	public @Nullable ActiveSpan activeSpan() {
-		ActiveSpan result = mTracer.activeSpan();
+	public @Nullable Span activeSpan() {
+		Span result = mTracer.activeSpan();
 		if (result == null)
 			return null;
 		TraceIdExtractor extractor = mExtractor;
 		if (extractor == null)
 			return result;
 		else
-			return new MDCActiveSpan(result, extractor);
+			return new MDCSpan(result, extractor);
 	}
 }

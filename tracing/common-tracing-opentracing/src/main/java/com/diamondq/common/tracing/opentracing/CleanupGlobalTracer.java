@@ -5,14 +5,13 @@ import java.lang.reflect.Field;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeforeShutdown;
-import javax.enterprise.inject.spi.Extension;
 import javax.inject.Inject;
 
-import io.opentracing.NoopTracerFactory;
+import io.opentracing.noop.NoopTracerFactory;
 import io.opentracing.util.GlobalTracer;
 
 @ApplicationScoped
-public class CleanupGlobalTracer implements Extension {
+public class CleanupGlobalTracer {
 
 	@Inject
 	public CleanupGlobalTracer() {

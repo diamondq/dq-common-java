@@ -4,8 +4,7 @@ import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.BaseSpan;
+import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer.SpanBuilder;
@@ -33,10 +32,10 @@ public class MDCSpanBuilder implements SpanBuilder {
 	}
 
 	/**
-	 * @see io.opentracing.Tracer.SpanBuilder#asChildOf(io.opentracing.BaseSpan)
+	 * @see io.opentracing.Tracer.SpanBuilder#asChildOf(io.opentracing.Span)
 	 */
 	@Override
-	public SpanBuilder asChildOf(@Nullable BaseSpan<?> pParent) {
+	public SpanBuilder asChildOf(@Nullable Span pParent) {
 		SpanBuilder result = mDelegate.asChildOf(pParent);
 		if (result == mDelegate)
 			return this;
@@ -110,11 +109,11 @@ public class MDCSpanBuilder implements SpanBuilder {
 	}
 
 	/**
-	 * @see io.opentracing.Tracer.SpanBuilder#startActive()
+	 * @see io.opentracing.Tracer.SpanBuilder#startActive(boolean)
 	 */
 	@Override
-	public ActiveSpan startActive() {
-		return new MDCActiveSpan(mDelegate.startActive(), mExtractor);
+	public Scope startActive(boolean pFinishSpanOnClose) {
+		return new MDCScope(mDelegate.startActive(pFinishSpanOnClose), mExtractor);
 	}
 
 	/**

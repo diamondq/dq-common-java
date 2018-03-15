@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Scope;
 import io.opentracing.Tracer;
 
 public class SimpleTest {
@@ -23,9 +23,9 @@ public class SimpleTest {
 	public void testFoo() {
 		Tracer tracer = weld.select(Tracer.class).get();
 		assertNotNull(tracer);
-		try (ActiveSpan span = tracer.buildSpan("testFoo").startActive()) {
+		try (Scope scope = tracer.buildSpan("testFoo").startActive(true)) {
 			sLogger.info("Test logging First");
-			try (ActiveSpan childSpan = tracer.buildSpan("childFoo").asChildOf(span).startActive()) {
+			try (Scope childSpan = tracer.buildSpan("childFoo").asChildOf(scope.span()).startActive(true)) {
 				sLogger.info("Test logging Inner");
 			}
 			sLogger.info("Test logging Outer");

@@ -5,15 +5,16 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.NoopTracerFactory;
+import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
+import io.opentracing.noop.NoopTracerFactory;
 import io.opentracing.propagation.Format;
 import io.opentracing.util.GlobalTracer;
 
@@ -37,19 +38,19 @@ public class NoopTracer implements Tracer {
 	}
 
 	/**
-	 * @see io.opentracing.ActiveSpanSource#activeSpan()
+	 * @see io.opentracing.Tracer#scopeManager()
 	 */
 	@Override
-	public @Nullable ActiveSpan activeSpan() {
-		return mDelegate.activeSpan();
+	public ScopeManager scopeManager() {
+		return mDelegate.scopeManager();
 	}
 
 	/**
-	 * @see io.opentracing.ActiveSpanSource#makeActive(io.opentracing.Span)
+	 * @see io.opentracing.Tracer#activeSpan()
 	 */
 	@Override
-	public ActiveSpan makeActive(Span pSpan) {
-		return mDelegate.makeActive(pSpan);
+	public @Nullable Span activeSpan() {
+		return mDelegate.activeSpan();
 	}
 
 	/**
@@ -65,13 +66,15 @@ public class NoopTracer implements Tracer {
 	 *      java.lang.Object)
 	 */
 	@Override
-	public <C> void inject(SpanContext pSpanContext, Format<C> pFormat, C pCarrier) {
+	public <C> void inject(SpanContext pSpanContext, Format<C> pFormat, @NonNull C pCarrier) {
 		mDelegate.inject(pSpanContext, pFormat, pCarrier);
 	}
 
+	/**
+	 * @see io.opentracing.Tracer#extract(io.opentracing.propagation.Format, java.lang.Object)
+	 */
 	@Override
-	public <C> SpanContext extract(Format<C> pFormat, C pCarrier) {
+	public <C> SpanContext extract(Format<C> pFormat, @NonNull C pCarrier) {
 		return mDelegate.extract(pFormat, pCarrier);
 	}
-
 }

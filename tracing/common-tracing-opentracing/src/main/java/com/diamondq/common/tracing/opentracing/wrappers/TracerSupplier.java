@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
@@ -35,12 +35,12 @@ public class TracerSupplier<A> extends AbstractTracerWrapper
 	public A get() {
 		boolean inGet = false;
 		try {
-			Continuation c = mSpanContinuation.getAndSet(null);
+			Span c = mSpan;
 			if (c == null) {
 				inGet = true;
 				return mDelegate.get();
 			}
-			try (ActiveSpan span = c.activate()) {
+			try (Scope scope = mScopeManager.activate(mSpan, false)) {
 				inGet = true;
 				A result = mDelegate.get();
 				inGet = false;

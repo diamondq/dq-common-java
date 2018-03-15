@@ -4,21 +4,16 @@ import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 
 import org.slf4j.MDC;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 
-public class MDCActiveSpan extends MDCBaseSpan<ActiveSpan> implements ActiveSpan {
+public class MDCScope implements Scope {
 
-	private final ActiveSpan mDelegate;
+	private final Scope mDelegate;
 
 	@SuppressWarnings("null")
-	public MDCActiveSpan(ActiveSpan pDelegate, TraceIdExtractor pExtractor) {
-		super(pDelegate, pExtractor);
+	public MDCScope(Scope pDelegate, TraceIdExtractor pExtractor) {
 		mDelegate = pDelegate;
-	}
-
-	@Override
-	public void deactivate() {
-		mDelegate.deactivate();
 	}
 
 	@Override
@@ -31,9 +26,12 @@ public class MDCActiveSpan extends MDCBaseSpan<ActiveSpan> implements ActiveSpan
 		MDC.remove("traceId");
 	}
 
+	/**
+	 * @see io.opentracing.Scope#span()
+	 */
 	@Override
-	public Continuation capture() {
-		return new MDCContinuation(mDelegate.capture(), mExtractor);
+	public Span span() {
+		return mDelegate.span();
 	}
 
 }

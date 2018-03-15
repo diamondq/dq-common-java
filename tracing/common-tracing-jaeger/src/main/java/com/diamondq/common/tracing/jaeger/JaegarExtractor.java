@@ -6,7 +6,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import io.opentracing.BaseSpan;
+import io.opentracing.Span;
 import io.opentracing.SpanContext;
 
 @ApplicationScoped
@@ -16,7 +16,7 @@ public class JaegarExtractor implements TraceIdExtractor {
 	}
 
 	@Override
-	public @Nullable String getTraceId(@Nullable BaseSpan<?> pSpan) {
+	public @Nullable String getTraceId(@Nullable Span pSpan) {
 		if (pSpan == null)
 			return null;
 		SpanContext context = pSpan.context();

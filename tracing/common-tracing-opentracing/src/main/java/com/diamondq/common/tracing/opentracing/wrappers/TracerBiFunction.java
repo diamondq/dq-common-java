@@ -7,8 +7,8 @@ import java.util.function.BiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
@@ -35,12 +35,12 @@ public class TracerBiFunction<A, B, C> extends AbstractTracerWrapper
 	public C apply(A pA, B pB) {
 		boolean inApply = false;
 		try {
-			Continuation c = mSpanContinuation.getAndSet(null);
+			Span c = mSpan;
 			if (c == null) {
 				inApply = true;
 				return mDelegate.apply(pA, pB);
 			}
-			try (ActiveSpan span = c.activate()) {
+			try (Scope scope = mScopeManager.activate(mSpan, false)) {
 				inApply = true;
 				C result = mDelegate.apply(pA, pB);
 				inApply = false;

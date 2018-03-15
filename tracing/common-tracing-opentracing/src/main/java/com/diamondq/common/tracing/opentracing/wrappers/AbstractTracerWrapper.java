@@ -1,20 +1,22 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.ScopeManager;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 
 public abstract class AbstractTracerWrapper implements AbortableContinuation {
 
-	protected final AtomicReference<@Nullable Continuation> mSpanContinuation;
+	protected final ScopeManager	mScopeManager;
+
+	protected final @Nullable Span	mSpan;
 
 	public AbstractTracerWrapper(Tracer pTracer) {
-		ActiveSpan activeSpan = pTracer.activeSpan();
-		mSpanContinuation = new AtomicReference<>(activeSpan != null ? activeSpan.capture() : null);
+		mScopeManager = pTracer.scopeManager();
+		Scope scope = pTracer.scopeManager().active();
+		mSpan = scope != null ? scope.span() : null;
 	}
 
 	/**
@@ -22,8 +24,7 @@ public abstract class AbstractTracerWrapper implements AbortableContinuation {
 	 */
 	@Override
 	public void abortContinuation() {
-		Continuation c = mSpanContinuation.getAndSet(null);
-		if (c != null)
-			c.activate().close();
+		if (mSpan != null)
+			mScopeManager.activate(mSpan, true).close();
 	}
 }

@@ -7,8 +7,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.GlobalTracer;
 
@@ -30,7 +30,7 @@ public class TestWrapper {
 	@Test
 	public void testActiveSpan() {
 		TracingAssertions.assertNoActiveSpan("No span at startup");
-		try (ActiveSpan span = GlobalTracer.get().buildSpan("testActiveSpan").startActive()) {
+		try (Scope scope = GlobalTracer.get().buildSpan("testActiveSpan").startActive(true)) {
 			TracingAssertions.assertActiveSpan("Span must be active");
 		}
 		TracingAssertions.assertNoActiveSpan("No span at end");
@@ -40,14 +40,14 @@ public class TestWrapper {
 	@Test
 	public void testAssertionCounts() {
 		TracingAssertions.assertNoActiveSpan("No span at startup");
-		Continuation capture;
-		try (ActiveSpan span = GlobalTracer.get().buildSpan("testActiveSpan").startActive()) {
+		Span capture;
+		try (Scope scope = GlobalTracer.get().buildSpan("testActiveSpan").startActive(false)) {
 			TracingAssertions.assertActiveSpan("Span must be active");
-			capture = span.capture();
+			capture = scope.span();
 		}
 		TracingAssertions.assertNoActiveSpan("No active span after block");
 		TracingAssertions.assertCompletedSpans("Span hasn't been completed yet", 0, mockTracker);
-		capture.activate().close();
+		GlobalTracer.get().scopeManager().activate(capture, true).close();
 		TracingAssertions.assertNoActiveSpan("No span at end");
 		TracingAssertions.assertCompletedSpans("Span should have completed", 1, mockTracker);
 	}

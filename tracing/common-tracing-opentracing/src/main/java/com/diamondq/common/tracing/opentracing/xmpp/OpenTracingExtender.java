@@ -14,7 +14,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer.SpanBuilder;
 import io.opentracing.propagation.Format;
@@ -43,7 +44,7 @@ public class OpenTracingExtender {
 		 */
 		@Override
 		public void accept(IQEvent pEvent) {
-			ActiveSpan activeSpan = GlobalTracer.get().activeSpan();
+			Span activeSpan = GlobalTracer.get().activeSpan();
 			if (activeSpan == null)
 				return;
 			IQ iq = pEvent.getIQ();
@@ -163,7 +164,7 @@ public class OpenTracingExtender {
 			SpanBuilder spanBuilder = processID(id);
 			if (spanBuilder == null)
 				return mDelegate.handleRequest(pIQ);
-			try (ActiveSpan span = spanBuilder.startActive()) {
+			try (Scope scope = spanBuilder.startActive(true)) {
 				return mDelegate.handleRequest(pIQ);
 			}
 
