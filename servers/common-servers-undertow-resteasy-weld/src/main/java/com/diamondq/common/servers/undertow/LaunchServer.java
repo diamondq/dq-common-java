@@ -33,7 +33,7 @@ public class LaunchServer {
 			@SuppressWarnings("unused")
 			UndertowRESTEasyWeldServer server = new UndertowRESTEasyWeldServer(config, pAppClass);
 
-			CDI.current().getBeanManager().getEvent().select(JAXRSServerLaunched.class).fire(new JAXRSServerLaunched());
+			CDI.current().getBeanManager().fireEvent(new JAXRSServerLaunched());
 
 			/* Wait forever */
 
