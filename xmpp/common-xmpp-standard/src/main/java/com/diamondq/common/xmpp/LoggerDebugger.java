@@ -9,7 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Scope;
 import io.opentracing.Tracer.SpanBuilder;
 import rocks.xmpp.core.session.XmppSession;
 import rocks.xmpp.core.session.debug.XmppDebugger;
@@ -31,7 +31,7 @@ public class LoggerDebugger implements XmppDebugger {
 			if (id != null) {
 				SpanBuilder builder = OpenTracingExtender.processID(id);
 				if (builder != null) {
-					try (ActiveSpan span = builder.startActive()) {
+					try (Scope scope = builder.startActive(true)) {
 						sLogger.debug("OUT: {}", xml);
 					}
 					return;
@@ -49,7 +49,7 @@ public class LoggerDebugger implements XmppDebugger {
 			if (id != null) {
 				SpanBuilder builder = OpenTracingExtender.processID(id);
 				if (builder != null) {
-					try (ActiveSpan span = builder.startActive()) {
+					try (Scope scope = builder.startActive(true)) {
 						sLogger.debug("IN: {}", xml);
 					}
 					return;
