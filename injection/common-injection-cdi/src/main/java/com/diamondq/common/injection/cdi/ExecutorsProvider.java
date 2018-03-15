@@ -30,7 +30,7 @@ public class ExecutorsProvider {
 	public ScheduledExecutorService createScheduledExecutorServiceViaInjection(Instance<Config> pConfig) {
 		@Nullable
 		Config config = null;
-		if (pConfig.isResolvable() == true)
+		if ((pConfig.isAmbiguous() == false) && (pConfig.isUnsatisfied() == false))
 			config = pConfig.get();
 		return createScheduledExecutorService(config);
 	}
