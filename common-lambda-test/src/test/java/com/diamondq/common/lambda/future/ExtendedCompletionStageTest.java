@@ -16,7 +16,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.mock.MockTracer;
 
 public class ExtendedCompletionStageTest {
@@ -27,7 +28,7 @@ public class ExtendedCompletionStageTest {
 	public WeldInitiator		weld	= WeldInitiator.of(new Weld());
 
 	@SuppressWarnings("null")
-	private MockTracer mockTracker;
+	private MockTracer			mockTracker;
 
 	@Before
 	public void setup() {
@@ -43,7 +44,7 @@ public class ExtendedCompletionStageTest {
 	public void testThenApply() {
 		sLogger.info("***** testThenApply");
 		ExtendedCompletableFuture<Boolean> f;
-		try (ActiveSpan span = mockTracker.buildSpan("testThenApply").startActive()) {
+		try (Scope scope = mockTracker.buildSpan("testThenApply").startActive(true)) {
 			sLogger.info("Before future");
 			f = new ExtendedCompletableFuture<>();
 			ExtendedCompletionStage<Boolean> r = ExtendedCompletionStage.of(f);
@@ -60,26 +61,27 @@ public class ExtendedCompletionStageTest {
 		sLogger.info("----- testThenApply");
 	}
 
-
 	@Test
 	public void testThenCombine() throws Exception {
 		sLogger.info("***** testThenCombine");
 		ExtendedCompletableFuture<Boolean> f1;
 		ExtendedCompletableFuture<Boolean> f2;
 		ExtendedCompletableFuture<Boolean> f3;
-		try (ActiveSpan span = mockTracker.buildSpan("testThenCombine").startActive()) {
+		Span capturedSpan;
+		try (Scope scope = mockTracker.buildSpan("testThenCombine").startActive(false)) {
+			capturedSpan = scope.span();
 			sLogger.info("Before future");
 			f1 = new ExtendedCompletableFuture<>();
 			f2 = new ExtendedCompletableFuture<>();
-			f3 = new ExtendedCompletableFuture<Boolean>().applyToEither(
-				ExtendedCompletionStage.of(f1).thenCombine(ExtendedCompletionStage.of(f2), (b1, b2) -> {
-				sLogger.info("   +++ Inside combine");
-				Assert.assertEquals(true, b1);
-				Assert.assertEquals(true, b2);
-				TracingAssertions.assertActiveSpan("Should have active span");
-				sLogger.info("   --- Inside combine");
-				return false;
-			}), (a) -> a);
+			f3 = new ExtendedCompletableFuture<Boolean>()
+				.applyToEither(ExtendedCompletionStage.of(f1).thenCombine(ExtendedCompletionStage.of(f2), (b1, b2) -> {
+					sLogger.info("   +++ Inside combine");
+					Assert.assertEquals(true, b1);
+					Assert.assertEquals(true, b2);
+					TracingAssertions.assertActiveSpan("Should have active span");
+					sLogger.info("   --- Inside combine");
+					return false;
+				}), (a) -> a);
 		}
 		TracingAssertions.assertNoActiveSpan("No active span after block");
 		TracingAssertions.assertCompletedSpans("No spans should have completed", 0, mockTracker);
@@ -90,6 +92,7 @@ public class ExtendedCompletionStageTest {
 		f2.complete(true);
 		Boolean result = f3.get();
 		TracingAssertions.assertNoActiveSpan("No active span after block");
+		mockTracker.scopeManager().activate(capturedSpan, true).close();
 		TracingAssertions.assertCompletedSpans("Span should have completed", 1, mockTracker);
 		Assert.assertEquals("Should have gotten the combine", false, result);
 		sLogger.info("----- testThenCombine");
@@ -98,11 +101,14 @@ public class ExtendedCompletionStageTest {
 	@SuppressWarnings("null")
 	@Test
 	public void testRunAsync() {
-		try (ActiveSpan span = mockTracker.buildSpan("testRunAsync").startActive()) {
+		try (Scope scope = mockTracker.buildSpan("testRunAsync").startActive(false)) {
 			try {
-				ExtendedCompletionStage.runAsync(()-> { Assert.fail("Should never reach here"); }, null);
+				ExtendedCompletionStage.runAsync(() -> {
+					Assert.fail("Should never reach here");
+				}, null);
 				Assert.fail("An exception should have occurred");
-			} catch (RuntimeException ex) {
+			}
+			catch (RuntimeException ex) {
 			}
 		}
 		TracingAssertions.assertNoActiveSpan("No active span after block");
@@ -113,12 +119,12 @@ public class ExtendedCompletionStageTest {
 	public void testRunAsyncExecutor() throws Exception {
 		Executor executor = weld.select(Executor.class).get();
 		ExtendedCompletableFuture<@Nullable Void> f;
-		try (ActiveSpan span = mockTracker.buildSpan("testRunAsyncExecutor").startActive()) {
+		try (Scope scope = mockTracker.buildSpan("testRunAsyncExecutor").startActive(true)) {
 			final String threadName = Thread.currentThread().getName();
-			f = new ExtendedCompletableFuture<@Nullable Void>().applyToEither(ExtendedCompletionStage.runAsync(()-> {
+			f = new ExtendedCompletableFuture<@Nullable Void>().applyToEither(ExtendedCompletionStage.runAsync(() -> {
 				TracingAssertions.assertActiveSpan("Should be within the span");
 				Assert.assertNotEquals("Threads should be different", threadName, Thread.currentThread().getName());
-			}, executor), (a)->a);
+			}, executor), (a) -> a);
 			TracingAssertions.assertCompletedSpans("Span should not have completed", 0, mockTracker);
 		}
 		TracingAssertions.assertNoActiveSpan("No active span after block");

@@ -16,7 +16,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.ActiveSpan;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.mock.MockTracer;
 
 public class ExtendedCompletableFutureTest {
@@ -42,7 +43,7 @@ public class ExtendedCompletableFutureTest {
 	@Test
 	public void testThenApply() {
 		ExtendedCompletableFuture<Boolean> f;
-		try (ActiveSpan span = mockTracker.buildSpan("testThenApply").startActive()) {
+		try (Scope scope = mockTracker.buildSpan("testThenApply").startActive(true)) {
 			sLogger.info("Before future");
 			f = new ExtendedCompletableFuture<>();
 			f.thenApply((b) -> {
@@ -63,7 +64,9 @@ public class ExtendedCompletableFutureTest {
 		ExtendedCompletableFuture<Boolean> f1;
 		ExtendedCompletableFuture<Boolean> f2;
 		ExtendedCompletableFuture<Boolean> f3;
-		try (ActiveSpan span = mockTracker.buildSpan("testThenCombine").startActive()) {
+		Span capturedSpan;
+		try (Scope scope = mockTracker.buildSpan("testThenCombine").startActive(false)) {
+			capturedSpan = scope.span();
 			sLogger.info("Before future");
 			f1 = new ExtendedCompletableFuture<>();
 			f2 = new ExtendedCompletableFuture<>();
@@ -85,6 +88,7 @@ public class ExtendedCompletableFutureTest {
 		f2.complete(true);
 		Boolean result = f3.get();
 		TracingAssertions.assertNoActiveSpan("No active span after block");
+		mockTracker.scopeManager().activate(capturedSpan, true).close();
 		TracingAssertions.assertCompletedSpans("Span should have completed", 1, mockTracker);
 		Assert.assertEquals("Should have gotten the combine", false, result);
 		sLogger.info("----- testThenCombine");
@@ -93,7 +97,7 @@ public class ExtendedCompletableFutureTest {
 	@SuppressWarnings("null")
 	@Test
 	public void testRunAsync() {
-		try (ActiveSpan span = mockTracker.buildSpan("testRunAsync").startActive()) {
+		try (Scope scope = mockTracker.buildSpan("testRunAsync").startActive(false)) {
 			try {
 				ExtendedCompletableFuture.runAsync(() -> {
 					Assert.fail("Should never reach here");
@@ -111,7 +115,7 @@ public class ExtendedCompletableFutureTest {
 	public void testRunAsyncExecutor() throws Exception {
 		Executor executor = weld.select(Executor.class).get();
 		ExtendedCompletableFuture<@Nullable Void> f;
-		try (ActiveSpan span = mockTracker.buildSpan("testRunAsyncExecutor").startActive()) {
+		try (Scope scope = mockTracker.buildSpan("testRunAsyncExecutor").startActive(true)) {
 			final String threadName = Thread.currentThread().getName();
 			f = ExtendedCompletableFuture.runAsync(() -> {
 				TracingAssertions.assertActiveSpan("Should be within the span");
