@@ -72,10 +72,5 @@
 			<artifactId>opentracing-mock</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.diamondq.common.java.tracing</groupId>
-			<artifactId>common-tracing-jaeger</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 </project>
