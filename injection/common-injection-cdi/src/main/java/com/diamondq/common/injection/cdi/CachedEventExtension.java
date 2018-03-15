@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.BeforeDestroyed;
 import javax.enterprise.context.Destroyed;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
@@ -104,9 +103,10 @@ public class CachedEventExtension implements Extension {
 		fireEvent(APPLICATION_SCOPED_INITIALIZED);
 	}
 
-	void onApplicationScopedBeforeDestroyed(@Observes @BeforeDestroyed(ApplicationScoped.class) Object pScope) {
-		fireEvent(APPLICATION_SCOPED_BEFORE_DESTROYED);
-	}
+	// Only available in CDI 2.0
+	// void onApplicationScopedBeforeDestroyed(@Observes @BeforeDestroyed(ApplicationScoped.class) Object pScope) {
+	// fireEvent(APPLICATION_SCOPED_BEFORE_DESTROYED);
+	// }
 
 	void onApplicationScopedDestroyed(@Observes @Destroyed(ApplicationScoped.class) Object pScope) {
 		fireEvent(APPLICATION_SCOPED_DESTROYED);
