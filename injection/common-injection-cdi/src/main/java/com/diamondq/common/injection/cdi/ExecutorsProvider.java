@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
@@ -33,6 +34,15 @@ public class ExecutorsProvider {
 		if ((pConfig.isAmbiguous() == false) && (pConfig.isUnsatisfied() == false))
 			config = pConfig.get();
 		return createScheduledExecutorService(config);
+	}
+
+	/**
+	 * Shutdowns the executor service when the Application is shutdown
+	 *
+	 * @param service the service
+	 */
+	public void close(@Disposes @Named("long-lived") ScheduledExecutorService service) {
+		service.shutdown();
 	}
 
 	/**
