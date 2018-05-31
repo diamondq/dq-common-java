@@ -7,22 +7,10 @@ pipeline {
     
   }
   stages {
-    stage('Clean') {
-      steps {
-        sh '''cd common-root
-mvn "-Duser.home=/" "-Djenkins=true" clean'''
-      }
-    }
     stage('Build') {
       steps {
         sh '''cd common-root
-mvn "-Duser.home=/" "-Djenkins=true" install'''
-      }
-    }
-    stage('Deploy') {
-      steps {
-        sh '''cd common-root
-mvn "-Duser.home=/" -Dmaven.test.skip=true "-Djenkins=true" deploy'''
+mvn "-Duser.home=/" "-Djenkins=true" clean deploy'''
       }
     }
   }
