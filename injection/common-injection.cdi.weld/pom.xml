@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-parent</artifactId>
+        <version>0.2.0-SNAPSHOT</version>
+        <relativePath>../../common-parent</relativePath>
+    </parent>
+    <artifactId>common-injection.cdi.weld</artifactId>
+    <packaging>jar</packaging>
+    <name>DiamondQ Common: Injection: CDI: Weld</name>
+    <dependencies>
+        <dependency>
+            <groupId>com.diamondq.common</groupId>
+            <artifactId>common-injection.cdi</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>!com.diamondq.*</Export-Package>
+                                <Require-Bundle>com.diamondq.common.inject.cdi</Require-Bundle>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

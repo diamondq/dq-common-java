@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-parent</artifactId>
+        <version>0.2.0-SNAPSHOT</version>
+        <relativePath>../../common-parent</relativePath>
+    </parent>
+    <artifactId>common-storage.kv</artifactId>
+    <packaging>jar</packaging>
+    <name>DiamondQ Common: Storage: KV: API</name>
+    <dependencies>
+        <dependency>
+            <groupId>com.diamondq.common</groupId>
+            <artifactId>common-lambda</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javatuples</groupId>
+            <artifactId>javatuples</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+    </dependencies>
+</project>

@@ -11,6 +11,7 @@ buildNumber.properties
 *.factorypath
 *.project
 *.settings
+META-INF/
 service/user.key
 service/application.port
 service/blob
