@@ -12,6 +12,7 @@ buildNumber.properties
 *.project
 *.settings
 META-INF/
+!**/src/*/resources/META-INF/
 service/user.key
 service/application.port
 service/blob
