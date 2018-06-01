@@ -4,6 +4,7 @@ import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -164,8 +165,10 @@ public class SyncEngine {
 		boolean bFragTypeComplete = pInfo.isBFragTypeComplete();
 		boolean typesEqual = pInfo.isTypesEqual();
 
-		return aSourceFuture.thenCombine(bSourceFuture, (aMap, bMap) -> {
+		return aSourceFuture.thenCombine(bSourceFuture, (origAMap, origBMap) -> {
 
+			Map<A_KEY, A_FRAG> aMap = new HashMap<>(origAMap);
+			Map<B_KEY, B_FRAG> bMap = new HashMap<>(origBMap);
 			Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = new HashSet<>();
 			Set<Pair<B_KEY, B_FRAG>> aToBeCreated = new HashSet<>();
 			Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = new HashSet<>();
