@@ -100,5 +100,9 @@
             <groupId>com.diamondq.common</groupId>
             <artifactId>common-tracing.opentracing</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
     </dependencies>
 </project>
