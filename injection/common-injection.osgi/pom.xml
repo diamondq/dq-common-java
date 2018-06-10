@@ -61,7 +61,6 @@
             <plugin>
                 <groupId>com.diamondq.maven</groupId>
                 <artifactId>i18n-maven-plugin</artifactId>
-                <version>1.0</version>
                 <executions>
                     <execution>
                         <id>generate-enums</id>

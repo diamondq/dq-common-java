@@ -556,6 +556,11 @@
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>3.0.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.diamondq.maven</groupId>
+                    <artifactId>i18n-maven-plugin</artifactId>
+                    <version>1.0.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
