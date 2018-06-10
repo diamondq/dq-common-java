@@ -50,14 +50,14 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 
 	protected final boolean	mPersistResources;
 
-	public AbstractDocumentPersistenceLayer(Scope pScope, boolean pPersistStructures, boolean pCacheStructures,
+	public AbstractDocumentPersistenceLayer(boolean pPersistStructures, boolean pCacheStructures,
 		int pCacheStructuresSeconds, boolean pPersistStructureDefinitions, boolean pCacheStructureDefinitions,
 		int pCacheStructureDefinitionsSeconds, boolean pPersistEditorStructureDefinitions,
 		boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds,
 		boolean pPersistResources, boolean pCacheResources, int pCacheResourcesSeconds) {
-		super(pScope, pCacheStructures, pCacheStructuresSeconds, pCacheStructureDefinitions,
-			pCacheStructureDefinitionsSeconds, pCacheEditorStructureDefinitions,
-			pCacheEditorStructureDefinitionsSeconds, pCacheResources, pCacheResourcesSeconds);
+		super(pCacheStructures, pCacheStructuresSeconds, pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds,
+			pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds, pCacheResources,
+			pCacheResourcesSeconds);
 		mPersistStructures = pPersistStructures;
 		mPersistStructureDefinitions = pPersistStructureDefinitions;
 		mPersistEditorStructureDefinitions = pPersistEditorStructureDefinitions;
@@ -104,6 +104,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			return true;
 
 		STRUCTURECONFIGOBJ config;
+		boolean changed = false;
+
 		@Nullable
 		STRUCTUREOPTIMISTICOBJ optimisticObj;
 		if (pMustMatchOldStructure == true) {
@@ -128,14 +130,16 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 		}
 		else {
 			@Nullable
-			STRUCTURECONFIGOBJ loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
-			if (loadedConfig == null)
-				throw new IllegalStateException("The config should always exist since createIfMissing was set");
+			STRUCTURECONFIGOBJ loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
+			if (loadedConfig == null) {
+				loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
+				if (loadedConfig == null)
+					throw new IllegalStateException("The config should always exist since createIfMissing was set");
+				changed = true;
+			}
 			config = loadedConfig;
 			optimisticObj = null;
 		}
-
-		boolean changed = false;
 
 		String oldStructureDefName =
 			getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);

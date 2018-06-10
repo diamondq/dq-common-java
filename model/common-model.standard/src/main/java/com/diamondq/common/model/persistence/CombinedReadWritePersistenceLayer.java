@@ -162,17 +162,17 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 				throw new IllegalArgumentException("The mandatory field scope was not set");
 			PersistenceLayer structureWriteLayer = mStructureWriteLayer;
 			if (structureWriteLayer == null)
-				structureWriteLayer = new NewMemoryPersistenceLayer(scope);
+				structureWriteLayer = new NewMemoryPersistenceLayer();
 			PersistenceLayer structureDefinitionWriteLayer = mStructureDefinitionWriteLayer;
 			if (structureDefinitionWriteLayer == null)
-				structureDefinitionWriteLayer = new NewMemoryPersistenceLayer(scope);
+				structureDefinitionWriteLayer = new NewMemoryPersistenceLayer();
 			PersistenceLayer editorStructureDefinitionWriteLayer = mEditorStructureDefinitionWriteLayer;
 			if (editorStructureDefinitionWriteLayer == null)
-				editorStructureDefinitionWriteLayer = new NewMemoryPersistenceLayer(scope);
+				editorStructureDefinitionWriteLayer = new NewMemoryPersistenceLayer();
 			PersistenceLayer resourceWriteLayer = mResourceWriteLayer;
 			if (resourceWriteLayer == null)
-				resourceWriteLayer = new NewMemoryPersistenceLayer(scope);
-			return new CombinedReadWritePersistenceLayer(scope, mStructureReadLayer, structureWriteLayer,
+				resourceWriteLayer = new NewMemoryPersistenceLayer();
+			return new CombinedReadWritePersistenceLayer(mStructureReadLayer, structureWriteLayer,
 				mStructureDefinitionReadLayer, structureDefinitionWriteLayer, mEditorStructureDefinitionReadLayer,
 				editorStructureDefinitionWriteLayer, mResourceReadLayer, resourceWriteLayer);
 		}
@@ -195,12 +195,11 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
 	private final PersistenceLayer				mResourceWriteLayer;
 
-	public CombinedReadWritePersistenceLayer(Scope pScope, @Nullable PersistenceLayer pStructureReadLayer,
+	public CombinedReadWritePersistenceLayer(@Nullable PersistenceLayer pStructureReadLayer,
 		PersistenceLayer pStructureWriteLayer, @Nullable PersistenceLayer pStructureDefinitionReadLayer,
 		PersistenceLayer pStructureDefinitionWriteLayer, @Nullable PersistenceLayer pEditorStructureDefinitionReadLayer,
 		PersistenceLayer pEditorStructureDefinitionWriteLayer, @Nullable PersistenceLayer pResourceReadLayer,
 		PersistenceLayer pResourceWriteLayer) {
-		super(pScope);
 		mStructureReadLayer = pStructureReadLayer;
 		mStructureWriteLayer = pStructureWriteLayer;
 		mStructureDefinitionReadLayer = pStructureDefinitionReadLayer;

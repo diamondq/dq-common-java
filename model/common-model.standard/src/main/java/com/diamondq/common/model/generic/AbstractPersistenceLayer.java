@@ -50,8 +50,6 @@ import org.javatuples.Pair;
 
 public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
-	protected final Scope																														mScope;
-
 	protected volatile Locale																													mGlobalDefaultLocale		=
 		Locale.US;
 
@@ -85,9 +83,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 		sInvalidPrimayKeyBitSet = b;
 	}
 
-	public AbstractPersistenceLayer(Scope pScope) {
+	public AbstractPersistenceLayer() {
 		super();
-		mScope = pScope;
 		mMigrationFunctions = Maps.newConcurrentMap();
 		CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
 		mMigrationCache = builder.build();

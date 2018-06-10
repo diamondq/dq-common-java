@@ -34,39 +34,21 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	 */
 	public static class MemoryPersistenceLayerBuilder {
 
-		private @Nullable Scope mScope;
-
-		/**
-		 * Sets the scope
-		 *
-		 * @param pScope the scope
-		 * @return the builder
-		 */
-		public MemoryPersistenceLayerBuilder scope(Scope pScope) {
-			mScope = pScope;
-			return this;
-		}
-
 		/**
 		 * Builds the layer
 		 *
 		 * @return the layer
 		 */
 		public MemoryPersistenceLayer build() {
-			Scope scope = mScope;
-			if (scope == null)
-				throw new IllegalArgumentException("The mandatory field scope was not set");
-			return new MemoryPersistenceLayer(scope);
+			return new MemoryPersistenceLayer();
 		}
 	}
 
 	/**
 	 * Default constructor
-	 *
-	 * @param pScope the scope
 	 */
-	public MemoryPersistenceLayer(Scope pScope) {
-		super(pScope, true, -1, true, -1, true, -1, true, -1);
+	public MemoryPersistenceLayer() {
+		super(true, -1, true, -1, true, -1, true, -1);
 	}
 
 	/**

@@ -73,12 +73,20 @@ public class GenericToolkit implements Toolkit {
 	}
 
 	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#removeScope(java.lang.String)
+	 */
+	@Override
+	public boolean removeScope(String pName) {
+		return mScopes.remove(pName) != null;
+	}
+
+	/**
 	 * Adds the persistence layer for a given scope
 	 *
 	 * @param pScope the scope
 	 * @param pLayer the persistence layer
 	 */
-	public void addPersistenceLayer(Scope pScope, PersistenceLayer pLayer) {
+	public void setPersistenceLayer(Scope pScope, PersistenceLayer pLayer) {
 		mPersistence.put(pScope, pLayer);
 	}
 
@@ -89,7 +97,7 @@ public class GenericToolkit implements Toolkit {
 	 * @param pScope the scope
 	 * @return the persistence layer, never null.
 	 */
-	private PersistenceLayer getPersistenceLayer(Scope pScope) {
+	public PersistenceLayer getPersistenceLayer(Scope pScope) {
 		PersistenceLayer layer = mPersistence.get(pScope);
 		if (layer == null)
 			throw new UnknownScopeException(pScope);

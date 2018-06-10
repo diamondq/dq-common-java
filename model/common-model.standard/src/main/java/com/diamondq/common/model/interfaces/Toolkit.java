@@ -41,6 +41,14 @@ public interface Toolkit {
 	public Scope getOrCreateScope(String pName);
 
 	/**
+	 * Removes a scope by name
+	 * 
+	 * @param pName the name
+	 * @return true if the scope was removed or false if the scope didn't exist
+	 */
+	public boolean removeScope(String pName);
+
+	/**
 	 * Returns the complete set of StructureDefinitions (references).
 	 *
 	 * @param pScope the scope

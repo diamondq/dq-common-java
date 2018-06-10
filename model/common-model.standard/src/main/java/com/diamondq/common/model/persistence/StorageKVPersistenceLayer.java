@@ -1,6 +1,7 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
+import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.CommonKeywordValues;
 import com.diamondq.common.model.interfaces.Property;
@@ -21,6 +22,7 @@ import com.diamondq.common.storage.kv.KVColumnType;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
+import com.diamondq.common.utils.misc.builders.IBuilder;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -48,22 +50,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	/**
 	 * The builder (generally used for the Config system)
 	 */
-	public static class StorageKVPersistenceLayerBuilder {
+	public static class StorageKVPersistenceLayerBuilder implements IBuilder<PersistenceLayer> {
 
-		private @Nullable Scope		mScope;
+		protected @Nullable IKVStore			kvStore;
 
-		private @Nullable IKVStore	mKVStore;
-
-		/**
-		 * Sets the scope
-		 *
-		 * @param pScope the scope
-		 * @return the builder
-		 */
-		public StorageKVPersistenceLayerBuilder scope(Scope pScope) {
-			mScope = pScope;
-			return this;
-		}
+		protected @Nullable IBuilder<IKVStore>	kvStoreBuilder;
 
 		/**
 		 * Sets the store
@@ -72,7 +63,18 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 		 * @return the builder
 		 */
 		public StorageKVPersistenceLayerBuilder kvStore(IKVStore pStore) {
-			mKVStore = pStore;
+			kvStore = pStore;
+			return this;
+		}
+
+		/**
+		 * Sets the store builder
+		 *
+		 * @param pBuilder the store builder
+		 * @return the builder
+		 */
+		public StorageKVPersistenceLayerBuilder kvStoreBuilder(IBuilder<IKVStore> pBuilder) {
+			kvStoreBuilder = pBuilder;
 			return this;
 		}
 
@@ -81,14 +83,16 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 		 *
 		 * @return the layer
 		 */
+		@Override
 		public StorageKVPersistenceLayer build() {
-			Scope scope = mScope;
-			IKVStore store = mKVStore;
-			if (scope == null)
-				throw new IllegalArgumentException("The mandatory field scope was not set");
-			if (store == null)
-				throw new IllegalArgumentException("The mandatory field kvStore was not set");
-			return new StorageKVPersistenceLayer(scope, store);
+			IKVStore localStore = kvStore;
+			if (localStore == null) {
+				IBuilder<IKVStore> localBuilder = kvStoreBuilder;
+				if (localBuilder == null)
+					throw new IllegalArgumentException("The one of kvStore or kvStoreBuilder must be set");
+				localStore = localBuilder.build();
+			}
+			return new StorageKVPersistenceLayer(localStore);
 		}
 	}
 
@@ -123,11 +127,10 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	/**
 	 * Default constructor
 	 *
-	 * @param pScope the scope
 	 * @param pStructureStore the KV store for structures
 	 */
-	public StorageKVPersistenceLayer(Scope pScope, IKVStore pStructureStore) {
-		super(pScope, true, false, -1, false, false, -1, false, false, -1, false, false, -1);
+	public StorageKVPersistenceLayer(IKVStore pStructureStore) {
+		super(true, false, -1, false, false, -1, false, false, -1, false, false, -1);
 		mStructureStore = pStructureStore;
 
 		mConfiguredTableDefinitions = Maps.newConcurrentMap();

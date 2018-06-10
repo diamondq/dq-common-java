@@ -48,11 +48,11 @@ public class ToolkitProvider {
 					throw new IllegalArgumentException("The config key persistence.scope-" + scopeName
 						+ ".resources requires at least one definition");
 
-				gt.addPersistenceLayer(scope,
-					new CombinedPersistenceLayer(scope, structureLayers,
-						ImmutableList.<PersistenceLayer> builder().add(new MemoryPersistenceLayer(scope))
+				gt.setPersistenceLayer(scope,
+					new CombinedPersistenceLayer(structureLayers,
+						ImmutableList.<PersistenceLayer> builder().add(new MemoryPersistenceLayer())
 							.addAll(structureLayers).build(),
-						Collections.singletonList(new MemoryPersistenceLayer(scope)), resourceLayers));
+						Collections.singletonList(new MemoryPersistenceLayer()), resourceLayers));
 			}
 		}
 		return toolkit;

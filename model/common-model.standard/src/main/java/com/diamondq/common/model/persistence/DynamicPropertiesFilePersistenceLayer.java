@@ -1,7 +1,6 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.config.Config;
-import com.diamondq.common.model.interfaces.Scope;
 import com.google.common.collect.Maps;
 
 import java.io.File;
@@ -16,20 +15,7 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
 	 */
 	public static class DynamicPropertiesFilePersistenceLayerBuilder {
 
-		private @Nullable Scope		mScope;
-
-		private @Nullable String	mAccessKey;
-
-		/**
-		 * Sets the scope
-		 *
-		 * @param pScope the scope
-		 * @return the builder
-		 */
-		public DynamicPropertiesFilePersistenceLayerBuilder scope(Scope pScope) {
-			mScope = pScope;
-			return this;
-		}
+		private @Nullable String mAccessKey;
 
 		/**
 		 * Sets the structure directory
@@ -48,13 +34,10 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
 		 * @return the layer
 		 */
 		public DynamicPropertiesFilePersistenceLayer build() {
-			Scope scope = mScope;
-			if (scope == null)
-				throw new IllegalArgumentException("The mandatory field scope was not set");
 			String accessKey = mAccessKey;
 			if (accessKey == null)
 				throw new IllegalArgumentException("The mandatory field accessKey was not set");
-			return new DynamicPropertiesFilePersistenceLayer(scope, accessKey);
+			return new DynamicPropertiesFilePersistenceLayer(accessKey);
 		}
 	}
 
@@ -62,9 +45,9 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
 
 	private final String					mAccessKey;
 
-	public DynamicPropertiesFilePersistenceLayer(Scope pScope, String pAccessKey) {
-		super(pScope, new File("placeholder"), false, -1, new File("placeholder"), false, -1, new File("placeholder"),
-			false, -1, new File("placeholder"), false, -1);
+	public DynamicPropertiesFilePersistenceLayer(String pAccessKey) {
+		super(new File("placeholder"), false, -1, new File("placeholder"), false, -1, new File("placeholder"), false,
+			-1, new File("placeholder"), false, -1);
 		mAccessKey = pAccessKey;
 	}
 

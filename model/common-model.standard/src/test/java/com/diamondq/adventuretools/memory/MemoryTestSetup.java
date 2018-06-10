@@ -13,7 +13,7 @@ public interface MemoryTestSetup {
 		ToolkitFactory instance = ToolkitFactory.newInstance();
 		GenericToolkit toolkit = (GenericToolkit) instance.newToolkit();
 		Scope scope = toolkit.getOrCreateScope("Design");
-		toolkit.addPersistenceLayer(scope, new MemoryPersistenceLayer(scope));
+		toolkit.setPersistenceLayer(scope, new MemoryPersistenceLayer());
 
 		BasicModelSetup.setup(toolkit, scope);
 

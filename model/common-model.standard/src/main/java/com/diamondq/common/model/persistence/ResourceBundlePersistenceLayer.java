@@ -27,20 +27,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 */
 	public static class ResourceBundlePersistenceLayerBuilder {
 
-		private @Nullable Scope		mScope;
-
-		private @Nullable String	mResourceBaseName;
-
-		/**
-		 * Sets the scope
-		 *
-		 * @param pScope the scope
-		 * @return the builder
-		 */
-		public ResourceBundlePersistenceLayerBuilder scope(Scope pScope) {
-			mScope = pScope;
-			return this;
-		}
+		private @Nullable String mResourceBaseName;
 
 		/**
 		 * Sets the resource base name
@@ -59,20 +46,17 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 		 * @return the layer
 		 */
 		public ResourceBundlePersistenceLayer build() {
-			Scope scope = mScope;
-			if (scope == null)
-				throw new IllegalArgumentException("The mandatory field scope was not set");
 			String resourceBaseName = mResourceBaseName;
 			if (resourceBaseName == null)
 				throw new IllegalArgumentException("The mandatory field resourceBaseName was not set");
-			return new ResourceBundlePersistenceLayer(scope, resourceBaseName);
+			return new ResourceBundlePersistenceLayer(resourceBaseName);
 		}
 	}
 
 	protected final String mBaseName;
 
-	public ResourceBundlePersistenceLayer(Scope pScope, String pResourceBaseName) {
-		super(pScope, false, -1, false, -1, false, -1, true, -1);
+	public ResourceBundlePersistenceLayer(String pResourceBaseName) {
+		super(false, -1, false, -1, false, -1, true, -1);
 		mBaseName = pResourceBaseName;
 	}
 

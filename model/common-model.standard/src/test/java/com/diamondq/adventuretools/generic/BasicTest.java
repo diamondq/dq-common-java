@@ -19,7 +19,7 @@ public class BasicTest {
 		ToolkitFactory instance = ToolkitFactory.newInstance();
 		GenericToolkit toolkit = (GenericToolkit) instance.newToolkit();
 		Scope scope = toolkit.getOrCreateScope("Design");
-		toolkit.addPersistenceLayer(scope, new MemoryPersistenceLayer(scope));
+		toolkit.setPersistenceLayer(scope, new MemoryPersistenceLayer());
 		StructureDefinition definition = toolkit.createNewStructureDefinition(scope, "Test-Definition");
 		toolkit.writeStructureDefinition(scope, definition);
 		Collection<StructureDefinitionRef> allStructureDefinitionRefs = toolkit.getAllStructureDefinitionRefs(scope);

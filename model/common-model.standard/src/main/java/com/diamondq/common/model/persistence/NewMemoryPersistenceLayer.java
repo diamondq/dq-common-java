@@ -29,29 +29,13 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 */
 	public static class MemoryPersistenceLayerBuilder {
 
-		private @Nullable Scope mScope;
-
-		/**
-		 * Sets the scope
-		 *
-		 * @param pScope the scope
-		 * @return the builder
-		 */
-		public MemoryPersistenceLayerBuilder scope(Scope pScope) {
-			mScope = pScope;
-			return this;
-		}
-
 		/**
 		 * Builds the layer
 		 *
 		 * @return the layer
 		 */
 		public NewMemoryPersistenceLayer build() {
-			Scope scope = mScope;
-			if (scope == null)
-				throw new IllegalArgumentException("The mandatory field scope was not set");
-			return new NewMemoryPersistenceLayer(scope);
+			return new NewMemoryPersistenceLayer();
 		}
 	}
 
@@ -68,11 +52,9 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
 	/**
 	 * Default constructor
-	 *
-	 * @param pScope the scope
 	 */
-	public NewMemoryPersistenceLayer(Scope pScope) {
-		super(pScope, true, true, -1, false, false, -1, false, false, -1, true, true, -1);
+	public NewMemoryPersistenceLayer() {
+		super(true, true, -1, false, false, -1, false, false, -1, true, true, -1);
 		mDataCache = Maps.newConcurrentMap();
 	}
 

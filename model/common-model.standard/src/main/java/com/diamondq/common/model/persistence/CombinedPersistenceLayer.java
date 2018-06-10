@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Quartet;
 
 public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
@@ -38,11 +39,10 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
 	private final boolean					mResourcePersistenceLayerIsSingleton;
 
-	public CombinedPersistenceLayer(Scope pScope, List<PersistenceLayer> pStructurePersistenceLayer,
+	public CombinedPersistenceLayer(List<PersistenceLayer> pStructurePersistenceLayer,
 		List<PersistenceLayer> pStructureDefinitionPersistenceLayer,
 		List<PersistenceLayer> pEditorStructureDefinitionPersistenceLayer,
 		List<PersistenceLayer> pResourcePersistenceLayer) {
-		super(pScope);
 		mStructurePersistenceLayer = ImmutableList.copyOf(pStructurePersistenceLayer);
 		mStructurePersistenceLayerIsSingleton = (mStructurePersistenceLayer.size() == 1);
 		mStructureDefinitionPersistenceLayer = ImmutableList.copyOf(pStructureDefinitionPersistenceLayer);
@@ -52,6 +52,16 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 			(mEditorStructureDefinitionPersistenceLayer.size() == 1);
 		mResourcePersistenceLayer = ImmutableList.copyOf(pResourcePersistenceLayer);
 		mResourcePersistenceLayerIsSingleton = (mResourcePersistenceLayer.size() == 1);
+	}
+
+	/**
+	 * Returns a copy of the persistence layers associated with this combining layer
+	 * 
+	 * @return the layers (structure, structure definition, editor structure definition and resource)
+	 */
+	public Quartet<List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>> getPersistenceLayers() {
+		return Quartet.with(mStructureDefinitionPersistenceLayer, mStructureDefinitionPersistenceLayer,
+			mEditorStructureDefinitionPersistenceLayer, mResourcePersistenceLayer);
 	}
 
 	/**

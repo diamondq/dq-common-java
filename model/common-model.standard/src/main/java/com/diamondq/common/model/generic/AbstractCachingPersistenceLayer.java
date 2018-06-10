@@ -38,7 +38,6 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	/**
 	 * The main constructor
 	 *
-	 * @param pScope the scope
 	 * @param pCacheStructures true if the class should cache structures
 	 * @param pCacheStructuresSeconds the number of seconds to cache (-1 is forever)
 	 * @param pCacheStructureDefinitions true if the class should cache structure definitions
@@ -48,11 +47,10 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 	 * @param pCacheResources true if the class should cache resources
 	 * @param pCacheResourcesSeconds the number of seconds to cache (-1 is forever)
 	 */
-	public AbstractCachingPersistenceLayer(Scope pScope, boolean pCacheStructures, int pCacheStructuresSeconds,
+	public AbstractCachingPersistenceLayer(boolean pCacheStructures, int pCacheStructuresSeconds,
 		boolean pCacheStructureDefinitions, int pCacheStructureDefinitionsSeconds,
 		boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds, boolean pCacheResources,
 		int pCacheResourcesSeconds) {
-		super(pScope);
 		if (pCacheStructures == true) {
 			CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
 			if (pCacheStructuresSeconds > 0)
