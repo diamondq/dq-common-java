@@ -33,6 +33,7 @@
         <module>../jaxrs/common-jaxrs.resteasy</module>
         <module>../injection/common-injection.cdi</module>
         <module>../injection/common-injection.cdi.weld</module>
+        <module>../injection/common-injection.osgi</module>
         <module>../security/common-security.jwt</module>
         <module>../security/common-security.acme</module>
         <module>../security/common-security.acl</module>
