@@ -10,6 +10,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureRef;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -233,6 +234,10 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 				}
 				if (pValue instanceof String) {
 					pValue = (TYPE) Long.valueOf((String) pValue);
+					break;
+				}
+				if (pValue instanceof Date) {
+					pValue = (TYPE) (Long) (((Date) pValue).getTime());
 					break;
 				}
 				throw new IllegalArgumentException("A Timestamp Property must be passed a Long, Integer or String");
