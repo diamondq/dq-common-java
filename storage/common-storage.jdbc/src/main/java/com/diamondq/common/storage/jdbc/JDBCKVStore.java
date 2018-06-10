@@ -13,6 +13,8 @@ import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
 import com.diamondq.common.storage.kv.impl.SyncWrapperAsyncKVTransaction;
+import com.diamondq.common.utils.misc.builders.IBuilder;
+import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
@@ -48,23 +50,29 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 	static final BigDecimal		sLONG_MAX_VALUE	= BigDecimal.valueOf(Long.MAX_VALUE);
 
-	public static class JDBCKVStoreBuilder {
+	public static class JDBCKVStoreBuilder implements IBuilder<IKVStore> {
 		@Nullable
-		private DataSource		mDatabase;
+		protected DataSource	datasource;
 
 		@Nullable
-		private IJDBCDialect	mDialect;
+		protected IJDBCDialect	dialect;
 
 		@Nullable
-		private String			mTableSchema;
+		protected String		mTableSchema;
 
+		@Deprecated
 		public JDBCKVStoreBuilder database(DataSource pDatabase) {
-			mDatabase = pDatabase;
+			datasource = pDatabase;
+			return this;
+		}
+
+		public JDBCKVStoreBuilder datasource(DataSource pDatabase) {
+			datasource = pDatabase;
 			return this;
 		}
 
 		public JDBCKVStoreBuilder dialect(IJDBCDialect pValue) {
-			mDialect = pValue;
+			dialect = pValue;
 			return this;
 		}
 
@@ -73,14 +81,19 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			return this;
 		}
 
+		public void onActivate(Map<String, Object> pProps) {
+			mTableSchema = PropertiesParsing.getNullableString(pProps, ".tableSchema");
+		}
+
+		@Override
 		public JDBCKVStore build() {
-			DataSource database = mDatabase;
-			if (database == null)
-				throw new IllegalArgumentException("database not set in JDBCKVStoreBuilder");
-			IJDBCDialect dialect = mDialect;
-			if (dialect == null)
+			DataSource localDatabase = datasource;
+			if (localDatabase == null)
+				throw new IllegalArgumentException("datasource not set in JDBCKVStoreBuilder");
+			IJDBCDialect localDialect = dialect;
+			if (localDialect == null)
 				throw new IllegalArgumentException("dialect not set in JDBCKVStoreBuilder");
-			return new JDBCKVStore(database, dialect, mTableSchema);
+			return new JDBCKVStore(localDatabase, localDialect, mTableSchema);
 		}
 	}
 
