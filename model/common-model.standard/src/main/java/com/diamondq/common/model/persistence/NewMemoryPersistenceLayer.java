@@ -54,7 +54,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	 * Default constructor
 	 */
 	public NewMemoryPersistenceLayer() {
-		super(true, true, -1, false, false, -1, false, false, -1, true, true, -1);
+		super(true, true, -1, false, true, -1, false, false, -1, true, true, -1);
 		mDataCache = Maps.newConcurrentMap();
 	}
 
