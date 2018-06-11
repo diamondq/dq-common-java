@@ -5,7 +5,7 @@ import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.persistence.CombinedPersistenceLayer;
-import com.diamondq.common.model.persistence.MemoryPersistenceLayer;
+import com.diamondq.common.model.persistence.NewMemoryPersistenceLayer;
 import com.diamondq.common.utils.misc.builders.IBuilder;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.collect.ImmutableList;
@@ -184,7 +184,7 @@ public class WrappedScope implements Scope {
 
 		for (int i = 0; i < sFILTER_KEYS.length; i++) {
 			if (layers[i].isEmpty() == true)
-				layers[i].add(Pair.with(Integer.MAX_VALUE, new MemoryPersistenceLayer()));
+				layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer()));
 		}
 
 		/* Now sort the lists */
