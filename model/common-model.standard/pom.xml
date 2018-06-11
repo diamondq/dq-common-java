@@ -49,13 +49,8 @@
             <artifactId>common-utils.misc</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.core</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
+            <groupId>com.diamondq.common</groupId>
+            <artifactId>common-injection.osgi</artifactId>
             <optional>true</optional>
         </dependency>
     </dependencies>
