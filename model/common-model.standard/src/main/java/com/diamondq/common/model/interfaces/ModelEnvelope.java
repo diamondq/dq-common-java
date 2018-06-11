@@ -4,18 +4,29 @@ import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ModelEnvelope<CONTENT> {
+public class ModelEnvelope<DEFS, CONTENT> {
 
 	public final Toolkit	toolkit;
 
 	public final Scope		scope;
 
+	public final DEFS		defs;
+
 	public volatile CONTENT	content;
 
-	public ModelEnvelope(Toolkit pToolkit, Scope pScope, CONTENT pContent) {
+	public ModelEnvelope(Toolkit pToolkit, Scope pScope, DEFS pDefs, CONTENT pContent) {
 		super();
 		toolkit = pToolkit;
 		scope = pScope;
+		defs = pDefs;
+		content = pContent;
+	}
+
+	public ModelEnvelope(ModelEnvelope<DEFS, ?> pExisting, CONTENT pContent) {
+		super();
+		toolkit = pExisting.toolkit;
+		scope = pExisting.scope;
+		defs = pExisting.defs;
 		content = pContent;
 	}
 
@@ -24,7 +35,7 @@ public class ModelEnvelope<CONTENT> {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(toolkit, scope, content);
+		return Objects.hash(toolkit, scope, defs, content);
 	}
 
 	/**
@@ -38,8 +49,8 @@ public class ModelEnvelope<CONTENT> {
 			return false;
 		if (getClass() != pObj.getClass())
 			return false;
-		ModelEnvelope<?> other = (ModelEnvelope<?>) pObj;
+		ModelEnvelope<?, ?> other = (ModelEnvelope<?, ?>) pObj;
 		return Objects.equals(toolkit, other.toolkit) && Objects.equals(scope, other.scope)
-			&& Objects.equals(content, other.content);
+			&& Objects.equals(defs, other.defs) && Objects.equals(content, other.content);
 	}
 }
