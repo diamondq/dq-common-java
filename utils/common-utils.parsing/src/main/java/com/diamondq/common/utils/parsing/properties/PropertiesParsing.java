@@ -69,6 +69,27 @@ public class PropertiesParsing {
 		return val;
 	}
 
+	public static long getNonNullLong(Map<String, Object> pProps, String pKey, long pDefault) {
+		Object propObj = pProps.get(pKey);
+		long val;
+		if (propObj == null)
+			val = pDefault;
+		else
+			val = Long.parseLong(propObj.toString());
+		return val;
+	}
+
+	public static @Nullable Long getNullableLong(Map<String, Object> pProps, String pKey) {
+		Object propObj = pProps.get(pKey);
+		@Nullable
+		Long val;
+		if (propObj == null)
+			val = null;
+		else
+			val = Long.parseLong(propObj.toString());
+		return val;
+	}
+
 	public static String[] getStringArray(Map<String, Object> pProps, String pKey) {
 		Object propObj = pProps.get(pKey);
 		if (propObj == null)
