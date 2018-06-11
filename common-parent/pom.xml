@@ -39,6 +39,39 @@
             </properties>
         </profile>
         <profile>
+            <id>osgi-inf-present</id>
+            <activation>
+                <file>
+                    <exists>OSGI-INF</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-osgi-inf</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>add-resource</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>OSGI-INF</directory>
+                                            <targetPath>OSGI-INF</targetPath>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>cli</id>
             <activation>
                 <property>
