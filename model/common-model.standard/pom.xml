@@ -41,6 +41,10 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.diamondq.common</groupId>
             <artifactId>common-utils.parsing</artifactId>
         </dependency>
