@@ -65,7 +65,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
 	protected final ConcurrentMap<String, ConcurrentMap<Integer, ConcurrentMap<Integer, List<BiFunction<Structure, Structure, Structure>>>>>	mMigrationFunctions;
 
-	protected final Cache<String, List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>>>										mMigrationCache;
+	protected final transient Cache<String, List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>>>								mMigrationCache;
 
 	static {
 		BitSet b = new BitSet();
@@ -128,6 +128,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	@Override
 	public Structure createNewTombstoneStructure(Toolkit pToolkit, Scope pScope, Structure pOldStructure) {
 		Map<String, Property<?>> oldProperties = pOldStructure.getProperties();
+		@SuppressWarnings("null")
 		Map<String, Property<?>> newProps = Maps.transformEntries(oldProperties, (key, value) -> {
 			if (value == null)
 				return null;
