@@ -4,5 +4,5 @@
 	
  <service>
     <provide interface="com.diamondq.common.model.generic.osgi.OSGiStorageKVPersistenceLayer"/>
- </service>uil/service>
+ </service>
 </scr:component>
