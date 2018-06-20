@@ -463,6 +463,11 @@
                 <version>4.0.2</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.7</version>
+            </dependency>
+            <dependency>
                 <groupId>rocks.xmpp</groupId>
                 <artifactId>xmpp-core-client</artifactId>
                 <version>${rocks.xmpp.version}</version>
