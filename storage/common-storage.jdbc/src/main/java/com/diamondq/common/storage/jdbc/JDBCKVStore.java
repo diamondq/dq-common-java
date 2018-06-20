@@ -40,8 +40,6 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 	private static final Logger	sLogger			= LoggerFactory.getLogger(JDBCKVStore.class);
 
-	private static final String	sDATA_KEY		= "DATA";
-
 	private static final String	sPRIMARY_KEY_2	= "PRIMARY_KEY_2";
 
 	private static final String	sPRIMARY_KEY_1	= "PRIMARY_KEY_1";
@@ -187,224 +185,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 	 */
 	public <O> JDBCTableInfo validateTable(Connection pConnection, String pTable, @Nullable Class<O> pClass) {
 		JDBCTableInfo tableInfo = mTableCache.getIfPresent(pTable);
-		String mungedTableName = escapeTableName(pTable);
-		if (tableInfo == null) {
-
-			/* Query the database to see if the table exists */
-
-			try {
-
-				String matchingSchema = null;
-				String tableSchema = getTableSchema();
-				if (tableSchema != null) {
-
-					/* Check the schema */
-
-					boolean missingSchema = true;
-					try (ResultSet rs = pConnection.getMetaData().getSchemas(null, null)) {
-						while (rs.next() == true) {
-							String str = rs.getString(1);
-							if (str == null)
-								continue;
-							String testName = str.toLowerCase();
-							if (tableSchema.equals(testName) == true) {
-								missingSchema = false;
-								matchingSchema = testName;
-								break;
-							}
-						}
-					}
-
-					if (missingSchema == true) {
-						try (PreparedStatement ps =
-							pConnection.prepareStatement(mDialect.generateCreateSchemaSQL(tableSchema))) {
-							ps.execute();
-						}
-
-						try (ResultSet rs = pConnection.getMetaData().getSchemas(null, null)) {
-							while (rs.next() == true) {
-								String testName = rs.getString(1);
-								if (tableSchema.equals(testName) == true) {
-									matchingSchema = testName;
-									break;
-								}
-							}
-						}
-					}
-				}
-
-				/* Check the table itself */
-
-				boolean missingTable = true;
-				try (ResultSet rs = pConnection.getMetaData().getTables(null, matchingSchema, null, null)) {
-					while (rs.next() == true) {
-						String str = rs.getString(3);
-						if (str == null)
-							continue;
-						String testName = str.toLowerCase();
-						if (mungedTableName.equals(testName) == true) {
-
-							/* Validate the fields */
-
-							missingTable = false;
-							break;
-						}
-					}
-				}
-
-				if (missingTable == true) {
-					StringBuilder sb = new StringBuilder();
-					sb.append("CREATE TABLE ");
-					if (getTableSchema() != null)
-						sb.append(getTableSchema()).append('.');
-					sb.append(mungedTableName);
-					sb.append(" (");
-					sb.append(sPRIMARY_KEY_1);
-					sb.append(" varchar(1024),");
-					sb.append(sPRIMARY_KEY_2);
-					sb.append(" varchar(1024),");
-					sb.append(sDATA_KEY);
-					sb.append(" ").append(mDialect.getUnlimitedTextType()).append(",");
-					sb.append(" PRIMARY KEY(");
-					sb.append(sPRIMARY_KEY_1);
-					sb.append(',');
-					sb.append(sPRIMARY_KEY_2);
-					sb.append(')');
-					sb.append(")");
-
-					sLogger.info("Constructing table via {}", sb.toString());
-					try (PreparedStatement ps = pConnection.prepareStatement(sb.toString())) {
-						ps.execute();
-					}
-				}
-			}
-			catch (SQLException ex) {
-				throw new RuntimeException(ex);
-			}
-
-			/* Generate all the SQL */
-
-			/* Get By */
-
-			StringBuilder sb = new StringBuilder();
-			sb.append("SELECT ").append(sDATA_KEY).append(" FROM ");
-			String tableSchema = getTableSchema();
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
-			sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
-			String getBySQL = sb.toString();
-
-			/* Supports Upsert */
-
-			boolean supportsUpsert = false;
-
-			/* putBySQL */
-
-			String putBySQL = "";
-
-			/* put query */
-
-			sb = new StringBuilder();
-			sb.append("SELECT 1 FROM ");
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
-			sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
-			String putQueryBySQL = sb.toString();
-
-			/* put insert */
-
-			sb = new StringBuilder();
-			sb.append("INSERT INTO ");
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			sb.append('(');
-			sb.append(sPRIMARY_KEY_1).append(',');
-			sb.append(sPRIMARY_KEY_2).append(',');
-			sb.append(sDATA_KEY);
-			sb.append(") VALUES (?, ?, ?)");
-			String putInsertBySQL = sb.toString();
-
-			/* put update */
-
-			sb = new StringBuilder();
-			sb.append("UPDATE ");
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			sb.append(" SET ");
-			sb.append(sDATA_KEY).append("=?");
-			sb.append(" WHERE ");
-			sb.append(sPRIMARY_KEY_1).append("=? AND ");
-			sb.append(sPRIMARY_KEY_2).append("=?");
-			String putUpdateBySQL = sb.toString();
-
-			/* remove */
-
-			sb = new StringBuilder();
-			sb.append("DELETE FROM ");
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			sb.append(" WHERE ");
-			sb.append(sPRIMARY_KEY_1).append("=? AND ");
-			sb.append(sPRIMARY_KEY_2).append("=?");
-			String removeBySQL = sb.toString();
-
-			/* get count */
-
-			sb = new StringBuilder();
-			sb.append("SELECT count(1) FROM ");
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			String getCountSQL = sb.toString();
-
-			/* clear sql */
-
-			sb = new StringBuilder();
-			sb.append("DELETE FROM ");
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			String clearSQL = sb.toString();
-
-			/* key iterator */
-
-			sb = new StringBuilder();
-			sb.append("SELECT distinct ");
-			sb.append(sPRIMARY_KEY_1);
-			sb.append(" FROM ");
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			String keyIteratorSQL = sb.toString();
-
-			/* key iterator 2 */
-
-			sb = new StringBuilder();
-			sb.append("SELECT ");
-			sb.append(sPRIMARY_KEY_2);
-			sb.append(" FROM ");
-			if (tableSchema != null)
-				sb.append(tableSchema).append('.');
-			sb.append(mungedTableName);
-			sb.append(" WHERE ");
-			sb.append(sPRIMARY_KEY_1).append("=?");
-			String keyIterator2SQL = sb.toString();
-
-			IResultSetDeserializer deserializer = new JDBCJsonDeserializer();
-			IPreparedStatementSerializer serializer = new JDBCJsonSerializer();
-
-			tableInfo =
-				new JDBCTableInfo(getBySQL, supportsUpsert, putBySQL, putQueryBySQL, putInsertBySQL, putUpdateBySQL,
-					deserializer, serializer, removeBySQL, getCountSQL, clearSQL, keyIteratorSQL, keyIterator2SQL);
-			mTableCache.put(pTable, tableInfo);
-		}
+		if (tableInfo == null)
+			throw new IllegalStateException("The table has not yet been defined.");
 		return tableInfo;
 	}
 
@@ -536,9 +318,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 						sb.append(sPRIMARY_KEY_1);
 						sb.append(" varchar(1024),");
 						sb.append(sPRIMARY_KEY_2);
-						sb.append(" varchar(1024),");
+						sb.append(" varchar(1024)");
 						for (IKVColumnDefinition cd : pDefinition.getColumnDefinitions()) {
-							sb.append(' ');
+							sb.append(", ");
 							sb.append(escapeColumnName(cd.getName()));
 							sb.append(' ');
 							switch (cd.getType()) {
@@ -577,9 +359,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 								break;
 							}
 							}
-							sb.append(',');
 						}
-						sb.append(" PRIMARY KEY(");
+						sb.append(", PRIMARY KEY(");
 						sb.append(sPRIMARY_KEY_1);
 						sb.append(',');
 						sb.append(sPRIMARY_KEY_2);
@@ -604,8 +385,11 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
 			StringBuilder sb = new StringBuilder();
 			sb.append("SELECT ");
-			sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
-				(cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
+			if (pDefinition.getColumnDefinitions().isEmpty())
+				sb.append("1");
+			else
+				sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
+					(cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
 			sb.append(" FROM ");
 			if (tableSchema != null)
 				sb.append(tableSchema).append('.');
@@ -642,11 +426,17 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 			sb.append(mungedTableName);
 			sb.append('(');
 			sb.append(sPRIMARY_KEY_1).append(',');
-			sb.append(sPRIMARY_KEY_2).append(',');
-			sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
-				(cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
-			sb.append(") VALUES (?, ?, ");
-			sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(), (cd) -> "?")));
+			sb.append(sPRIMARY_KEY_2);
+			if (pDefinition.getColumnDefinitions().isEmpty() == false) {
+				sb.append(',');
+				sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
+					(cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
+			}
+			sb.append(") VALUES (?, ?");
+			if (pDefinition.getColumnDefinitions().isEmpty() == false) {
+				sb.append(", ");
+				sb.append(String.join(", ", Iterables.transform(pDefinition.getColumnDefinitions(), (cd) -> "?")));
+			}
 			sb.append(")");
 			String putInsertBySQL = sb.toString();
 
