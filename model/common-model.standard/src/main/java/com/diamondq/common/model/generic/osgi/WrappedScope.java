@@ -2,6 +2,7 @@ package com.diamondq.common.model.generic.osgi;
 
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
+import com.diamondq.common.model.generic.UnknownScopeException;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.persistence.CombinedPersistenceLayer;
@@ -12,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,9 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Octet;
 import org.javatuples.Pair;
+import org.javatuples.Quartet;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -48,6 +52,8 @@ public class WrappedScope implements Scope {
 
 	protected volatile boolean														mInitialized	= false;
 
+	protected boolean[]																mDefaultLayers;
+
 	private static final @NonNull String[]											sFILTER_KEYS	=
 		new @NonNull String[] {".structure_filter", ".structure_definition_filter",
 				".editor_structure_definition_filter", ".resource_filter"};
@@ -56,6 +62,7 @@ public class WrappedScope implements Scope {
 	public WrappedScope() {
 		mScope = null;
 		mFilters = new Filter[sFILTER_KEYS.length];
+		mDefaultLayers = new boolean[sFILTER_KEYS.length];
 	}
 
 	public Scope getScope() {
@@ -63,6 +70,7 @@ public class WrappedScope implements Scope {
 	}
 
 	public void setToolkit(Toolkit pToolkit) {
+		sLogger.trace("setToolkit({}) from {}", pToolkit, this);
 		mToolkit = pToolkit;
 	}
 
@@ -70,26 +78,26 @@ public class WrappedScope implements Scope {
 		sLogger.trace("addPersistenceLayer({}, {}) from {}", pLayer, pProps, this);
 		ImmutableMap<String, Object> props = ImmutableMap.copyOf(pProps);
 		mLayers.put(pLayer, props);
-		processLayers();
+		processLayers(false);
 	}
 
 	public void removePersistenceLayer(PersistenceLayer pLayer) {
 		sLogger.trace("removePersistenceLayer({}) from {}", pLayer, this);
 		mLayers.remove(pLayer);
-		processLayers();
+		processLayers(false);
 	}
 
 	public void addBuilder(IBuilder<PersistenceLayer> pLayer, Map<String, Object> pProps) {
 		sLogger.trace("addBuilder({}, {}) from {}", pLayer, pProps, this);
 		ImmutableMap<String, Object> props = ImmutableMap.copyOf(pProps);
 		mBuilderLayers.put(pLayer, props);
-		processLayers();
+		processLayers(false);
 	}
 
 	public void removeBuilder(IBuilder<PersistenceLayer> pLayer) {
 		sLogger.trace("removeBuilder({}) from {}", pLayer, this);
 		mBuilderLayers.remove(pLayer);
-		processLayers();
+		processLayers(false);
 	}
 
 	public void onActivate(ComponentContext pContext, Map<String, Object> pProps) {
@@ -114,7 +122,7 @@ public class WrappedScope implements Scope {
 		}
 
 		mInitialized = true;
-		processLayers();
+		processLayers(true);
 	}
 
 	/**
@@ -123,93 +131,212 @@ public class WrappedScope implements Scope {
 	 * @param pLayer
 	 * @param pProps
 	 */
-	private void processLayers() {
-		sLogger.trace("processLayers()");
+	private void processLayers(boolean pIsFirstProcess) {
+		sLogger.trace("processLayers({}) from {}", pIsFirstProcess, this);
 
 		if (mInitialized == false)
 			return;
 
-		@SuppressWarnings("unchecked")
-		List<Pair<Integer, PersistenceLayer>>[] layers = new List[sFILTER_KEYS.length];
-		for (int o = 0; o < sFILTER_KEYS.length; o++)
-			layers[o] = Lists.newArrayList();
+		synchronized (this) {
 
-		for (Map.Entry<PersistenceLayer, Map<String, Object>> pair : mLayers.entrySet()) {
-			for (int i = 0; i < sFILTER_KEYS.length; i++) {
-				Filter filter = mFilters[i];
-				if (filter == null)
-					continue;
+			/* Get the existing layers (if any) */
 
-				Map<String, Object> props = pair.getValue();
-				if (filter.matches(props) == true) {
+			PersistenceLayer existingLayer;
+			Octet<Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean> modificationState;
+			if (mToolkit instanceof WrappedToolkit) {
+				try {
+					existingLayer = ((WrappedToolkit) mToolkit).getPersistenceLayer(mScope);
+				}
+				catch (UnknownScopeException ex) {
+					existingLayer = null;
+				}
+				modificationState = ((WrappedToolkit) mToolkit).getModificationState();
+			}
+			else
+				throw new UnsupportedOperationException();
+			@SuppressWarnings("unchecked")
+			List<PersistenceLayer>[] existingLayers = new List[sFILTER_KEYS.length];
+			if (existingLayer == null) {
+				for (int i = 0; i < sFILTER_KEYS.length; i++)
+					existingLayers[i] = new ArrayList<>();
+			}
+			else {
+				if (existingLayer instanceof CombinedPersistenceLayer == false)
+					throw new UnsupportedOperationException();
+				Quartet<List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>> existingLayerQuartet =
+					((CombinedPersistenceLayer) existingLayer).getPersistenceLayers();
+				if (sFILTER_KEYS.length != 4)
+					throw new UnsupportedOperationException();
+				existingLayers[0] = existingLayerQuartet.getValue0();
+				existingLayers[1] = existingLayerQuartet.getValue1();
+				existingLayers[2] = existingLayerQuartet.getValue2();
+				existingLayers[3] = existingLayerQuartet.getValue3();
+			}
 
-					Object rankingObj = props.get(Constants.SERVICE_RANKING);
-					int ranking;
-					if (rankingObj == null)
-						ranking = Integer.MAX_VALUE;
-					else if (rankingObj instanceof Integer)
-						ranking = ((Integer) rankingObj);
-					else
-						ranking = Integer.parseInt(rankingObj.toString());
+			@SuppressWarnings("unchecked")
+			List<Pair<Integer, PersistenceLayer>>[] layers = new List[sFILTER_KEYS.length];
+			for (int o = 0; o < sFILTER_KEYS.length; o++)
+				layers[o] = Lists.newArrayList();
 
-					layers[i].add(Pair.with(ranking, pair.getKey()));
+			for (Map.Entry<PersistenceLayer, Map<String, Object>> pair : mLayers.entrySet()) {
+				for (int i = 0; i < sFILTER_KEYS.length; i++) {
+					Filter filter = mFilters[i];
+					if (filter == null)
+						continue;
+
+					Map<String, Object> props = pair.getValue();
+					if (filter.matches(props) == true) {
+
+						Object rankingObj = props.get(Constants.SERVICE_RANKING);
+						int ranking;
+						if (rankingObj == null)
+							ranking = Integer.MAX_VALUE;
+						else if (rankingObj instanceof Integer)
+							ranking = ((Integer) rankingObj);
+						else
+							ranking = Integer.parseInt(rankingObj.toString());
+
+						layers[i].add(Pair.with(ranking, pair.getKey()));
+					}
 				}
 			}
-		}
 
-		for (Map.Entry<IBuilder<PersistenceLayer>, Map<String, Object>> pair : mBuilderLayers.entrySet()) {
-			for (int i = 0; i < sFILTER_KEYS.length; i++) {
-				Filter filter = mFilters[i];
-				if (filter == null)
-					continue;
+			for (Map.Entry<IBuilder<PersistenceLayer>, Map<String, Object>> pair : mBuilderLayers.entrySet()) {
+				for (int i = 0; i < sFILTER_KEYS.length; i++) {
+					Filter filter = mFilters[i];
+					if (filter == null)
+						continue;
 
-				Map<String, Object> props = pair.getValue();
-				if (filter.matches(props) == true) {
+					Map<String, Object> props = pair.getValue();
+					if (filter.matches(props) == true) {
 
-					Object rankingObj = props.get(Constants.SERVICE_RANKING);
-					int ranking;
-					if (rankingObj == null)
-						ranking = Integer.MAX_VALUE;
-					else if (rankingObj instanceof Integer)
-						ranking = ((Integer) rankingObj);
-					else
-						ranking = Integer.parseInt(rankingObj.toString());
+						Object rankingObj = props.get(Constants.SERVICE_RANKING);
+						int ranking;
+						if (rankingObj == null)
+							ranking = Integer.MAX_VALUE;
+						else if (rankingObj instanceof Integer)
+							ranking = ((Integer) rankingObj);
+						else
+							ranking = Integer.parseInt(rankingObj.toString());
 
-					layers[i].add(Pair.with(ranking, pair.getKey().build()));
+						layers[i].add(Pair.with(ranking, pair.getKey().build()));
+					}
 				}
 			}
+
+			/* Add default values */
+
+			for (int i = 0; i < sFILTER_KEYS.length; i++) {
+				if (layers[i].isEmpty() == true) {
+					if (pIsFirstProcess == true) {
+						if (mFilters[i] != null)
+							sLogger.info("Filter {} didn't resolve. Using a Memory PersistenceLayer for now",
+								mFilters[i]);
+						layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer()));
+						mDefaultLayers[i] = true;
+					}
+					else {
+						if (mDefaultLayers[i] == true) {
+							for (PersistenceLayer pl : existingLayers[i])
+								layers[i].add(Pair.with(Integer.MAX_VALUE, pl));
+						}
+						else {
+							if (mFilters[i] != null)
+								sLogger.info("Filter {} didn't resolve. Using a Memory PersistenceLayer for now",
+									mFilters[i]);
+							layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer()));
+							mDefaultLayers[i] = true;
+						}
+					}
+				}
+				else
+					mDefaultLayers[i] = false;
+			}
+
+			/* Now sort the lists */
+
+			@SuppressWarnings("unchecked")
+			ImmutableList.Builder<PersistenceLayer>[] sortedLayers = new ImmutableList.Builder[sFILTER_KEYS.length];
+			for (int i = 0; i < sFILTER_KEYS.length; i++) {
+				final int o = i;
+				Collections.sort(layers[o], (a, b) -> {
+					return b.getValue0() - a.getValue0();
+				});
+				sortedLayers[o] = ImmutableList.builder();
+				layers[o].forEach((p) -> {
+					sortedLayers[o].add(p.getValue1());
+				});
+			}
+
+			@SuppressWarnings("unchecked")
+			@NonNull
+			List<PersistenceLayer>[] finalLayers = new @NonNull List[sFILTER_KEYS.length];
+			for (int i = 0; i < sFILTER_KEYS.length; i++)
+				finalLayers[i] = sortedLayers[i].build();
+
+			/* Now check if there are any failures due to modifications */
+
+			if (sFILTER_KEYS.length != 4)
+				throw new UnsupportedOperationException();
+			for (int i = 0; i < 4; i++) {
+				boolean isDifferent = false;
+				if (finalLayers[i].size() != existingLayers[i].size())
+					isDifferent = true;
+				else {
+					for (int o = 0; o < finalLayers[i].size(); o++) {
+						if (finalLayers[i].get(o) != existingLayers[i].get(o)) {
+							isDifferent = true;
+							break;
+						}
+					}
+				}
+				if (isDifferent == true) {
+					switch (i) {
+					case 0:
+						if (modificationState.getValue0() == true)
+							throw new UnsupportedOperationException(
+								"The structure persistence layer has updated something before the scope was updated. Not yet supported.");
+						if (modificationState.getValue4() == true)
+							throw new UnsupportedOperationException(
+								"The structure persistence layer has deleted something before the scope was updated. Not yet supported.");
+						break;
+					case 1:
+						if (modificationState.getValue1() == true)
+							throw new UnsupportedOperationException(
+								"The structure definition persistence layer has updated something before the scope was updated. Not yet supported.");
+						if (modificationState.getValue5() == true)
+							throw new UnsupportedOperationException(
+								"The structure definition persistence layer has deleted something before the scope was updated. Not yet supported.");
+						break;
+					case 2:
+						if (modificationState.getValue2() == true)
+							throw new UnsupportedOperationException(
+								"The editor structure persistence layer has updated something before the scope was updated. Not yet supported.");
+						if (modificationState.getValue6() == true)
+							throw new UnsupportedOperationException(
+								"The editor structure persistence layer has deleted something before the scope was updated. Not yet supported.");
+						break;
+					case 3:
+						if (modificationState.getValue3() == true)
+							throw new UnsupportedOperationException(
+								"The resource persistence layer has updated something before the scope was updated. Not yet supported.");
+						if (modificationState.getValue7() == true)
+							throw new UnsupportedOperationException(
+								"The resource persistence layer has deleted something before the scope was updated. Not yet supported.");
+						break;
+					}
+				}
+			}
+
+			CombinedPersistenceLayer combinedPersistenceLayer =
+				new CombinedPersistenceLayer(finalLayers[0], finalLayers[1], finalLayers[2], finalLayers[3]);
+			if (mToolkit instanceof GenericToolkit)
+				((GenericToolkit) mToolkit).setPersistenceLayer(mScope, combinedPersistenceLayer);
+			else if (mToolkit instanceof WrappedToolkit)
+				((WrappedToolkit) mToolkit).setPersistenceLayer(mScope, combinedPersistenceLayer);
+			else
+				return;
 		}
-
-		/* Add default values */
-
-		for (int i = 0; i < sFILTER_KEYS.length; i++) {
-			if (layers[i].isEmpty() == true)
-				layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer()));
-		}
-
-		/* Now sort the lists */
-
-		@SuppressWarnings("unchecked")
-		ImmutableList.Builder<PersistenceLayer>[] sortedLayers = new ImmutableList.Builder[sFILTER_KEYS.length];
-		for (int i = 0; i < sFILTER_KEYS.length; i++) {
-			final int o = i;
-			Collections.sort(layers[o], (a, b) -> {
-				return a.getValue0() - b.getValue0();
-			});
-			sortedLayers[o] = ImmutableList.builder();
-			layers[o].forEach((p) -> {
-				sortedLayers[o].add(p.getValue1());
-			});
-		}
-
-		CombinedPersistenceLayer combinedPersistenceLayer = new CombinedPersistenceLayer(sortedLayers[0].build(),
-			sortedLayers[1].build(), sortedLayers[2].build(), sortedLayers[3].build());
-		if (mToolkit instanceof GenericToolkit)
-			((GenericToolkit) mToolkit).setPersistenceLayer(mScope, combinedPersistenceLayer);
-		else if (mToolkit instanceof WrappedToolkit)
-			((WrappedToolkit) mToolkit).setPersistenceLayer(mScope, combinedPersistenceLayer);
-		else
-			return;
 
 	}
 
