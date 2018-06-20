@@ -4,8 +4,6 @@ import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.persistence.PropertiesFilePersistenceLayer;
-import com.diamondq.common.model.persistence.StorageKVPersistenceLayer;
-import com.diamondq.common.storage.kv.IKVStore;
 
 import java.io.File;
 
@@ -16,6 +14,7 @@ public class OSGiPropertiesFilePersistenceLayer extends AbstractOSGiConstructor 
 			.constructorClass(PropertiesFilePersistenceLayer.class) //
 			.register(PersistenceLayer.class) //
 			.cArg().type(File.class).prop(".structureDir").optional().build() //
+			.cArg().type(Integer.TYPE).prop(".cacheStructuresSeconds").value(300).build() //
 			.cArg().type(File.class).prop(".structureDefDir").optional().build() //
 			.cArg().type(File.class).prop(".editorStructureDefDir").optional().build() //
 		);
