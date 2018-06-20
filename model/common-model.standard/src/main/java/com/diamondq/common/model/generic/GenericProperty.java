@@ -186,11 +186,18 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 			case Integer: {
 				if (pValue instanceof Integer)
 					break;
+				if (pValue instanceof Long) {
+					if (((Long) pValue).longValue() > Integer.MAX_VALUE)
+						throw new IllegalArgumentException(
+							"An Integer Property can only be passed a Long that is less than a MAX Integer");
+					pValue = (TYPE) (Integer) ((Long) pValue).intValue();
+					break;
+				}
 				if (pValue instanceof String) {
 					pValue = (TYPE) (Integer) Integer.parseInt((String) pValue);
 					break;
 				}
-				throw new IllegalArgumentException("An Integer Property must be passed an Integer or a String");
+				throw new IllegalArgumentException("An Integer Property must be passed an Integer, Long or a String");
 			}
 			case PropertyRef: {
 				if (pValue instanceof PropertyRef)
