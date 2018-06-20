@@ -29,11 +29,31 @@ import java.util.function.BiFunction;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Octet;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WrappedToolkit implements Toolkit {
+	private static final Logger	sLogger								= LoggerFactory.getLogger(WrappedToolkit.class);
 
-	protected Toolkit mToolkit;
+	protected Toolkit			mToolkit;
+
+	protected volatile boolean	mWriteStructure						= false;
+
+	protected volatile boolean	mWriteStructureDefinition			= false;
+
+	protected volatile boolean	mWriteEditorStructureDefinition		= false;
+
+	protected volatile boolean	mWriteResource						= false;
+
+	protected volatile boolean	mDeleteStructure					= false;
+
+	protected volatile boolean	mDeleteStructureDefinition			= false;
+
+	protected volatile boolean	mDeleteEditorStructureDefinition	= false;
+
+	protected volatile boolean	mDeleteResource						= false;
 
 	@SuppressWarnings("null")
 	public WrappedToolkit() {
@@ -41,6 +61,7 @@ public class WrappedToolkit implements Toolkit {
 	}
 
 	public void onActivate() {
+		sLogger.trace("onActivate() from {}", this);
 		mToolkit = ToolkitFactory.newInstance().newToolkit();
 	}
 
@@ -58,7 +79,20 @@ public class WrappedToolkit implements Toolkit {
 		return pScope;
 	}
 
+	public PersistenceLayer getPersistenceLayer(Scope pScope) {
+		if (mToolkit instanceof GenericToolkit)
+			return ((GenericToolkit) mToolkit).getPersistenceLayer(pScope);
+		else
+			throw new UnsupportedOperationException();
+	}
+
+	public Octet<Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean> getModificationState() {
+		return Octet.with(mWriteStructure, mWriteStructureDefinition, mWriteEditorStructureDefinition, mWriteResource,
+			mDeleteStructure, mDeleteStructureDefinition, mDeleteEditorStructureDefinition, mDeleteResource);
+	}
+
 	public void setPersistenceLayer(Scope pScope, PersistenceLayer pLayer) {
+		sLogger.trace("setPersistenceLayer({}, {}) from {}", pScope, pLayer, this);
 		if (mToolkit instanceof GenericToolkit)
 			((GenericToolkit) mToolkit).setPersistenceLayer(pScope, pLayer);
 		else
@@ -129,6 +163,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public void writeStructureDefinition(Scope pScope, StructureDefinition pValue) {
+		mWriteStructureDefinition = true;
 		mToolkit.writeStructureDefinition(dewrapScope(pScope), pValue);
 	}
 
@@ -138,6 +173,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public void deleteStructureDefinition(Scope pScope, StructureDefinition pValue) {
+		mDeleteStructureDefinition = true;
 		mToolkit.deleteStructureDefinition(dewrapScope(pScope), pValue);
 	}
 
@@ -260,6 +296,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public void writeStructure(Scope pScope, Structure pStructure) {
+		mWriteStructure = true;
 		mToolkit.writeStructure(dewrapScope(pScope), pStructure);
 	}
 
@@ -269,6 +306,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public boolean writeStructure(Scope pScope, Structure pStructure, @Nullable Structure pOldStructure) {
+		mWriteStructure = true;
 		return mToolkit.writeStructure(dewrapScope(pScope), pStructure, pOldStructure);
 	}
 
@@ -278,6 +316,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public boolean deleteStructure(Scope pScope, Structure pOldStructure) {
+		mDeleteStructure = true;
 		return mToolkit.deleteStructure(dewrapScope(pScope), pOldStructure);
 	}
 
@@ -342,6 +381,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public void writeEditorStructureDefinition(Scope pScope, EditorStructureDefinition pEditorStructureDefinition) {
+		mWriteEditorStructureDefinition = true;
 		mToolkit.writeEditorStructureDefinition(dewrapScope(pScope), pEditorStructureDefinition);
 	}
 
@@ -351,6 +391,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public void deleteEditorStructureDefinition(Scope pScope, EditorStructureDefinition pValue) {
+		mDeleteEditorStructureDefinition = true;
 		mToolkit.deleteEditorStructureDefinition(dewrapScope(pScope), pValue);
 	}
 
@@ -435,6 +476,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public void writeResourceString(Scope pScope, Locale pLocale, String pKey, String pValue) {
+		mWriteResource = true;
 		mToolkit.writeResourceString(dewrapScope(pScope), pLocale, pKey, pValue);
 	}
 
@@ -444,6 +486,7 @@ public class WrappedToolkit implements Toolkit {
 	 */
 	@Override
 	public void deleteResourceString(Scope pScope, Locale pLocale, String pKey) {
+		mDeleteResource = true;
 		mToolkit.deleteResourceString(dewrapScope(pScope), pLocale, pKey);
 	}
 
