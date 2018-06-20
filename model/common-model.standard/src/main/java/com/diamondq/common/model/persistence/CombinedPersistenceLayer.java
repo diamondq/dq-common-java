@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Quartet;
 
@@ -25,19 +27,19 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
 	private final List<PersistenceLayer>	mStructurePersistenceLayer;
 
-	private final boolean					mStructurePersistenceLayerIsSingleton;
+	private final transient boolean			mStructurePersistenceLayerIsSingleton;
 
 	private final List<PersistenceLayer>	mStructureDefinitionPersistenceLayer;
 
-	private final boolean					mStructureDefinitionPersistenceLayerIsSingleton;
+	private final transient boolean			mStructureDefinitionPersistenceLayerIsSingleton;
 
 	private final List<PersistenceLayer>	mEditorStructureDefinitionPersistenceLayer;
 
-	private final boolean					mEditorStructureDefinitionPersistenceLayerIsSingleton;
+	private final transient boolean			mEditorStructureDefinitionPersistenceLayerIsSingleton;
 
 	private final List<PersistenceLayer>	mResourcePersistenceLayer;
 
-	private final boolean					mResourcePersistenceLayerIsSingleton;
+	private final transient boolean			mResourcePersistenceLayerIsSingleton;
 
 	public CombinedPersistenceLayer(List<PersistenceLayer> pStructurePersistenceLayer,
 		List<PersistenceLayer> pStructureDefinitionPersistenceLayer,
@@ -354,4 +356,11 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.DEFAULT_STYLE, false);
+	}
 }
