@@ -28,11 +28,15 @@ import java.util.Properties;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Persistence Layer that stores the information in Properties files.
  */
 public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceLayer<Properties, String> {
+
+	private static final Logger sLogger = LoggerFactory.getLogger(PropertiesFilePersistenceLayer.class);
 
 	/**
 	 * The builder (generally used for the Config system)
@@ -128,6 +132,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 		@Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
 		super(pStructureBaseDir != null, true, pCacheStructuresSeconds, pStructureDefBaseDir != null, true, -1,
 			pEditorStructureDefBaseDir != null, true, -1, false, true, -1);
+		sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}) from {}", pStructureBaseDir,
+			pCacheStructuresSeconds, pStructureDefBaseDir, pEditorStructureDefBaseDir, this);
 		mStructureBaseDir = pStructureBaseDir;
 		mStructureDefBaseDir = pStructureDefBaseDir;
 		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
@@ -159,6 +165,11 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir != null,
 			pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir != null,
 			pCacheResources, pCacheResourcesSeconds);
+		sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) from {}",
+			pStructureBaseDir, pCacheStructures, pCacheStructuresSeconds, pStructureDefBaseDir,
+			pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir,
+			pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir,
+			pCacheResources, pCacheResourcesSeconds, this);
 		mStructureBaseDir = pStructureBaseDir;
 		mStructureDefBaseDir = pStructureDefBaseDir;
 		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
@@ -374,7 +385,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			@SuppressWarnings("null")
 			@NonNull
 			String[] strings = (String[]) pValue;
-			String[] escaped = new String[strings.length];
+			@NonNull
+			String[] escaped = new @NonNull String[strings.length];
 			for (int i = 0; i < strings.length; i++)
 				escaped[i] = escape(strings[i]);
 			String escapedStr = String.join(",", escaped);
