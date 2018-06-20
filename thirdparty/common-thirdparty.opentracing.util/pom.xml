@@ -10,13 +10,13 @@
     </parent>
     <artifactId>common-thirdparty.opentracing.util</artifactId>
     <packaging>bundle</packaging>
-    <version>0.31.0</version>
+    <version>0.31.0_01</version>
     <name>DiamondQ Common: Third Party: OpenTracing Util</name>
     <dependencies>
         <dependency>
             <groupId>io.opentracing</groupId>
             <artifactId>opentracing-util</artifactId>
-            <version>${project.version}</version>
+            <version>0.31.0</version>
         </dependency>
     </dependencies>
 </project>
