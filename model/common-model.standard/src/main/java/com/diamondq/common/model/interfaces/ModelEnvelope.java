@@ -30,6 +30,10 @@ public class ModelEnvelope<DEFS, CONTENT> {
 		content = pContent;
 	}
 
+	public ModelEnvelope<DEFS, CONTENT> withContent(CONTENT pContent) {
+		return new ModelEnvelope<>(this, pContent);
+	}
+
 	/**
 	 * @see java.lang.Object#hashCode()
 	 */
