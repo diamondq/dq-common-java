@@ -18,6 +18,7 @@ public class JDBCJsonDeserializer implements IResultSetDeserializer {
 	 * @see com.diamondq.common.storage.jdbc.IResultSetDeserializer#deserializeFromResultSet(java.sql.ResultSet,
 	 *      java.lang.Class)
 	 */
+	@SuppressWarnings("null")
 	@Override
 	public <O> O deserializeFromResultSet(ResultSet pRs, Class<O> pClass) throws SQLException {
 		String data = pRs.getString(1);
