@@ -1,13 +1,17 @@
 package com.diamondq.common.injection.osgi;
 
 import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
+import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -70,6 +74,9 @@ public class AbstractOSGiConstructor {
 	@SuppressWarnings("null")
 	public AbstractOSGiConstructor(ConstructorInfoBuilder pBuilder) {
 		mInfo = pBuilder.build();
+		if ((mInfo.method != null)
+			&& (AbstractOSGiConstructor.class.isAssignableFrom(mInfo.constructionClass) == false))
+			throw new ExtendedIllegalArgumentException(Messages.METHOD_ONLY_ON_FACTORY);
 		mBundleContext = null;
 		mCurrentProps = Collections.emptyMap();
 	}
@@ -192,16 +199,25 @@ public class AbstractOSGiConstructor {
 					String propValue = arg.propertyValueKey;
 					if (arg.argumentClass == String.class)
 						value = PropertiesParsing.getNullableString(mCurrentProps, propValue);
-					else if (arg.argumentClass == Integer.class)
+					else if ((arg.argumentClass == Integer.class) || (arg.argumentClass == Integer.TYPE))
 						value = PropertiesParsing.getNullableInt(mCurrentProps, propValue);
-					else if (arg.argumentClass == Boolean.class)
+					else if ((arg.argumentClass == Boolean.class) || (arg.argumentClass == Boolean.TYPE))
 						value = PropertiesParsing.getNullableBoolean(mCurrentProps, propValue);
+					else if (arg.argumentClass == File.class) {
+						String valueStr = PropertiesParsing.getNullableString(mCurrentProps, propValue);
+						if (valueStr != null)
+							value = new File(valueStr);
+					}
 					else
 						throw new UnsupportedOperationException();
 					if (value == null) {
-						if (arg.required == Boolean.TRUE) {
-							available = false;
-							break;
+						if (arg.propertyValueSet == true)
+							value = arg.propertyValue;
+						if (value == null) {
+							if (arg.required == Boolean.TRUE) {
+								available = false;
+								break;
+							}
 						}
 					}
 				}
@@ -213,8 +229,20 @@ public class AbstractOSGiConstructor {
 			if (available == true) {
 				Object service;
 				try {
-					Object serviceObj = mInfo.constructor.newInstance(args);
-					service = serviceObj;
+					Constructor<?> c = mInfo.constructor;
+					if (c != null) {
+						Object serviceObj = c.newInstance(args);
+						service = serviceObj;
+					}
+					else {
+						Method m = mInfo.method;
+						if (m != null) {
+							Object serviceObj = m.invoke(this, args);
+							service = serviceObj;
+						}
+						else
+							throw new IllegalStateException();
+					}
 				}
 				catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException ex) {
