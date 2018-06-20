@@ -494,7 +494,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 		case StructureRefList: {
 			@NonNull
 			String[] strings = (@NonNull String[]) pValue;
-			String[] escaped = new String[strings.length];
+			@NonNull
+			String @NonNull [] escaped = new @NonNull String[strings.length];
 			for (int i = 0; i < strings.length; i++)
 				escaped[i] = escape(strings[i]);
 			String escapedStr = String.join(",", escaped);
@@ -627,6 +628,35 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
 
 			transaction.removeByKey(defName, containerAndPrimaryKey.container, containerAndPrimaryKey.primary);
+
+			/* Then, for each subcomponent, make sure it's listed */
+
+			String[] parts = pKey.split("/");
+			if (parts.length > 2) {
+				for (int i = 0; i < parts.length - 2; i += 3) {
+					StringBuilder typeBuilder = new StringBuilder();
+					typeBuilder.append(parts[i]).append('_').append(parts[i + 2]).append('_').append(parts[i + 3]);
+
+					StringBuilder leftKeyBuilder = new StringBuilder();
+					boolean isFirst = true;
+					for (int o = 0; o <= i + 1; o++) {
+						if (isFirst == true)
+							isFirst = false;
+						else
+							leftKeyBuilder.append('/');
+						leftKeyBuilder.append(parts[o]);
+					}
+
+					String tableName = typeBuilder.toString();
+					String leftKey = leftKeyBuilder.toString();
+					String rightKey = parts[i + 4];
+
+					validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
+
+					transaction.removeByKey(tableName, leftKey, rightKey);
+				}
+			}
+
 			success = true;
 		}
 		finally {
