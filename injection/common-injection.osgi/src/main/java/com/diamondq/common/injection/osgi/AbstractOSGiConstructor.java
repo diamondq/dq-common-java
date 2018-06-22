@@ -105,7 +105,7 @@ public class AbstractOSGiConstructor {
 	}
 
 	protected void processProperties() {
-		sLogger.trace("processProperties({})");
+		sLogger.trace("processProperties()");
 
 		synchronized (this) {
 
@@ -146,6 +146,7 @@ public class AbstractOSGiConstructor {
 					mTrackers.put(mInfo.filters[i], filterTracker);
 				}
 
+				sLogger.trace("Starting ServiceTracker for {}", finalFilterStr);
 				ServiceTracker<Object, Object> tracker = new ServiceTracker<>(mBundleContext, filter, filterTracker);
 				filterTracker.setTracker(tracker);
 				tracker.open();
@@ -159,7 +160,7 @@ public class AbstractOSGiConstructor {
 	}
 
 	protected void build() {
-		sLogger.trace("build({})");
+		sLogger.trace("build()");
 		synchronized (this) {
 
 			/* Now that all the filters are active, create the initial output, and then turn on future notifications */
@@ -178,6 +179,8 @@ public class AbstractOSGiConstructor {
 					List<Triplet<Integer, Long, ServiceReference<Object>>> references = tracker.getReferences();
 					if (references.isEmpty()) {
 						if (arg.required == Boolean.TRUE) {
+							sLogger.trace("\tUnable to find references to arg #{}: propertyFilterKey={}", i,
+								arg.propertyFilterKey);
 							available = false;
 							break;
 						}
@@ -187,6 +190,8 @@ public class AbstractOSGiConstructor {
 						Object obj = mBundleContext.getService(ref);
 						if (obj == null) {
 							if (arg.required == Boolean.TRUE) {
+								sLogger.trace("\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}", i,
+									arg.propertyFilterKey, ref);
 								available = false;
 								break;
 							}
@@ -215,6 +220,8 @@ public class AbstractOSGiConstructor {
 							value = arg.propertyValue;
 						if (value == null) {
 							if (arg.required == Boolean.TRUE) {
+								sLogger.trace("\tUnable to resolve reference to arg #{}: propertyValueKey={}", i,
+									arg.propertyValueKey);
 								available = false;
 								break;
 							}
@@ -261,11 +268,14 @@ public class AbstractOSGiConstructor {
 					properties.put(key, pair.getValue());
 				}
 
+				sLogger.trace("Registering constructed service...");
 				mRegistration = mBundleContext.registerService(mInfo.registrationClasses, service, properties);
 			}
 			else {
-				if (mRegistration != null) {
-					mRegistration.unregister();
+				ServiceRegistration<?> registration = mRegistration;
+				if (registration != null) {
+					sLogger.trace("Clearing old registration");
+					registration.unregister();
 					mRegistration = null;
 				}
 			}
