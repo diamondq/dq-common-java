@@ -91,6 +91,18 @@ public class WrappedToolkit implements Toolkit {
 			mDeleteStructure, mDeleteStructureDefinition, mDeleteEditorStructureDefinition, mDeleteResource);
 	}
 
+	public void clearModificationState() {
+		sLogger.trace("clearModificationState() from {}", this);
+		mWriteStructure = false;
+		mWriteStructureDefinition = false;
+		mWriteEditorStructureDefinition = false;
+		mWriteResource = false;
+		mDeleteStructure = false;
+		mDeleteStructureDefinition = false;
+		mDeleteEditorStructureDefinition = false;
+		mDeleteResource = false;
+	}
+
 	public void setPersistenceLayer(Scope pScope, PersistenceLayer pLayer) {
 		sLogger.trace("setPersistenceLayer({}, {}) from {}", pScope, pLayer, this);
 		if (mToolkit instanceof GenericToolkit)

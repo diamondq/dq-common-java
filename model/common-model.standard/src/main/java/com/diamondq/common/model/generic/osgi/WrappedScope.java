@@ -60,6 +60,7 @@ public class WrappedScope implements Scope {
 
 	@SuppressWarnings("null")
 	public WrappedScope() {
+		sLogger.trace("WrappedScope() from {}", this);
 		mScope = null;
 		mFilters = new Filter[sFILTER_KEYS.length];
 		mDefaultLayers = new boolean[sFILTER_KEYS.length];
@@ -332,8 +333,10 @@ public class WrappedScope implements Scope {
 				new CombinedPersistenceLayer(finalLayers[0], finalLayers[1], finalLayers[2], finalLayers[3]);
 			if (mToolkit instanceof GenericToolkit)
 				((GenericToolkit) mToolkit).setPersistenceLayer(mScope, combinedPersistenceLayer);
-			else if (mToolkit instanceof WrappedToolkit)
+			else if (mToolkit instanceof WrappedToolkit) {
 				((WrappedToolkit) mToolkit).setPersistenceLayer(mScope, combinedPersistenceLayer);
+				((WrappedToolkit) mToolkit).clearModificationState();
+			}
 			else
 				return;
 		}
