@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" name="com.diamondq.common.scheduledexecutorservice">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" configuration-policy="optional" immediate="true" name="com.diamondq.common.scheduledexecutorservice">
     <implementation class="com.diamondq.common.injection.osgi.common.ScheduledExecutorServiceProvider"/>
+    <service>
+       <provide interface="com.diamondq.common.injection.osgi.common.ScheduledExecutorServiceProvider"/>
+    </service>
 </scr:component>

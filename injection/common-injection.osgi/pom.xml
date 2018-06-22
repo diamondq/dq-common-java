@@ -67,6 +67,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>com.diamondq.common.injection.osgi</Export-Package>
+                                <Service-Component>OSGI-INF/*.xml</Service-Component>
                             </instructions>
                         </configuration>
                     </execution>
