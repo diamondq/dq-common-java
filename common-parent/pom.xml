@@ -24,9 +24,13 @@
         <rocks.xmpp.version>0.8.0-DQ-SNAPSHOT</rocks.xmpp.version>
         <rocks.precis.version>1.1.0-DQ-SNAPSHOT</rocks.precis.version>
         <jboss-logging.version>3.3.2.Final</jboss-logging.version>
-        <snapshot.update.policy>always</snapshot.update.policy>
+        <snapshot.update.policy>daily</snapshot.update.policy>
+        <gpg.arg1>--pinentry-mode</gpg.arg1>
+        <gpg.arg2>loopback</gpg.arg2>
     </properties>
     <profiles>
+        <!-- Define the Eclipse External Annotations only if we're in the 
+            Eclipse M2E environment -->
         <profile>
             <id>m2e</id>
             <activation>
@@ -38,6 +42,57 @@
                 <m2e.jdt.annotationpath>${eclipse.external.annotations}</m2e.jdt.annotationpath>
             </properties>
         </profile>
+        <!-- If there is a src/i18n/resources then add in the generation 
+            of the Messages class -->
+        <profile>
+            <id>generate-i18n-strings</id>
+            <activation>
+                <file>
+                    <exists>src/i18n/resources</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.diamondq.maven</groupId>
+                        <artifactId>i18n-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-enums</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>generateEnums</goal>
+                                </goals>
+                                <configuration>
+                                    <propsDir>${project.basedir}/src/i18n/resources</propsDir>
+                                    <implementsClass>com.diamondq.common.utils.misc.internationalization.MessagesEnum</implementsClass>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.build.directory}/generated-sources/i18n</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- If there is an OSGI-INF directory, then add it as a resource 
+            and make sure that the Manifest includes the XML files -->
         <profile>
             <id>osgi-inf-present</id>
             <activation>
@@ -68,9 +123,156 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>bundle-manifest</id>
+                                <configuration>
+                                    <instructions>
+                                        <Service-Component>OSGI-INF/*.xml</Service-Component>
+                                    </instructions>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
+        <!-- If there is a META-INF folder then make sure it's added to the 
+            build -->
+        <profile>
+            <id>meta-inf-present</id>
+            <activation>
+                <file>
+                    <exists>META-INF</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-meta-inf</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>add-resource</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>META-INF</directory>
+                                            <targetPath>META-INF</targetPath>
+                                            <excludes>
+                                                <exclude>MANIFEST.MF</exclude>
+                                                <exclude>placeholder.txt</exclude>
+                                            </excludes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- If there is source code, then add the maven-bundle-plugin -->
+        <profile>
+            <id>osgi-project</id>
+            <activation>
+                <file>
+                    <exists>src/main</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>bundle-manifest</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>manifest</goal>
+                                </goals>
+                                <configuration>
+                                    <instructions>
+                                        <_removeheaders>Tool,
+                                            Originally-Created-By,
+                                            Bnd-LastModified,
+                                            Private-Package,
+                                            Include-Resource</_removeheaders>
+                                        <Export-Package>!com.diamondq.*.i18n,!com.diamondq.*.impl,com.diamondq.*</Export-Package>
+                                    </instructions>
+                                    <manifestLocation>${project.basedir}/META-INF</manifestLocation>
+                                    <niceManifest>true</niceManifest>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>source-manifest</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>manifest</goal>
+                                </goals>
+                                <configuration>
+                                    <instructions>
+                                        <_removeheaders>Tool,
+                                            Originally-Created-By,
+                                            Bnd-LastModified,
+                                            Private-Package,
+                                            Include-Resource,
+                                            Import-Package,
+                                            Export-Package,
+                                            Require-Capability,
+                                            Provide-Capability</_removeheaders>
+                                        <Export-Package />
+                                        <Bundle-SymbolicName>$[maven-symbolicname].source</Bundle-SymbolicName>
+                                        <Eclipse-SourceBundle>$[maven-symbolicname];version="$[Bundle-Version]";roots:="."</Eclipse-SourceBundle>
+                                    </instructions>
+                                    <manifestLocation>${project.build.directory}/sources</manifestLocation>
+                                    <niceManifest>true</niceManifest>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-jar</id>
+                                <configuration>
+                                    <archive>
+                                        <manifestFile>${project.basedir}/META-INF/MANIFEST.MF</manifestFile>
+                                    </archive>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Generate sources jar -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <configuration>
+                                    <archive>
+                                        <manifestFile>${project.build.directory}/sources/MANIFEST.MF</manifestFile>
+                                    </archive>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- If we're running in Jenkins, then make sure we always update 
+            snapshots -->
         <profile>
             <id>cli</id>
             <activation>
@@ -79,6 +281,13 @@
                     <value>true</value>
                 </property>
             </activation>
+            <properties>
+                <snapshot.update.policy>always</snapshot.update.policy>
+            </properties>
+        </profile>
+        <!-- Only SIGN if we're running within Jenkins -->
+        <profile>
+            <id>sign</id>
             <build>
                 <plugins>
                     <plugin>
@@ -93,8 +302,8 @@
                                 </goals>
                                 <configuration>
                                     <gpgArguments>
-                                        <arg>--pinentry-mode</arg>
-                                        <arg>loopback</arg>
+                                        <arg>${gpg.arg1}</arg>
+                                        <arg>${gpg.arg2}</arg>
                                     </gpgArguments>
                                 </configuration>
                             </execution>
@@ -102,6 +311,12 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
     <repositories>
@@ -616,66 +831,6 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <_removeheaders>Tool,
-                                    Originally-Created-By,
-                                    Bnd-LastModified, Private-Package,
-                                    Include-Resource</_removeheaders>
-                                <Export-Package>com.diamondq.*</Export-Package>
-                            </instructions>
-                            <manifestLocation>${project.basedir}/META-INF</manifestLocation>
-                            <niceManifest>true</niceManifest>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>source-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <_removeheaders>Tool,
-                                    Originally-Created-By,
-                                    Bnd-LastModified, Private-Package,
-                                    Include-Resource, Import-Package,
-                                    Export-Package, Require-Capability,
-                                    Provide-Capability</_removeheaders>
-                                <Export-Package />
-                                <Bundle-SymbolicName>$[maven-symbolicname].source</Bundle-SymbolicName>
-                                <Eclipse-SourceBundle>$[maven-symbolicname];version="$[Bundle-Version]";roots:="."</Eclipse-SourceBundle>
-                            </instructions>
-                            <manifestLocation>${project.build.directory}/sources</manifestLocation>
-                            <niceManifest>true</niceManifest>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-jar</id>
-                        <configuration>
-                            <archive>
-                                <manifestFile>${project.basedir}/META-INF/MANIFEST.MF</manifestFile>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- Generate sources jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -686,11 +841,6 @@
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
-                        <configuration>
-                            <archive>
-                                <manifestFile>${project.build.directory}/sources/MANIFEST.MF</manifestFile>
-                            </archive>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
