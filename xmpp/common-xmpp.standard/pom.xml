@@ -44,12 +44,12 @@
             <artifactId>xmpp-extensions-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>rocks.xmpp</groupId>
-            <artifactId>xmpp-debug</artifactId>
+            <groupId>com.diamondq.common</groupId>
+            <artifactId>common-tracing.opentracing</artifactId>
         </dependency>
         <dependency>
             <groupId>com.diamondq.common</groupId>
-            <artifactId>common-tracing.opentracing</artifactId>
+            <artifactId>common-injection.osgi</artifactId>
         </dependency>
     </dependencies>
     <build>
