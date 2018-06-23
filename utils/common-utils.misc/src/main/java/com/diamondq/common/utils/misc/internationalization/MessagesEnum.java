@@ -1,4 +1,4 @@
-package com.diamondq.common.utils.misc.i18n;
+package com.diamondq.common.utils.misc.internationalization;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

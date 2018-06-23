@@ -1,4 +1,4 @@
-package com.diamondq.common.utils.misc.i18n;
+package com.diamondq.common.utils.misc.internationalization;
 
 import java.text.MessageFormat;
 import java.util.Locale;

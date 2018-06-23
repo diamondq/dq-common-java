@@ -1,7 +1,7 @@
 package com.diamondq.common.utils.misc.errors;
 
-import com.diamondq.common.utils.misc.i18n.I18N;
-import com.diamondq.common.utils.misc.i18n.MessagesEnum;
+import com.diamondq.common.utils.misc.internationalization.I18N;
+import com.diamondq.common.utils.misc.internationalization.MessagesEnum;
 
 import java.util.Arrays;
 import java.util.Locale;
