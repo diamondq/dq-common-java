@@ -73,7 +73,6 @@
                                     filter:="(osgi.extender=osgi.serviceloader.processor)",osgi.extender;
                                     filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
                                 <Provide-Capability>osgi.serviceloader;osgi.serviceloader="com.diamondq.common.model.interfaces.ToolkitFactory"</Provide-Capability>
-                                <Service-Component>OSGI-INF/*.xml</Service-Component>
                             </instructions>
                         </configuration>
                     </execution>

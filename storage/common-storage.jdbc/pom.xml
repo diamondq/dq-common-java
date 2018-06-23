@@ -44,7 +44,7 @@
             <groupId>com.diamondq.common</groupId>
             <artifactId>common-injection.osgi</artifactId>
             <!-- This is marked optional so that from the Maven dependency 
-                point-off-view, we don't required oSGi. ie. This allows non-OSGi applications 
+                point-off-view, we don't required OSGi. ie. This allows non-OSGi applications 
                 to use this library. However, we do want it mandatory in the MANIFEST -->
             <optional>true</optional>
         </dependency>
@@ -60,7 +60,6 @@
                         <configuration>
                             <instructions>
                                 <Import-Package>com.diamondq.common.injection.osgi;resolution:=mandatory,*</Import-Package>
-                                <Service-Component>OSGI-INF/*.xml</Service-Component>
                             </instructions>
                         </configuration>
                     </execution>

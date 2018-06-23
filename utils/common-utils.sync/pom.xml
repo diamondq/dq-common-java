@@ -13,6 +13,11 @@
     <name>DiamondQ Common: Utils: Sync</name>
     <dependencies>
         <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
         </dependency>
@@ -29,23 +34,4 @@
             <artifactId>common-lambda</artifactId>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <configuration>
-                            <instructions>
-                                <Import-Package>javax.inject;resolution:=optional,*</Import-Package>
-                                <Service-Component>OSGI-INF/*.xml</Service-Component>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>
