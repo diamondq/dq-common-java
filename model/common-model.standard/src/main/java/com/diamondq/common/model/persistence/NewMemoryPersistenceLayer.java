@@ -1,6 +1,7 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
+import com.diamondq.common.model.interfaces.EditorStructureDefinition;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyType;
@@ -11,6 +12,7 @@ import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.cache.Cache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -289,6 +291,26 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			}
 		}
 		return;
+	}
+
+	public ConcurrentMap<String, Object> getDataCache() {
+		return mDataCache;
+	}
+
+	public @Nullable Cache<String, Structure> getStructureCache() {
+		return mStructureCache;
+	}
+
+	public @Nullable Cache<String, StructureDefinition> getStructureDefinitionCache() {
+		return mStructureDefinitionCache;
+	}
+
+	public @Nullable Cache<String, List<EditorStructureDefinition>> getEditorStructureDefinitionCache() {
+		return mEditorStructureDefinitionCacheByRef;
+	}
+
+	public @Nullable Cache<String, String> getResourceCache() {
+		return mResourceCache;
 	}
 
 	/**

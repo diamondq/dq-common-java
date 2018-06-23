@@ -285,6 +285,22 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
 	protected void internalDeleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
 	}
 
+	public @Nullable Cache<String, Structure> getStructureCache() {
+		return mStructureCache;
+	}
+
+	public @Nullable Cache<String, StructureDefinition> getStructureDefinitionCache() {
+		return mStructureDefinitionCache;
+	}
+
+	public @Nullable Cache<String, List<EditorStructureDefinition>> getEditorStructureDefinitionCache() {
+		return mEditorStructureDefinitionCacheByRef;
+	}
+
+	public @Nullable Cache<String, String> getResourceCache() {
+		return mResourceCache;
+	}
+
 	public static MemoryPersistenceLayerBuilder builder() {
 		return new MemoryPersistenceLayerBuilder();
 	}

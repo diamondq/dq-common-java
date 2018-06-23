@@ -126,6 +126,19 @@ public class WrappedScope implements Scope {
 		processLayers(true);
 	}
 
+	public @Nullable PersistenceLayer getPersistenceLayer() {
+		if (mToolkit instanceof WrappedToolkit) {
+			try {
+				return ((WrappedToolkit) mToolkit).getPersistenceLayer(mScope);
+			}
+			catch (UnknownScopeException ex) {
+				return null;
+			}
+		}
+		else
+			throw new UnsupportedOperationException();
+	}
+
 	/**
 	 * Adds the PersistenceLayer if the filter matches the properties
 	 * 
