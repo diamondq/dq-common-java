@@ -1,6 +1,7 @@
 package com.diamondq.common.xmpp;
 
 import com.diamondq.common.config.Config;
+import com.diamondq.common.xmpp.cdi.XMPPClientRef;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;

@@ -1,4 +1,4 @@
-package com.diamondq.common.xmpp;
+package com.diamondq.common.xmpp.logging;
 
 import java.util.function.BiConsumer;
 

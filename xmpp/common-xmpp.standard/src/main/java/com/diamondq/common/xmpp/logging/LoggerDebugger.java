@@ -1,4 +1,4 @@
-package com.diamondq.common.xmpp;
+package com.diamondq.common.xmpp.logging;
 
 import com.diamondq.common.tracing.opentracing.xmpp.OpenTracingExtender;
 

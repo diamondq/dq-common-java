@@ -1,4 +1,4 @@
-package com.diamondq.common.xmpp;
+package com.diamondq.common.xmpp.cdi;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
