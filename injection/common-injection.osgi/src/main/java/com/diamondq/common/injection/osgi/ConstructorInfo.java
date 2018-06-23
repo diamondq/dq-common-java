@@ -22,9 +22,11 @@ public class ConstructorInfo {
 
 		public final boolean			required;
 
+		public final boolean			collection;
+
 		public ConstructionArg(Class<?> pArgumentClass, @Nullable String pPropertyFilterKey,
 			@Nullable String pPropertyValueKey, @Nullable Object pPropertyValue, boolean pPropertyValueSet,
-			boolean pRequired) {
+			boolean pRequired, boolean pCollection) {
 			super();
 			argumentClass = pArgumentClass;
 			propertyFilterKey = pPropertyFilterKey;
@@ -32,6 +34,7 @@ public class ConstructorInfo {
 			propertyValue = pPropertyValue;
 			propertyValueSet = pPropertyValueSet;
 			required = pRequired;
+			collection = pCollection;
 		}
 
 	}
@@ -42,6 +45,8 @@ public class ConstructorInfo {
 
 	public final @Nullable Method			method;
 
+	public final @Nullable Method			deleteMethod;
+
 	public final @NonNull String[]			filters;
 
 	public final @NonNull Class<?>[]		filterClasses;
@@ -51,12 +56,13 @@ public class ConstructorInfo {
 	public final @NonNull ConstructionArg[]	constructionArgs;
 
 	public ConstructorInfo(Class<?> pConstructionClass, @Nullable Constructor<?> pConstructor, @Nullable Method pMethod,
-		@NonNull ConstructionArg[] pConstructionArgs, @NonNull String[] pFilters, @NonNull Class<?>[] pFilterClasses,
-		@NonNull String[] pRegistrationClasses) {
+		@Nullable Method pDeleteMethod, @NonNull ConstructionArg[] pConstructionArgs, @NonNull String[] pFilters,
+		@NonNull Class<?>[] pFilterClasses, @NonNull String[] pRegistrationClasses) {
 		super();
 		constructionClass = pConstructionClass;
 		constructor = pConstructor;
 		method = pMethod;
+		deleteMethod = pDeleteMethod;
 		constructionArgs = pConstructionArgs;
 		filters = pFilters;
 		filterClasses = pFilterClasses;

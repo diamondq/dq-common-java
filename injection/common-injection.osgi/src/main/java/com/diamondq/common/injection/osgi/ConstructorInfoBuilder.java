@@ -4,7 +4,6 @@ import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
 import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -28,6 +27,8 @@ public class ConstructorInfoBuilder {
 
 	private @Nullable String		mConstructionMethod;
 
+	private @Nullable String		mDeleteMethod;
+
 	public static class ConstructorArgBuilder {
 
 		private final ConstructorInfoBuilder	mBuilder;
@@ -39,6 +40,8 @@ public class ConstructorInfoBuilder {
 		private @Nullable String				mProperty;
 
 		private @Nullable Boolean				mRequired;
+
+		private @Nullable Boolean				mCollection;
 
 		private @Nullable Object				mValue;
 
@@ -79,6 +82,11 @@ public class ConstructorInfoBuilder {
 			return this;
 		}
 
+		public ConstructorArgBuilder collection() {
+			mCollection = true;
+			return this;
+		}
+
 		public ConstructorInfoBuilder build() {
 			Class<?> localClass = mClass;
 			if (localClass == null)
@@ -92,10 +100,14 @@ public class ConstructorInfoBuilder {
 			Boolean requiredObj = mRequired;
 			boolean required = (requiredObj == null ? true : requiredObj);
 
+			Boolean collectionObj = mCollection;
+			boolean collection = (collectionObj == null ? false : collectionObj);
+
 			if ((mValueSet == true) && (mValue == null) && (required == true))
 				throw new ExtendedIllegalArgumentException(Messages.REQUIRED_VALUE_NULL);
 
-			ConstructionArg arg = new ConstructionArg(localClass, mFilter, mProperty, mValue, mValueSet, required);
+			ConstructionArg arg =
+				new ConstructionArg(localClass, mFilter, mProperty, mValue, mValueSet, required, collection);
 			mBuilder.mConstructionArgs.add(arg);
 			return mBuilder;
 		}
@@ -113,6 +125,11 @@ public class ConstructorInfoBuilder {
 
 	public ConstructorInfoBuilder factoryMethod(String pMethod) {
 		mConstructionMethod = pMethod;
+		return this;
+	}
+
+	public ConstructorInfoBuilder factoryDelete(String pMethod) {
+		mDeleteMethod = pMethod;
 		return this;
 	}
 
@@ -147,6 +164,8 @@ public class ConstructorInfoBuilder {
 		Constructor<?> constructor = null;
 		@Nullable
 		Method method = null;
+		@Nullable
+		Method deleteMethod = null;
 
 		if (localConstructionMethod == null) {
 			/* Figure out the constructor */
@@ -161,14 +180,24 @@ public class ConstructorInfoBuilder {
 				for (int i = 0; i < parameters.length; i++) {
 					Class<?> paramClass = parameters[i].getType();
 					ConstructionArg arg = mConstructionArgs.get(i);
-					if (paramClass.isAssignableFrom(arg.argumentClass) == false) {
+					if (arg.collection == true) {
+						if (paramClass.isAssignableFrom(List.class) == false) {
+							match = false;
+							break;
+						}
 
-//						if ((paramClass.isPrimitive()) && (paramClass.)
-						/* Handle some basic conversions */
-						/* TODO */
+						/* TODO: Check the generic parameter is possible */
+					}
+					else {
+						if (paramClass.isAssignableFrom(arg.argumentClass) == false) {
 
-						match = false;
-						break;
+							// if ((paramClass.isPrimitive()) && (paramClass.)
+							/* Handle some basic conversions */
+							/* TODO */
+
+							match = false;
+							break;
+						}
 					}
 				}
 				if (match == false)
@@ -206,20 +235,56 @@ public class ConstructorInfoBuilder {
 				for (int i = 0; i < parameters.length; i++) {
 					Class<?> paramClass = parameters[i].getType();
 					ConstructionArg arg = mConstructionArgs.get(i);
-					if (paramClass.isAssignableFrom(arg.argumentClass) == false) {
-						match = false;
-						break;
+					if (arg.collection == true) {
+						if (paramClass.isAssignableFrom(List.class) == false) {
+							match = false;
+							break;
+						}
+					}
+					else {
+						if (paramClass.isAssignableFrom(arg.argumentClass) == false) {
+							match = false;
+							break;
+						}
 					}
 				}
 				if (match == false)
 					continue;
 				method = possibleMethod;
 			}
+			String localDeleteMethod = mDeleteMethod;
+			if (localDeleteMethod != null) {
+				for (Method possibleMethod : possibleMethods) {
+					if (possibleMethod.getName().equals(localDeleteMethod) == false)
+						continue;
+					@NonNull
+					Parameter[] parameters = possibleMethod.getParameters();
+					if (parameters.length != 1)
+						continue;
+					boolean match = false;
+					for (String matchClassName : mRegistrationClasses) {
+						Class<?> matchClass;
+						try {
+							matchClass = Class.forName(matchClassName);
+						}
+						catch (ClassNotFoundException ex) {
+							break;
+						}
+						if (parameters[0].getType().isAssignableFrom(matchClass) == true) {
+							match = true;
+							break;
+						}
+					}
+					if (match == false)
+						continue;
+					deleteMethod = possibleMethod;
+				}
+			}
 			if (method == null)
 				throw new ExtendedIllegalArgumentException(Messages.NO_MATCHING_METHOD, localConstructionMethod);
 		}
 
-		return new ConstructorInfo(localConstructionClass, constructor, method,
+		return new ConstructorInfo(localConstructionClass, constructor, method, deleteMethod,
 			mConstructionArgs.toArray(new @NonNull ConstructionArg[0]), filterList.toArray(new @NonNull String[0]),
 			filterClassList.toArray(new @NonNull Class[0]), mRegistrationClasses.toArray(new @NonNull String[0]));
 	}

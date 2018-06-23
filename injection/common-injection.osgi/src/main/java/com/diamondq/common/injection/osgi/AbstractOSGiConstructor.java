@@ -12,6 +12,7 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -71,6 +72,8 @@ public class AbstractOSGiConstructor {
 
 	protected @Nullable ServiceRegistration<?>	mRegistration;
 
+	protected @Nullable Object					mServiceObject;
+
 	@SuppressWarnings("null")
 	public AbstractOSGiConstructor(ConstructorInfoBuilder pBuilder) {
 		mInfo = pBuilder.build();
@@ -101,7 +104,19 @@ public class AbstractOSGiConstructor {
 
 	public void onDeactivate(ComponentContext pContext) {
 		sLogger.trace("onDeactivate({}) for {}", pContext, this);
-		// throw new UnsupportedOperationException();
+		ServiceRegistration<?> registration = mRegistration;
+		if (registration != null) {
+			sLogger.trace("Clearing old registration");
+			registration.unregister();
+			if (mInfo.deleteMethod != null)
+				try {
+					mInfo.deleteMethod.invoke(this, mServiceObject);
+				}
+				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+					throw new RuntimeException(ex);
+				}
+			mRegistration = null;
+		}
 	}
 
 	protected void processProperties() {
@@ -186,18 +201,41 @@ public class AbstractOSGiConstructor {
 						}
 					}
 					else {
-						ServiceReference<Object> ref = references.iterator().next().getValue2();
-						Object obj = mBundleContext.getService(ref);
-						if (obj == null) {
-							if (arg.required == Boolean.TRUE) {
-								sLogger.trace("\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}", i,
-									arg.propertyFilterKey, ref);
-								available = false;
-								break;
+						if (arg.collection == true) {
+							List<Object> list = new ArrayList<>();
+							for (Triplet<Integer, Long, ServiceReference<Object>> triplet : references) {
+								ServiceReference<Object> ref = triplet.getValue2();
+								Object obj = mBundleContext.getService(ref);
+								if (obj == null) {
+									if (arg.required == Boolean.TRUE) {
+										sLogger.trace(
+											"\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}", i,
+											arg.propertyFilterKey, ref);
+										list = null;
+										available = false;
+										break;
+									}
+								}
+								else
+									list.add(obj);
 							}
+							value = list;
 						}
-						else
-							value = obj;
+						else {
+							ServiceReference<Object> ref = references.iterator().next().getValue2();
+							Object obj = mBundleContext.getService(ref);
+							if (obj == null) {
+								if (arg.required == Boolean.TRUE) {
+									sLogger.trace(
+										"\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}", i,
+										arg.propertyFilterKey, ref);
+									available = false;
+									break;
+								}
+							}
+							else
+								value = obj;
+						}
 					}
 				}
 				else if (arg.propertyValueKey != null) {
@@ -269,6 +307,7 @@ public class AbstractOSGiConstructor {
 				}
 
 				sLogger.trace("Registering constructed service...");
+				mServiceObject = service;
 				mRegistration = mBundleContext.registerService(mInfo.registrationClasses, service, properties);
 			}
 			else {
@@ -276,6 +315,13 @@ public class AbstractOSGiConstructor {
 				if (registration != null) {
 					sLogger.trace("Clearing old registration");
 					registration.unregister();
+					if (mInfo.deleteMethod != null)
+						try {
+							mInfo.deleteMethod.invoke(this, mServiceObject);
+						}
+						catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+							throw new RuntimeException(ex);
+						}
 					mRegistration = null;
 				}
 			}
