@@ -62,7 +62,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 	 * @return the layers (structure, structure definition, editor structure definition and resource)
 	 */
 	public Quartet<List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>> getPersistenceLayers() {
-		return Quartet.with(mStructureDefinitionPersistenceLayer, mStructureDefinitionPersistenceLayer,
+		return Quartet.with(mStructurePersistenceLayer, mStructureDefinitionPersistenceLayer,
 			mEditorStructureDefinitionPersistenceLayer, mResourcePersistenceLayer);
 	}
 
