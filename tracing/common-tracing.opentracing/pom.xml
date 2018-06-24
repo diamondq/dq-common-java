@@ -64,6 +64,23 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <configuration>
+                            <instructions>
+                                <Require-Capability>osgi.extender;
+                                    filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
+                                <Provide-Capability>osgi.serviceloader;
+                                    osgi.serviceloader=rocks.xmpp.core.session.Module</Provide-Capability>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
