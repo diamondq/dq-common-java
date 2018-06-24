@@ -1,8 +1,8 @@
 pipeline {
   agent {
     docker {
-      image 'maven:3-jdk-8'
-      args '-v /data/jenkins/m2-common:/.m2 -v /data/jenkins/gpg:/.gnupg'
+      image 'maven:3-jdk-10'
+      args '--user root:root -v /data/jenkins/m2-common:/root/.m2 -v /data/jenkins/gpg:/root/.gnupg'
     }
     
   }
@@ -10,7 +10,7 @@ pipeline {
     stage('Build') {
       steps {
         sh '''cd common-root
-mvn "-Duser.home=/" "-Djenkins=true" clean deploy'''
+mvn "-Djenkins=true" clean deploy'''
       }
     }
   }
