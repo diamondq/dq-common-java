@@ -24,16 +24,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.25</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-ext</artifactId>
-                <version>1.7.25</version>
-            </dependency>
-            <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-deployment.basic</artifactId>
                 <version>0.2.0-SNAPSHOT</version>
@@ -132,6 +122,36 @@
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-storage.kv</artifactId>
                 <version>0.2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.diamondq.common</groupId>
+                <artifactId>common-thirdparty.cal10n.api</artifactId>
+                <version>0.8.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.diamondq.common</groupId>
+                <artifactId>common-thirdparty.opentracing.api</artifactId>
+                <version>0.31.0_01</version>
+            </dependency>
+            <dependency>
+                <groupId>com.diamondq.common</groupId>
+                <artifactId>common-thirdparty.opentracing.noop</artifactId>
+                <version>0.31.0_01</version>
+            </dependency>
+            <dependency>
+                <groupId>com.diamondq.common</groupId>
+                <artifactId>common-thirdparty.opentracing.util</artifactId>
+                <version>0.31.0_01</version>
+            </dependency>
+            <dependency>
+                <groupId>com.diamondq.common</groupId>
+                <artifactId>common-thirdparty.twilio</artifactId>
+                <version>7.21.3_01</version>
+            </dependency>
+            <dependency>
+                <groupId>com.diamondq.common</groupId>
+                <artifactId>common-thirdparty.unirest.java</artifactId>
+                <version>1.4.9</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
