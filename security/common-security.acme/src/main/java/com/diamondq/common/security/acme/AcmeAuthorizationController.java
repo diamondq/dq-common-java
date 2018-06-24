@@ -319,6 +319,7 @@ public class AcmeAuthorizationController {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private void getCert(State pState) throws IOException, AcmeException, URISyntaxException {
 
 		/* First, get or generate a domain public/private key pair */

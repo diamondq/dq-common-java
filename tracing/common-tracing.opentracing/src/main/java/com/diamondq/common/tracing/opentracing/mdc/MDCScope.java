@@ -11,7 +11,6 @@ public class MDCScope implements Scope {
 
 	private final Scope mDelegate;
 
-	@SuppressWarnings("null")
 	public MDCScope(Scope pDelegate, TraceIdExtractor pExtractor) {
 		mDelegate = pDelegate;
 	}

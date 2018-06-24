@@ -119,6 +119,7 @@ public class MDCSpanBuilder implements SpanBuilder {
 	/**
 	 * @see io.opentracing.Tracer.SpanBuilder#startManual()
 	 */
+	@SuppressWarnings({"deprecation", "javadoc"})
 	@Override
 	public Span startManual() {
 		return new MDCSpan(mDelegate.startManual(), mExtractor);

@@ -135,7 +135,16 @@ public class DOMTraversal {
 		if (resultList.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Unable to find ");
-			sb.append(String.join(", ", pTraverseArgs));
+			boolean first = true;
+			for (String s : pTraverseArgs) {
+				if (s == null)
+					continue;
+				if (first == true)
+					first = false;
+				else
+					sb.append(", ");
+				sb.append(s);
+			}
 			sb.append(" within the document");
 			throw new RuntimeException(sb.toString());
 		}

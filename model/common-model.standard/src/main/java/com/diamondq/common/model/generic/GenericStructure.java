@@ -219,7 +219,7 @@ public class GenericStructure implements Structure, Revision<String> {
 	/**
 	 * @see com.diamondq.common.model.interfaces.Structure#lookupMandatoryPropertyByName(java.lang.String)
 	 */
-	@SuppressWarnings("cast")
+	@SuppressWarnings({"cast", "null", "unused"})
 	@Override
 	public <@Nullable T> Property<T> lookupMandatoryPropertyByName(String pName) {
 		Property<?> prop = mProperties.get(pName);

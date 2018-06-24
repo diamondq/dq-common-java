@@ -8,6 +8,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -29,6 +30,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -159,8 +161,10 @@ public class GenericStructureDefinition implements StructureDefinition {
 	 */
 	@Override
 	public StructureDefinition removePropertyDefinition(PropertyDefinition pValue) {
+		@NonNull
+		Predicate<PropertyDefinition> equalTo = Predicates.equalTo(pValue);
 		return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance,
-			Maps.filterValues(mProperties, Predicates.not(Predicates.equalTo(pValue))), mParentDefinitions, mKeywords);
+			Maps.filterValues(mProperties, Predicates.not(equalTo)), mParentDefinitions, mKeywords);
 	}
 
 	/**
