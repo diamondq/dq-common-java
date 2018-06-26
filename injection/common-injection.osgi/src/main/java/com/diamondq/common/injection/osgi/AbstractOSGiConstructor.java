@@ -137,8 +137,7 @@ public class AbstractOSGiConstructor {
 			for (int i = 0; i < mInfo.filters.length; i++) {
 				String filterStr = PropertiesParsing.getNullableString(mCurrentProps, mInfo.filters[i]);
 				if (filterStr == null)
-					throw new ExtendedIllegalArgumentException(Messages.NO_PROP_MATCHING_FILTER, mInfo.filters[i],
-						errorId);
+					continue;
 				String finalFilterStr;
 				if (filterStr.isEmpty() == true)
 					finalFilterStr = "(objectClass=" + mInfo.filterClasses[i].getName() + ")";
@@ -182,6 +181,8 @@ public class AbstractOSGiConstructor {
 
 			boolean available = true;
 
+			String errorId = mBundleContext.getBundle().getSymbolicName() + " with " + mCurrentProps.toString();
+
 			@Nullable
 			Object[] args = new @Nullable Object[mInfo.constructionArgs.length];
 			for (int i = 0; i < mInfo.constructionArgs.length; i++) {
@@ -189,52 +190,57 @@ public class AbstractOSGiConstructor {
 				Object value = null;
 				if (arg.propertyFilterKey != null) {
 					FilterTracker tracker = mTrackers.get(arg.propertyFilterKey);
-					if (tracker == null)
-						throw new IllegalStateException();
-					List<Triplet<Integer, Long, ServiceReference<Object>>> references = tracker.getReferences();
-					if (references.isEmpty()) {
-						if (arg.required == Boolean.TRUE) {
-							sLogger.trace("\tUnable to find references to arg #{}: propertyFilterKey={}", i,
-								arg.propertyFilterKey);
-							available = false;
-							break;
-						}
+					if (tracker == null) {
+						if (arg.required == true)
+							throw new ExtendedIllegalArgumentException(Messages.NO_PROP_MATCHING_FILTER,
+								mInfo.filters[i], errorId);
 					}
 					else {
-						if (arg.collection == true) {
-							List<Object> list = new ArrayList<>();
-							for (Triplet<Integer, Long, ServiceReference<Object>> triplet : references) {
-								ServiceReference<Object> ref = triplet.getValue2();
+						List<Triplet<Integer, Long, ServiceReference<Object>>> references = tracker.getReferences();
+						if (references.isEmpty()) {
+							if (arg.required == Boolean.TRUE) {
+								sLogger.trace("\tUnable to find references to arg #{}: propertyFilterKey={}", i,
+									arg.propertyFilterKey);
+								available = false;
+								break;
+							}
+						}
+						else {
+							if (arg.collection == true) {
+								List<Object> list = new ArrayList<>();
+								for (Triplet<Integer, Long, ServiceReference<Object>> triplet : references) {
+									ServiceReference<Object> ref = triplet.getValue2();
+									Object obj = mBundleContext.getService(ref);
+									if (obj == null) {
+										if (arg.required == Boolean.TRUE) {
+											sLogger.trace(
+												"\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}",
+												i, arg.propertyFilterKey, ref);
+											list = null;
+											available = false;
+											break;
+										}
+									}
+									else
+										list.add(obj);
+								}
+								value = list;
+							}
+							else {
+								ServiceReference<Object> ref = references.iterator().next().getValue2();
 								Object obj = mBundleContext.getService(ref);
 								if (obj == null) {
 									if (arg.required == Boolean.TRUE) {
 										sLogger.trace(
 											"\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}", i,
 											arg.propertyFilterKey, ref);
-										list = null;
 										available = false;
 										break;
 									}
 								}
 								else
-									list.add(obj);
+									value = obj;
 							}
-							value = list;
-						}
-						else {
-							ServiceReference<Object> ref = references.iterator().next().getValue2();
-							Object obj = mBundleContext.getService(ref);
-							if (obj == null) {
-								if (arg.required == Boolean.TRUE) {
-									sLogger.trace(
-										"\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}", i,
-										arg.propertyFilterKey, ref);
-									available = false;
-									break;
-								}
-							}
-							else
-								value = obj;
 						}
 					}
 				}
