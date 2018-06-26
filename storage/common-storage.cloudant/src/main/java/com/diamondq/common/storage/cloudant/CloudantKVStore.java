@@ -14,7 +14,7 @@ import com.diamondq.common.storage.kv.KVColumnType;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
-import com.diamondq.common.storage.kv.impl.SyncWrapperAsyncKVTransaction;
+import com.diamondq.common.storage.kv.SyncWrapperAsyncKVTransaction;
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
