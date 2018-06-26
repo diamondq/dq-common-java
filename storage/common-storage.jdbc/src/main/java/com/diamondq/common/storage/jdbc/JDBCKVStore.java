@@ -12,7 +12,7 @@ import com.diamondq.common.storage.kv.KVColumnDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
-import com.diamondq.common.storage.kv.impl.SyncWrapperAsyncKVTransaction;
+import com.diamondq.common.storage.kv.SyncWrapperAsyncKVTransaction;
 import com.diamondq.common.utils.misc.builders.IBuilder;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.cache.Cache;

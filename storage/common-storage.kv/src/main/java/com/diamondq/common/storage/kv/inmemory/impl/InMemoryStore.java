@@ -9,7 +9,7 @@ import com.diamondq.common.storage.kv.KVColumnDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
-import com.diamondq.common.storage.kv.impl.SyncWrapperAsyncKVTransaction;
+import com.diamondq.common.storage.kv.SyncWrapperAsyncKVTransaction;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

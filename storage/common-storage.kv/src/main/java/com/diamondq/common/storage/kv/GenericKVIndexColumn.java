@@ -1,7 +1,4 @@
-package com.diamondq.common.storage.kv.impl;
-
-import com.diamondq.common.storage.kv.IKVIndexColumn;
-import com.diamondq.common.storage.kv.KVColumnType;
+package com.diamondq.common.storage.kv;
 
 /**
  * Generic implementation of the KVIndexColumn

@@ -1,7 +1,7 @@
 package com.diamondq.common.storage.jdbc;
 
+import com.diamondq.common.storage.kv.GenericKVColumnDefinition;
 import com.diamondq.common.storage.kv.KVColumnType;
-import com.diamondq.common.storage.kv.impl.GenericKVColumnDefinition;
 
 import java.math.BigDecimal;
 

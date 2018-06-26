@@ -1,7 +1,7 @@
 package com.diamondq.common.storage.kv.inmemory.impl;
 
+import com.diamondq.common.storage.kv.AbstractKVTransaction;
 import com.diamondq.common.storage.kv.IKVTransaction;
-import com.diamondq.common.storage.kv.impl.AbstractKVTransaction;
 import com.google.common.collect.Sets;
 
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-package com.diamondq.common.storage.kv.impl;
+package com.diamondq.common.storage.kv;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 

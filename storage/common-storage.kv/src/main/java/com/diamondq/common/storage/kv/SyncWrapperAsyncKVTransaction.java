@@ -1,9 +1,7 @@
-package com.diamondq.common.storage.kv.impl;
+package com.diamondq.common.storage.kv;
 
 import com.diamondq.common.lambda.LambdaExceptionUtil;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
-import com.diamondq.common.storage.kv.IKVAsyncTransaction;
-import com.diamondq.common.storage.kv.IKVTransaction;
 
 import java.util.Iterator;
 

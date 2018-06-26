@@ -1,7 +1,5 @@
-package com.diamondq.common.storage.kv.impl;
+package com.diamondq.common.storage.kv;
 
-import com.diamondq.common.storage.kv.IKVIndexColumn;
-import com.diamondq.common.storage.kv.IKVIndexDefinition;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
