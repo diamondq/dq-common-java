@@ -2,6 +2,7 @@ package com.diamondq.common.utils.parsing.properties;
 
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PropertiesParsing {
@@ -90,11 +91,12 @@ public class PropertiesParsing {
 		return val;
 	}
 
-	public static String[] getStringArray(Map<String, Object> pProps, String pKey) {
+	public static @NonNull String[] getStringArray(Map<String, Object> pProps, String pKey) {
 		Object propObj = pProps.get(pKey);
 		if (propObj == null)
 			return new String[0];
 		String val = propObj.toString();
+		@NonNull
 		String[] results = val.split(",");
 		return results;
 	}
