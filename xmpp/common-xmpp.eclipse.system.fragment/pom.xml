@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-parent</artifactId>
+        <version>0.2.0-SNAPSHOT</version>
+        <relativePath>../../common-parent</relativePath>
+    </parent>
+    <artifactId>common-xmpp.eclipse.system.fragment</artifactId>
+    <packaging>jar</packaging>
+    <name>DiamondQ Common: XMPP: Eclipse System Fragment</name>
+    <properties>
+        <osgi.export.packages>javax.xml.bind;version=2.2.12,javax.xml.bind.annotation.adapters;version=2.2.12,
+            javax.xml.bind.annotation;version=2.2.12 
+        </osgi.export.packages>
+        <osgi.import.packages>!*</osgi.import.packages>
+        <osgi.fragment.host>system.bundle;extension:=framework</osgi.fragment.host>
+    </properties>
+</project>

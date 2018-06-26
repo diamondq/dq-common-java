@@ -52,6 +52,7 @@
         <module>../utils/common-utils.log4j2</module>
         <module>../utils/common-utils.misc</module>
         <module>../xmpp/common-xmpp.standard</module>
+        <module>../xmpp/common-xmpp.eclipse.system.fragment</module>
         <module>../deployment/common-deployment.basic</module>
     </modules>
     <build>
