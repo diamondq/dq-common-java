@@ -1,7 +1,6 @@
 package com.diamondq.common.security.openaz;
 
 import com.diamondq.common.config.Config;
-import com.diamondq.common.security.acl.api.AuthenticationQueryExtender;
 import com.diamondq.common.security.openaz.parser.Parser;
 import com.diamondq.common.security.xacml.model.IFunctionArgument;
 
@@ -37,7 +36,7 @@ public class AuthQueryExtenderImpl implements AuthenticationQueryExtender {
 	}
 
 	/**
-	 * @see com.diamondq.common.security.acl.api.AuthenticationQueryExtender#extendForAccessControl(javax.jdo.JDOQLTypedQuery,
+	 * @see com.diamondq.common.security.openaz.AuthenticationQueryExtender#extendForAccessControl(javax.jdo.JDOQLTypedQuery,
 	 *      javax.jdo.query.BooleanExpression, java.util.List, java.lang.Object[])
 	 */
 	@Override

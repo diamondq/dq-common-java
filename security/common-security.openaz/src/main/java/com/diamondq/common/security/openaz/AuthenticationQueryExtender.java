@@ -1,4 +1,4 @@
-package com.diamondq.common.security.acl.api;
+package com.diamondq.common.security.openaz;
 
 import java.util.List;
 
