@@ -195,11 +195,13 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 
 			String propName = propDef.getName();
+			boolean hasProp = hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName);
 			switch (p.getDefinition().getType()) {
 			case String: {
 				if (p.isValueSet() == true) {
-					String value =
-						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String);
+					String value = hasProp == true
+						? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String)
+						: null;
 					String newValue = (String) p.getValue(pStructure);
 					if (newValue == null)
 						newValue = "";
@@ -218,12 +220,13 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			case Boolean: {
 				if (p.isValueSet() == true) {
-					Boolean value =
-						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean);
+					Boolean value = hasProp == true
+						? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean)
+						: null;
 					Boolean newValue = (Boolean) p.getValue(pStructure);
 					if (newValue == null)
 						newValue = false;
-					if (value != newValue) {
+					if ((value == null) || (value != newValue)) {
 						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean,
 							newValue);
 						changed = true;
@@ -238,8 +241,9 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			case Decimal: {
 				if (p.isValueSet() == true) {
-					BigDecimal value =
-						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal);
+					BigDecimal value = hasProp == true
+						? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal)
+						: null;
 					Number newValue = (Number) p.getValue(pStructure);
 					BigDecimal newDec;
 					if (newValue == null)
@@ -262,7 +266,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 						newDec = new BigDecimal((Short) newValue);
 					else
 						throw new UnsupportedOperationException();
-					if (newDec.equals(value) == false) {
+					if ((value == null) || (newDec.equals(value) == false)) {
 						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal,
 							newDec);
 						changed = true;
@@ -277,12 +281,13 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			case Integer: {
 				if (p.isValueSet() == true) {
-					Integer value =
-						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer);
+					Integer value = hasProp == true
+						? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer)
+						: null;
 					Integer newValue = (Integer) p.getValue(pStructure);
 					if (newValue == null)
 						newValue = 0;
-					if (value != newValue) {
+					if ((value == null) || (value != newValue)) {
 						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer,
 							newValue);
 						changed = true;
@@ -297,8 +302,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			case PropertyRef: {
 				if (p.isValueSet() == true) {
-					String value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
-						PropertyType.PropertyRef);
+					String value = hasProp == true ? getStructureConfigObjectProp(pToolkit, pScope, config, false,
+						propName, PropertyType.PropertyRef) : null;
 					PropertyRef<?> newValueRef = (PropertyRef<?>) p.getValue(pStructure);
 					String newValue;
 					if (newValueRef == null)
@@ -320,8 +325,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			case StructureRef: {
 				if (p.isValueSet() == true) {
-					String value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
-						PropertyType.StructureRef);
+					String value = hasProp == true ? getStructureConfigObjectProp(pToolkit, pScope, config, false,
+						propName, PropertyType.StructureRef) : null;
 					StructureRef newValueRef = (StructureRef) p.getValue(pStructure);
 					String newValue;
 					if (newValueRef == null)
@@ -343,8 +348,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			case StructureRefList: {
 				if (p.isValueSet() == true) {
-					String[] value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
-						PropertyType.StructureRefList);
+					String[] value = hasProp == true ? getStructureConfigObjectProp(pToolkit, pScope, config, false,
+						propName, PropertyType.StructureRefList) : null;
 					String[] newValues = (String[]) p.getValue(pStructure);
 					if (newValues == null)
 						newValues = new String[0];
@@ -369,8 +374,9 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			case Binary: {
 				if (p.isValueSet() == true) {
-					Object value =
-						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary);
+					Object value = hasProp == true
+						? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary)
+						: null;
 					Object newValue = p.getValue(pStructure);
 					if (newValue == null)
 						newValue = new byte[0];
@@ -389,12 +395,12 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 			}
 			case Timestamp: {
 				if (p.isValueSet() == true) {
-					Long value =
-						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp);
+					Long value = hasProp == true ? getStructureConfigObjectProp(pToolkit, pScope, config, false,
+						propName, PropertyType.Timestamp) : null;
 					Long newValue = (Long) p.getValue(pStructure);
 					if (newValue == null)
 						newValue = 0L;
-					if (value != newValue) {
+					if ((value == null) || (value != newValue)) {
 						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp,
 							newValue);
 						changed = true;
