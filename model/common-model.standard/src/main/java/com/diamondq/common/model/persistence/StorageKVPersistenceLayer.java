@@ -445,7 +445,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 	@Override
 	protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
 		boolean pIsMeta, String pKey) {
-		return pConfig.containsKey(pKey);
+		if (pConfig.containsKey(pKey) == false)
+			return false;
+		Object value = pConfig.get(pKey);
+		if (value == null)
+			return false;
+		return true;
 	}
 
 	/**
