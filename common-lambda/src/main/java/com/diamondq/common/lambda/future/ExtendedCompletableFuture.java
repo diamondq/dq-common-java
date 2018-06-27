@@ -1171,6 +1171,20 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 		return applyToEitherAsync(result, (v) -> v, pService);
 	}
 
+	/**
+	 * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#resolve()
+	 */
+	@SuppressWarnings("null")
+	@Override
+	public T resolve() {
+		try {
+			return toCompletableFuture().get();
+		}
+		catch (InterruptedException | ExecutionException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 	static <INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST> ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> startLoop(
 		ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current,
 		@Nullable Function<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, STARTPRE> pStartPreFunction,

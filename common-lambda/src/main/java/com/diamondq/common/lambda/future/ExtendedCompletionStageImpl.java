@@ -6,6 +6,7 @@ import com.diamondq.common.lambda.interfaces.CancelableRunnable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -795,6 +796,20 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 			else
 				return pFalseFunc.apply(input);
 		});
+	}
+
+	/**
+	 * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#resolve()
+	 */
+	@SuppressWarnings("null")
+	@Override
+	public T resolve() {
+		try {
+			return toCompletableFuture().get();
+		}
+		catch (InterruptedException | ExecutionException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	/**

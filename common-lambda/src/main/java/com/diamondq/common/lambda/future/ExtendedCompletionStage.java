@@ -464,6 +464,13 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		Function<T, ? extends R> pFalseFunc);
 
 	/**
+	 * Waits until the object is returned or throws a RuntimeException
+	 * 
+	 * @return the answer
+	 */
+	public T resolve();
+
+	/**
 	 * The state object for these 'future' based loops
 	 *
 	 * @param <INPUT>
