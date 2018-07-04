@@ -300,6 +300,27 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 				}
 				break;
 			}
+			case Long: {
+				if (p.isValueSet() == true) {
+					Long value = hasProp == true
+						? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long)
+						: null;
+					Long newValue = (Long) p.getValue(pStructure);
+					if (newValue == null)
+						newValue = 0L;
+					if ((value == null) || (value != newValue)) {
+						setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long,
+							newValue);
+						changed = true;
+					}
+				}
+				else {
+					if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+						PropertyType.Long) == true)
+						changed = true;
+				}
+				break;
+			}
 			case PropertyRef: {
 				if (p.isValueSet() == true) {
 					String value = hasProp == true ? getStructureConfigObjectProp(pToolkit, pScope, config, false,
@@ -594,6 +615,17 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer);
 					@SuppressWarnings("unchecked")
 					Property<@Nullable Integer> ap = (Property<@Nullable Integer>) p;
+					ap = ap.setValue(value);
+					structure = structure.updateProperty(ap);
+				}
+				break;
+			}
+			case Long: {
+				if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+					long value =
+						getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long);
+					@SuppressWarnings("unchecked")
+					Property<@Nullable Long> ap = (Property<@Nullable Long>) p;
 					ap = ap.setValue(value);
 					structure = structure.updateProperty(ap);
 				}

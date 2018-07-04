@@ -91,6 +91,11 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 				TYPE defaultResult = (TYPE) (Integer) Integer.parseInt(defaultValue);
 				return defaultResult;
 			}
+			case Long: {
+				@SuppressWarnings("unchecked")
+				TYPE defaultResult = (TYPE) (Long) Long.parseLong(defaultValue);
+				return defaultResult;
+			}
 			case Decimal: {
 				@SuppressWarnings("unchecked")
 				TYPE defaultResult = (TYPE) new BigDecimal(defaultValue);
@@ -198,6 +203,19 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 					break;
 				}
 				throw new IllegalArgumentException("An Integer Property must be passed an Integer, Long or a String");
+			}
+			case Long: {
+				if (pValue instanceof Long)
+					break;
+				if (pValue instanceof Integer) {
+					pValue = (TYPE) (Long) ((Integer) pValue).longValue();
+					break;
+				}
+				if (pValue instanceof String) {
+					pValue = (TYPE) (Integer) Integer.parseInt((String) pValue);
+					break;
+				}
+				throw new IllegalArgumentException("An Long Property must be passed an Integer, Long or a String");
 			}
 			case PropertyRef: {
 				if (pValue instanceof PropertyRef)

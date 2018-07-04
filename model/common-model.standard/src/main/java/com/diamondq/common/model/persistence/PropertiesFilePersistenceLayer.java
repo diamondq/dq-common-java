@@ -263,6 +263,11 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			R result = (R) (value == null ? Integer.valueOf(0) : (Integer) Integer.parseInt(value));
 			return result;
 		}
+		case Long: {
+			@SuppressWarnings("unchecked")
+			R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
+			return result;
+		}
 		case Decimal: {
 			@SuppressWarnings("unchecked")
 			R result = (R) (value == null ? new BigDecimal(0.0) : new BigDecimal(value));
@@ -366,6 +371,10 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 			break;
 		}
 		case Integer: {
+			pConfig.setProperty(pKey, pValue.toString());
+			break;
+		}
+		case Long: {
 			pConfig.setProperty(pKey, pValue.toString());
 			break;
 		}

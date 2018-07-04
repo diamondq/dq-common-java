@@ -77,8 +77,8 @@ public class DynamicEditorStructureDefinition implements EditorStructureDefiniti
 		mComponents = builder.build();
 	}
 
-	private static @Nullable EditorPropertyDefinition buildEditorPropertyDescription(Scope pScope, PropertyDefinition pPD,
-		int pOrder) {
+	private static @Nullable EditorPropertyDefinition buildEditorPropertyDescription(Scope pScope,
+		PropertyDefinition pPD, int pOrder) {
 
 		switch (pPD.getType()) {
 		case Binary: {
@@ -97,6 +97,9 @@ public class DynamicEditorStructureDefinition implements EditorStructureDefiniti
 			return null;
 		}
 		case Integer: {
+			return null;
+		}
+		case Long: {
 			return null;
 		}
 		case String: {
@@ -168,7 +171,8 @@ public class DynamicEditorStructureDefinition implements EditorStructureDefiniti
 	}
 
 	/**
-	 * @see com.diamondq.common.model.interfaces.EditorStructureDefinition#addKeyword(java.lang.String, java.lang.String)
+	 * @see com.diamondq.common.model.interfaces.EditorStructureDefinition#addKeyword(java.lang.String,
+	 *      java.lang.String)
 	 */
 	@Override
 	public EditorStructureDefinition addKeyword(String pKey, String pValue) {

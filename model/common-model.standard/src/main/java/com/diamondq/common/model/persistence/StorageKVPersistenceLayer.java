@@ -260,6 +260,10 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 								colBuilder = colBuilder.type(KVColumnType.Integer);
 								break;
 							}
+							case Long: {
+								colBuilder = colBuilder.type(KVColumnType.Long);
+								break;
+							}
 							case PropertyRef: {
 								colBuilder = colBuilder.type(KVColumnType.String);
 								break;
@@ -375,6 +379,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			R result = (R) (value == null ? Integer.valueOf(0) : (Integer) value);
 			return result;
 		}
+		case Long: {
+			@SuppressWarnings("unchecked")
+			R result = (R) (value == null ? Long.valueOf(0) : (Long) value);
+			return result;
+		}
 		case Decimal: {
 			@SuppressWarnings("unchecked")
 			R result = (R) (value == null ? new BigDecimal(0.0)
@@ -481,6 +490,10 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 			break;
 		}
 		case Integer: {
+			pConfig.put(pKey, pValue);
+			break;
+		}
+		case Long: {
 			pConfig.put(pKey, pValue);
 			break;
 		}

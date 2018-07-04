@@ -99,6 +99,25 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
 				mDialect.writeInteger(pPs, index, value);
 				break;
 			}
+			case Long: {
+				Object obj = data.get(cd.getName());
+				Long value;
+				if (obj == null)
+					value = null;
+				else if (obj instanceof String)
+					value = Long.valueOf((String) obj);
+				else if (obj instanceof Integer)
+					value = ((Integer) obj).longValue();
+				else if (obj instanceof Long)
+					value = (Long) obj;
+				else if (obj instanceof BigDecimal)
+					value = ((BigDecimal) obj).longValue();
+				else
+					throw new IllegalArgumentException(
+						"Only Integer, Long, BigDecimal or String supported, but found " + obj.getClass());
+				mDialect.writeLong(pPs, index, value);
+				break;
+			}
 			case String: {
 				Object obj = data.get(cd.getName());
 				String value;

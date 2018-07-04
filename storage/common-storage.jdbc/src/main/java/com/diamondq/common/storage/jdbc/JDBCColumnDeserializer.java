@@ -56,6 +56,12 @@ public class JDBCColumnDeserializer implements IResultSetDeserializer {
 					result.put(cd.getName(), value);
 				break;
 			}
+			case Long: {
+				Long value = mDialect.readLong(pRs, index);
+				if (value != null)
+					result.put(cd.getName(), value);
+				break;
+			}
 			case String: {
 				Integer maxLength = cd.getMaxLength();
 				String value;

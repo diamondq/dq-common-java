@@ -21,6 +21,10 @@ public enum KVColumnType {
 	 */
 	Integer,
 	/**
+	 * An long (64bit)
+	 */
+	Long,
+	/**
 	 * A full timestamp
 	 */
 	Timestamp

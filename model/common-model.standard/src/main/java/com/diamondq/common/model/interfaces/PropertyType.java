@@ -11,6 +11,9 @@ public enum PropertyType {
 	/** This represents an Integer value with the Java range of possible values */
 	Integer,
 
+	/** This represents a Long value with the Java range of possible values */
+	Long,
+
 	/** This represents a Binary Decimal (ie. any possible Decimal value) */
 	Decimal,
 

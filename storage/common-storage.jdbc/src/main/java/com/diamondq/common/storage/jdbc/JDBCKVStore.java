@@ -346,6 +346,10 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 								sb.append(mDialect.getIntegerType());
 								break;
 							}
+							case Long: {
+								sb.append(mDialect.getLongType());
+								break;
+							}
 							case String: {
 								Integer maxLength = cd.getMaxLength();
 								if (maxLength != null)
