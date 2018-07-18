@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.diamondq.common</groupId>
         <artifactId>common-thirdparty.parent</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.0.1</version>
         <relativePath>../common-thirdparty.parent</relativePath>
     </parent>
     <artifactId>common-thirdparty.unirest.java</artifactId>
