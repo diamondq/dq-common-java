@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" configuration-policy="require" deactivate="onDeactivate" immediate="true" modified="onModified" name="com.diamondq.common.model.storagekvpersistencelayer">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" configuration-policy="require" deactivate="onDeactivate" immediate="false" modified="onModified" name="com.diamondq.common.model.storagekvpersistencelayer">
    <implementation class="com.diamondq.common.model.generic.osgi.OSGiStorageKVPersistenceLayer"/>
 	
  <service>
