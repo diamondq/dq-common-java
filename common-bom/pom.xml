@@ -30,6 +30,11 @@
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
+                <artifactId>common-features.general</artifactId>
+                <version>0.2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.diamondq.common</groupId>
                 <artifactId>common-injection.cdi</artifactId>
                 <version>0.2.0-SNAPSHOT</version>
             </dependency>
@@ -146,7 +151,7 @@
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-thirdparty.opentracing.util</artifactId>
-                <version>0.31.0_01</version>
+                <version>0.31.0_02</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
