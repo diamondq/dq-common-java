@@ -294,6 +294,16 @@ public class WrappedToolkit implements Toolkit {
 	}
 
 	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructureByPrimaryKeys(com.diamondq.common.model.interfaces.Scope,
+	 *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.Object[])
+	 */
+	@Override
+	public @Nullable Structure lookupStructureByPrimaryKeys(Scope pScope, StructureDefinition pStructureDef,
+		@Nullable Object @NonNull... pPrimaryKeys) {
+		return mToolkit.lookupStructureByPrimaryKeys(dewrapScope(pScope), pStructureDef, pPrimaryKeys);
+	}
+
+	/**
 	 * @see com.diamondq.common.model.interfaces.Toolkit#createNewStructure(com.diamondq.common.model.interfaces.Scope,
 	 *      com.diamondq.common.model.interfaces.StructureDefinition)
 	 */

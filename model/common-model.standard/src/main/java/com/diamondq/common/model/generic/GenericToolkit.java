@@ -246,6 +246,16 @@ public class GenericToolkit implements Toolkit {
 	}
 
 	/**
+	 * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructureByPrimaryKeys(com.diamondq.common.model.interfaces.Scope,
+	 *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.Object[])
+	 */
+	@Override
+	public @Nullable Structure lookupStructureByPrimaryKeys(Scope pScope, StructureDefinition pStructureDef,
+		@Nullable Object @NonNull... pPrimaryKeys) {
+		return getPersistenceLayer(pScope).lookupStructureByPrimaryKeys(this, pScope, pStructureDef, pPrimaryKeys);
+	}
+
+	/**
 	 * @see com.diamondq.common.model.interfaces.Toolkit#createStructureRefFromParts(com.diamondq.common.model.interfaces.Scope,
 	 *      com.diamondq.common.model.interfaces.Structure, java.lang.String,
 	 *      com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)

@@ -84,6 +84,9 @@ public interface PersistenceLayer {
 	public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope,
 		String pSerializedRef);
 
+	public @Nullable Structure lookupStructureByPrimaryKeys(GenericToolkit pGenericToolkit, Scope pScope,
+		StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys);
+
 	public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue);
 
 	/* Property */

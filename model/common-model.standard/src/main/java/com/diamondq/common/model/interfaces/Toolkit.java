@@ -212,6 +212,17 @@ public interface Toolkit {
 	public @Nullable Structure lookupStructureBySerializedRef(Scope pScope, String pSerializedRef);
 
 	/**
+	 * Looks up a Structure with the given primary keys
+	 * 
+	 * @param pScope the scope
+	 * @param pStructureDef the structure definition
+	 * @param pPrimaryKeys the primary keys
+	 * @return the structure or null if there is no match
+	 */
+	public @Nullable Structure lookupStructureByPrimaryKeys(Scope pScope, StructureDefinition pStructureDef,
+		@Nullable Object... pPrimaryKeys);
+
+	/**
 	 * Creates a new Structure given a StructureDefinition. NOTE: The StructureDefinition must be in the same scope as
 	 * that provided. NOTE: The new Structure is NOT automatically written to the toolkit.
 	 *
