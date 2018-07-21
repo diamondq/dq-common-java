@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Pair;
 
 public class GenericQueryBuilder implements QueryBuilder {
 
@@ -32,17 +33,20 @@ public class GenericQueryBuilder implements QueryBuilder {
 		}
 	}
 
-	private final ImmutableList<GenericWhereInfo>	mWhereList;
+	private final ImmutableList<GenericWhereInfo>		mWhereList;
 
-	private final @Nullable String					mParentParamKey;
+	private final @Nullable String						mParentParamKey;
 
-	private final @Nullable PropertyDefinition		mParentPropertyDefinition;
+	private final @Nullable PropertyDefinition			mParentPropertyDefinition;
+
+	private final ImmutableList<Pair<String, Boolean>>	mSortList;
 
 	public GenericQueryBuilder(@Nullable List<GenericWhereInfo> pWhereList, @Nullable String pParentParamKey,
-		@Nullable PropertyDefinition pParentPropertyDefinition) {
+		@Nullable PropertyDefinition pParentPropertyDefinition, @Nullable List<Pair<String, Boolean>> pSortList) {
 		mWhereList = (pWhereList == null ? ImmutableList.of() : ImmutableList.copyOf(pWhereList));
 		mParentParamKey = pParentParamKey;
 		mParentPropertyDefinition = pParentPropertyDefinition;
+		mSortList = (pSortList == null ? ImmutableList.of() : ImmutableList.copyOf(pSortList));
 	}
 
 	/**
@@ -64,6 +68,10 @@ public class GenericQueryBuilder implements QueryBuilder {
 		return mParentPropertyDefinition;
 	}
 
+	List<Pair<String, Boolean>> getSortList() {
+		return mSortList;
+	}
+
 	/**
 	 * @see com.diamondq.common.model.interfaces.QueryBuilder#andWhereConstant(java.lang.String,
 	 *      com.diamondq.common.model.interfaces.WhereOperator, java.lang.Object)
@@ -73,7 +81,7 @@ public class GenericQueryBuilder implements QueryBuilder {
 		return new GenericQueryBuilder(
 			ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
 				.add(new GenericWhereInfo(pKey, pOperator, pValue, null)).build(),
-			mParentParamKey, mParentPropertyDefinition);
+			mParentParamKey, mParentPropertyDefinition, mSortList);
 	}
 
 	/**
@@ -85,7 +93,7 @@ public class GenericQueryBuilder implements QueryBuilder {
 		return new GenericQueryBuilder(
 			ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
 				.add(new GenericWhereInfo(pKey, pOperator, null, pParamKey)).build(),
-			mParentParamKey, mParentPropertyDefinition);
+			mParentParamKey, mParentPropertyDefinition, mSortList);
 	}
 
 	/**
@@ -94,6 +102,15 @@ public class GenericQueryBuilder implements QueryBuilder {
 	 */
 	@Override
 	public QueryBuilder andWhereParentIs(String pParentParamKey, PropertyDefinition pParentPropertyDef) {
-		return new GenericQueryBuilder(mWhereList, pParentParamKey, pParentPropertyDef);
+		return new GenericQueryBuilder(mWhereList, pParentParamKey, pParentPropertyDef, mSortList);
+	}
+
+	/**
+	 * @see com.diamondq.common.model.interfaces.QueryBuilder#orderBy(java.lang.String, boolean)
+	 */
+	@Override
+	public QueryBuilder orderBy(String pKey, boolean pIsAscending) {
+		return new GenericQueryBuilder(mWhereList, mParentParamKey, mParentPropertyDefinition, ImmutableList
+			.<Pair<String, Boolean>> builder().addAll(mSortList).add(Pair.with(pKey, pIsAscending)).build());
 	}
 }

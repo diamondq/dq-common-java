@@ -32,6 +32,7 @@ import com.google.common.collect.Sets;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
@@ -484,6 +485,13 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 		return null;
 	}
 
+	@Override
+	public @Nullable Structure lookupStructureByPrimaryKeys(GenericToolkit pGenericToolkit, Scope pScope,
+		StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys) {
+		return pGenericToolkit
+			.createStructureRefFromParts(pScope, null, null, pStructureDef, Arrays.asList(pPrimaryKeys)).resolve();
+	}
+
 	/**
 	 * This is a highly inefficient implementation that simply scans through all structures until it finds one that
 	 * matches. A better implementation would use indexes to do a more directed search.
@@ -643,6 +651,35 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
 			results.add(test);
 		}
+
+		/* Handle sorting if necessary */
+
+		List<Pair<String, Boolean>> sortList = gqb.getSortList();
+		if (sortList.isEmpty() == false) {
+			Collections.sort(results, (s1, s2) -> {
+				int sortResult = 0;
+				for (Pair<String, Boolean> sort : sortList) {
+					Object o1 = s1.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s1);
+					Object o2 = s2.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s2);
+					if (o1 instanceof Comparable) {
+						@SuppressWarnings("unchecked")
+						Comparable<Object> c1 = (Comparable<Object>) o1;
+						if (o2 == null)
+							sortResult = -1;
+						else
+							sortResult = c1.compareTo(o2);
+					}
+					else
+						throw new IllegalArgumentException();
+					if (sort.getValue1() == false)
+						sortResult *= -1;
+					if (sortResult != 0)
+						break;
+				}
+				return sortResult;
+			});
+		}
+
 		return ImmutableList.copyOf(results);
 
 	}
@@ -653,7 +690,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 	 */
 	@Override
 	public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope) {
-		return new GenericQueryBuilder(null, null, null);
+		return new GenericQueryBuilder(null, null, null, null);
 	}
 
 	/**

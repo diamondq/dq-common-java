@@ -14,4 +14,13 @@ public interface QueryBuilder {
 	 * @return the builder
 	 */
 	public QueryBuilder andWhereParentIs(String pParentParamKey, PropertyDefinition pParentPropertyDef);
+
+	/**
+	 * Adds a key to sort by (can be called multiple times)
+	 * 
+	 * @param pKey the key to store by
+	 * @param pIsAscending true sort ascending or false to sort descending
+	 * @return the builder
+	 */
+	public QueryBuilder orderBy(String pKey, boolean pIsAscending);
 }
