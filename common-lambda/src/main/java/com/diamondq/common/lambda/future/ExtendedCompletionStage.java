@@ -3,8 +3,10 @@ package com.diamondq.common.lambda.future;
 import com.diamondq.common.lambda.interfaces.CancelableRunnable;
 import com.diamondq.common.lambda.interfaces.CancelableSupplier;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
@@ -439,6 +441,15 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 	 * @return the future
 	 */
 	public <C, U> ExtendedCompletionStage<?> continueIf(Class<C> pClass, Function<C, U> pFunc);
+
+	/**
+	 * Like thenCompose but only if the incoming object is not null. If it is, then the return is automatically null.
+	 * 
+	 * @param pFunc the function
+	 * @return the future
+	 */
+	public <U> ExtendedCompletionStage<@Nullable U> thenComposeWhenNotNull(
+		Function<@NonNull T, @NonNull ? extends @NonNull CompletionStage<U>> pFunc);
 
 	/**
 	 * Splits a compose into two tracks
@@ -901,5 +912,15 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
 		for (int i = 0; i < cfs.length; i++)
 			args[i] = cfs[i].toCompletableFuture();
 		return ExtendedCompletableFuture.of(CompletableFuture.anyOf(args));
+	}
+
+	public static <U> ExtendedCompletionStage<List<U>> listOf(Collection<ExtendedCompletionStage<U>> cfs) {
+		return ExtendedCompletionStage.allOf(cfs).thenApply((v) -> {
+			List<U> results = new ArrayList<>();
+			for (CompletionStage<U> stage : cfs) {
+				results.add(stage.toCompletableFuture().join());
+			}
+			return results;
+		});
 	}
 }

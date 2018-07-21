@@ -1107,6 +1107,20 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 	}
 
 	/**
+	 * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenComposeWhenNotNull(java.util.function.Function)
+	 */
+	@SuppressWarnings("null")
+	@Override
+	public <U> ExtendedCompletionStage<@Nullable U> thenComposeWhenNotNull(
+		Function<@NonNull T, @NonNull ? extends @NonNull CompletionStage<U>> pFunc) {
+		return thenCompose((result) -> {
+			if (result == null)
+				return ExtendedCompletableFuture.completedFuture(null);
+			return pFunc.apply(result);
+		});
+	}
+
+	/**
 	 * Splits a compose into two tracks
 	 *
 	 * @param pBoolFunc the boolean function
