@@ -34,13 +34,13 @@ public class PresenceDetector {
 		Contact contact = rosterManager.getContact(pJid);
 		if (contact == null) {
 
-			sLogger.trace("User is not subscribed. Adding contact...");
+			sLogger.debug("User is not subscribed. Adding contact...");
 
 			/* We haven't subscribed yet */
 
 			rosterManager.addContact(new Contact(pJid), true, null);
 
-			sLogger.trace("TODO: Marking the user as not available");
+			sLogger.warn("TODO: Marking the user as not available");
 			return ExtendedCompletableFuture.completedFuture(false);
 		}
 		else {
