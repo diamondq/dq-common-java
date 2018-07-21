@@ -76,54 +76,84 @@ public class WrappedScope implements Scope {
 	}
 
 	public void addPersistenceLayer(PersistenceLayer pLayer, Map<String, Object> pProps) {
-		sLogger.trace("addPersistenceLayer({}, {}) from {}", pLayer, pProps, this);
-		ImmutableMap<String, Object> props = ImmutableMap.copyOf(pProps);
-		mLayers.put(pLayer, props);
-		processLayers(false);
+		try {
+			sLogger.trace("addPersistenceLayer({}, {}) from {}", pLayer, pProps, this);
+			ImmutableMap<String, Object> props = ImmutableMap.copyOf(pProps);
+			mLayers.put(pLayer, props);
+			processLayers(false);
+		}
+		catch (RuntimeException ex) {
+			sLogger.error("", ex);
+			throw ex;
+		}
 	}
 
 	public void removePersistenceLayer(PersistenceLayer pLayer) {
-		sLogger.trace("removePersistenceLayer({}) from {}", pLayer, this);
-		mLayers.remove(pLayer);
-		processLayers(false);
+		try {
+			sLogger.trace("removePersistenceLayer({}) from {}", pLayer, this);
+			mLayers.remove(pLayer);
+			processLayers(false);
+		}
+		catch (RuntimeException ex) {
+			sLogger.error("", ex);
+			throw ex;
+		}
 	}
 
 	public void addBuilder(IBuilder<PersistenceLayer> pLayer, Map<String, Object> pProps) {
-		sLogger.trace("addBuilder({}, {}) from {}", pLayer, pProps, this);
-		ImmutableMap<String, Object> props = ImmutableMap.copyOf(pProps);
-		mBuilderLayers.put(pLayer, props);
-		processLayers(false);
+		try {
+			sLogger.trace("addBuilder({}, {}) from {}", pLayer, pProps, this);
+			ImmutableMap<String, Object> props = ImmutableMap.copyOf(pProps);
+			mBuilderLayers.put(pLayer, props);
+			processLayers(false);
+		}
+		catch (RuntimeException ex) {
+			sLogger.error("", ex);
+			throw ex;
+		}
 	}
 
 	public void removeBuilder(IBuilder<PersistenceLayer> pLayer) {
-		sLogger.trace("removeBuilder({}) from {}", pLayer, this);
-		mBuilderLayers.remove(pLayer);
-		processLayers(false);
+		try {
+			sLogger.trace("removeBuilder({}) from {}", pLayer, this);
+			mBuilderLayers.remove(pLayer);
+			processLayers(false);
+		}
+		catch (RuntimeException ex) {
+			sLogger.error("", ex);
+			throw ex;
+		}
 	}
 
 	public void onActivate(ComponentContext pContext, Map<String, Object> pProps) {
-		sLogger.trace("onActivate({}, {}) from {}", pContext, pProps, this);
-		mName = PropertiesParsing.getNonNullString(pProps, "name", "default");
-		mScope = mToolkit.getOrCreateScope(mName);
+		try {
+			sLogger.trace("onActivate({}, {}) from {}", pContext, pProps, this);
+			mName = PropertiesParsing.getNonNullString(pProps, "name", "default");
+			mScope = mToolkit.getOrCreateScope(mName);
 
-		/* Now see if any the layers match the criteria */
+			/* Now see if any the layers match the criteria */
 
-		for (int i = 0; i < sFILTER_KEYS.length; i++) {
-			String filter = PropertiesParsing.getNullableString(pProps, sFILTER_KEYS[i]);
-			if (filter != null) {
-				try {
-					mFilters[i] = pContext.getBundleContext().createFilter(filter);
+			for (int i = 0; i < sFILTER_KEYS.length; i++) {
+				String filter = PropertiesParsing.getNullableString(pProps, sFILTER_KEYS[i]);
+				if (filter != null) {
+					try {
+						mFilters[i] = pContext.getBundleContext().createFilter(filter);
+					}
+					catch (InvalidSyntaxException ex) {
+						throw new RuntimeException(ex);
+					}
 				}
-				catch (InvalidSyntaxException ex) {
-					throw new RuntimeException(ex);
-				}
+				else
+					mFilters[i] = null;
 			}
-			else
-				mFilters[i] = null;
-		}
 
-		mInitialized = true;
-		processLayers(true);
+			mInitialized = true;
+			processLayers(true);
+		}
+		catch (RuntimeException ex) {
+			sLogger.error("", ex);
+			throw ex;
+		}
 	}
 
 	public @Nullable PersistenceLayer getPersistenceLayer() {
@@ -357,10 +387,17 @@ public class WrappedScope implements Scope {
 	}
 
 	public void onDeactivate() {
-		String name = mName;
-		if (name != null) {
-			mName = null;
-			mToolkit.removeScope(name);
+		try {
+			sLogger.trace("onDeactivate() from {}", this);
+			String name = mName;
+			if (name != null) {
+				mName = null;
+				mToolkit.removeScope(name);
+			}
+		}
+		catch (RuntimeException ex) {
+			sLogger.error("", ex);
+			throw ex;
 		}
 	}
 
