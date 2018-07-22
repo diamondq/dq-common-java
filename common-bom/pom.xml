@@ -157,7 +157,7 @@
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-thirdparty.twilio</artifactId>
-                <version>7.21.3_01</version>
+                <version>7.22.0</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
