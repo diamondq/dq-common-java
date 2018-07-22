@@ -25,12 +25,12 @@
         <bundle>mvn:org.glassfish.hk2.external/javax.inject/2.5.0-b61</bundle>
     </feature>
 
-    <feature name="jackson" version="2.9.5" install="manual">
-        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.9.5</bundle>
-        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.9.5</bundle>
-        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.9.5</bundle>
-        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.9.5</bundle>
-        <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/2.9.5</bundle>
+    <feature name="jackson" version="2.9.6" install="manual">
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.9.6</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.9.6</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.9.6</bundle>
+        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.9.6</bundle>
+        <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/2.9.6</bundle>
     </feature>
 
     <feature name="jersey" version="2.27" install="manual">
