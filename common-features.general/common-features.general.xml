@@ -4,13 +4,13 @@
     xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.5.0 feature-1.5.0.xsd">
     
     <feature name="aries-spifly" version="1.0.10" install="manual">
-        <bundle>mvn:org.ow2.asm/asm/6.2</bundle>
-        <bundle>mvn:org.ow2.asm/asm-analysis/6.2</bundle>
-        <bundle>mvn:org.ow2.asm/asm-commons/6.2</bundle>
-        <bundle>mvn:org.ow2.asm/asm-tree/6.2</bundle>
-        <bundle>mvn:org.ow2.asm/asm-util/6.2</bundle>
-        <bundle>mvn:org.apache.aries/org.apache.aries.util/1.1.3</bundle>
-        <bundle>mvn:org.apache.aries.spifly/org.apache.aries.spifly.dynamic.bundle/1.0.10</bundle>
+        <bundle start-level="35">mvn:org.ow2.asm/asm/6.2</bundle>
+        <bundle start-level="35">mvn:org.ow2.asm/asm-analysis/6.2</bundle>
+        <bundle start-level="35">mvn:org.ow2.asm/asm-commons/6.2</bundle>
+        <bundle start-level="35">mvn:org.ow2.asm/asm-tree/6.2</bundle>
+        <bundle start-level="35">mvn:org.ow2.asm/asm-util/6.2</bundle>
+        <bundle start-level="35">mvn:org.apache.aries/org.apache.aries.util/1.1.3</bundle>
+        <bundle start-level="35">mvn:org.apache.aries.spifly/org.apache.aries.spifly.dynamic.bundle/1.0.10</bundle>
     </feature>
 
     <feature name="hk2" version="2.5.0-b61" install="manual">
@@ -58,12 +58,12 @@
 
     <feature name="rocks" version="0.8" install="manual">
         <feature>aries-spifly</feature>
-        <bundle>mvn:rocks.xmpp/precis/1.1.0-DQ-SNAPSHOT</bundle>
-        <bundle>mvn:rocks.xmpp/xmpp-addr/0.8.0-DQ-SNAPSHOT</bundle>
-        <bundle>mvn:rocks.xmpp/xmpp-core-client/0.8.0-DQ-SNAPSHOT</bundle>
-        <bundle>mvn:rocks.xmpp/xmpp-core-common/0.8.0-DQ-SNAPSHOT</bundle>
-        <bundle>mvn:rocks.xmpp/xmpp-extensions-client/0.8.0-DQ-SNAPSHOT</bundle>
-        <bundle>mvn:rocks.xmpp/xmpp-extensions-common/0.8.0-DQ-SNAPSHOT</bundle>
+        <bundle start-level="70">mvn:rocks.xmpp/precis/1.1.0-DQ-SNAPSHOT</bundle>
+        <bundle start-level="70">mvn:rocks.xmpp/xmpp-addr/0.8.0-DQ-SNAPSHOT</bundle>
+        <bundle start-level="75">mvn:rocks.xmpp/xmpp-core-client/0.8.0-DQ-SNAPSHOT</bundle>
+        <bundle start-level="70">mvn:rocks.xmpp/xmpp-core-common/0.8.0-DQ-SNAPSHOT</bundle>
+        <bundle start-level="70">mvn:rocks.xmpp/xmpp-extensions-client/0.8.0-DQ-SNAPSHOT</bundle>
+        <bundle start-level="70">mvn:rocks.xmpp/xmpp-extensions-common/0.8.0-DQ-SNAPSHOT</bundle>
     </feature>
 
     <feature name="pax-jdbc-spec" version="1.3.0" install="manual">
