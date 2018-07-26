@@ -10,7 +10,7 @@
     </parent>
     <artifactId>common-thirdparty.opentracing.util</artifactId>
     <packaging>bundle</packaging>
-    <version>0.31.0_02</version>
+    <version>0.31.0_03</version>
     <name>DiamondQ Common: Third Party: OpenTracing Util</name>
     <dependencies>
         <dependency>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.diamondq.common</groupId>
             <artifactId>common-thirdparty.opentracing.api</artifactId>
-            <version>0.31.0</version>
+            <version>0.31.0_01</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
