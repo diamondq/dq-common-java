@@ -152,7 +152,7 @@
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-thirdparty.opentracing.util</artifactId>
-                <version>0.31.0_03</version>
+                <version>0.31.0_04</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
