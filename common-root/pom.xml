@@ -57,6 +57,7 @@
     <modules>
         <module>../common-bom</module>
         <module>../common-features.general</module>
+        <module>../common-masterparent</module>
         <module>../common-parent</module>
         <module>../common-lambda</module>
         <module>../common-lambda.test</module>
