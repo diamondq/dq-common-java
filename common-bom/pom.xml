@@ -16,113 +16,113 @@
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-deployment.basic</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-features.general</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <type>xml</type>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-injection.cdi</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-injection.cdi.weld</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-injection.osgi</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-jaxrs.common</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-jaxrs.resteasy</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-lambda</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-model.standard</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-security.acl</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-security.acl.noop</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-security.acme</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-security.jwt</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-security.openaz</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-servers.undertow</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-servers.undertow.resteasy.weld</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-storage.cloudant</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-storage.common</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-storage.hibernate.ogm</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-storage.jdbc</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-storage.jdo.datanucleus</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-storage.kv</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
@@ -157,48 +157,48 @@
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-tracing.jaeger</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-tracing.opentracing</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-tracing.opentracing</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-utils.log4j2</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-utils.misc</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-utils.parsing</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-utils.sync</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-xmpp.standard</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.diamondq.common</groupId>
                 <artifactId>common-xmpp.eclipse.system.fragment</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
