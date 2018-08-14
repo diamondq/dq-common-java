@@ -29,6 +29,7 @@
         <dependency>
             <groupId>com.diamondq.common.config</groupId>
             <artifactId>config-api</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
