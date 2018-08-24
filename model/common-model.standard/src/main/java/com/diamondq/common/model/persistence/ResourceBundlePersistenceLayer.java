@@ -30,7 +30,9 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	 */
 	public static class ResourceBundlePersistenceLayerBuilder {
 
-		private @Nullable String mResourceBaseName;
+		private @Nullable String		mResourceBaseName;
+
+		private @Nullable ClassLoader	mClassLoader;
 
 		/**
 		 * Sets the resource base name
@@ -43,6 +45,11 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 			return this;
 		}
 
+		public ResourceBundlePersistenceLayerBuilder classLoader(ClassLoader pValue) {
+			mClassLoader = pValue;
+			return this;
+		}
+
 		/**
 		 * Builds the layer
 		 *
@@ -52,16 +59,19 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 			String resourceBaseName = mResourceBaseName;
 			if (resourceBaseName == null)
 				throw new IllegalArgumentException("The mandatory field resourceBaseName was not set");
-			return new ResourceBundlePersistenceLayer(resourceBaseName);
+			return new ResourceBundlePersistenceLayer(resourceBaseName, mClassLoader);
 		}
 	}
 
-	protected final String mBaseName;
+	protected final String					mBaseName;
 
-	public ResourceBundlePersistenceLayer(String pResourceBaseName) {
+	protected final @Nullable ClassLoader	mClassLoader;
+
+	public ResourceBundlePersistenceLayer(String pResourceBaseName, @Nullable ClassLoader pClassLoader) {
 		super(false, -1, false, -1, false, -1, true, -1);
 		sLogger.trace("ResourceBundlePersistenceLayer({}) from {}", pResourceBaseName, this);
 		mBaseName = pResourceBaseName;
+		mClassLoader = pClassLoader;
 	}
 
 	/**
@@ -72,7 +82,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 	protected @Nullable String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
 		String pKey) {
 		try {
-			ResourceBundle bundle = ResourceBundle.getBundle(mBaseName, pLocale);
+			ResourceBundle bundle = ResourceBundle.getBundle(mBaseName, pLocale, mClassLoader);
 			return bundle.getString(pKey);
 		}
 		catch (MissingResourceException ex) {
