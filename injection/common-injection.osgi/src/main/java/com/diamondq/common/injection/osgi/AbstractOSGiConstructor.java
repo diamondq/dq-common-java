@@ -1,6 +1,7 @@
 package com.diamondq.common.injection.osgi;
 
 import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
+import com.diamondq.common.injection.osgi.ConstructorInfo.SpecialTypes;
 import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
@@ -23,7 +24,6 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Triplet;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -42,7 +42,7 @@ public class AbstractOSGiConstructor {
 	private static final Set<String>	sSKIP_PROPS;
 
 	static {
-		Builder<String> b = ImmutableSet.builder();
+		Builder<String> b = ImmutableSet.<String> builder();
 		b.add(Constants.SERVICE_BUNDLEID);
 		b.add(Constants.SERVICE_DESCRIPTION);
 		b.add(Constants.SERVICE_EXPORTED_CONFIGS);
@@ -66,7 +66,7 @@ public class AbstractOSGiConstructor {
 
 	protected final ConstructorInfo				mInfo;
 
-	protected volatile BundleContext			mBundleContext;
+	protected volatile ComponentContext			mComponentContext;
 
 	protected volatile Map<String, Object>		mCurrentProps;
 
@@ -80,14 +80,14 @@ public class AbstractOSGiConstructor {
 		if ((mInfo.method != null)
 			&& (AbstractOSGiConstructor.class.isAssignableFrom(mInfo.constructionClass) == false))
 			throw new ExtendedIllegalArgumentException(Messages.METHOD_ONLY_ON_FACTORY);
-		mBundleContext = null;
+		mComponentContext = null;
 		mCurrentProps = Collections.emptyMap();
 	}
 
 	public void onActivate(ComponentContext pContext, Map<String, Object> pProps) {
 		sLogger.trace("onActivate({}, {}) for {}", pContext, pProps, this);
 		synchronized (this) {
-			mBundleContext = pContext.getBundleContext();
+			mComponentContext = pContext;
 			mCurrentProps = ImmutableMap.copyOf(pProps);
 		}
 		processProperties();
@@ -96,7 +96,7 @@ public class AbstractOSGiConstructor {
 	public void onModified(ComponentContext pContext, Map<String, Object> pProps) {
 		sLogger.trace("onModified({}, {}) for {}", pContext, pProps, this);
 		synchronized (this) {
-			mBundleContext = pContext.getBundleContext();
+			mComponentContext = pContext;
 			mCurrentProps = ImmutableMap.copyOf(pProps);
 		}
 		processProperties();
@@ -124,7 +124,8 @@ public class AbstractOSGiConstructor {
 
 		synchronized (this) {
 
-			String errorId = mBundleContext.getBundle().getSymbolicName() + " with " + mCurrentProps.toString();
+			String errorId = mComponentContext.getBundleContext().getBundle().getSymbolicName() + " with "
+				+ mCurrentProps.toString();
 
 			/*
 			 * Shut down all the service trackers. NOTE: With the rebuilding flag on, these should NOT update any of the
@@ -145,7 +146,7 @@ public class AbstractOSGiConstructor {
 					finalFilterStr = "(&(objectClass=" + mInfo.filterClasses[i].getName() + ")" + filterStr + ")";
 				Filter filter;
 				try {
-					filter = mBundleContext.createFilter(finalFilterStr);
+					filter = mComponentContext.getBundleContext().createFilter(finalFilterStr);
 				}
 				catch (InvalidSyntaxException ex) {
 					throw new IllegalArgumentException(
@@ -156,12 +157,13 @@ public class AbstractOSGiConstructor {
 
 				FilterTracker filterTracker = mTrackers.get(mInfo.filters[i]);
 				if (filterTracker == null) {
-					filterTracker = new FilterTracker(mBundleContext);
+					filterTracker = new FilterTracker(mComponentContext.getBundleContext());
 					mTrackers.put(mInfo.filters[i], filterTracker);
 				}
 
 				sLogger.trace("Starting ServiceTracker for {}", finalFilterStr);
-				ServiceTracker<Object, Object> tracker = new ServiceTracker<>(mBundleContext, filter, filterTracker);
+				ServiceTracker<Object, Object> tracker =
+					new ServiceTracker<>(mComponentContext.getBundleContext(), filter, filterTracker);
 				filterTracker.setTracker(tracker);
 				tracker.open();
 			}
@@ -181,7 +183,8 @@ public class AbstractOSGiConstructor {
 
 			boolean available = true;
 
-			String errorId = mBundleContext.getBundle().getSymbolicName() + " with " + mCurrentProps.toString();
+			String errorId = mComponentContext.getBundleContext().getBundle().getSymbolicName() + " with "
+				+ mCurrentProps.toString();
 
 			@Nullable
 			Object[] args = new @Nullable Object[mInfo.constructionArgs.length];
@@ -210,7 +213,7 @@ public class AbstractOSGiConstructor {
 								List<Object> list = new ArrayList<>();
 								for (Triplet<Integer, Long, ServiceReference<Object>> triplet : references) {
 									ServiceReference<Object> ref = triplet.getValue2();
-									Object obj = mBundleContext.getService(ref);
+									Object obj = mComponentContext.getBundleContext().getService(ref);
 									if (obj == null) {
 										if (arg.required == Boolean.TRUE) {
 											sLogger.trace(
@@ -228,7 +231,7 @@ public class AbstractOSGiConstructor {
 							}
 							else {
 								ServiceReference<Object> ref = references.iterator().next().getValue2();
-								Object obj = mBundleContext.getService(ref);
+								Object obj = mComponentContext.getBundleContext().getService(ref);
 								if (obj == null) {
 									if (arg.required == Boolean.TRUE) {
 										sLogger.trace(
@@ -270,6 +273,18 @@ public class AbstractOSGiConstructor {
 								break;
 							}
 						}
+					}
+				}
+				else if (arg.specialType != SpecialTypes.NA) {
+					switch (arg.specialType) {
+					case BUNDLECONTEXT:
+						value = mComponentContext.getBundleContext();
+						break;
+					case COMPONENTCONTEXT:
+						value = mComponentContext;
+						break;
+					case NA:
+						throw new IllegalStateException();
 					}
 				}
 				else
@@ -314,7 +329,8 @@ public class AbstractOSGiConstructor {
 
 				sLogger.trace("Registering constructed service...");
 				mServiceObject = service;
-				mRegistration = mBundleContext.registerService(mInfo.registrationClasses, service, properties);
+				mRegistration = mComponentContext.getBundleContext().registerService(mInfo.registrationClasses, service,
+					properties);
 			}
 			else {
 				ServiceRegistration<?> registration = mRegistration;

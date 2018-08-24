@@ -8,6 +8,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConstructorInfo {
 
+	public static enum SpecialTypes {
+		NA, BUNDLECONTEXT, COMPONENTCONTEXT
+	}
+
 	public static class ConstructionArg {
 
 		public final Class<?>			argumentClass;
@@ -24,9 +28,11 @@ public class ConstructorInfo {
 
 		public final boolean			collection;
 
+		public final SpecialTypes		specialType;
+
 		public ConstructionArg(Class<?> pArgumentClass, @Nullable String pPropertyFilterKey,
 			@Nullable String pPropertyValueKey, @Nullable Object pPropertyValue, boolean pPropertyValueSet,
-			boolean pRequired, boolean pCollection) {
+			boolean pRequired, boolean pCollection, SpecialTypes pSpecialType) {
 			super();
 			argumentClass = pArgumentClass;
 			propertyFilterKey = pPropertyFilterKey;
@@ -35,6 +41,7 @@ public class ConstructorInfo {
 			propertyValueSet = pPropertyValueSet;
 			required = pRequired;
 			collection = pCollection;
+			specialType = pSpecialType;
 		}
 
 	}

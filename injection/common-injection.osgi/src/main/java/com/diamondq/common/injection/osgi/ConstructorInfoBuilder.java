@@ -1,6 +1,7 @@
 package com.diamondq.common.injection.osgi;
 
 import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
+import com.diamondq.common.injection.osgi.ConstructorInfo.SpecialTypes;
 import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 
@@ -45,7 +46,9 @@ public class ConstructorInfoBuilder {
 
 		private @Nullable Object				mValue;
 
-		private boolean							mValueSet	= false;
+		private boolean							mValueSet		= false;
+
+		private SpecialTypes					mSpecialType	= SpecialTypes.NA;
 
 		public ConstructorArgBuilder(ConstructorInfoBuilder pConstructorInfoBuilder) {
 			mBuilder = pConstructorInfoBuilder;
@@ -87,6 +90,16 @@ public class ConstructorInfoBuilder {
 			return this;
 		}
 
+		public ConstructorArgBuilder injectBundleContext() {
+			mSpecialType = SpecialTypes.BUNDLECONTEXT;
+			return this;
+		}
+
+		public ConstructorArgBuilder injectComponentContext() {
+			mSpecialType = SpecialTypes.COMPONENTCONTEXT;
+			return this;
+		}
+
 		public ConstructorInfoBuilder build() {
 			Class<?> localClass = mClass;
 			if (localClass == null)
@@ -94,7 +107,7 @@ public class ConstructorInfoBuilder {
 
 			/* Make sure there is a way to find the argument */
 
-			if ((mFilter == null) && (mProperty == null) && (mValueSet == false))
+			if ((mFilter == null) && (mProperty == null) && (mValueSet == false) && (mSpecialType == SpecialTypes.NA))
 				throw new ExtendedIllegalArgumentException(Messages.ARG_VALUE_REQUIRED);
 
 			Boolean requiredObj = mRequired;
@@ -106,8 +119,8 @@ public class ConstructorInfoBuilder {
 			if ((mValueSet == true) && (mValue == null) && (required == true))
 				throw new ExtendedIllegalArgumentException(Messages.REQUIRED_VALUE_NULL);
 
-			ConstructionArg arg =
-				new ConstructionArg(localClass, mFilter, mProperty, mValue, mValueSet, required, collection);
+			ConstructionArg arg = new ConstructionArg(localClass, mFilter, mProperty, mValue, mValueSet, required,
+				collection, mSpecialType);
 			mBuilder.mConstructionArgs.add(arg);
 			return mBuilder;
 		}
