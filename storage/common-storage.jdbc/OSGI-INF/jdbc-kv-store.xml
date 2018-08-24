@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" configuration-policy="require" deactivate="onDeactivate" immediate="true" modified="onModified" name="com.diamondq.common.storage.jdbc.jdbcstore">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate" configuration-policy="require" deactivate="onDeactivate" immediate="true" modified="onModified" name="com.diamondq.common.storage.jdbc.jdbcstore">
 	<implementation class="com.diamondq.common.storage.jdbc.osgi.OSGiJDBCKVStoreBuilder"/>
  <service>
     <provide interface="com.diamondq.common.storage.jdbc.osgi.OSGiJDBCKVStoreBuilder"/>

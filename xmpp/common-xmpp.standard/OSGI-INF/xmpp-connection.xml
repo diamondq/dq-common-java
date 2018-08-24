@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" configuration-policy="require" deactivate="onDeactivate" immediate="true" modified="onModified" name="com.diamondq.common.xmpp.connection">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate" configuration-policy="require" deactivate="onDeactivate" immediate="true" modified="onModified" name="com.diamondq.common.xmpp.connection">
 	<implementation class="com.diamondq.common.xmpp.osgi.XMPPConnectionImpl"/>
  <service>
     <provide interface="com.diamondq.common.xmpp.osgi.XMPPConnectionImpl"/>

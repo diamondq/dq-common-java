@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="com.diamondq.common.security.acl.noop.authenticationengine">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" immediate="true" name="com.diamondq.common.security.acl.noop.authenticationengine">
 	<implementation class="com.diamondq.common.security.acl.noop.NoopAuthenticationEngine"/>
  <service>
     <provide interface="com.diamondq.common.security.acl.api.AuthenticationEngine"/>
