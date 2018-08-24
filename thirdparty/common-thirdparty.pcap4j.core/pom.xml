@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-thirdparty.parent</artifactId>
+        <version>0.2.0.1</version>
+        <relativePath>../common-thirdparty.parent</relativePath>
+    </parent>
+    <artifactId>common-thirdparty.pcap4j.core</artifactId>
+    <packaging>bundle</packaging>
+    <version>1.7.3</version>
+    <description>The core module of Pcap4J.</description>
+    <name>DiamondQ Common: Third Party: pcap4j core</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.pcap4j</groupId>
+            <artifactId>pcap4j-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-bundle</id>
+                        <configuration>
+                            <instructions>
+                                <!-- A few extra packages are marked optional -->
+                                <Import-Package>
+                                    * 
+                                </Import-Package>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
