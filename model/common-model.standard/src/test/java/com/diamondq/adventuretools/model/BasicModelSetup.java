@@ -10,40 +10,39 @@ import org.junit.Assert;
 
 public class BasicModelSetup {
 
-	public static void setup(Toolkit toolkit, Scope scope) {
+  public static void setup(Toolkit toolkit, Scope scope) {
 
-		/* Map Anchor */
+    /* Map Anchor */
 
-		StructureDefinition mapAnchorDef =
-			toolkit.createNewStructureDefinition(scope, "mapAnchor").setSingleInstance(false);
+    StructureDefinition mapAnchorDef =
+      toolkit.createNewStructureDefinition(scope, "mapAnchor").setSingleInstance(false);
 
-		mapAnchorDef = mapAnchorDef.addPropertyDefinition(
-			toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
-		mapAnchorDef = mapAnchorDef.addPropertyDefinition(
-			toolkit.createNewPropertyDefinition(scope, "x", PropertyType.Integer).setDefaultValue("0").setFinal(true));
-		mapAnchorDef = mapAnchorDef.addPropertyDefinition(
-			toolkit.createNewPropertyDefinition(scope, "y", PropertyType.Integer).setDefaultValue("0").setFinal(true));
-		mapAnchorDef = mapAnchorDef.addPropertyDefinition(
-			toolkit.createNewPropertyDefinition(scope, "z", PropertyType.Integer).setDefaultValue("0").setFinal(true));
+    mapAnchorDef = mapAnchorDef.addPropertyDefinition(
+      toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
+    mapAnchorDef = mapAnchorDef.addPropertyDefinition(
+      toolkit.createNewPropertyDefinition(scope, "x", PropertyType.Integer).setDefaultValue("0").setFinal(true));
+    mapAnchorDef = mapAnchorDef.addPropertyDefinition(
+      toolkit.createNewPropertyDefinition(scope, "y", PropertyType.Integer).setDefaultValue("0").setFinal(true));
+    mapAnchorDef = mapAnchorDef.addPropertyDefinition(
+      toolkit.createNewPropertyDefinition(scope, "z", PropertyType.Integer).setDefaultValue("0").setFinal(true));
 
-		toolkit.writeStructureDefinition(scope, mapAnchorDef);
+    toolkit.writeStructureDefinition(scope, mapAnchorDef);
 
-		StructureDefinition sd = toolkit.lookupStructureDefinitionByName(scope, "mapAnchor");
-		Assert.assertNotNull(sd);
-		StructureDefinitionRef mapAnchorRef = sd.getReference();
+    StructureDefinition sd = toolkit.lookupStructureDefinitionByName(scope, "mapAnchor");
+    Assert.assertNotNull(sd);
+    StructureDefinitionRef mapAnchorRef = sd.getReference();
 
-		/* Zone */
+    /* Zone */
 
-		StructureDefinition definition = toolkit.createNewStructureDefinition(scope, "zone").setSingleInstance(false);
+    StructureDefinition definition = toolkit.createNewStructureDefinition(scope, "zone").setSingleInstance(false);
 
-		definition = definition.addPropertyDefinition(
-			toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
-		definition = definition
-			.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "mapAnchorId", PropertyType.StructureRef)
-				.addReferenceType(mapAnchorRef));
-		definition = definition
-			.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "dimensionId", PropertyType.Integer));
+    definition = definition.addPropertyDefinition(
+      toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
+    definition = definition.addPropertyDefinition(toolkit
+      .createNewPropertyDefinition(scope, "mapAnchorId", PropertyType.StructureRef).addReferenceType(mapAnchorRef));
+    definition =
+      definition.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "dimensionId", PropertyType.Integer));
 
-		toolkit.writeStructureDefinition(scope, definition);
-	}
+    toolkit.writeStructureDefinition(scope, definition);
+  }
 }

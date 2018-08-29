@@ -5,15 +5,15 @@ import com.diamondq.common.model.interfaces.ToolkitFactory;
 
 public class GenericToolkitFactory extends ToolkitFactory {
 
-	public GenericToolkitFactory() {
-		super();
-	}
+  public GenericToolkitFactory() {
+    super();
+  }
 
-	/**
-	 * @see com.diamondq.common.model.interfaces.ToolkitFactory#newToolkit()
-	 */
-	@Override
-	public Toolkit newToolkit() {
-		return new GenericToolkit();
-	}
+  /**
+   * @see com.diamondq.common.model.interfaces.ToolkitFactory#newToolkit()
+   */
+  @Override
+  public Toolkit newToolkit() {
+    return new GenericToolkit();
+  }
 }

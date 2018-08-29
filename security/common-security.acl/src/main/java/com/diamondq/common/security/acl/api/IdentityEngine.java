@@ -12,6 +12,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public interface IdentityEngine {
 
-	public @Nullable UserInfo getIdentity(HttpServletRequest pRequest);
+  public @Nullable UserInfo getIdentity(HttpServletRequest pRequest);
 
 }

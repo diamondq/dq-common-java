@@ -10,49 +10,49 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class LaunchServer {
 
-	public static void run(String[] pArgs, String pAppName, Class<? extends Application> pAppClass) {
-		try {
+  public static void run(String[] pArgs, String pAppName, Class<? extends Application> pAppClass) {
+    try {
 
-			try {
-				Class.forName("org.slf4j.bridge.SLF4JBridgeHandler");
-				clearJavaUtilLoggingHandlers();
-			}
-			catch (ClassNotFoundException ignored) {
-			}
+      try {
+        Class.forName("org.slf4j.bridge.SLF4JBridgeHandler");
+        clearJavaUtilLoggingHandlers();
+      }
+      catch (ClassNotFoundException ignored) {
+      }
 
-			/* Set the application name so that the initial bootstrap can load properly */
+      /* Set the application name so that the initial bootstrap can load properly */
 
-			System.setProperty("application.name", pAppName);
+      System.setProperty("application.name", pAppName);
 
-			/*
-			 * Bootstrap initially. NOTE: This bootstrap/config is only used for server setup. A second bootstrap/config
-			 * is computed once the CDI system is operational.
-			 */
+      /*
+       * Bootstrap initially. NOTE: This bootstrap/config is only used for server setup. A second bootstrap/config is
+       * computed once the CDI system is operational.
+       */
 
-			Config config = new StandardBootstrap().bootstrap();
-			@SuppressWarnings("unused")
-			UndertowRESTEasyWeldServer server = new UndertowRESTEasyWeldServer(config, pAppClass);
+      Config config = new StandardBootstrap().bootstrap();
+      @SuppressWarnings("unused")
+      UndertowRESTEasyWeldServer server = new UndertowRESTEasyWeldServer(config, pAppClass);
 
-			CDI.current().getBeanManager().fireEvent(new JAXRSServerLaunched());
+      CDI.current().getBeanManager().fireEvent(new JAXRSServerLaunched());
 
-			/* Wait forever */
+      /* Wait forever */
 
-			while (true) {
-				try {
-					Thread.sleep(1000000L);
-				}
-				catch (InterruptedException ex) {
-				}
-			}
-		}
-		catch (RuntimeException ex) {
-			ex.printStackTrace();
-			System.exit(-1);
-		}
-	}
+      while (true) {
+        try {
+          Thread.sleep(1000000L);
+        }
+        catch (InterruptedException ex) {
+        }
+      }
+    }
+    catch (RuntimeException ex) {
+      ex.printStackTrace();
+      System.exit(-1);
+    }
+  }
 
-	private static void clearJavaUtilLoggingHandlers() {
-		SLF4JBridgeHandler.removeHandlersForRootLogger();
-		SLF4JBridgeHandler.install();
-	}
+  private static void clearJavaUtilLoggingHandlers() {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+  }
 }

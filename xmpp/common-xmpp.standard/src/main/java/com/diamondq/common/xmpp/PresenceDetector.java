@@ -16,36 +16,36 @@ import rocks.xmpp.im.subscription.PresenceManager;
 
 public class PresenceDetector {
 
-	private static final Logger sLogger = LoggerFactory.getLogger(PresenceDetector.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(PresenceDetector.class);
 
-	public static ExtendedCompletionStage<Boolean> isAvailable(XmppClient pClient, Jid pJid) {
-		sLogger.trace("isAvailable({}, {})", pClient, pJid);
-		PresenceManager presenceManager = pClient.getManager(PresenceManager.class);
-		Presence presence = presenceManager.getPresence(pJid);
-		if (presence.getType() != Type.UNAVAILABLE) {
-			boolean result = presence.isAvailable();
-			sLogger.trace("Returning {}", result);
-			return ExtendedCompletableFuture.completedFuture(result);
-		}
+  public static ExtendedCompletionStage<Boolean> isAvailable(XmppClient pClient, Jid pJid) {
+    sLogger.trace("isAvailable({}, {})", pClient, pJid);
+    PresenceManager presenceManager = pClient.getManager(PresenceManager.class);
+    Presence presence = presenceManager.getPresence(pJid);
+    if (presence.getType() != Type.UNAVAILABLE) {
+      boolean result = presence.isAvailable();
+      sLogger.trace("Returning {}", result);
+      return ExtendedCompletableFuture.completedFuture(result);
+    }
 
-		/* The user may not be subscribed for presence */
+    /* The user may not be subscribed for presence */
 
-		RosterManager rosterManager = pClient.getManager(RosterManager.class);
-		Contact contact = rosterManager.getContact(pJid);
-		if (contact == null) {
+    RosterManager rosterManager = pClient.getManager(RosterManager.class);
+    Contact contact = rosterManager.getContact(pJid);
+    if (contact == null) {
 
-			sLogger.debug("User is not subscribed. Adding contact...");
+      sLogger.debug("User is not subscribed. Adding contact...");
 
-			/* We haven't subscribed yet */
+      /* We haven't subscribed yet */
 
-			rosterManager.addContact(new Contact(pJid), true, null);
+      rosterManager.addContact(new Contact(pJid), true, null);
 
-			sLogger.warn("TODO: Marking the user as not available");
-			return ExtendedCompletableFuture.completedFuture(false);
-		}
-		else {
-			sLogger.trace("Returning false");
-			return ExtendedCompletableFuture.completedFuture(false);
-		}
-	}
+      sLogger.warn("TODO: Marking the user as not available");
+      return ExtendedCompletableFuture.completedFuture(false);
+    }
+    else {
+      sLogger.trace("Returning false");
+      return ExtendedCompletableFuture.completedFuture(false);
+    }
+  }
 }

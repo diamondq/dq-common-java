@@ -7,8 +7,8 @@ import java.util.List;
 
 public class JDBCTableDefinition extends GenericKVTableDefinition {
 
-	public JDBCTableDefinition(String pTableName, List<IKVColumnDefinition> pColumnDefinitions) {
-		super(pTableName, pColumnDefinitions);
-	}
+  public JDBCTableDefinition(String pTableName, List<IKVColumnDefinition> pColumnDefinitions) {
+    super(pTableName, pColumnDefinitions);
+  }
 
 }

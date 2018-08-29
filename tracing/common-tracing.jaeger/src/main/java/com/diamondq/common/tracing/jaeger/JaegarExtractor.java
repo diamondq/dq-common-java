@@ -12,18 +12,18 @@ import io.opentracing.SpanContext;
 @ApplicationScoped
 public class JaegarExtractor implements TraceIdExtractor {
 
-	public JaegarExtractor() {
-	}
+  public JaegarExtractor() {
+  }
 
-	@Override
-	public @Nullable String getTraceId(@Nullable Span pSpan) {
-		if (pSpan == null)
-			return null;
-		SpanContext context = pSpan.context();
-		if ((context instanceof com.uber.jaeger.SpanContext) == false)
-			return null;
-		long traceId = ((com.uber.jaeger.SpanContext) context).getTraceId();
-		return String.format("%x", traceId);
-	}
+  @Override
+  public @Nullable String getTraceId(@Nullable Span pSpan) {
+    if (pSpan == null)
+      return null;
+    SpanContext context = pSpan.context();
+    if ((context instanceof com.uber.jaeger.SpanContext) == false)
+      return null;
+    long traceId = ((com.uber.jaeger.SpanContext) context).getTraceId();
+    return String.format("%x", traceId);
+  }
 
 }

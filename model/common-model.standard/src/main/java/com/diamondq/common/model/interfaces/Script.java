@@ -4,6 +4,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface Script {
 
-	public @Nullable Object evaluate(Property<?> pProperty);
+  public @Nullable Object evaluate(Property<?> pProperty);
 
 }

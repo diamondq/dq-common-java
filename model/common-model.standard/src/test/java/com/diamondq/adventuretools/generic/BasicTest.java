@@ -14,16 +14,16 @@ import org.junit.Test;
 
 public class BasicTest {
 
-	@Test
-	public void test() {
-		ToolkitFactory instance = ToolkitFactory.newInstance();
-		GenericToolkit toolkit = (GenericToolkit) instance.newToolkit();
-		Scope scope = toolkit.getOrCreateScope("Design");
-		toolkit.setPersistenceLayer(scope, new MemoryPersistenceLayer());
-		StructureDefinition definition = toolkit.createNewStructureDefinition(scope, "Test-Definition");
-		toolkit.writeStructureDefinition(scope, definition);
-		Collection<StructureDefinitionRef> allStructureDefinitionRefs = toolkit.getAllStructureDefinitionRefs(scope);
-		Assert.assertTrue(allStructureDefinitionRefs.contains(definition.getReference()));
-	}
+  @Test
+  public void test() {
+    ToolkitFactory instance = ToolkitFactory.newInstance();
+    GenericToolkit toolkit = (GenericToolkit) instance.newToolkit();
+    Scope scope = toolkit.getOrCreateScope("Design");
+    toolkit.setPersistenceLayer(scope, new MemoryPersistenceLayer());
+    StructureDefinition definition = toolkit.createNewStructureDefinition(scope, "Test-Definition");
+    toolkit.writeStructureDefinition(scope, definition);
+    Collection<StructureDefinitionRef> allStructureDefinitionRefs = toolkit.getAllStructureDefinitionRefs(scope);
+    Assert.assertTrue(allStructureDefinitionRefs.contains(definition.getReference()));
+  }
 
 }

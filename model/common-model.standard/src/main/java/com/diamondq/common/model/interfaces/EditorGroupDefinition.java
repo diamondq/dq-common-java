@@ -6,24 +6,24 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EditorGroupDefinition extends EditorComponentDefinition<EditorGroupDefinition> {
 
-	/* direction */
+  /* direction */
 
-	public @Nullable EditorComponentDirection getDirection();
+  public @Nullable EditorComponentDirection getDirection();
 
-	public EditorGroupDefinition setDirection(@Nullable EditorComponentDirection pValue);
+  public EditorGroupDefinition setDirection(@Nullable EditorComponentDirection pValue);
 
-	/* numColumns */
+  /* numColumns */
 
-	public int getNumColumns();
+  public int getNumColumns();
 
-	public EditorGroupDefinition setNumColumns(int pValue);
+  public EditorGroupDefinition setNumColumns(int pValue);
 
-	/* components */
+  /* components */
 
-	public List<? extends EditorComponentDefinition<?>> getComponents();
+  public List<? extends EditorComponentDefinition<?>> getComponents();
 
-	public <T extends EditorComponentDefinition<T>> EditorGroupDefinition addComponent(T pValue);
+  public <T extends EditorComponentDefinition<T>> EditorGroupDefinition addComponent(T pValue);
 
-	public <T extends EditorComponentDefinition<T>> EditorGroupDefinition removeComponent(T pValue);
+  public <T extends EditorComponentDefinition<T>> EditorGroupDefinition removeComponent(T pValue);
 
 }

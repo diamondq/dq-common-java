@@ -9,24 +9,24 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@XmlRootElement(name = "opentracing", namespace="http://www.diamondq.com/xmpp/opentracing")
+@XmlRootElement(name = "opentracing", namespace = "http://www.diamondq.com/xmpp/opentracing")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TracingMapModel {
 
-	private Map<String, String> attrs = new HashMap<>();
+  private Map<String, String> attrs = new HashMap<>();
 
-	@SuppressWarnings("unused")
-	private TracingMapModel() {
+  @SuppressWarnings("unused")
+  private TracingMapModel() {
 
-	}
+  }
 
-	public TracingMapModel(@Nullable Map<String, String> pAttrs) {
-		if (pAttrs != null)
-			attrs.putAll(pAttrs);
-	}
+  public TracingMapModel(@Nullable Map<String, String> pAttrs) {
+    if (pAttrs != null)
+      attrs.putAll(pAttrs);
+  }
 
-	public Map<String, String> getAttrs() {
-		return attrs;
-	}
+  public Map<String, String> getAttrs() {
+    return attrs;
+  }
 
 }

@@ -7,57 +7,57 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Builder for Index Definitions
- * 
+ *
  * @param <IDB> the actual type for the Index Definitions builder
  */
 public abstract class KVIndexDefinitionBuilder<@NonNull IDB extends KVIndexDefinitionBuilder<IDB>> {
 
-	@Nullable
-	protected String											mName;
+  @Nullable
+  protected String                                         mName;
 
-	protected ImmutableList.Builder<@NonNull IKVIndexColumn>	mColumns;
+  protected ImmutableList.Builder<@NonNull IKVIndexColumn> mColumns;
 
-	/**
-	 * Builds the Index Definition
-	 * 
-	 * @return the Index definition
-	 */
-	public abstract IKVIndexDefinition build();
+  /**
+   * Builds the Index Definition
+   * 
+   * @return the Index definition
+   */
+  public abstract IKVIndexDefinition build();
 
-	/**
-	 * Default constructor
-	 */
-	public KVIndexDefinitionBuilder() {
-		mColumns = ImmutableList.builder();
-	}
+  /**
+   * Default constructor
+   */
+  public KVIndexDefinitionBuilder() {
+    mColumns = ImmutableList.builder();
+  }
 
-	/**
-	 * Sets the index name
-	 * 
-	 * @param pValue the name
-	 * @return the updated builder
-	 */
-	@SuppressWarnings("unchecked")
-	public IDB name(String pValue) {
-		mName = pValue;
-		return (IDB) this;
-	}
+  /**
+   * Sets the index name
+   * 
+   * @param pValue the name
+   * @return the updated builder
+   */
+  @SuppressWarnings("unchecked")
+  public IDB name(String pValue) {
+    mName = pValue;
+    return (IDB) this;
+  }
 
-	/**
-	 * Adds a new column to the builder
-	 * 
-	 * @param pValue the new column
-	 * @return the updated builder
-	 */
-	@SuppressWarnings("unchecked")
-	public IDB addColumn(IKVIndexColumn pValue) {
-		mColumns.add(pValue);
-		return (IDB) this;
-	}
+  /**
+   * Adds a new column to the builder
+   * 
+   * @param pValue the new column
+   * @return the updated builder
+   */
+  @SuppressWarnings("unchecked")
+  public IDB addColumn(IKVIndexColumn pValue) {
+    mColumns.add(pValue);
+    return (IDB) this;
+  }
 
-	protected void validate() {
-		if (mName == null)
-			throw new IllegalArgumentException(
-				"The mandatory field name was not set on the " + this.getClass().getSimpleName());
-	}
+  protected void validate() {
+    if (mName == null)
+      throw new IllegalArgumentException(
+        "The mandatory field name was not set on the " + this.getClass().getSimpleName());
+  }
 }

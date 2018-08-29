@@ -21,45 +21,45 @@ import io.opentracing.util.GlobalTracer;
 @Plugin(name = "OpenTracing", category = "Core", elementType = "appender", printObject = true)
 public class TracingAppender extends AbstractAppender {
 
-	private static final Charset sUTF8 = Charset.forName("UTF-8");
+  private static final Charset sUTF8 = Charset.forName("UTF-8");
 
-	public TracingAppender(String pName, @Nullable Filter pFilter, Layout<? extends Serializable> pLayout,
-		boolean pIgnoreExceptions) {
-		super(pName, pFilter, pLayout, pIgnoreExceptions);
-	}
+  public TracingAppender(String pName, @Nullable Filter pFilter, Layout<? extends Serializable> pLayout,
+    boolean pIgnoreExceptions) {
+    super(pName, pFilter, pLayout, pIgnoreExceptions);
+  }
 
-	@PluginFactory
-	public static @Nullable TracingAppender createAppender(@PluginAttribute("name") @Nullable String name,
-		@PluginAttribute("ignoreExceptions") boolean ignoreExceptions,
-		@PluginElement("Layout") @Nullable Layout<@NonNull ? extends @NonNull Serializable> layout,
-		@PluginElement("Filters") @Nullable Filter filter) {
+  @PluginFactory
+  public static @Nullable TracingAppender createAppender(@PluginAttribute("name") @Nullable String name,
+    @PluginAttribute("ignoreExceptions") boolean ignoreExceptions,
+    @PluginElement("Layout") @Nullable Layout<@NonNull ? extends @NonNull Serializable> layout,
+    @PluginElement("Filters") @Nullable Filter filter) {
 
-		if (name == null) {
-			LOGGER.error("No name provided for StubAppender");
-			return null;
-		}
+    if (name == null) {
+      LOGGER.error("No name provided for StubAppender");
+      return null;
+    }
 
-		if (layout == null) {
-			@SuppressWarnings("null")
-			Layout<@NonNull ? extends @NonNull Serializable> defaultLayout = PatternLayout.createDefaultLayout();
-			layout = defaultLayout;
-		}
-		return new TracingAppender(name, filter, layout, ignoreExceptions);
-	}
+    if (layout == null) {
+      @SuppressWarnings("null")
+      Layout<@NonNull ? extends @NonNull Serializable> defaultLayout = PatternLayout.createDefaultLayout();
+      layout = defaultLayout;
+    }
+    return new TracingAppender(name, filter, layout, ignoreExceptions);
+  }
 
-	@Override
-	public void append(LogEvent pEvent) {
-		Span activeSpan = GlobalTracer.get().activeSpan();
-		if (activeSpan == null)
-			return;
-		Layout<? extends Serializable> layout = getLayout();
-		String data;
-		if (layout == null)
-			data = pEvent.toString();
-		else {
-			byte[] byteArray = layout.toByteArray(pEvent);
-			data = new String(byteArray, sUTF8);
-		}
-		activeSpan.log(pEvent.getTimeMillis() * 1000, data);
-	}
+  @Override
+  public void append(LogEvent pEvent) {
+    Span activeSpan = GlobalTracer.get().activeSpan();
+    if (activeSpan == null)
+      return;
+    Layout<? extends Serializable> layout = getLayout();
+    String data;
+    if (layout == null)
+      data = pEvent.toString();
+    else {
+      byte[] byteArray = layout.toByteArray(pEvent);
+      data = new String(byteArray, sUTF8);
+    }
+    activeSpan.log(pEvent.getTimeMillis() * 1000, data);
+  }
 }

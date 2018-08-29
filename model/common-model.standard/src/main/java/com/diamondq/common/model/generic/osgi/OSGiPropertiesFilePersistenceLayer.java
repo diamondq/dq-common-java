@@ -9,15 +9,15 @@ import java.io.File;
 
 public class OSGiPropertiesFilePersistenceLayer extends AbstractOSGiConstructor {
 
-	public OSGiPropertiesFilePersistenceLayer() {
-		super(ConstructorInfoBuilder.builder() //
-			.constructorClass(PropertiesFilePersistenceLayer.class) //
-			.register(PersistenceLayer.class) //
-			.cArg().type(File.class).prop(".structureDir").optional().build() //
-			.cArg().type(Integer.TYPE).prop(".cacheStructuresSeconds").value(300).build() //
-			.cArg().type(File.class).prop(".structureDefDir").optional().build() //
-			.cArg().type(File.class).prop(".editorStructureDefDir").optional().build() //
-		);
-	}
+  public OSGiPropertiesFilePersistenceLayer() {
+    super(ConstructorInfoBuilder.builder() //
+      .constructorClass(PropertiesFilePersistenceLayer.class) //
+      .register(PersistenceLayer.class) //
+      .cArg().type(File.class).prop(".structureDir").optional().build() //
+      .cArg().type(Integer.TYPE).prop(".cacheStructuresSeconds").value(300).build() //
+      .cArg().type(File.class).prop(".structureDefDir").optional().build() //
+      .cArg().type(File.class).prop(".editorStructureDefDir").optional().build() //
+    );
+  }
 
 }

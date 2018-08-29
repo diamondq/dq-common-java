@@ -1,48 +1,44 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.parent</artifactId>
-        <version>0.2.0.1</version>
-        <relativePath>../common-thirdparty.parent</relativePath>
-    </parent>
-    <artifactId>common-thirdparty.checker.qual</artifactId>
-    <packaging>bundle</packaging>
-    <version>2.5.1</version>
-    <name>DiamondQ Common: Third Party: Checker Qual</name>
-	<dependencies>
-		<dependency>
-			<groupId>org.checkerframework</groupId>
-			<artifactId>checker-qual</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Vendor>DiamondQ</Bundle-Vendor>
-						<Embed-Dependency>*</Embed-Dependency>
-						<Export-Package>
-							 org.checkerframework.*
-						</Export-Package>
-						<_nouses>true</_nouses>
-						<_removeheaders>
-							 Embed-Dependency,
-							 Embedded-Artifacts,
-							 Private-Package,
-							 Include-Resource
-						</_removeheaders>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.diamondq.common</groupId>
+    <artifactId>common-thirdparty.parent</artifactId>
+    <version>0.2.0.1</version>
+    <relativePath>../common-thirdparty.parent</relativePath>
+  </parent>
+  <artifactId>common-thirdparty.checker.qual</artifactId>
+  <packaging>bundle</packaging>
+  <version>2.5.1</version>
+  <name>DiamondQ Common: Third Party: Checker Qual</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.checkerframework</groupId>
+      <artifactId>checker-qual</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Vendor>DiamondQ</Bundle-Vendor>
+            <Embed-Dependency>*</Embed-Dependency>
+            <Export-Package> org.checkerframework.* 
+            </Export-Package>
+            <_nouses>true</_nouses>
+            <_removeheaders> Embed-Dependency, Embedded-Artifacts,
+              Private-Package, Include-Resource 
+            </_removeheaders>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

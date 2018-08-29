@@ -28,104 +28,103 @@ import org.slf4j.LoggerFactory;
 
 public class Test1 {
 
-	private static final Logger	sLogger	= LoggerFactory.getLogger(Test1.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(Test1.class);
 
-	@Rule
-	public final OsgiContext	context	= new OsgiContext();
+  @Rule
+  public final OsgiContext    context = new OsgiContext();
 
-	/**
-	 * If we've required a filter, but no filter is passed, then we should fail.
-	 */
-	@Test
-	public void failNoFilters() {
-		sLogger.debug("********** failNoFilters");
-		BundleContext bundleContext = MockOsgi.newBundleContext();
-		TestConstructor service = new TestConstructor();
-		MockOsgi.injectServices(service, bundleContext);
-		try {
-			MockOsgi.activate(service, bundleContext);
-		}
-		catch (RuntimeException ex) {
-			Throwable cause = ex.getCause();
-			if (cause instanceof ExtendedIllegalArgumentException) {
-				ExtendedIllegalArgumentException actualEx = (ExtendedIllegalArgumentException) cause;
-				Assert.assertEquals(Messages.NO_PROP_MATCHING_FILTER, actualEx.getCode());
-				return;
-			}
-			throw ex;
-		}
-		Assert.fail();
-	}
+  /**
+   * If we've required a filter, but no filter is passed, then we should fail.
+   */
+  @Test
+  public void failNoFilters() {
+    sLogger.debug("********** failNoFilters");
+    BundleContext bundleContext = MockOsgi.newBundleContext();
+    TestConstructor service = new TestConstructor();
+    MockOsgi.injectServices(service, bundleContext);
+    try {
+      MockOsgi.activate(service, bundleContext);
+    }
+    catch (RuntimeException ex) {
+      Throwable cause = ex.getCause();
+      if (cause instanceof ExtendedIllegalArgumentException) {
+        ExtendedIllegalArgumentException actualEx = (ExtendedIllegalArgumentException) cause;
+        Assert.assertEquals(Messages.NO_PROP_MATCHING_FILTER, actualEx.getCode());
+        return;
+      }
+      throw ex;
+    }
+    Assert.fail();
+  }
 
-	@Test
-	public void basicInjection() throws IOException, InvalidSyntaxException {
-		sLogger.debug("********** basicInjection");
-		ConfigurationAdmin configAdmin = context.getService(ConfigurationAdmin.class);
-		Assert.assertNotNull(configAdmin);
-		Configuration config = configAdmin.getConfiguration("com.diamondq.common.injection.test.testconstructor");
-		Dictionary<String, Object> props = new Hashtable<String, Object>();
-		props.put(".dep_filter", "");
-		config.update(props);
-		TestConstructor service = new TestConstructor();
-		MockOsgi.injectServices(service, context.bundleContext());
-		MockOsgi.activate(service, context.bundleContext());
+  @Test
+  public void basicInjection() throws IOException, InvalidSyntaxException {
+    sLogger.debug("********** basicInjection");
+    ConfigurationAdmin configAdmin = context.getService(ConfigurationAdmin.class);
+    Assert.assertNotNull(configAdmin);
+    Configuration config = configAdmin.getConfiguration("com.diamondq.common.injection.test.testconstructor");
+    Dictionary<String, Object> props = new Hashtable<>();
+    props.put(".dep_filter", "");
+    config.update(props);
+    TestConstructor service = new TestConstructor();
+    MockOsgi.injectServices(service, context.bundleContext());
+    MockOsgi.activate(service, context.bundleContext());
 
-		Collection<@NonNull ServiceReference<@NonNull TestClassWithObjConstructor>> refs =
-			context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
-		Assert.assertEquals(0, refs.size());
+    Collection<@NonNull ServiceReference<@NonNull TestClassWithObjConstructor>> refs =
+      context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
+    Assert.assertEquals(0, refs.size());
 
-		/* Now register the dependency */
+    /* Now register the dependency */
 
-		TestDep dep = new TestDep("test");
-		context.bundleContext().registerService(TestDep.class, dep, new Hashtable<>());
+    TestDep dep = new TestDep("test");
+    context.bundleContext().registerService(TestDep.class, dep, new Hashtable<>());
 
-		/* Check that the real service has now registered */
+    /* Check that the real service has now registered */
 
-		refs = context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
-		Assert.assertEquals(1, refs.size());
+    refs = context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
+    Assert.assertEquals(1, refs.size());
 
-	}
+  }
 
-	/**
-	 * Register the dependency and then remove it, making sure that the final object comes and then goes.
-	 * 
-	 * @throws IOException
-	 * @throws InvalidSyntaxException
-	 */
-	@Test
-	public void basicInAndOut() throws IOException, InvalidSyntaxException {
-		sLogger.debug("********** basicInAndOut");
-		ConfigurationAdmin configAdmin = context.getService(ConfigurationAdmin.class);
-		Assert.assertNotNull(configAdmin);
-		Configuration config = configAdmin.getConfiguration("com.diamondq.common.injection.test.testconstructor");
-		Dictionary<String, Object> props = new Hashtable<String, Object>();
-		props.put(".dep_filter", "");
-		config.update(props);
-		TestConstructor service = new TestConstructor();
-		MockOsgi.injectServices(service, context.bundleContext());
-		MockOsgi.activate(service, context.bundleContext());
+  /**
+   * Register the dependency and then remove it, making sure that the final object comes and then goes.
+   * 
+   * @throws IOException
+   * @throws InvalidSyntaxException
+   */
+  @Test
+  public void basicInAndOut() throws IOException, InvalidSyntaxException {
+    sLogger.debug("********** basicInAndOut");
+    ConfigurationAdmin configAdmin = context.getService(ConfigurationAdmin.class);
+    Assert.assertNotNull(configAdmin);
+    Configuration config = configAdmin.getConfiguration("com.diamondq.common.injection.test.testconstructor");
+    Dictionary<String, Object> props = new Hashtable<>();
+    props.put(".dep_filter", "");
+    config.update(props);
+    TestConstructor service = new TestConstructor();
+    MockOsgi.injectServices(service, context.bundleContext());
+    MockOsgi.activate(service, context.bundleContext());
 
-		Collection<@NonNull ServiceReference<@NonNull TestClassWithObjConstructor>> refs =
-			context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
-		Assert.assertEquals(0, refs.size());
+    Collection<@NonNull ServiceReference<@NonNull TestClassWithObjConstructor>> refs =
+      context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
+    Assert.assertEquals(0, refs.size());
 
-		/* Now register the dependency */
+    /* Now register the dependency */
 
-		TestDep dep = new TestDep("test");
-		ServiceRegistration<TestDep> reg =
-			context.bundleContext().registerService(TestDep.class, dep, new Hashtable<>());
+    TestDep dep = new TestDep("test");
+    ServiceRegistration<TestDep> reg = context.bundleContext().registerService(TestDep.class, dep, new Hashtable<>());
 
-		/* Check that the real service has now registered */
+    /* Check that the real service has now registered */
 
-		refs = context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
-		Assert.assertEquals(1, refs.size());
+    refs = context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
+    Assert.assertEquals(1, refs.size());
 
-		/* Now unregister */
+    /* Now unregister */
 
-		reg.unregister();
+    reg.unregister();
 
-		refs = context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
-		Assert.assertEquals(0, refs.size());
+    refs = context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
+    Assert.assertEquals(0, refs.size());
 
-	}
+  }
 }

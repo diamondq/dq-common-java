@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate" configuration-policy="require" deactivate="onDeactivate" immediate="true" modified="onModified" name="com.diamondq.common.model.resourcebundlepersistencelayer">
-   <implementation class="com.diamondq.common.model.generic.osgi.OSGiResourceBundlePersistenceLayer"/>
-   <service>
-      <provide interface="com.diamondq.common.model.generic.osgi.OSGiResourceBundlePersistenceLayer"/>
-   </service>
-	
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate"
+  configuration-policy="require" deactivate="onDeactivate"
+  immediate="true" modified="onModified"
+  name="com.diamondq.common.model.resourcebundlepersistencelayer">
+  <implementation
+    class="com.diamondq.common.model.generic.osgi.OSGiResourceBundlePersistenceLayer" />
+  <service>
+    <provide
+      interface="com.diamondq.common.model.generic.osgi.OSGiResourceBundlePersistenceLayer" />
+  </service>
 </scr:component>

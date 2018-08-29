@@ -1,5 +1,7 @@
 package com.diamondq.common.security.openaz;
 
+import com.diamondq.common.config.Config;
+
 import java.util.Properties;
 
 import javax.enterprise.inject.Produces;
@@ -9,16 +11,14 @@ import org.apache.openaz.pepapi.PepAgent;
 import org.apache.openaz.pepapi.PepAgentFactory;
 import org.apache.openaz.pepapi.std.StdPepAgentFactory;
 
-import com.diamondq.common.config.Config;
-
 public class CDIFactory {
 
-	@Produces
-	@Singleton
-	public PepAgent getPepAgent(Config pConfig) {
-		Properties props = pConfig.bind("openaz", Properties.class);
-		PepAgentFactory agentFactory = new StdPepAgentFactory(props);
-		return agentFactory.getPepAgent();
-	}
+  @Produces
+  @Singleton
+  public PepAgent getPepAgent(Config pConfig) {
+    Properties props = pConfig.bind("openaz", Properties.class);
+    PepAgentFactory agentFactory = new StdPepAgentFactory(props);
+    return agentFactory.getPepAgent();
+  }
 
 }

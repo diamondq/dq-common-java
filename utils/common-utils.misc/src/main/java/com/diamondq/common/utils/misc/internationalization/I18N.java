@@ -11,23 +11,23 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class I18N {
 
-	/**
-	 * Formats a given string (provided by resource key) with arguments into a locale specific value.
-	 * 
-	 * @param pLocale the locale
-	 * @param pFormatKey the key
-	 * @param pArgs the arguments
-	 * @return the formated string
-	 */
-	public static String getFormat(Locale pLocale, MessagesEnum pFormatKey, @Nullable Object @Nullable... pArgs) {
+  /**
+   * Formats a given string (provided by resource key) with arguments into a locale specific value.
+   * 
+   * @param pLocale the locale
+   * @param pFormatKey the key
+   * @param pArgs the arguments
+   * @return the formated string
+   */
+  public static String getFormat(Locale pLocale, MessagesEnum pFormatKey, @Nullable Object @Nullable... pArgs) {
 
-		ResourceBundle bundle = pFormatKey.getBundle(pLocale);
-		String format = bundle.getString(pFormatKey.getCode());
-		return MessageFormat.format(format, pArgs);
+    ResourceBundle bundle = pFormatKey.getBundle(pLocale);
+    String format = bundle.getString(pFormatKey.getCode());
+    return MessageFormat.format(format, pArgs);
 
-	}
+  }
 
-	public static Locale getDefaultLocale() {
-		return Locale.getDefault();
-	}
+  public static Locale getDefaultLocale() {
+    return Locale.getDefault();
+  }
 }

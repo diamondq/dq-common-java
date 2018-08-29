@@ -9,47 +9,46 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AbstractConstructorJAXRSApplicationInfo implements JAXRSApplicationInfo {
-	private static final Logger			sLogger	=
-		LoggerFactory.getLogger(AbstractConstructorJAXRSApplicationInfo.class);
+  private static final Logger       sLogger = LoggerFactory.getLogger(AbstractConstructorJAXRSApplicationInfo.class);
 
-	private final Set<Class<?>>			mClasses;
+  private final Set<Class<?>>       mClasses;
 
-	private final Set<Object>			mSingletons;
+  private final Set<Object>         mSingletons;
 
-	private final Map<String, Object>	mProperties;
+  private final Map<String, Object> mProperties;
 
-	public AbstractConstructorJAXRSApplicationInfo(@Nullable Set<Class<?>> pClasses, @Nullable Set<Object> pSingletons,
-		@Nullable Map<String, Object> pProperties) {
-		mClasses = (pClasses != null ? pClasses : Collections.emptySet());
-		mSingletons = (pSingletons != null ? pSingletons : Collections.emptySet());
-		mProperties = (pProperties != null ? pProperties : Collections.emptyMap());
-	}
+  public AbstractConstructorJAXRSApplicationInfo(@Nullable Set<Class<?>> pClasses, @Nullable Set<Object> pSingletons,
+    @Nullable Map<String, Object> pProperties) {
+    mClasses = (pClasses != null ? pClasses : Collections.emptySet());
+    mSingletons = (pSingletons != null ? pSingletons : Collections.emptySet());
+    mProperties = (pProperties != null ? pProperties : Collections.emptyMap());
+  }
 
-	/**
-	 * @see com.diamondq.common.jaxrs.model.JAXRSApplicationInfo#getClasses()
-	 */
-	@Override
-	public Set<Class<?>> getClasses() {
-		sLogger.trace("getClasses() from {}", this);
-		return mClasses;
-	}
+  /**
+   * @see com.diamondq.common.jaxrs.model.JAXRSApplicationInfo#getClasses()
+   */
+  @Override
+  public Set<Class<?>> getClasses() {
+    sLogger.trace("getClasses() from {}", this);
+    return mClasses;
+  }
 
-	/**
-	 * @see com.diamondq.common.jaxrs.model.JAXRSApplicationInfo#getSingletons()
-	 */
-	@Override
-	public Set<Object> getSingletons() {
-		sLogger.trace("getSingletons() from {}", this);
-		return mSingletons;
-	}
+  /**
+   * @see com.diamondq.common.jaxrs.model.JAXRSApplicationInfo#getSingletons()
+   */
+  @Override
+  public Set<Object> getSingletons() {
+    sLogger.trace("getSingletons() from {}", this);
+    return mSingletons;
+  }
 
-	/**
-	 * @see com.diamondq.common.jaxrs.model.JAXRSApplicationInfo#getProperties()
-	 */
-	@Override
-	public Map<String, Object> getProperties() {
-		sLogger.trace("getProperties() from {}", this);
-		return mProperties;
-	}
+  /**
+   * @see com.diamondq.common.jaxrs.model.JAXRSApplicationInfo#getProperties()
+   */
+  @Override
+  public Map<String, Object> getProperties() {
+    sLogger.trace("getProperties() from {}", this);
+    return mProperties;
+  }
 
 }

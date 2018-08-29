@@ -16,9 +16,9 @@ import javax.inject.Qualifier;
 @Retention(RUNTIME)
 @Target({METHOD, FIELD, PARAMETER, TYPE})
 public @interface XMPPClientRef {
-	@Nonbinding
-	String value();
+  @Nonbinding
+  String value();
 
-	@Nonbinding
-	String domainConfigKey() default "";
+  @Nonbinding
+  String domainConfigKey() default "";
 }

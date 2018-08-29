@@ -15,37 +15,37 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @ApplicationScoped
 public class KryoPool {
 
-	private final LinkedList<@NonNull Kryo> mKryoPool;
+  private final LinkedList<@NonNull Kryo> mKryoPool;
 
-	/**
-	 * Default constructor
-	 */
-	@Inject
-	public KryoPool() {
-		mKryoPool = new LinkedList<>();
-	}
+  /**
+   * Default constructor
+   */
+  @Inject
+  public KryoPool() {
+    mKryoPool = new LinkedList<>();
+  }
 
-	/**
-	 * Gets a value from the pool
-	 * 
-	 * @return the pool
-	 */
-	public Kryo getFromPool() {
-		synchronized (this) {
-			if (mKryoPool.isEmpty() == false)
-				return mKryoPool.remove();
-			return new Kryo();
-		}
-	}
+  /**
+   * Gets a value from the pool
+   * 
+   * @return the pool
+   */
+  public Kryo getFromPool() {
+    synchronized (this) {
+      if (mKryoPool.isEmpty() == false)
+        return mKryoPool.remove();
+      return new Kryo();
+    }
+  }
 
-	/**
-	 * Returns a value to the pool
-	 * 
-	 * @param pKryo the value to return
-	 */
-	public void returnToPool(Kryo pKryo) {
-		synchronized (this) {
-			mKryoPool.add(pKryo);
-		}
-	}
+  /**
+   * Returns a value to the pool
+   * 
+   * @param pKryo the value to return
+   */
+  public void returnToPool(Kryo pKryo) {
+    synchronized (this) {
+      mKryoPool.add(pKryo);
+    }
+  }
 }

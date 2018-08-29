@@ -5,17 +5,17 @@ import org.slf4j.LoggerFactory;
 
 public class TestClassWithObjConstructor {
 
-	private static final Logger	sLogger	= LoggerFactory.getLogger(TestClassWithObjConstructor.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(TestClassWithObjConstructor.class);
 
-	private final TestDep		mDep;
+  private final TestDep       mDep;
 
-	public TestClassWithObjConstructor(TestDep pDep) {
-		sLogger.debug("TestClassWithObjConstructor({}) with {}", pDep, this);
-		mDep = pDep;
-	}
+  public TestClassWithObjConstructor(TestDep pDep) {
+    sLogger.debug("TestClassWithObjConstructor({}) with {}", pDep, this);
+    mDep = pDep;
+  }
 
-	public TestDep getDep() {
-		return mDep;
-	}
+  public TestDep getDep() {
+    return mDep;
+  }
 
 }

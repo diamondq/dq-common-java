@@ -13,9 +13,9 @@ import org.immutables.value.Value.Style.ImplementationVisibility;
 @Singleton
 public abstract class AbstractApplicationInfo {
 
-	public abstract Optional<URI> getSecuredURI();
+  public abstract Optional<URI> getSecuredURI();
 
-	public abstract Optional<URI> getUnsecuredURI();
+  public abstract Optional<URI> getUnsecuredURI();
 
-	public abstract String getFQDN();
+  public abstract String getFQDN();
 }

@@ -6,6 +6,6 @@ import java.sql.SQLException;
 
 public interface IResultSetDeserializer {
 
-	public <O> O deserializeFromResultSet(ResultSet pRs, Class<O> pClass) throws SQLException;
+  public <O> O deserializeFromResultSet(ResultSet pRs, Class<O> pClass) throws SQLException;
 
 }

@@ -9,11 +9,11 @@ import rocks.xmpp.core.session.ConnectionEvent;
 
 public class LoggerConnectionListener implements Consumer<ConnectionEvent> {
 
-	private static final Logger sLogger = LoggerFactory.getLogger(LoggerConnectionListener.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(LoggerConnectionListener.class);
 
-	@Override
-	public void accept(ConnectionEvent pEvent) {
-		sLogger.info(pEvent.toString());
-	}
+  @Override
+  public void accept(ConnectionEvent pEvent) {
+    sLogger.info(pEvent.toString());
+  }
 
 }

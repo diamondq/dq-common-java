@@ -7,6 +7,6 @@ import org.immutables.value.Value.Style.ImplementationVisibility;
 @Value.Style(depluralize = true, typeAbstract = "I*", typeImmutable = "*", visibility = ImplementationVisibility.PUBLIC)
 public interface IResource extends IFunctionArgument {
 
-	public abstract String getResourceId();
+  public abstract String getResourceId();
 
 }

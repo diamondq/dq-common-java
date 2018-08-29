@@ -14,22 +14,22 @@ import io.opentracing.Tracer;
 
 public class SimpleTest {
 
-	private static final Logger	sLogger	= LoggerFactory.getLogger(SimpleTest.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(SimpleTest.class);
 
-	@Rule
-	public WeldInitiator		weld	= WeldInitiator.of(new Weld());
+  @Rule
+  public WeldInitiator        weld    = WeldInitiator.of(new Weld());
 
-	@Test
-	public void testFoo() {
-		Tracer tracer = weld.select(Tracer.class).get();
-		assertNotNull(tracer);
-		try (Scope scope = tracer.buildSpan("testFoo").startActive(true)) {
-			sLogger.info("Test logging First");
-			try (Scope childSpan = tracer.buildSpan("childFoo").asChildOf(scope.span()).startActive(true)) {
-				sLogger.info("Test logging Inner");
-			}
-			sLogger.info("Test logging Outer");
-		}
-		sLogger.info("Complete");
-	}
+  @Test
+  public void testFoo() {
+    Tracer tracer = weld.select(Tracer.class).get();
+    assertNotNull(tracer);
+    try (Scope scope = tracer.buildSpan("testFoo").startActive(true)) {
+      sLogger.info("Test logging First");
+      try (Scope childSpan = tracer.buildSpan("childFoo").asChildOf(scope.span()).startActive(true)) {
+        sLogger.info("Test logging Inner");
+      }
+      sLogger.info("Test logging Outer");
+    }
+    sLogger.info("Complete");
+  }
 }

@@ -13,22 +13,22 @@ import io.opentracing.util.GlobalTracer;
 @ApplicationScoped
 public class CleanupGlobalTracer {
 
-	@Inject
-	public CleanupGlobalTracer() {
-	}
+  @Inject
+  public CleanupGlobalTracer() {
+  }
 
-	public void cleanupGlobal(@Observes BeforeShutdown pEvent) {
-		cleanup();
-	}
+  public void cleanupGlobal(@Observes BeforeShutdown pEvent) {
+    cleanup();
+  }
 
-	public static void cleanup() {
-		try {
-			Field field = GlobalTracer.class.getDeclaredField("tracer");
-			field.setAccessible(true);
-			field.set(null, NoopTracerFactory.create());
-		}
-		catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+  public static void cleanup() {
+    try {
+      Field field = GlobalTracer.class.getDeclaredField("tracer");
+      field.setAccessible(true);
+      field.set(null, NoopTracerFactory.create());
+    }
+    catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 }

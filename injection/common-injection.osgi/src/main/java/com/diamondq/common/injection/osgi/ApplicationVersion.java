@@ -6,18 +6,18 @@ import java.util.Map;
 
 public class ApplicationVersion {
 
-	private String mVersion;
+  private String mVersion;
 
-	@SuppressWarnings("null")
-	public ApplicationVersion() {
-	}
+  @SuppressWarnings("null")
+  public ApplicationVersion() {
+  }
 
-	public void onActivate(Map<String, Object> pProps) {
+  public void onActivate(Map<String, Object> pProps) {
 
-		mVersion = PropertiesParsing.getNonNullString(pProps, ".application-version", "0.1.0-FALLBACK");
-	}
+    mVersion = PropertiesParsing.getNonNullString(pProps, ".application-version", "0.1.0-FALLBACK");
+  }
 
-	public String getVersion() {
-		return mVersion;
-	}
+  public String getVersion() {
+    return mVersion;
+  }
 }

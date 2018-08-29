@@ -10,14 +10,14 @@ import javax.sql.DataSource;
 
 public class OSGiJDBCKVStoreBuilder extends AbstractOSGiConstructor {
 
-	public OSGiJDBCKVStoreBuilder() {
-		// public JDBCKVStore(DataSource pDatabase, IJDBCDialect pDialect, @Nullable String pTableSchema) {
-		super(ConstructorInfoBuilder.builder() //
-			.register(IKVStore.class) //
-			.constructorClass(JDBCKVStore.class) //
-			.cArg().type(DataSource.class).propFilter(".datasource_filter").required().build() //
-			.cArg().type(IJDBCDialect.class).propFilter(".dialect_filter").required().build() //
-			.cArg().type(String.class).prop(".tableSchema").optional().build());
-	}
+  public OSGiJDBCKVStoreBuilder() {
+    // public JDBCKVStore(DataSource pDatabase, IJDBCDialect pDialect, @Nullable String pTableSchema) {
+    super(ConstructorInfoBuilder.builder() //
+      .register(IKVStore.class) //
+      .constructorClass(JDBCKVStore.class) //
+      .cArg().type(DataSource.class).propFilter(".datasource_filter").required().build() //
+      .cArg().type(IJDBCDialect.class).propFilter(".dialect_filter").required().build() //
+      .cArg().type(String.class).prop(".tableSchema").optional().build());
+  }
 
 }

@@ -7,18 +7,18 @@ import org.immutables.value.Value;
 import org.immutables.value.Value.Style.ImplementationVisibility;
 
 @Value.Immutable
-@Value.Style(depluralize = true, typeAbstract = "I*", get = {"get*",
-		"is*"}, typeImmutable = "*", visibility = ImplementationVisibility.PUBLIC)
+@Value.Style(depluralize = true, typeAbstract = "I*", get = {"get*", "is*"}, typeImmutable = "*",
+  visibility = ImplementationVisibility.PUBLIC)
 public interface ILiteralBag extends ILiteral {
 
-	public Collection<String> getValue();
+  public Collection<String> getValue();
 
-	@Value.Derived
-	@Override
-	default @Nullable String getSingleValue() {
-		Collection<String> value = getValue();
-		if (value.isEmpty() == true)
-			return null;
-		return value.iterator().next();
-	}
+  @Value.Derived
+  @Override
+  default @Nullable String getSingleValue() {
+    Collection<String> value = getValue();
+    if (value.isEmpty() == true)
+      return null;
+    return value.iterator().next();
+  }
 }

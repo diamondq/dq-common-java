@@ -9,18 +9,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public interface IKVTableDefinition {
 
-	/**
-	 * Returns the name of the table
-	 * 
-	 * @return the name
-	 */
-	public String getTableName();
+  /**
+   * Returns the name of the table
+   * 
+   * @return the name
+   */
+  public String getTableName();
 
-	/**
-	 * Returns the list of columns
-	 * 
-	 * @return the list of columns
-	 */
-	public List<@NonNull IKVColumnDefinition> getColumnDefinitions();
+  /**
+   * Returns the list of columns
+   * 
+   * @return the list of columns
+   */
+  public List<@NonNull IKVColumnDefinition> getColumnDefinitions();
 
 }

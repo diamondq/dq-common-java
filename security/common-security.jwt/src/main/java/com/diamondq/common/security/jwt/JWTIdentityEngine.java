@@ -25,97 +25,97 @@ import org.jose4j.lang.JoseException;
 @ApplicationScoped
 public class JWTIdentityEngine implements IdentityEngine {
 
-	private final String		mJWTHeader;
+  private final String      mJWTHeader;
 
-	private final Boolean		mBearerPrefix;
+  private final Boolean     mBearerPrefix;
 
-	private final JwtConsumer	mJwtConsumer;
+  private final JwtConsumer mJwtConsumer;
 
-	@Inject
-	public JWTIdentityEngine(Config pConfig) {
-		String jwtHeader = pConfig.bind("identity.jwt.header", String.class);
-		if (jwtHeader == null)
-			throw new IllegalArgumentException();
-		mJWTHeader = jwtHeader;
-		Boolean bearerPrefix = pConfig.bind("identity.jwt.bearer-prefix", Boolean.class);
-		if (bearerPrefix == null)
-			throw new IllegalArgumentException();
-		mBearerPrefix = bearerPrefix;
+  @Inject
+  public JWTIdentityEngine(Config pConfig) {
+    String jwtHeader = pConfig.bind("identity.jwt.header", String.class);
+    if (jwtHeader == null)
+      throw new IllegalArgumentException();
+    mJWTHeader = jwtHeader;
+    Boolean bearerPrefix = pConfig.bind("identity.jwt.bearer-prefix", Boolean.class);
+    if (bearerPrefix == null)
+      throw new IllegalArgumentException();
+    mBearerPrefix = bearerPrefix;
 
-		JWTConfigProperties jwtConfigProperties = pConfig.bind("roadassistant.jwt", JWTConfigProperties.class);
-		if (jwtConfigProperties == null)
-			throw new IllegalArgumentException();
+    JWTConfigProperties jwtConfigProperties = pConfig.bind("roadassistant.jwt", JWTConfigProperties.class);
+    if (jwtConfigProperties == null)
+      throw new IllegalArgumentException();
 
-		RsaJsonWebKey key;
-		try {
-			key = new RsaJsonWebKey(JsonKeyUtils.toMap(jwtConfigProperties.getPublicKey()));
-		}
-		catch (JoseException ex) {
-			throw new RuntimeException(ex);
-		}
+    RsaJsonWebKey key;
+    try {
+      key = new RsaJsonWebKey(JsonKeyUtils.toMap(jwtConfigProperties.getPublicKey()));
+    }
+    catch (JoseException ex) {
+      throw new RuntimeException(ex);
+    }
 
-		String registryServerFQDN = pConfig.bind("application.fqdn", String.class);
-		mJwtConsumer = new JwtConsumerBuilder()
-			/* the JWT must have an expiration time */
-			.setRequireExpirationTime()
-			/* but the expiration time can't be too crazy */
-			.setMaxFutureValidityInMinutes(jwtConfigProperties.getMaximumExpiry())
-			/* allow some leeway in validating time based claims to account for clock skew */
-			.setAllowedClockSkewInSeconds(30)
-			/* the JWT must have a subject claim */
-			.setRequireSubject()
-			/* whom the JWT needs to have been issued by */
-			.setExpectedAudience(registryServerFQDN).setExpectedIssuer(jwtConfigProperties.getIssuerFQDN())
-			/* verify the signature with the public key */
-			.setVerificationKey(key.getKey())
-			/* Finished */
-			.build();
-	}
+    String registryServerFQDN = pConfig.bind("application.fqdn", String.class);
+    mJwtConsumer = new JwtConsumerBuilder()
+      /* the JWT must have an expiration time */
+      .setRequireExpirationTime()
+      /* but the expiration time can't be too crazy */
+      .setMaxFutureValidityInMinutes(jwtConfigProperties.getMaximumExpiry())
+      /* allow some leeway in validating time based claims to account for clock skew */
+      .setAllowedClockSkewInSeconds(30)
+      /* the JWT must have a subject claim */
+      .setRequireSubject()
+      /* whom the JWT needs to have been issued by */
+      .setExpectedAudience(registryServerFQDN).setExpectedIssuer(jwtConfigProperties.getIssuerFQDN())
+      /* verify the signature with the public key */
+      .setVerificationKey(key.getKey())
+      /* Finished */
+      .build();
+  }
 
-	/**
-	 * @see com.diamondq.common.security.acl.api.IdentityEngine#getIdentity(javax.servlet.http.HttpServletRequest)
-	 */
-	@Override
-	public @Nullable UserInfo getIdentity(HttpServletRequest pRequest) {
+  /**
+   * @see com.diamondq.common.security.acl.api.IdentityEngine#getIdentity(javax.servlet.http.HttpServletRequest)
+   */
+  @Override
+  public @Nullable UserInfo getIdentity(HttpServletRequest pRequest) {
 
-		String header = pRequest.getHeader(mJWTHeader);
-		if (header == null)
-			return null;
+    String header = pRequest.getHeader(mJWTHeader);
+    if (header == null)
+      return null;
 
-		if (Boolean.TRUE.equals(mBearerPrefix)) {
-			if (header.startsWith("Bearer ") == false)
-				return null;
+    if (Boolean.TRUE.equals(mBearerPrefix)) {
+      if (header.startsWith("Bearer ") == false)
+        return null;
 
-			header = header.substring("Bearer ".length());
-		}
+      header = header.substring("Bearer ".length());
+    }
 
-		/* Now, parse the JWT */
+    /* Now, parse the JWT */
 
-		/* Validate the JWT and process it to the Claims */
+    /* Validate the JWT and process it to the Claims */
 
-		JwtClaims jwtClaims;
-		try {
-			jwtClaims = mJwtConsumer.processToClaims(header);
+    JwtClaims jwtClaims;
+    try {
+      jwtClaims = mJwtConsumer.processToClaims(header);
 
-			String subjectId = jwtClaims.getSubject();
-			String nameClaim = jwtClaims.getClaimValue("name", String.class);
-			String emailClaim = jwtClaims.getClaimValue("email", String.class);
+      String subjectId = jwtClaims.getSubject();
+      String nameClaim = jwtClaims.getClaimValue("name", String.class);
+      String emailClaim = jwtClaims.getClaimValue("email", String.class);
 
-			if (nameClaim == null)
-				throw new IllegalArgumentException("The mandatory name claim was not found in the JWT");
-			if (emailClaim == null)
-				throw new IllegalArgumentException("The mandatory email claim was not found in the JWT");
-			if (subjectId == null)
-				throw new IllegalArgumentException("The mandatory subjectId claim was not found in the JWT");
-			
-			Set<String> roles = new HashSet<>();
-			List<String> list = jwtClaims.getStringListClaimValue("roles");
-			roles.addAll(list);
-			return new UserInfoImpl(emailClaim, nameClaim, subjectId, roles);
-		}
-		catch (InvalidJwtException | MalformedClaimException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+      if (nameClaim == null)
+        throw new IllegalArgumentException("The mandatory name claim was not found in the JWT");
+      if (emailClaim == null)
+        throw new IllegalArgumentException("The mandatory email claim was not found in the JWT");
+      if (subjectId == null)
+        throw new IllegalArgumentException("The mandatory subjectId claim was not found in the JWT");
+
+      Set<String> roles = new HashSet<>();
+      List<String> list = jwtClaims.getStringListClaimValue("roles");
+      roles.addAll(list);
+      return new UserInfoImpl(emailClaim, nameClaim, subjectId, roles);
+    }
+    catch (InvalidJwtException | MalformedClaimException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 
 }

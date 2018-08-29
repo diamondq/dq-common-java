@@ -6,8 +6,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface AuthenticationEngine {
 
-	public boolean decide(Object @Nullable... pObjects);
+  public boolean decide(Object @Nullable... pObjects);
 
-	public boolean[] bulkDecide(List<?> pAssociations, Object @Nullable... pCommonObjects);
+  public boolean[] bulkDecide(List<?> pAssociations, Object @Nullable... pCommonObjects);
 
 }

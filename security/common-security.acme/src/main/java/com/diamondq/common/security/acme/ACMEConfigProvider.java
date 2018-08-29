@@ -13,14 +13,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class ACMEConfigProvider {
 
-	@Produces
-	@Singleton
-	public ACMEConfig getConfig(Config pConfig) {
-		@Nullable
-		ACMEConfig result = pConfig.bind("acme-ssl", ACMEConfig.class);
-		if (result == null)
-			throw new IllegalArgumentException();
-		return result;
-	}
+  @Produces
+  @Singleton
+  public ACMEConfig getConfig(Config pConfig) {
+    @Nullable
+    ACMEConfig result = pConfig.bind("acme-ssl", ACMEConfig.class);
+    if (result == null)
+      throw new IllegalArgumentException();
+    return result;
+  }
 
 }

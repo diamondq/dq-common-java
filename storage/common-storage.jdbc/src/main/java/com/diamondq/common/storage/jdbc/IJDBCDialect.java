@@ -14,60 +14,60 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public interface IJDBCDialect {
 
-	/**
-	 * Returns the DDL necessary to create a new schema
-	 * 
-	 * @param pSchemaName the schema name
-	 * @return the DDL SQL
-	 */
-	public String generateCreateSchemaSQL(String pSchemaName);
+  /**
+   * Returns the DDL necessary to create a new schema
+   * 
+   * @param pSchemaName the schema name
+   * @return the DDL SQL
+   */
+  public String generateCreateSchemaSQL(String pSchemaName);
 
-	/**
-	 * Returns the data type, used for CREATE TABLE actions to create a column on unlimited text size (such as a CLOB).
-	 * 
-	 * @return the type
-	 */
-	public String getUnlimitedTextType();
+  /**
+   * Returns the data type, used for CREATE TABLE actions to create a column on unlimited text size (such as a CLOB).
+   * 
+   * @return the type
+   */
+  public String getUnlimitedTextType();
 
-	public @Nullable String readUnlimitedTextType(ResultSet pRs, int pIndex) throws SQLException;
+  public @Nullable String readUnlimitedTextType(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeUnlimitedText(PreparedStatement pPs, int pIndex, @Nullable String pValue) throws SQLException;
+  public void writeUnlimitedText(PreparedStatement pPs, int pIndex, @Nullable String pValue) throws SQLException;
 
-	public String getBooleanType();
+  public String getBooleanType();
 
-	public @Nullable Boolean readBoolean(ResultSet pResultSet, int pIndex) throws SQLException;
+  public @Nullable Boolean readBoolean(ResultSet pResultSet, int pIndex) throws SQLException;
 
-	public void writeBoolean(PreparedStatement pPs, int pIndex, @Nullable Boolean pValue) throws SQLException;
+  public void writeBoolean(PreparedStatement pPs, int pIndex, @Nullable Boolean pValue) throws SQLException;
 
-	public String getLongType();
+  public String getLongType();
 
-	public @Nullable Long readLong(ResultSet pRs, int pIndex) throws SQLException;
+  public @Nullable Long readLong(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeLong(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException;
+  public void writeLong(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException;
 
-	public String getUnlimitedDecimalType();
+  public String getUnlimitedDecimalType();
 
-	public @Nullable BigDecimal readDecimal(ResultSet pRs, int pIndex) throws SQLException;
+  public @Nullable BigDecimal readDecimal(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeDecimal(PreparedStatement pPs, int pIndex, @Nullable BigDecimal pValue) throws SQLException;
+  public void writeDecimal(PreparedStatement pPs, int pIndex, @Nullable BigDecimal pValue) throws SQLException;
 
-	public String getIntegerType();
+  public String getIntegerType();
 
-	public @Nullable Integer readInteger(ResultSet pRs, int pIndex) throws SQLException;
+  public @Nullable Integer readInteger(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeInteger(PreparedStatement pPs, int pIndex, @Nullable Integer pValue) throws SQLException;
+  public void writeInteger(PreparedStatement pPs, int pIndex, @Nullable Integer pValue) throws SQLException;
 
-	public String getTextType(int pMaxLength);
+  public String getTextType(int pMaxLength);
 
-	public @Nullable String readText(ResultSet pRs, int pIndex) throws SQLException;
+  public @Nullable String readText(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeText(PreparedStatement pPs, int pIndex, @Nullable String pValue) throws SQLException;
+  public void writeText(PreparedStatement pPs, int pIndex, @Nullable String pValue) throws SQLException;
 
-	public String getTimestampType();
+  public String getTimestampType();
 
-	public @Nullable Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException;
+  public @Nullable Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException;
 
-	public void writeTimestamp(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException;
+  public void writeTimestamp(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException;
 
-	public Set<@NonNull String> getReservedWords();
+  public Set<@NonNull String> getReservedWords();
 }

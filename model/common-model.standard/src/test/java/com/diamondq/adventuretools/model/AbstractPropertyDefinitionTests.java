@@ -11,80 +11,76 @@ import org.junit.Test;
 
 public abstract class AbstractPropertyDefinitionTests implements StandardTest {
 
-	protected @Nullable Toolkit	mToolkit;
+  protected @Nullable Toolkit mToolkit;
 
-	protected @Nullable Scope	mScope;
+  protected @Nullable Scope   mScope;
 
-	@Override
-	public void setup(Toolkit pToolkit, Scope pScope) {
-		mToolkit = pToolkit;
-		mScope = pScope;
-	}
+  @Override
+  public void setup(Toolkit pToolkit, Scope pScope) {
+    mToolkit = pToolkit;
+    mScope = pScope;
+  }
 
-	protected StructureDefinition checkAndCreate(String pStructureName) {
+  protected StructureDefinition checkAndCreate(String pStructureName) {
 
-		Toolkit toolkit = mToolkit;
-		Scope scope = mScope;
-		Assert.assertNotNull(toolkit);
-		Assert.assertNotNull(scope);
+    Toolkit toolkit = mToolkit;
+    Scope scope = mScope;
+    Assert.assertNotNull(toolkit);
+    Assert.assertNotNull(scope);
 
-		/* Make sure it doesn't already exist */
+    /* Make sure it doesn't already exist */
 
-		StructureDefinition def = toolkit.lookupStructureDefinitionByName(scope, pStructureName);
-		Assert.assertNull(def);
+    StructureDefinition def = toolkit.lookupStructureDefinitionByName(scope, pStructureName);
+    Assert.assertNull(def);
 
-		/* Create a new object */
+    /* Create a new object */
 
-		StructureDefinition newDef = toolkit.createNewStructureDefinition(scope, pStructureName);
-		Assert.assertNotNull(newDef);
+    StructureDefinition newDef = toolkit.createNewStructureDefinition(scope, pStructureName);
+    Assert.assertNotNull(newDef);
 
-		return newDef;
-	}
+    return newDef;
+  }
 
-	@Test
-	public void testValidName() {
+  @Test
+  public void testValidName() {
 
-		String name = "apdt-vn";
+    String name = "apdt-vn";
 
-		Toolkit toolkit = mToolkit;
-		Scope scope = mScope;
-		Assert.assertNotNull(toolkit);
-		Assert.assertNotNull(scope);
+    Toolkit toolkit = mToolkit;
+    Scope scope = mScope;
+    Assert.assertNotNull(toolkit);
+    Assert.assertNotNull(scope);
 
-		/* Define a basic structure definition */
+    /* Define a basic structure definition */
 
-		StructureDefinition def = checkAndCreate(name);
-		Assert.assertNotNull(def);
+    StructureDefinition def = checkAndCreate(name);
+    Assert.assertNotNull(def);
 
-		def =
-			def.addPropertyDefinition(
-				toolkit
-					.createNewPropertyDefinition(scope,
-						"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-", PropertyType.String)
-					.setPrimaryKey(true));
+    def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope,
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-", PropertyType.String).setPrimaryKey(true));
 
-		toolkit.writeStructureDefinition(scope, def);
-	}
+    toolkit.writeStructureDefinition(scope, def);
+  }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testInvalidValidName() {
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidValidName() {
 
-		String name = "apdt-ivn";
+    String name = "apdt-ivn";
 
-		Toolkit toolkit = mToolkit;
-		Scope scope = mScope;
-		Assert.assertNotNull(toolkit);
-		Assert.assertNotNull(scope);
+    Toolkit toolkit = mToolkit;
+    Scope scope = mScope;
+    Assert.assertNotNull(toolkit);
+    Assert.assertNotNull(scope);
 
-		/* Define a basic structure definition */
+    /* Define a basic structure definition */
 
-		StructureDefinition def = checkAndCreate(name);
-		Assert.assertNotNull(def);
+    StructureDefinition def = checkAndCreate(name);
+    Assert.assertNotNull(def);
 
-		def = def.addPropertyDefinition(
-			toolkit.createNewPropertyDefinition(scope, "abc/def", PropertyType.String).setPrimaryKey(true));
+    def = def.addPropertyDefinition(
+      toolkit.createNewPropertyDefinition(scope, "abc/def", PropertyType.String).setPrimaryKey(true));
 
-		toolkit.writeStructureDefinition(scope, def);
-	}
+    toolkit.writeStructureDefinition(scope, def);
+  }
 
 }

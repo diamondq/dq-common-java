@@ -9,21 +9,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericPropertyDefinitionRef extends AbstractRef<PropertyDefinition> implements PropertyDefinitionRef {
 
-	public GenericPropertyDefinitionRef(Scope pScope, String pName) {
-		super(pScope, pName, PropertyDefinition.class);
-	}
+  public GenericPropertyDefinitionRef(Scope pScope, String pName) {
+    super(pScope, pName, PropertyDefinition.class);
+  }
 
-	/**
-	 * @see com.diamondq.common.model.interfaces.Ref#resolve()
-	 */
-	@Override
-	public @Nullable PropertyDefinition resolve() {
-		int offset = mId.indexOf('#');
-		StructureDefinition sd;
-		sd = mScope.getToolkit().lookupStructureDefinitionByName(mScope, mId.substring(0, offset));
-		if (sd == null)
-			return null;
-		return sd.lookupPropertyDefinitionByName(mId.substring(offset + 1));
-	}
+  /**
+   * @see com.diamondq.common.model.interfaces.Ref#resolve()
+   */
+  @Override
+  public @Nullable PropertyDefinition resolve() {
+    int offset = mId.indexOf('#');
+    StructureDefinition sd;
+    sd = mScope.getToolkit().lookupStructureDefinitionByName(mScope, mId.substring(0, offset));
+    if (sd == null)
+      return null;
+    return sd.lookupPropertyDefinitionByName(mId.substring(offset + 1));
+  }
 
 }

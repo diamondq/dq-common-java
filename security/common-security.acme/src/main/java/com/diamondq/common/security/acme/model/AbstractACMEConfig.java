@@ -14,17 +14,17 @@ import org.immutables.value.Value.Style.ImplementationVisibility;
 @JsonDeserialize(as = ACMEConfig.class)
 public abstract class AbstractACMEConfig {
 
-	public abstract int getUserKeySize();
+  public abstract int getUserKeySize();
 
-	public abstract String getConnectUrl();
+  public abstract String getConnectUrl();
 
-	public abstract String getDomain();
+  public abstract String getDomain();
 
-	public abstract Optional<String> getUserKeyPair();
+  public abstract Optional<String> getUserKeyPair();
 
-	public abstract String getKeyStoreFile();
+  public abstract String getKeyStoreFile();
 
-	public abstract String getKeyStoreAlias();
+  public abstract String getKeyStoreAlias();
 
-	public abstract String getKeyStorePassword();
+  public abstract String getKeyStorePassword();
 }

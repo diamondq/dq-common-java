@@ -5,5 +5,5 @@ import com.diamondq.common.model.interfaces.Toolkit;
 
 public interface StandardTest {
 
-	public void setup(Toolkit pToolkit, Scope pScope);
+  public void setup(Toolkit pToolkit, Scope pScope);
 }

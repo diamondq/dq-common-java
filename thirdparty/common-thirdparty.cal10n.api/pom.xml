@@ -1,22 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.parent</artifactId>
-        <version>0.2.0.1</version>
-        <relativePath>../common-thirdparty.parent</relativePath>
-    </parent>
-    <artifactId>common-thirdparty.cal10n.api</artifactId>
-    <packaging>bundle</packaging>
-    <version>0.8.1</version>
-    <name>DiamondQ Common: Third Party: Cal10N API</name>
-    <dependencies>
-        <dependency>
-            <groupId>ch.qos.cal10n</groupId>
-            <artifactId>cal10n-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.diamondq.common</groupId>
+    <artifactId>common-thirdparty.parent</artifactId>
+    <version>0.2.0.1</version>
+    <relativePath>../common-thirdparty.parent</relativePath>
+  </parent>
+  <artifactId>common-thirdparty.cal10n.api</artifactId>
+  <packaging>bundle</packaging>
+  <version>0.8.1</version>
+  <name>DiamondQ Common: Third Party: Cal10N API</name>
+  <dependencies>
+    <dependency>
+      <groupId>ch.qos.cal10n</groupId>
+      <artifactId>cal10n-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

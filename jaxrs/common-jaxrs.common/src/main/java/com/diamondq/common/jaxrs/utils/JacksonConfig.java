@@ -11,15 +11,15 @@ import javax.ws.rs.ext.Provider;
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
 public class JacksonConfig implements ContextResolver<ObjectMapper> {
-	private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-	public JacksonConfig() {
-		objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new Jdk8Module());
-	}
+  public JacksonConfig() {
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new Jdk8Module());
+  }
 
-	@Override
-	public ObjectMapper getContext(Class<?> objectType) {
-		return objectMapper;
-	}
+  @Override
+  public ObjectMapper getContext(Class<?> objectType) {
+    return objectMapper;
+  }
 }

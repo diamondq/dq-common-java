@@ -23,30 +23,30 @@ import io.swagger.annotations.Api;
 @Api(tags = {"SSL"})
 public class AcmeWellKnownController {
 
-	private static final Logger	sLogger	= LoggerFactory.getLogger(AcmeWellKnownController.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(AcmeWellKnownController.class);
 
-	private DataService			mDataService;
+  private DataService         mDataService;
 
-	@Inject
-	public AcmeWellKnownController(DataService pDataService) {
-		mDataService = pDataService;
-	}
+  @Inject
+  public AcmeWellKnownController(DataService pDataService) {
+    mDataService = pDataService;
+  }
 
-	@Path("{token}")
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public String getAuthorization(@Nullable @PathParam("token") String pToken) throws IOException {
-		sLogger.info("Received acme-challenge token {}", pToken);
-		if (pToken == null)
-			throw new IllegalStateException("Invalid token " + pToken);
+  @Path("{token}")
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  public String getAuthorization(@Nullable @PathParam("token") String pToken) throws IOException {
+    sLogger.info("Received acme-challenge token {}", pToken);
+    if (pToken == null)
+      throw new IllegalStateException("Invalid token " + pToken);
 
-		ChallengeState response = mDataService.lookupChallengeState(pToken);
-		String result = (response == null ? null : response.getResponse());
-		if ((response == null) || (result == null) || (pToken.equals(response.getToken()) == false))
-			throw new IllegalStateException("Invalid token " + pToken);
-		mDataService.deleteChallengeState(response);
+    ChallengeState response = mDataService.lookupChallengeState(pToken);
+    String result = (response == null ? null : response.getResponse());
+    if ((response == null) || (result == null) || (pToken.equals(response.getToken()) == false))
+      throw new IllegalStateException("Invalid token " + pToken);
+    mDataService.deleteChallengeState(response);
 
-		return result;
-	}
+    return result;
+  }
 
 }

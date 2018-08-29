@@ -9,7 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface AuthenticationQueryExtender {
 
-	public BooleanExpression extendForAccessControl(JDOQLTypedQuery<?> pTypedQuery, BooleanExpression pExpression,
-		List<?> pAssociations, Object @Nullable... pObjects);
+  public BooleanExpression extendForAccessControl(JDOQLTypedQuery<?> pTypedQuery, BooleanExpression pExpression,
+    List<?> pAssociations, Object @Nullable... pObjects);
 
 }

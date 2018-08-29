@@ -12,40 +12,40 @@ import io.opentracing.util.GlobalTracer;
 
 public class TracerConsumer<T> extends AbstractTracerWrapper implements Consumer<T>, AbortableContinuation {
 
-	private static final Logger	sLogger	= LoggerFactory.getLogger(TracerConsumer.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(TracerConsumer.class);
 
-	private final Consumer<T>	mDelegate;
+  private final Consumer<T>   mDelegate;
 
-	public TracerConsumer(Consumer<T> pDelegate) {
-		this(GlobalTracer.get(), pDelegate);
-	}
+  public TracerConsumer(Consumer<T> pDelegate) {
+    this(GlobalTracer.get(), pDelegate);
+  }
 
-	public TracerConsumer(Tracer pTracer, Consumer<T> pDelegate) {
-		super(pTracer);
-		mDelegate = pDelegate;
-	}
+  public TracerConsumer(Tracer pTracer, Consumer<T> pDelegate) {
+    super(pTracer);
+    mDelegate = pDelegate;
+  }
 
-	@Override
-	public void accept(T pT) {
-		boolean inAccept = false;
-		try {
-			Span c = mSpan;
-			if (c == null) {
-				inAccept = true;
-				mDelegate.accept(pT);
-				return;
-			}
-			try (Scope scope = mScopeManager.activate(mSpan, false)) {
-				inAccept = true;
-				mDelegate.accept(pT);
-				inAccept = false;
-			}
-		}
-		catch (RuntimeException ex) {
-			if (inAccept == false)
-				sLogger.error("Error during span activation or shutdown", ex);
-			throw ex;
-		}
-	}
+  @Override
+  public void accept(T pT) {
+    boolean inAccept = false;
+    try {
+      Span c = mSpan;
+      if (c == null) {
+        inAccept = true;
+        mDelegate.accept(pT);
+        return;
+      }
+      try (Scope scope = mScopeManager.activate(mSpan, false)) {
+        inAccept = true;
+        mDelegate.accept(pT);
+        inAccept = false;
+      }
+    }
+    catch (RuntimeException ex) {
+      if (inAccept == false)
+        sLogger.error("Error during span activation or shutdown", ex);
+      throw ex;
+    }
+  }
 
 }

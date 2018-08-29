@@ -5,15 +5,15 @@ import org.immutables.value.Value;
 import org.immutables.value.Value.Style.ImplementationVisibility;
 
 @Value.Immutable
-@Value.Style(depluralize = true, typeAbstract = "I*", get = {"get*",
-		"is*"}, typeImmutable = "*", visibility = ImplementationVisibility.PUBLIC)
+@Value.Style(depluralize = true, typeAbstract = "I*", get = {"get*", "is*"}, typeImmutable = "*",
+  visibility = ImplementationVisibility.PUBLIC)
 public interface ILiteralSingle extends ILiteral {
 
-	public abstract @Nullable String getValue();
+  public abstract @Nullable String getValue();
 
-	@Value.Derived
-	@Override
-	default @Nullable String getSingleValue() {
-		return getValue();
-	}
+  @Value.Derived
+  @Override
+  default @Nullable String getSingleValue() {
+    return getValue();
+  }
 }

@@ -1,76 +1,76 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.parent</artifactId>
-        <version>0.2.0.1</version>
-        <relativePath>../common-thirdparty.parent</relativePath>
-    </parent>
-    <artifactId>common-thirdparty.firebase.admin</artifactId>
-    <packaging>bundle</packaging>
-    <version>6.3.0</version>
-    <description>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.diamondq.common</groupId>
+    <artifactId>common-thirdparty.parent</artifactId>
+    <version>0.2.0.1</version>
+    <relativePath>../common-thirdparty.parent</relativePath>
+  </parent>
+  <artifactId>common-thirdparty.firebase.admin</artifactId>
+  <packaging>bundle</packaging>
+  <version>6.3.0</version>
+  <description>
         This is the official Firebase Admin Java SDK. Build extraordinary native JVM apps in
         minutes with Firebase. The Firebase platform can power your app’s backend, user
         authentication, static hosting, and more.
     </description>
-    <name>DiamondQ Common: Third Party: Firebase Admin</name>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore-osgi</artifactId>
-            <version>4.4.10</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient-osgi</artifactId>
-            <version>4.5.6</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.firebase</groupId>
-            <artifactId>firebase-admin</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.cloud</groupId>
-                    <artifactId>google-cloud-storage</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.cloud</groupId>
-                    <artifactId>google-cloud-firestore</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-bundle</id>
-                        <configuration>
-                            <instructions>
-                                <!-- Due to the large number of dependencies, 
-                                    we're just going to include them all. However, we want to exclude those dependencies 
-                                    that are already OSGi libraries. It's 'safer' to list the exclusions so that 
-                                    if something changes, it'll be included by default. -->
-                                <Embed-Transitive>true</Embed-Transitive>
-                                <Embed-Dependency>*;scope=compile|runtime;artifactId=!jsr305|jackson-core|gson|httpclient|guava|json|slf4j-api|netty-codec-http|netty-handler|netty-transport|google-cloud-storage|google-cloud-firestore</Embed-Dependency>
-                                <!-- The Google Guava was hardwired to 20.0->21, 
-                                    so by changing the version to 20, it becomes [20,) -->
-                                <!-- A few extra packages are marked optional -->
-                                <Import-Package>com.google.common.*;version=20,com.google.api.gax.paging;resolution:=optional,com.google.cloud;resolution:=optional,com.google.cloud.firestore;resolution:=optional,com.google.cloud.storage;resolution:=optional,*</Import-Package>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+  <name>DiamondQ Common: Third Party: Firebase Admin</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore-osgi</artifactId>
+      <version>4.4.10</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient-osgi</artifactId>
+      <version>4.5.6</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.firebase</groupId>
+      <artifactId>firebase-admin</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.cloud</groupId>
+          <artifactId>google-cloud-storage</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.cloud</groupId>
+          <artifactId>google-cloud-firestore</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-bundle</id>
+            <configuration>
+              <instructions>
+                <!-- Due to the large number of dependencies, we're just 
+                  going to include them all. However, we want to exclude those dependencies 
+                  that are already OSGi libraries. It's 'safer' to list the exclusions so that 
+                  if something changes, it'll be included by default. -->
+                <Embed-Transitive>true</Embed-Transitive>
+                <Embed-Dependency>*;scope=compile|runtime;artifactId=!jsr305|jackson-core|gson|httpclient|guava|json|slf4j-api|netty-codec-http|netty-handler|netty-transport|google-cloud-storage|google-cloud-firestore</Embed-Dependency>
+                <!-- The Google Guava was hardwired to 20.0->21, so by changing 
+                  the version to 20, it becomes [20,) -->
+                <!-- A few extra packages are marked optional -->
+                <Import-Package>com.google.common.*;version=20,com.google.api.gax.paging;resolution:=optional,com.google.cloud;resolution:=optional,com.google.cloud.firestore;resolution:=optional,com.google.cloud.storage;resolution:=optional,*</Import-Package>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

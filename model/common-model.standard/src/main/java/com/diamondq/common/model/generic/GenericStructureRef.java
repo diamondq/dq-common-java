@@ -8,16 +8,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericStructureRef extends AbstractRef<Structure> implements StructureRef {
 
-	public GenericStructureRef(Scope pScope, String pName) {
-		super(pScope, pName, Structure.class);
-	}
+  public GenericStructureRef(Scope pScope, String pName) {
+    super(pScope, pName, Structure.class);
+  }
 
-	/**
-	 * @see com.diamondq.common.model.interfaces.Ref#resolve()
-	 */
-	@Override
-	public @Nullable Structure resolve() {
-		return mScope.getToolkit().lookupStructureBySerializedRef(mScope, mId);
-	}
+  /**
+   * @see com.diamondq.common.model.interfaces.Ref#resolve()
+   */
+  @Override
+  public @Nullable Structure resolve() {
+    return mScope.getToolkit().lookupStructureBySerializedRef(mScope, mId);
+  }
 
 }

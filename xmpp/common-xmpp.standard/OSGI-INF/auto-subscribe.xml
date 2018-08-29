@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate" configuration-policy="require" immediate="true" name="com.diamondq.common.xmpp.autosubscribe">
-	<implementation class="com.diamondq.common.xmpp.osgi.AutoSubscribe"/>
- <service>
-    <provide interface="java.util.function.Consumer"/>
- </service>
- <property name="inboundPresenceListener" type="Boolean" value="true"/>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate"
+  configuration-policy="require" immediate="true"
+  name="com.diamondq.common.xmpp.autosubscribe">
+  <implementation
+    class="com.diamondq.common.xmpp.osgi.AutoSubscribe" />
+  <service>
+    <provide interface="java.util.function.Consumer" />
+  </service>
+  <property name="inboundPresenceListener" type="Boolean"
+    value="true" />
 </scr:component>

@@ -18,38 +18,38 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class AsyncResponseHelper {
 
-	private static final Logger sLogger = LoggerFactory.getLogger(AsyncResponseHelper.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(AsyncResponseHelper.class);
 
-	/**
-	 * Default constructor
-	 */
-	public AsyncResponseHelper() {
-	}
+  /**
+   * Default constructor
+   */
+  public AsyncResponseHelper() {
+  }
 
-	/**
-	 * Defer the result until the future completes or errors
-	 * 
-	 * @param pLocale the locale (for error handling)
-	 * @param pResponse the AsyncResponse
-	 * @param pFuture the future
-	 */
-	public void toDeferredResult(Locale pLocale, AsyncResponse pResponse,
-		ExtendedCompletableFuture<@Nullable ?> pFuture) {
+  /**
+   * Defer the result until the future completes or errors
+   * 
+   * @param pLocale the locale (for error handling)
+   * @param pResponse the AsyncResponse
+   * @param pFuture the future
+   */
+  public void toDeferredResult(Locale pLocale, AsyncResponse pResponse,
+    ExtendedCompletableFuture<@Nullable ?> pFuture) {
 
-		pFuture.whenComplete((response, error) -> {
-			try {
-				if (error != null) {
-					sLogger.debug("Resuming error {}", error);
-					pResponse.resume(error);
-				}
-				else
-					pResponse.resume(response);
-			}
-			catch (RuntimeException ex) {
-				sLogger.error("", ex);
-				pResponse.resume(ex);
-			}
-		});
+    pFuture.whenComplete((response, error) -> {
+      try {
+        if (error != null) {
+          sLogger.debug("Resuming error {}", error);
+          pResponse.resume(error);
+        }
+        else
+          pResponse.resume(response);
+      }
+      catch (RuntimeException ex) {
+        sLogger.error("", ex);
+        pResponse.resume(ex);
+      }
+    });
 
-	}
+  }
 }

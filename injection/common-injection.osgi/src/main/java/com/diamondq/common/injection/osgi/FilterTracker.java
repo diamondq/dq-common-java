@@ -23,129 +23,128 @@ import org.slf4j.LoggerFactory;
 
 public class FilterTracker implements ServiceTrackerCustomizer<Object, Object> {
 
-	private static final Logger															sLogger				=
-		LoggerFactory.getLogger(FilterTracker.class);
+  private static final Logger                                                       sLogger            =
+    LoggerFactory.getLogger(FilterTracker.class);
 
-	private static final Comparator<Triplet<Integer, Long, ServiceReference<Object>>>	sRANKED_COMPARATOR	=
-		(a, b) -> {
-																													int rankingResult =
-																														a.getValue0()
-																															- b.getValue0();
-																													if (rankingResult != 0)
-																														return rankingResult < 0
-																															? -1
-																															: 1;
-																													long idResult =
-																														a.getValue1()
-																															- b.getValue1();
-																													return idResult < 0
-																														? -1
-																														: (idResult == 0
-																															? 0
-																															: 1);
-																												};
+  private static final Comparator<Triplet<Integer, Long, ServiceReference<Object>>> sRANKED_COMPARATOR = (a, b) -> {
+                                                                                                         int rankingResult =
+                                                                                                           a.getValue0()
+                                                                                                             - b
+                                                                                                               .getValue0();
+                                                                                                         if (rankingResult != 0)
+                                                                                                           return rankingResult < 0
+                                                                                                             ? -1 : 1;
+                                                                                                         long idResult =
+                                                                                                           a.getValue1()
+                                                                                                             - b
+                                                                                                               .getValue1();
+                                                                                                         return idResult < 0
+                                                                                                           ? -1
+                                                                                                           : (idResult == 0
+                                                                                                             ? 0 : 1);
+                                                                                                       };
 
-	private BundleContext																mBundleContext;
+  private BundleContext                                                             mBundleContext;
 
-	private Map<ServiceReference<Object>, Pair<Integer, Long>>							mReferences;
+  private Map<ServiceReference<Object>, Pair<Integer, Long>>                        mReferences;
 
-	private List<Triplet<Integer, Long, ServiceReference<Object>>>						mRankedReferences;
+  private List<Triplet<Integer, Long, ServiceReference<Object>>>                    mRankedReferences;
 
-	private @Nullable ServiceTracker<Object, Object>									mTracker;
+  private @Nullable ServiceTracker<Object, Object>                                  mTracker;
 
-	private @Nullable Consumer<FilterTracker>											mNotify				= null;
+  private @Nullable Consumer<FilterTracker>                                         mNotify            = null;
 
-	public FilterTracker(BundleContext pContext) {
-		mBundleContext = pContext;
-		mReferences = Maps.newHashMap();
-		mRankedReferences = Lists.newArrayList();
-	}
+  public FilterTracker(BundleContext pContext) {
+    mBundleContext = pContext;
+    mReferences = Maps.newHashMap();
+    mRankedReferences = Lists.newArrayList();
+  }
 
-	public List<Triplet<Integer, Long, ServiceReference<Object>>> getReferences() {
-		return ImmutableList.copyOf(mRankedReferences);
-	}
+  public List<Triplet<Integer, Long, ServiceReference<Object>>> getReferences() {
+    return ImmutableList.copyOf(mRankedReferences);
+  }
 
-	public void closeForRebuild() {
-		sLogger.trace("closeForRebuild() for {}", this);
-		ServiceTracker<Object, Object> tracker = mTracker;
-		mTracker = null;
-		if (tracker != null)
-			tracker.close();
-		mNotify = null;
-	}
+  public void closeForRebuild() {
+    sLogger.trace("closeForRebuild() for {}", this);
+    ServiceTracker<Object, Object> tracker = mTracker;
+    mTracker = null;
+    if (tracker != null)
+      tracker.close();
+    mNotify = null;
+  }
 
-	public void setNotify(Consumer<FilterTracker> pConsumer) {
-		sLogger.trace("setNotify(...) for {}", this);
-		mNotify = pConsumer;
-	}
+  public void setNotify(Consumer<FilterTracker> pConsumer) {
+    sLogger.trace("setNotify(...) for {}", this);
+    mNotify = pConsumer;
+  }
 
-	public void setTracker(ServiceTracker<Object, Object> pTracker) {
-		sLogger.trace("setTracker(...) for {}", this);
-		mTracker = pTracker;
-	}
+  public void setTracker(ServiceTracker<Object, Object> pTracker) {
+    sLogger.trace("setTracker(...) for {}", this);
+    mTracker = pTracker;
+  }
 
-	private Pair<Integer, Long> getRankingIdPair(ServiceReference<Object> pReference) {
-		Object rankingObj = pReference.getProperty(Constants.SERVICE_RANKING);
-		int ranking;
-		if (rankingObj == null)
-			ranking = 0;
-		else if (rankingObj instanceof Integer)
-			ranking = (Integer) rankingObj;
-		else
-			ranking = Integer.parseInt(rankingObj.toString());
-		Object idObj = pReference.getProperty(Constants.SERVICE_ID);
-		long id;
-		if (idObj == null)
-			id = 0;
-		else if (idObj instanceof Long)
-			id = (Long) idObj;
-		else
-			id = Long.parseLong(idObj.toString());
-		return Pair.with(ranking, id);
-	}
+  private Pair<Integer, Long> getRankingIdPair(ServiceReference<Object> pReference) {
+    Object rankingObj = pReference.getProperty(Constants.SERVICE_RANKING);
+    int ranking;
+    if (rankingObj == null)
+      ranking = 0;
+    else if (rankingObj instanceof Integer)
+      ranking = (Integer) rankingObj;
+    else
+      ranking = Integer.parseInt(rankingObj.toString());
+    Object idObj = pReference.getProperty(Constants.SERVICE_ID);
+    long id;
+    if (idObj == null)
+      id = 0;
+    else if (idObj instanceof Long)
+      id = (Long) idObj;
+    else
+      id = Long.parseLong(idObj.toString());
+    return Pair.with(ranking, id);
+  }
 
-	/**
-	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
-	 */
-	@Override
-	public @Nullable Object addingService(ServiceReference<Object> pReference) {
-		sLogger.trace("addingService({}) for {}", pReference, this);
-		if (mTracker != null) {
-			Pair<Integer, Long> pair = getRankingIdPair(pReference);
-			mReferences.put(pReference, pair);
-			mRankedReferences.add(Triplet.with(pair.getValue0(), pair.getValue1(), pReference));
-			Collections.sort(mRankedReferences, sRANKED_COMPARATOR);
-			if (mNotify != null)
-				mNotify.accept(this);
-		}
-		return mBundleContext.getService(pReference);
-	}
+  /**
+   * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
+   */
+  @Override
+  public @Nullable Object addingService(ServiceReference<Object> pReference) {
+    sLogger.trace("addingService({}) for {}", pReference, this);
+    if (mTracker != null) {
+      Pair<Integer, Long> pair = getRankingIdPair(pReference);
+      mReferences.put(pReference, pair);
+      mRankedReferences.add(Triplet.with(pair.getValue0(), pair.getValue1(), pReference));
+      Collections.sort(mRankedReferences, sRANKED_COMPARATOR);
+      if (mNotify != null)
+        mNotify.accept(this);
+    }
+    return mBundleContext.getService(pReference);
+  }
 
-	/**
-	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(org.osgi.framework.ServiceReference,
-	 *      java.lang.Object)
-	 */
-	@Override
-	public void modifiedService(ServiceReference<Object> pReference, Object pService) {
-		sLogger.trace("modifiedService({}, ...) for {}", pReference, this);
-		/* We don't care if the properties are updated */
-	}
+  /**
+   * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(org.osgi.framework.ServiceReference,
+   *      java.lang.Object)
+   */
+  @Override
+  public void modifiedService(ServiceReference<Object> pReference, Object pService) {
+    sLogger.trace("modifiedService({}, ...) for {}", pReference, this);
+    /* We don't care if the properties are updated */
+  }
 
-	/**
-	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference,
-	 *      java.lang.Object)
-	 */
-	@Override
-	public void removedService(ServiceReference<Object> pReference, Object pService) {
-		sLogger.trace("removedService({}, ...) for {}", pReference, this);
-		if (mTracker != null) {
-			Pair<Integer, Long> pair = mReferences.remove(pReference);
-			if (pair != null) {
-				mRankedReferences.remove(Triplet.with(pair.getValue0(), pair.getValue1(), pReference));
-				Collections.sort(mRankedReferences, sRANKED_COMPARATOR);
-			}
-			if (mNotify != null)
-				mNotify.accept(this);
-		}
-	}
+  /**
+   * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference,
+   *      java.lang.Object)
+   */
+  @Override
+  public void removedService(ServiceReference<Object> pReference, Object pService) {
+    sLogger.trace("removedService({}, ...) for {}", pReference, this);
+    if (mTracker != null) {
+      Pair<Integer, Long> pair = mReferences.remove(pReference);
+      if (pair != null) {
+        mRankedReferences.remove(Triplet.with(pair.getValue0(), pair.getValue1(), pReference));
+        Collections.sort(mRankedReferences, sRANKED_COMPARATOR);
+      }
+      if (mNotify != null)
+        mNotify.accept(this);
+    }
+  }
 }

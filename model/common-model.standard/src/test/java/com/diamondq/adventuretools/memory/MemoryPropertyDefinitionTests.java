@@ -6,9 +6,9 @@ import org.junit.Before;
 
 public class MemoryPropertyDefinitionTests extends AbstractPropertyDefinitionTests implements MemoryTestSetup {
 
-	@Before
-	public void before() {
-		beforeSetup(this);
-	}
+  @Before
+  public void before() {
+    beforeSetup(this);
+  }
 
 }

@@ -4,8 +4,8 @@ import com.diamondq.common.security.acl.model.SimpleResource;
 
 public class SimpleResourceMapper extends ResourceMapper<SimpleResource> {
 
-	public SimpleResourceMapper() {
-		super(SimpleResource.class);
-	}
+  public SimpleResourceMapper() {
+    super(SimpleResource.class);
+  }
 
 }

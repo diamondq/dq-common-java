@@ -13,52 +13,52 @@ import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
 public class TracerSupplier<A> extends AbstractTracerWrapper
-	implements Supplier<A>, AbortableContinuation, CancelableSupplier<A> {
+  implements Supplier<A>, AbortableContinuation, CancelableSupplier<A> {
 
-	private static final Logger	sLogger	= LoggerFactory.getLogger(TracerSupplier.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(TracerSupplier.class);
 
-	private final Supplier<A>	mDelegate;
+  private final Supplier<A>   mDelegate;
 
-	public TracerSupplier(Supplier<A> pDelegate) {
-		this(GlobalTracer.get(), pDelegate);
-	}
+  public TracerSupplier(Supplier<A> pDelegate) {
+    this(GlobalTracer.get(), pDelegate);
+  }
 
-	public TracerSupplier(Tracer pTracer, Supplier<A> pDelegate) {
-		super(pTracer);
-		mDelegate = pDelegate;
-	}
+  public TracerSupplier(Tracer pTracer, Supplier<A> pDelegate) {
+    super(pTracer);
+    mDelegate = pDelegate;
+  }
 
-	/**
-	 * @see java.util.function.Supplier#get()
-	 */
-	@Override
-	public A get() {
-		boolean inGet = false;
-		try {
-			Span c = mSpan;
-			if (c == null) {
-				inGet = true;
-				return mDelegate.get();
-			}
-			try (Scope scope = mScopeManager.activate(mSpan, false)) {
-				inGet = true;
-				A result = mDelegate.get();
-				inGet = false;
-				return result;
-			}
-		}
-		catch (RuntimeException ex) {
-			if (inGet == false)
-				sLogger.error("Error during span activation or shutdown", ex);
-			throw ex;
-		}
-	}
+  /**
+   * @see java.util.function.Supplier#get()
+   */
+  @Override
+  public A get() {
+    boolean inGet = false;
+    try {
+      Span c = mSpan;
+      if (c == null) {
+        inGet = true;
+        return mDelegate.get();
+      }
+      try (Scope scope = mScopeManager.activate(mSpan, false)) {
+        inGet = true;
+        A result = mDelegate.get();
+        inGet = false;
+        return result;
+      }
+    }
+    catch (RuntimeException ex) {
+      if (inGet == false)
+        sLogger.error("Error during span activation or shutdown", ex);
+      throw ex;
+    }
+  }
 
-	/**
-	 * @see com.diamondq.common.lambda.interfaces.CancelableSupplier#cancel()
-	 */
-	@Override
-	public void cancel() {
-		abortContinuation();
-	}
+  /**
+   * @see com.diamondq.common.lambda.interfaces.CancelableSupplier#cancel()
+   */
+  @Override
+  public void cancel() {
+    abortContinuation();
+  }
 }

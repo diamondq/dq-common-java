@@ -5,18 +5,18 @@ package com.diamondq.common.storage.kv;
  */
 public interface IKVIndexColumn {
 
-	/**
-	 * The name of the column
-	 * 
-	 * @return the name
-	 */
-	public String getName();
+  /**
+   * The name of the column
+   * 
+   * @return the name
+   */
+  public String getName();
 
-	/**
-	 * The type of the column
-	 * 
-	 * @return the type of column
-	 */
-	public KVColumnType getType();
+  /**
+   * The type of the column
+   * 
+   * @return the type of column
+   */
+  public KVColumnType getType();
 
 }

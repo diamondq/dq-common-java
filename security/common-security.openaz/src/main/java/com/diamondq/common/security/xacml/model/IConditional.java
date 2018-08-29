@@ -9,8 +9,8 @@ import org.immutables.value.Value.Style.ImplementationVisibility;
 @Value.Style(depluralize = true, typeAbstract = "I*", typeImmutable = "*", visibility = ImplementationVisibility.PUBLIC)
 public interface IConditional extends IFunctionArgument {
 
-	public ConditionalCode getCode();
+  public ConditionalCode getCode();
 
-	public List<IFunctionArgument> getOperations();
+  public List<IFunctionArgument> getOperations();
 
 }

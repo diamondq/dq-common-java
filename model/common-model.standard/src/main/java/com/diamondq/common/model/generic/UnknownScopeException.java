@@ -4,10 +4,10 @@ import com.diamondq.common.model.interfaces.Scope;
 
 public class UnknownScopeException extends RuntimeException {
 
-	private static final long serialVersionUID = 2701948702516077196L;
+  private static final long serialVersionUID = 2701948702516077196L;
 
-	public UnknownScopeException(Scope pScope) {
-		super("Unknown scope: " + pScope.getName());
-	}
+  public UnknownScopeException(Scope pScope) {
+    super("Unknown scope: " + pScope.getName());
+  }
 
 }

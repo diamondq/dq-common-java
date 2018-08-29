@@ -12,41 +12,40 @@ import java.util.concurrent.ThreadFactory;
 
 public class ScheduledExecutorServiceProvider extends AbstractOSGiConstructor {
 
-	public ScheduledExecutorServiceProvider() {
-		super(ConstructorInfoBuilder.builder().constructorClass(ScheduledExecutorServiceProvider.class) //
-			.register(ScheduledExecutorService.class).register(ExecutorService.class) //
-			.factoryMethod("create").cArg().type(Integer.class).prop(".executors.core-pool-size").optional().build());
-	}
+  public ScheduledExecutorServiceProvider() {
+    super(ConstructorInfoBuilder.builder().constructorClass(ScheduledExecutorServiceProvider.class) //
+      .register(ScheduledExecutorService.class).register(ExecutorService.class) //
+      .factoryMethod("create").cArg().type(Integer.class).prop(".executors.core-pool-size").optional().build());
+  }
 
-	public ScheduledExecutorService create(Integer pCorePoolSize) {
-		int corePoolSize = (pCorePoolSize == null ? Runtime.getRuntime().availableProcessors() : pCorePoolSize);
-		ThreadFactory threadFactory = Executors.defaultThreadFactory();
-		ScheduledExecutorService scheduledExecutorService =
-			Executors.newScheduledThreadPool(corePoolSize, threadFactory);
+  public ScheduledExecutorService create(Integer pCorePoolSize) {
+    int corePoolSize = (pCorePoolSize == null ? Runtime.getRuntime().availableProcessors() : pCorePoolSize);
+    ThreadFactory threadFactory = Executors.defaultThreadFactory();
+    ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(corePoolSize, threadFactory);
 
-		/* See if the Guava MoreExecutors is present */
+    /* See if the Guava MoreExecutors is present */
 
-		try {
-			Class<?> moreExecutorsClass = Class.forName("com.google.common.util.concurrent.MoreExecutors");
-			Method decorateMethod = moreExecutorsClass.getMethod("listeningDecorator", ScheduledExecutorService.class);
-			ScheduledExecutorService decoratedExecutor =
-				(ScheduledExecutorService) decorateMethod.invoke(null, scheduledExecutorService);
-			if (decoratedExecutor != null)
-				scheduledExecutorService = decoratedExecutor;
-		}
-		catch (ClassNotFoundException ex) {
-		}
-		catch (NoSuchMethodException ex) {
-		}
-		catch (IllegalAccessException ex) {
-			throw new RuntimeException(ex);
-		}
-		catch (IllegalArgumentException ex) {
-			throw new RuntimeException(ex);
-		}
-		catch (InvocationTargetException ex) {
-			throw new RuntimeException(ex);
-		}
-		return scheduledExecutorService;
-	}
+    try {
+      Class<?> moreExecutorsClass = Class.forName("com.google.common.util.concurrent.MoreExecutors");
+      Method decorateMethod = moreExecutorsClass.getMethod("listeningDecorator", ScheduledExecutorService.class);
+      ScheduledExecutorService decoratedExecutor =
+        (ScheduledExecutorService) decorateMethod.invoke(null, scheduledExecutorService);
+      if (decoratedExecutor != null)
+        scheduledExecutorService = decoratedExecutor;
+    }
+    catch (ClassNotFoundException ex) {
+    }
+    catch (NoSuchMethodException ex) {
+    }
+    catch (IllegalAccessException ex) {
+      throw new RuntimeException(ex);
+    }
+    catch (IllegalArgumentException ex) {
+      throw new RuntimeException(ex);
+    }
+    catch (InvocationTargetException ex) {
+      throw new RuntimeException(ex);
+    }
+    return scheduledExecutorService;
+  }
 }

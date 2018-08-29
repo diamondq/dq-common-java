@@ -36,554 +36,553 @@ import org.slf4j.LoggerFactory;
  */
 public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceLayer<Properties, String> {
 
-	private static final Logger sLogger = LoggerFactory.getLogger(PropertiesFilePersistenceLayer.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(PropertiesFilePersistenceLayer.class);
 
-	/**
-	 * The builder (generally used for the Config system)
-	 */
-	public static class PropertiesFilePersistenceLayerBuilder {
+  /**
+   * The builder (generally used for the Config system)
+   */
+  public static class PropertiesFilePersistenceLayerBuilder {
 
-		private @Nullable File		mStructureDir;
+    private @Nullable File    mStructureDir;
 
-		private @Nullable Integer	mCacheStructuresSeconds;
+    private @Nullable Integer mCacheStructuresSeconds;
 
-		private @Nullable File		mStructureDefDir;
+    private @Nullable File    mStructureDefDir;
 
-		private @Nullable File		mEditorStructureDefDir;
+    private @Nullable File    mEditorStructureDefDir;
 
-		/**
-		 * Sets the structure directory
-		 *
-		 * @param pValue the directory
-		 * @return the builder
-		 */
-		public PropertiesFilePersistenceLayerBuilder structureDir(String pValue) {
-			mStructureDir = new File(pValue);
-			return this;
-		}
+    /**
+     * Sets the structure directory
+     *
+     * @param pValue the directory
+     * @return the builder
+     */
+    public PropertiesFilePersistenceLayerBuilder structureDir(String pValue) {
+      mStructureDir = new File(pValue);
+      return this;
+    }
 
-		/**
-		 * Sets the number of seconds to cache structures.
-		 *
-		 * @param pValue the number of seconds
-		 * @return the builder
-		 */
-		public PropertiesFilePersistenceLayerBuilder cacheStructuresSeconds(Integer pValue) {
-			mCacheStructuresSeconds = pValue;
-			return this;
-		}
+    /**
+     * Sets the number of seconds to cache structures.
+     *
+     * @param pValue the number of seconds
+     * @return the builder
+     */
+    public PropertiesFilePersistenceLayerBuilder cacheStructuresSeconds(Integer pValue) {
+      mCacheStructuresSeconds = pValue;
+      return this;
+    }
 
-		/**
-		 * Sets the structure def directory
-		 *
-		 * @param pValue the directory
-		 * @return the builder
-		 */
-		public PropertiesFilePersistenceLayerBuilder structureDefDir(String pValue) {
-			mStructureDefDir = new File(pValue);
-			return this;
-		}
+    /**
+     * Sets the structure def directory
+     *
+     * @param pValue the directory
+     * @return the builder
+     */
+    public PropertiesFilePersistenceLayerBuilder structureDefDir(String pValue) {
+      mStructureDefDir = new File(pValue);
+      return this;
+    }
 
-		/**
-		 * Sets the editor structure def directory
-		 *
-		 * @param pValue the directory
-		 * @return the builder
-		 */
-		public PropertiesFilePersistenceLayerBuilder editorStructureDefDir(String pValue) {
-			mEditorStructureDefDir = new File(pValue);
-			return this;
-		}
+    /**
+     * Sets the editor structure def directory
+     *
+     * @param pValue the directory
+     * @return the builder
+     */
+    public PropertiesFilePersistenceLayerBuilder editorStructureDefDir(String pValue) {
+      mEditorStructureDefDir = new File(pValue);
+      return this;
+    }
 
-		/**
-		 * Builds the layer
-		 *
-		 * @return the layer
-		 */
-		public PropertiesFilePersistenceLayer build() {
-			Integer cacheStructuresSeconds = mCacheStructuresSeconds;
-			if (cacheStructuresSeconds == null)
-				cacheStructuresSeconds = -1;
-			return new PropertiesFilePersistenceLayer(mStructureDir, cacheStructuresSeconds, mStructureDefDir,
-				mEditorStructureDefDir);
-		}
-	}
+    /**
+     * Builds the layer
+     *
+     * @return the layer
+     */
+    public PropertiesFilePersistenceLayer build() {
+      Integer cacheStructuresSeconds = mCacheStructuresSeconds;
+      if (cacheStructuresSeconds == null)
+        cacheStructuresSeconds = -1;
+      return new PropertiesFilePersistenceLayer(mStructureDir, cacheStructuresSeconds, mStructureDefDir,
+        mEditorStructureDefDir);
+    }
+  }
 
-	private final @Nullable File	mStructureBaseDir;
+  private final @Nullable File mStructureBaseDir;
 
-	@SuppressWarnings("unused")
-	private final @Nullable File	mStructureDefBaseDir;
+  @SuppressWarnings("unused")
+  private final @Nullable File mStructureDefBaseDir;
 
-	@SuppressWarnings("unused")
-	private final @Nullable File	mEditorStructureDefBaseDir;
+  @SuppressWarnings("unused")
+  private final @Nullable File mEditorStructureDefBaseDir;
 
-	@SuppressWarnings("unused")
-	private final @Nullable File	mResourceBaseDir;
+  @SuppressWarnings("unused")
+  private final @Nullable File mResourceBaseDir;
 
-	/**
-	 * Default constructor
-	 *
-	 * @param pStructureBaseDir the directory for structures
-	 * @param pCacheStructuresSeconds the number of seconds to cache
-	 * @param pStructureDefBaseDir the directory for structure definitions
-	 * @param pEditorStructureDefBaseDir the directory for editor structure definitions
-	 */
-	public PropertiesFilePersistenceLayer(@Nullable File pStructureBaseDir, int pCacheStructuresSeconds,
-		@Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
-		super(pStructureBaseDir != null, true, pCacheStructuresSeconds, pStructureDefBaseDir != null, true, -1,
-			pEditorStructureDefBaseDir != null, true, -1, false, true, -1);
-		sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}) from {}", pStructureBaseDir,
-			pCacheStructuresSeconds, pStructureDefBaseDir, pEditorStructureDefBaseDir, this);
-		mStructureBaseDir = pStructureBaseDir;
-		mStructureDefBaseDir = pStructureDefBaseDir;
-		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
-		mResourceBaseDir = null;
-	}
+  /**
+   * Default constructor
+   *
+   * @param pStructureBaseDir the directory for structures
+   * @param pCacheStructuresSeconds the number of seconds to cache
+   * @param pStructureDefBaseDir the directory for structure definitions
+   * @param pEditorStructureDefBaseDir the directory for editor structure definitions
+   */
+  public PropertiesFilePersistenceLayer(@Nullable File pStructureBaseDir, int pCacheStructuresSeconds,
+    @Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
+    super(pStructureBaseDir != null, true, pCacheStructuresSeconds, pStructureDefBaseDir != null, true, -1,
+      pEditorStructureDefBaseDir != null, true, -1, false, true, -1);
+    sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}) from {}", pStructureBaseDir, pCacheStructuresSeconds,
+      pStructureDefBaseDir, pEditorStructureDefBaseDir, this);
+    mStructureBaseDir = pStructureBaseDir;
+    mStructureDefBaseDir = pStructureDefBaseDir;
+    mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
+    mResourceBaseDir = null;
+  }
 
-	/**
-	 * Additional constructor
-	 *
-	 * @param pStructureBaseDir the directory for structures
-	 * @param pCacheStructures
-	 * @param pCacheStructuresSeconds the number of seconds to cache
-	 * @param pStructureDefBaseDir the directory for structure definitions
-	 * @param pCacheStructureDefinitions
-	 * @param pCacheStructureDefinitionsSeconds
-	 * @param pEditorStructureDefBaseDir the directory for editor structure definitions
-	 * @param pCacheEditorStructureDefinitions
-	 * @param pCacheEditorStructureDefinitionsSeconds
-	 * @param pResourcesBaseDir
-	 * @param pCacheResources
-	 * @param pCacheResourcesSeconds
-	 */
-	public PropertiesFilePersistenceLayer(@Nullable File pStructureBaseDir, boolean pCacheStructures,
-		int pCacheStructuresSeconds, @Nullable File pStructureDefBaseDir, boolean pCacheStructureDefinitions,
-		int pCacheStructureDefinitionsSeconds, @Nullable File pEditorStructureDefBaseDir,
-		boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds,
-		@Nullable File pResourcesBaseDir, boolean pCacheResources, int pCacheResourcesSeconds) {
-		super(pStructureBaseDir != null, pCacheStructures, pCacheStructuresSeconds, pStructureDefBaseDir != null,
-			pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir != null,
-			pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir != null,
-			pCacheResources, pCacheResourcesSeconds);
-		sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) from {}",
-			pStructureBaseDir, pCacheStructures, pCacheStructuresSeconds, pStructureDefBaseDir,
-			pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir,
-			pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir,
-			pCacheResources, pCacheResourcesSeconds, this);
-		mStructureBaseDir = pStructureBaseDir;
-		mStructureDefBaseDir = pStructureDefBaseDir;
-		mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
-		mResourceBaseDir = pResourcesBaseDir;
-	}
+  /**
+   * Additional constructor
+   *
+   * @param pStructureBaseDir the directory for structures
+   * @param pCacheStructures
+   * @param pCacheStructuresSeconds the number of seconds to cache
+   * @param pStructureDefBaseDir the directory for structure definitions
+   * @param pCacheStructureDefinitions
+   * @param pCacheStructureDefinitionsSeconds
+   * @param pEditorStructureDefBaseDir the directory for editor structure definitions
+   * @param pCacheEditorStructureDefinitions
+   * @param pCacheEditorStructureDefinitionsSeconds
+   * @param pResourcesBaseDir
+   * @param pCacheResources
+   * @param pCacheResourcesSeconds
+   */
+  public PropertiesFilePersistenceLayer(@Nullable File pStructureBaseDir, boolean pCacheStructures,
+    int pCacheStructuresSeconds, @Nullable File pStructureDefBaseDir, boolean pCacheStructureDefinitions,
+    int pCacheStructureDefinitionsSeconds, @Nullable File pEditorStructureDefBaseDir,
+    boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds,
+    @Nullable File pResourcesBaseDir, boolean pCacheResources, int pCacheResourcesSeconds) {
+    super(pStructureBaseDir != null, pCacheStructures, pCacheStructuresSeconds, pStructureDefBaseDir != null,
+      pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir != null,
+      pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir != null,
+      pCacheResources, pCacheResourcesSeconds);
+    sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) from {}",
+      pStructureBaseDir, pCacheStructures, pCacheStructuresSeconds, pStructureDefBaseDir, pCacheStructureDefinitions,
+      pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir, pCacheEditorStructureDefinitions,
+      pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir, pCacheResources, pCacheResourcesSeconds, this);
+    mStructureBaseDir = pStructureBaseDir;
+    mStructureDefBaseDir = pStructureDefBaseDir;
+    mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
+    mResourceBaseDir = pResourcesBaseDir;
+  }
 
-	protected @Nullable File getStructureBaseDir() {
-		return mStructureBaseDir;
-	}
+  protected @Nullable File getStructureBaseDir() {
+    return mStructureBaseDir;
+  }
 
-	protected @Nullable File getStructureFile(String pKey, boolean pCreateIfMissing) {
-		@NonNull
-		String[] parts = pKey.split("/");
-		parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
-		File structureFile = getStructureBaseDir();
-		if (structureFile == null)
-			throw new IllegalStateException("Constructor was called with a null structureFile");
-		for (String p : parts)
-			structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
-		if (structureFile.exists() == false) {
-			if (pCreateIfMissing == false)
-				return null;
-			if (structureFile.getParentFile().exists() == false)
-				structureFile.getParentFile().mkdirs();
-		}
-		return structureFile;
-	}
+  protected @Nullable File getStructureFile(String pKey, boolean pCreateIfMissing) {
+    @NonNull
+    String[] parts = pKey.split("/");
+    parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
+    File structureFile = getStructureBaseDir();
+    if (structureFile == null)
+      throw new IllegalStateException("Constructor was called with a null structureFile");
+    for (String p : parts)
+      structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
+    if (structureFile.exists() == false) {
+      if (pCreateIfMissing == false)
+        return null;
+      if (structureFile.getParentFile().exists() == false)
+        structureFile.getParentFile().mkdirs();
+    }
+    return structureFile;
+  }
 
-	protected @Nullable File getStructureDir(@Nullable String pKey, boolean pCreateIfMissing) {
-		@NonNull
-		String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
-		File structureFile = getStructureBaseDir();
-		if (structureFile == null)
-			throw new IllegalStateException("Constructor was called with a null structureFile");
-		for (String p : parts)
-			structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
-		if (structureFile.exists() == false)
-			if (pCreateIfMissing == false)
-				return null;
-		structureFile.mkdirs();
-		return structureFile;
-	}
+  protected @Nullable File getStructureDir(@Nullable String pKey, boolean pCreateIfMissing) {
+    @NonNull
+    String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
+    File structureFile = getStructureBaseDir();
+    if (structureFile == null)
+      throw new IllegalStateException("Constructor was called with a null structureFile");
+    for (String p : parts)
+      structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
+    if (structureFile.exists() == false)
+      if (pCreateIfMissing == false)
+        return null;
+    structureFile.mkdirs();
+    return structureFile;
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#loadStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
-	 */
-	@Override
-	protected @Nullable Properties loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
-		String pKey, boolean pCreateIfMissing) {
-		File structureFile = getStructureFile(pKey, pCreateIfMissing);
-		if (structureFile == null)
-			return null;
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#loadStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
+   */
+  @Override
+  protected @Nullable Properties loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+    boolean pCreateIfMissing) {
+    File structureFile = getStructureFile(pKey, pCreateIfMissing);
+    if (structureFile == null)
+      return null;
 
-		Properties p = new Properties();
-		if (structureFile.exists() == true) {
-			try {
-				try (FileInputStream fis = new FileInputStream(structureFile)) {
-					p.load(fis);
-				}
-			}
-			catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-		return p;
-	}
+    Properties p = new Properties();
+    if (structureFile.exists() == true) {
+      try {
+        try (FileInputStream fis = new FileInputStream(structureFile)) {
+          p.load(fis);
+        }
+      }
+      catch (IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+    return p;
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#getStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.PropertyType)
-	 */
-	@Override
-	protected <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
-		String pKey, PropertyType pType) {
-		String value = pConfig.getProperty(pKey);
-		switch (pType) {
-		case String: {
-			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? "" : (String) value);
-			return result;
-		}
-		case Boolean: {
-			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? Boolean.FALSE : (Boolean) Boolean.parseBoolean(value));
-			return result;
-		}
-		case Integer: {
-			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? Integer.valueOf(0) : (Integer) Integer.parseInt(value));
-			return result;
-		}
-		case Long: {
-			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
-			return result;
-		}
-		case Decimal: {
-			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? new BigDecimal(0.0) : new BigDecimal(value));
-			return result;
-		}
-		case PropertyRef: {
-			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? "" : (String) value);
-			return result;
-		}
-		case StructureRef: {
-			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? "" : (String) value);
-			return result;
-		}
-		case StructureRefList: {
-			@NonNull
-			String[] strings = (value == null ? "" : value).split(",");
-			for (int i = 0; i < strings.length; i++)
-				strings[i] = unescape(strings[i]);
-			@SuppressWarnings("unchecked")
-			R result = (R) strings;
-			return result;
-		}
-		case Binary: {
-			byte[] data = (value == null ? new byte[0] : Base64.getDecoder().decode(value));
-			@SuppressWarnings("unchecked")
-			R result = (R) data;
-			return result;
-		}
-		case EmbeddedStructureList: {
-			throw new UnsupportedOperationException();
-		}
-		case Image: {
-			throw new UnsupportedOperationException();
-		}
-		case Timestamp: {
-			@SuppressWarnings("unchecked")
-			R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
-			return result;
-		}
-		}
-		throw new IllegalArgumentException();
-	}
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#getStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *      com.diamondq.common.model.interfaces.PropertyType)
+   */
+  @Override
+  protected <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
+    String pKey, PropertyType pType) {
+    String value = pConfig.getProperty(pKey);
+    switch (pType) {
+    case String: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? "" : (String) value);
+      return result;
+    }
+    case Boolean: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? Boolean.FALSE : (Boolean) Boolean.parseBoolean(value));
+      return result;
+    }
+    case Integer: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? Integer.valueOf(0) : (Integer) Integer.parseInt(value));
+      return result;
+    }
+    case Long: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
+      return result;
+    }
+    case Decimal: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? new BigDecimal(0.0) : new BigDecimal(value));
+      return result;
+    }
+    case PropertyRef: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? "" : (String) value);
+      return result;
+    }
+    case StructureRef: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? "" : (String) value);
+      return result;
+    }
+    case StructureRefList: {
+      @NonNull
+      String[] strings = (value == null ? "" : value).split(",");
+      for (int i = 0; i < strings.length; i++)
+        strings[i] = unescape(strings[i]);
+      @SuppressWarnings("unchecked")
+      R result = (R) strings;
+      return result;
+    }
+    case Binary: {
+      byte[] data = (value == null ? new byte[0] : Base64.getDecoder().decode(value));
+      @SuppressWarnings("unchecked")
+      R result = (R) data;
+      return result;
+    }
+    case EmbeddedStructureList: {
+      throw new UnsupportedOperationException();
+    }
+    case Image: {
+      throw new UnsupportedOperationException();
+    }
+    case Timestamp: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
+      return result;
+    }
+    }
+    throw new IllegalArgumentException();
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#isStructureConfigChanged(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.Object)
-	 */
-	@Override
-	protected boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, Properties pConfig) {
-		return false;
-	}
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#isStructureConfigChanged(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object)
+   */
+  @Override
+  protected boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, Properties pConfig) {
+    return false;
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#removeStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.PropertyType)
-	 */
-	@Override
-	protected boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
-		boolean pIsMeta, String pKey, PropertyType pType) {
-		return pConfig.remove(pKey) != null;
-	}
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#removeStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *      com.diamondq.common.model.interfaces.PropertyType)
+   */
+  @Override
+  protected boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
+    String pKey, PropertyType pType) {
+    return pConfig.remove(pKey) != null;
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#hasStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
-	 */
-	@Override
-	protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
-		String pKey) {
-		return pConfig.containsKey(pKey);
-	}
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#hasStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
+   */
+  @Override
+  protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
+    String pKey) {
+    return pConfig.containsKey(pKey);
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#persistContainerProp(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
-	 *      com.diamondq.common.model.interfaces.Property)
-	 */
-	@Override
-	protected boolean persistContainerProp(Toolkit pToolkit, Scope pScope, Structure pStructure, Property<?> pProp) {
-		return false;
-	}
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#persistContainerProp(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+   *      com.diamondq.common.model.interfaces.Property)
+   */
+  @Override
+  protected boolean persistContainerProp(Toolkit pToolkit, Scope pScope, Structure pStructure, Property<?> pProp) {
+    return false;
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#setStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
-	 */
-	@Override
-	protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
-		boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
-		switch (pType) {
-		case String: {
-			pConfig.setProperty(pKey, (String) pValue);
-			break;
-		}
-		case Boolean: {
-			pConfig.setProperty(pKey, pValue.toString());
-			break;
-		}
-		case Integer: {
-			pConfig.setProperty(pKey, pValue.toString());
-			break;
-		}
-		case Long: {
-			pConfig.setProperty(pKey, pValue.toString());
-			break;
-		}
-		case Decimal: {
-			pConfig.setProperty(pKey, pValue.toString());
-			break;
-		}
-		case PropertyRef: {
-			pConfig.setProperty(pKey, pValue.toString());
-			break;
-		}
-		case StructureRef: {
-			pConfig.setProperty(pKey, pValue.toString());
-			break;
-		}
-		case StructureRefList: {
-			@SuppressWarnings("null")
-			@NonNull
-			String[] strings = (String[]) pValue;
-			@NonNull
-			String[] escaped = new @NonNull String[strings.length];
-			for (int i = 0; i < strings.length; i++)
-				escaped[i] = escape(strings[i]);
-			String escapedStr = String.join(",", escaped);
-			pConfig.setProperty(pKey, escapedStr);
-			break;
-		}
-		case Binary: {
-			byte[] bytes;
-			if ((pValue instanceof byte[]) == false)
-				bytes = pValue.toString().getBytes(Charsets.UTF_8);
-			else
-				bytes = (byte[]) pValue;
-			pConfig.setProperty(pKey, Base64.getEncoder().encodeToString(bytes));
-			break;
-		}
-		case EmbeddedStructureList: {
-			throw new UnsupportedOperationException();
-		}
-		case Image: {
-			throw new UnsupportedOperationException();
-		}
-		case Timestamp: {
-			pConfig.setProperty(pKey, pValue.toString());
-			break;
-		}
-		}
-	}
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#setStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
+   */
+  @Override
+  protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
+    boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
+    switch (pType) {
+    case String: {
+      pConfig.setProperty(pKey, (String) pValue);
+      break;
+    }
+    case Boolean: {
+      pConfig.setProperty(pKey, pValue.toString());
+      break;
+    }
+    case Integer: {
+      pConfig.setProperty(pKey, pValue.toString());
+      break;
+    }
+    case Long: {
+      pConfig.setProperty(pKey, pValue.toString());
+      break;
+    }
+    case Decimal: {
+      pConfig.setProperty(pKey, pValue.toString());
+      break;
+    }
+    case PropertyRef: {
+      pConfig.setProperty(pKey, pValue.toString());
+      break;
+    }
+    case StructureRef: {
+      pConfig.setProperty(pKey, pValue.toString());
+      break;
+    }
+    case StructureRefList: {
+      @SuppressWarnings("null")
+      @NonNull
+      String[] strings = (String[]) pValue;
+      @NonNull
+      String[] escaped = new @NonNull String[strings.length];
+      for (int i = 0; i < strings.length; i++)
+        escaped[i] = escape(strings[i]);
+      String escapedStr = String.join(",", escaped);
+      pConfig.setProperty(pKey, escapedStr);
+      break;
+    }
+    case Binary: {
+      byte[] bytes;
+      if ((pValue instanceof byte[]) == false)
+        bytes = pValue.toString().getBytes(Charsets.UTF_8);
+      else
+        bytes = (byte[]) pValue;
+      pConfig.setProperty(pKey, Base64.getEncoder().encodeToString(bytes));
+      break;
+    }
+    case EmbeddedStructureList: {
+      throw new UnsupportedOperationException();
+    }
+    case Image: {
+      throw new UnsupportedOperationException();
+    }
+    case Timestamp: {
+      pConfig.setProperty(pKey, pValue.toString());
+      break;
+    }
+    }
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#constructOptimisticObj(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.Structure)
-	 */
-	@Override
-	protected @Nullable String constructOptimisticObj(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		@Nullable Structure pStructure) {
-		return constructOptimisticStringObj(pToolkit, pScope, pDefName, pKey, pStructure);
-	}
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#constructOptimisticObj(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *      com.diamondq.common.model.interfaces.Structure)
+   */
+  @Override
+  protected @Nullable String constructOptimisticObj(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+    @Nullable Structure pStructure) {
+    return constructOptimisticStringObj(pToolkit, pScope, pDefName, pKey, pStructure);
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
-	 *      java.lang.Object)
-	 */
-	@Override
-	protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Properties pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
-		File structureFile = getStructureFile(pKey, true);
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
+   *      java.lang.Object)
+   */
+  @Override
+  protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+    Properties pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
+    File structureFile = getStructureFile(pKey, true);
 
-		if (pMustMatchOptimisticObj == true) {
-			@Nullable
-			Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
-			@Nullable
-			String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
-			if (Objects.equals(pOptimisticObj, oldOptimistic) == false)
-				return false;
-		}
+    if (pMustMatchOptimisticObj == true) {
+      @Nullable
+      Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
+      @Nullable
+      String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
+      if (Objects.equals(pOptimisticObj, oldOptimistic) == false)
+        return false;
+    }
 
-		try {
-			try (FileOutputStream fos = new FileOutputStream(structureFile)) {
-				pConfig.store(fos, "");
-			}
-		}
-		catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
+    try {
+      try (FileOutputStream fos = new FileOutputStream(structureFile)) {
+        pConfig.store(fos, "");
+      }
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	private String unescape(String pValue) {
-		try {
-			return URLDecoder.decode(pValue, "UTF-8");
-		}
-		catch (UnsupportedEncodingException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+  private String unescape(String pValue) {
+    try {
+      return URLDecoder.decode(pValue, "UTF-8");
+    }
+    catch (UnsupportedEncodingException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 
-	private String escape(String pValue) {
-		try {
-			return URLEncoder.encode(pValue, "UTF-8");
-		}
-		catch (UnsupportedEncodingException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+  private String escape(String pValue) {
+    try {
+      return URLEncoder.encode(pValue, "UTF-8");
+    }
+    catch (UnsupportedEncodingException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.Structure)
-	 */
-	@Override
-	protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
-		Structure pStructure) {
-		File structureFile = getStructureFile(pKey, false);
-		if (structureFile == null)
-			return false;
+  /**
+   * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *      com.diamondq.common.model.interfaces.Structure)
+   */
+  @Override
+  protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
+    Structure pStructure) {
+    File structureFile = getStructureFile(pKey, false);
+    if (structureFile == null)
+      return false;
 
-		String optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pStructure);
-		Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
-		String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
-		if (Objects.equals(optimisticObj, oldOptimistic) == false)
-			return false;
+    String optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pStructure);
+    Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
+    String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
+    if (Objects.equals(optimisticObj, oldOptimistic) == false)
+      return false;
 
-		structureFile.delete();
+    structureFile.delete();
 
-		return true;
-	}
+    return true;
+  }
 
-	/**
-	 * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalPopulateChildStructureList(com.diamondq.common.model.interfaces.Toolkit,
-	 *      com.diamondq.common.model.interfaces.Scope, java.lang.Object,
-	 *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String, java.lang.String,
-	 *      com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
-	 */
-	@Override
-	protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, @Nullable Properties pConfig,
-		StructureDefinition pStructureDefinition, String pStructureDefName, @Nullable String pKey,
-		@Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
-		File structureDir = getStructureDir(pKey, false);
-		if (structureDir == null)
-			return;
-		File childDir = (pPropDef == null ? structureDir : new File(structureDir, pPropDef.getName()));
-		if (childDir.exists() == false)
-			return;
-		File[] listTypeDirs = childDir.listFiles((File pFile) -> pFile.isDirectory());
-		if (listTypeDirs == null)
-			throw new IllegalArgumentException("Unable to list the content of " + childDir.toString());
-		StringBuilder refBuilder = new StringBuilder();
-		if (pKey != null)
-			refBuilder.append(pKey).append('/');
-		if (pPropDef != null)
-			refBuilder.append(pPropDef.getName()).append('/');
-		int preTypeOffset = refBuilder.length();
-		for (File listTypeDir : listTypeDirs) {
+  /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalPopulateChildStructureList(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object,
+   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String, java.lang.String,
+   *      com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
+   */
+  @Override
+  protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, @Nullable Properties pConfig,
+    StructureDefinition pStructureDefinition, String pStructureDefName, @Nullable String pKey,
+    @Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
+    File structureDir = getStructureDir(pKey, false);
+    if (structureDir == null)
+      return;
+    File childDir = (pPropDef == null ? structureDir : new File(structureDir, pPropDef.getName()));
+    if (childDir.exists() == false)
+      return;
+    File[] listTypeDirs = childDir.listFiles((File pFile) -> pFile.isDirectory());
+    if (listTypeDirs == null)
+      throw new IllegalArgumentException("Unable to list the content of " + childDir.toString());
+    StringBuilder refBuilder = new StringBuilder();
+    if (pKey != null)
+      refBuilder.append(pKey).append('/');
+    if (pPropDef != null)
+      refBuilder.append(pPropDef.getName()).append('/');
+    int preTypeOffset = refBuilder.length();
+    for (File listTypeDir : listTypeDirs) {
 
-			/* If the PropertyDefinition has type restrictions, then make sure that this directory/type is valid */
+      /* If the PropertyDefinition has type restrictions, then make sure that this directory/type is valid */
 
-			String typeName = unescapeValue(listTypeDir.getName());
+      String typeName = unescapeValue(listTypeDir.getName());
 
-			if (pPropDef != null) {
-				Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
-				if (referenceTypes.isEmpty() == false) {
-					boolean match = false;
-					for (StructureDefinitionRef sdr : referenceTypes) {
-						StructureDefinition sd = sdr.resolve();
-						if (sd == null)
-							continue;
-						String testName = sd.getName();
-						if (typeName.equals(testName)) {
-							match = true;
-							break;
-						}
-					}
-					if (match == false)
-						continue;
-				}
-			}
-			else if (pKey == null) {
-				/*
-				 * Special case where there is no parent key. In this case, the StructureDefinition is the restriction
-				 */
+      if (pPropDef != null) {
+        Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
+        if (referenceTypes.isEmpty() == false) {
+          boolean match = false;
+          for (StructureDefinitionRef sdr : referenceTypes) {
+            StructureDefinition sd = sdr.resolve();
+            if (sd == null)
+              continue;
+            String testName = sd.getName();
+            if (typeName.equals(testName)) {
+              match = true;
+              break;
+            }
+          }
+          if (match == false)
+            continue;
+        }
+      }
+      else if (pKey == null) {
+        /*
+         * Special case where there is no parent key. In this case, the StructureDefinition is the restriction
+         */
 
-				if (typeName.equals(pStructureDefName) == false)
-					continue;
-			}
+        if (typeName.equals(pStructureDefName) == false)
+          continue;
+      }
 
-			refBuilder.setLength(preTypeOffset);
-			refBuilder.append(typeName).append('/');
-			int preNameOffset = refBuilder.length();
+      refBuilder.setLength(preTypeOffset);
+      refBuilder.append(typeName).append('/');
+      int preNameOffset = refBuilder.length();
 
-			File[] listFiles = listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties"));
-			for (File f : listFiles) {
-				String name = unescapeValue(f.getName().substring(0, f.getName().length() - ".properties".length()));
+      File[] listFiles = listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties"));
+      for (File f : listFiles) {
+        String name = unescapeValue(f.getName().substring(0, f.getName().length() - ".properties".length()));
 
-				refBuilder.setLength(preNameOffset);
-				refBuilder.append(name);
-				pStructureRefListBuilder
-					.add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
-			}
-		}
-		return;
-	}
+        refBuilder.setLength(preNameOffset);
+        refBuilder.append(name);
+        pStructureRefListBuilder
+          .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
+      }
+    }
+    return;
+  }
 
-	public static PropertiesFilePersistenceLayerBuilder builder() {
-		return new PropertiesFilePersistenceLayerBuilder();
-	}
+  public static PropertiesFilePersistenceLayerBuilder builder() {
+    return new PropertiesFilePersistenceLayerBuilder();
+  }
 
 }

@@ -8,12 +8,12 @@ import com.diamondq.common.storage.kv.IKVStore;
 
 public class OSGiStorageKVPersistenceLayer extends AbstractOSGiConstructor {
 
-	public OSGiStorageKVPersistenceLayer() {
-		super(ConstructorInfoBuilder.builder() //
-			.constructorClass(StorageKVPersistenceLayer.class) //
-			.register(PersistenceLayer.class) //
-			.cArg().type(IKVStore.class).propFilter(".kvstore").required().build() //
-		);
-	}
+  public OSGiStorageKVPersistenceLayer() {
+    super(ConstructorInfoBuilder.builder() //
+      .constructorClass(StorageKVPersistenceLayer.class) //
+      .register(PersistenceLayer.class) //
+      .cArg().type(IKVStore.class).propFilter(".kvstore").required().build() //
+    );
+  }
 
 }

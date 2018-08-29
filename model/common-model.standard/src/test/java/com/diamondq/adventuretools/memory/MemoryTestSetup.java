@@ -9,14 +9,14 @@ import com.diamondq.common.model.persistence.MemoryPersistenceLayer;
 
 public interface MemoryTestSetup {
 
-	default public void beforeSetup(StandardTest pStandardTest) {
-		ToolkitFactory instance = ToolkitFactory.newInstance();
-		GenericToolkit toolkit = (GenericToolkit) instance.newToolkit();
-		Scope scope = toolkit.getOrCreateScope("Design");
-		toolkit.setPersistenceLayer(scope, new MemoryPersistenceLayer());
+  default public void beforeSetup(StandardTest pStandardTest) {
+    ToolkitFactory instance = ToolkitFactory.newInstance();
+    GenericToolkit toolkit = (GenericToolkit) instance.newToolkit();
+    Scope scope = toolkit.getOrCreateScope("Design");
+    toolkit.setPersistenceLayer(scope, new MemoryPersistenceLayer());
 
-		BasicModelSetup.setup(toolkit, scope);
+    BasicModelSetup.setup(toolkit, scope);
 
-		pStandardTest.setup(toolkit, scope);
-	}
+    pStandardTest.setup(toolkit, scope);
+  }
 }

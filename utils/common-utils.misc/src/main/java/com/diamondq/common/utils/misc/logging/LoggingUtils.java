@@ -15,360 +15,358 @@ import org.slf4j.helpers.MessageFormatter;
 
 public class LoggingUtils {
 
-	/**
-	 * Used to represent a hash. Is converted to a Base64 string
-	 */
-	public static final Function<@Nullable Object, @Nullable Object>	sHashType;
+  /**
+   * Used to represent a hash. Is converted to a Base64 string
+   */
+  public static final Function<@Nullable Object, @Nullable Object> sHashType;
 
-	/**
-	 * Is used to represent a byte array. If it's less than 5 bytes, it's displayed directly, otherwise, it is converted
-	 * to just a byte length
-	 */
-	public static final Function<@Nullable Object, @Nullable Object>	sBytesType;
+  /**
+   * Is used to represent a byte array. If it's less than 5 bytes, it's displayed directly, otherwise, it is converted
+   * to just a byte length
+   */
+  public static final Function<@Nullable Object, @Nullable Object> sBytesType;
 
-	public static final Function<@Nullable Object, @Nullable Object>	sX509CertificateType;
+  public static final Function<@Nullable Object, @Nullable Object> sX509CertificateType;
 
-	static {
-		sHashType = (i) -> {
-			if (i instanceof byte[]) {
-				byte[] d = (byte[]) i;
-				return "%HASH[" + Base64.getEncoder().encodeToString(d) + "]";
-			}
-			else
-				return i;
-		};
-		sBytesType = (i) -> {
-			if (i instanceof byte[]) {
-				byte[] d = (byte[]) i;
-				if (d.length < 5)
-					return d;
-				return "%BYTES[" + String.valueOf(d.length) + "]";
-			}
-			else
-				return i;
-		};
-		sX509CertificateType = (i) -> {
-			if (i instanceof X509Certificate) {
-				X509Certificate cert = (X509Certificate) i;
-				StringBuilder sb = new StringBuilder();
-				sb.append("X509Certificate[");
-				sb.append("Version=").append(cert.getVersion());
-				sb.append(", Subject=").append(cert.getSubjectDN().toString());
-				sb.append(", Signature Algorithm=").append(cert.getSigAlgName());
-				sb.append(", Issuer=").append(cert.getIssuerDN().toString());
-				sb.append(", Serial Number=").append(cert.getSerialNumber().toString());
-				sb.append(", Validity=[From=").append(cert.getNotBefore());
-				sb.append(", To=").append(cert.getNotAfter()).append("]");
-				sb.append("]");
-				return sb.toString();
-			}
-			else
-				return i;
-		};
-	}
+  static {
+    sHashType = (i) -> {
+      if (i instanceof byte[]) {
+        byte[] d = (byte[]) i;
+        return "%HASH[" + Base64.getEncoder().encodeToString(d) + "]";
+      }
+      else
+        return i;
+    };
+    sBytesType = (i) -> {
+      if (i instanceof byte[]) {
+        byte[] d = (byte[]) i;
+        if (d.length < 5)
+          return d;
+        return "%BYTES[" + String.valueOf(d.length) + "]";
+      }
+      else
+        return i;
+    };
+    sX509CertificateType = (i) -> {
+      if (i instanceof X509Certificate) {
+        X509Certificate cert = (X509Certificate) i;
+        StringBuilder sb = new StringBuilder();
+        sb.append("X509Certificate[");
+        sb.append("Version=").append(cert.getVersion());
+        sb.append(", Subject=").append(cert.getSubjectDN().toString());
+        sb.append(", Signature Algorithm=").append(cert.getSigAlgName());
+        sb.append(", Issuer=").append(cert.getIssuerDN().toString());
+        sb.append(", Serial Number=").append(cert.getSerialNumber().toString());
+        sb.append(", Validity=[From=").append(cert.getNotBefore());
+        sb.append(", To=").append(cert.getNotAfter()).append("]");
+        sb.append("]");
+        return sb.toString();
+      }
+      else
+        return i;
+    };
+  }
 
-	private static ThreadLocal<Stack<String>>	sENTRY_METHOD				=
-		ThreadLocal.withInitial(() -> new Stack<>());
+  private static ThreadLocal<Stack<String>> sENTRY_METHOD            = ThreadLocal.withInitial(() -> new Stack<>());
 
-	private static Marker						sENTRY_MARKER				= MarkerFactory.getMarker("ENTRY");
+  private static Marker                     sENTRY_MARKER            = MarkerFactory.getMarker("ENTRY");
 
-	private static Marker						sEXIT_MARKER				= MarkerFactory.getMarker("EXIT");
+  private static Marker                     sEXIT_MARKER             = MarkerFactory.getMarker("EXIT");
 
-	private static String						sEXIT_MESSAGE_0				= "EXIT {}() from {}";
+  private static String                     sEXIT_MESSAGE_0          = "EXIT {}() from {}";
 
-	private static String						sEXIT_MESSAGE_1				= "EXIT {}(...) with {} from {}";
+  private static String                     sEXIT_MESSAGE_1          = "EXIT {}(...) with {} from {}";
 
-	private static String						sEXIT_MESSAGE_ERROR			= "EXIT {}() from {} with error";
+  private static String                     sEXIT_MESSAGE_ERROR      = "EXIT {}() from {} with error";
 
-	private static String[]						sENTRY_MESSAGE_ARRAY		= new String[] {"{}() from {}",
-			"{}({}) from {}", "{}({}, {}) from {}", "{}({}, {}, {}) from {}", "{}({}, {}, {}, {}) from {}"};
+  private static String[]                   sENTRY_MESSAGE_ARRAY     = new String[] {"{}() from {}", "{}({}) from {}",
+      "{}({}, {}) from {}", "{}({}, {}, {}) from {}", "{}({}, {}, {}, {}) from {}"};
 
-	private static int							sENTRY_MESSAGE_ARRAY_LEN	= sENTRY_MESSAGE_ARRAY.length;
+  private static int                        sENTRY_MESSAGE_ARRAY_LEN = sENTRY_MESSAGE_ARRAY.length;
 
-	/**
-	 * This represents the ENTRY of a method. It MUST be matched with a corresponding EXIT (even under Exceptions). This
-	 * effectively creates a pLogger.trace(ENTRY_MARKER, "{methodName}({pArgs}) from {pThis}")
-	 * 
-	 * @param pLogger the logger
-	 * @param pThis the object representing 'this'
-	 * @param pArgs any arguments to display
-	 */
-	public static void entry(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
-		if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-			entryWithMetaInternal(pLogger, pThis, false, true, pArgs);
-		}
-	}
+  /**
+   * This represents the ENTRY of a method. It MUST be matched with a corresponding EXIT (even under Exceptions). This
+   * effectively creates a pLogger.trace(ENTRY_MARKER, "{methodName}({pArgs}) from {pThis}")
+   * 
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   * @param pArgs any arguments to display
+   */
+  public static void entry(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
+    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+      entryWithMetaInternal(pLogger, pThis, false, true, pArgs);
+    }
+  }
 
-	/**
-	 * This represents the ENTRY of a method. It MUST be matched with a corresponding EXIT (even under Exceptions). This
-	 * effectively creates a pLogger.trace(ENTRY_MARKER, "{methodName}({pArgs}) from {pThis}"). This differs from entry
-	 * in that each argument must be followed with a @Nullable Function<@Nullable Object, @Nullable Object> that is
-	 * called to convert the argument into what is displayed. Usually the Function constants provided by LoggingUtils
-	 * are used. For example entryWithMeta(sLogger, this, byteArray, LoggingUtils.sBytesType, hashData,
-	 * LoggingUtils.sHashType). Provide a null function if conversion isn't necessary. NOTE: The last value in pArgs can
-	 * be an Exception in which case it doesn't have a corresponding conversion.
-	 *
-	 * @param pLogger the logger
-	 * @param pThis the object representing 'this'
-	 * @param pArgs any arguments to display
-	 */
-	public static void entryWithMeta(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
-		if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-			entryWithMetaInternal(pLogger, pThis, true, true, pArgs);
-		}
-	}
+  /**
+   * This represents the ENTRY of a method. It MUST be matched with a corresponding EXIT (even under Exceptions). This
+   * effectively creates a pLogger.trace(ENTRY_MARKER, "{methodName}({pArgs}) from {pThis}"). This differs from entry in
+   * that each argument must be followed with a @Nullable Function<@Nullable Object, @Nullable Object> that is called to
+   * convert the argument into what is displayed. Usually the Function constants provided by LoggingUtils are used. For
+   * example entryWithMeta(sLogger, this, byteArray, LoggingUtils.sBytesType, hashData, LoggingUtils.sHashType). Provide
+   * a null function if conversion isn't necessary. NOTE: The last value in pArgs can be an Exception in which case it
+   * doesn't have a corresponding conversion.
+   *
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   * @param pArgs any arguments to display
+   */
+  public static void entryWithMeta(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
+    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+      entryWithMetaInternal(pLogger, pThis, true, true, pArgs);
+    }
+  }
 
-	/**
-	 * This represents the ENTRY of a method. It MUST NOT be matched with a corresponding EXIT. This effectively creates
-	 * a pLogger.trace(ENTRY_MARKER, "{methodName}({pArgs}) from {pThis}")
-	 * 
-	 * @param pLogger the logger
-	 * @param pThis the object representing 'this'
-	 * @param pArgs any arguments to display
-	 */
-	public static void simpleEntry(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
-		if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-			entryWithMetaInternal(pLogger, pThis, false, false, pArgs);
-		}
-	}
+  /**
+   * This represents the ENTRY of a method. It MUST NOT be matched with a corresponding EXIT. This effectively creates a
+   * pLogger.trace(ENTRY_MARKER, "{methodName}({pArgs}) from {pThis}")
+   * 
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   * @param pArgs any arguments to display
+   */
+  public static void simpleEntry(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
+    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+      entryWithMetaInternal(pLogger, pThis, false, false, pArgs);
+    }
+  }
 
-	/**
-	 * This represents the ENTRY of a method. It MUST NOT be matched with a corresponding EXIT (even under Exceptions).
-	 * This effectively creates a pLogger.trace(ENTRY_MARKER, "{methodName}({pArgs}) from {pThis}"). This differs from
-	 * simpleEntry in that each argument must be followed with a @Nullable Function<@Nullable Object, @Nullable Object>
-	 * that is called to convert the argument into what is displayed. Usually the Function constants provided by
-	 * LoggingUtils are used. For example entryWithMeta(sLogger, this, byteArray, LoggingUtils.sBytesType, hashData,
-	 * LoggingUtils.sHashType). Provide a null function if conversion isn't necessary. NOTE: The last value in pArgs can
-	 * be an Exception in which case it doesn't have a corresponding conversion.
-	 *
-	 * @param pLogger the logger
-	 * @param pThis the object representing 'this'
-	 * @param pArgs any arguments to display
-	 */
-	public static void simpleEntryWithMeta(Logger pLogger, @Nullable Object pThis,
-		@Nullable Object @Nullable... pArgs) {
-		if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-			entryWithMetaInternal(pLogger, pThis, true, false, pArgs);
-		}
-	}
+  /**
+   * This represents the ENTRY of a method. It MUST NOT be matched with a corresponding EXIT (even under Exceptions).
+   * This effectively creates a pLogger.trace(ENTRY_MARKER, "{methodName}({pArgs}) from {pThis}"). This differs from
+   * simpleEntry in that each argument must be followed with a @Nullable Function<@Nullable Object, @Nullable Object>
+   * that is called to convert the argument into what is displayed. Usually the Function constants provided by
+   * LoggingUtils are used. For example entryWithMeta(sLogger, this, byteArray, LoggingUtils.sBytesType, hashData,
+   * LoggingUtils.sHashType). Provide a null function if conversion isn't necessary. NOTE: The last value in pArgs can
+   * be an Exception in which case it doesn't have a corresponding conversion.
+   *
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   * @param pArgs any arguments to display
+   */
+  public static void simpleEntryWithMeta(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
+    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+      entryWithMetaInternal(pLogger, pThis, true, false, pArgs);
+    }
+  }
 
-	/**
-	 * This represents the EXIT of a method. It must be matched with a preceding ENTRY. This effectively creates a
-	 * pLogger.trace(EXIT_MARKER, "EXIT {methodName}() from {pThis}").
-	 * 
-	 * @param pLogger the logger
-	 * @param pThis the object representing 'this'
-	 */
-	public static void exit(Logger pLogger, Object pThis) {
-		if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+  /**
+   * This represents the EXIT of a method. It must be matched with a preceding ENTRY. This effectively creates a
+   * pLogger.trace(EXIT_MARKER, "EXIT {methodName}() from {pThis}").
+   * 
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   */
+  public static void exit(Logger pLogger, Object pThis) {
+    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
 
-			String indent = MDC.get("DQIndent");
-			if (indent == null)
-				indent = "";
-			if (indent.length() > 1)
-				indent = indent.substring(0, indent.length() - 2);
-			if (indent.length() == 0)
-				MDC.remove("DQIndent");
-			else
-				MDC.put("DQIndent", indent);
+      String indent = MDC.get("DQIndent");
+      if (indent == null)
+        indent = "";
+      if (indent.length() > 1)
+        indent = indent.substring(0, indent.length() - 2);
+      if (indent.length() == 0)
+        MDC.remove("DQIndent");
+      else
+        MDC.put("DQIndent", indent);
 
-			/* Calculate the method name */
+      /* Calculate the method name */
 
-			StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-			String methodName = stackTraceElements[2].getMethodName();
+      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+      String methodName = stackTraceElements[2].getMethodName();
 
-			Stack<String> stack = sENTRY_METHOD.get();
-			@Nullable
-			String oldMethodName = stack.pop();
-			if (methodName.equals(oldMethodName) == false)
-				pLogger.warn("Unmatched LoggingUtils.exit({}) with LoggingUtils.entry({})", methodName, oldMethodName);
+      Stack<String> stack = sENTRY_METHOD.get();
+      @Nullable
+      String oldMethodName = stack.pop();
+      if (methodName.equals(oldMethodName) == false)
+        pLogger.warn("Unmatched LoggingUtils.exit({}) with LoggingUtils.entry({})", methodName, oldMethodName);
 
-			pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_0, methodName, pThis);
-		}
-	}
+      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_0, methodName, pThis);
+    }
+  }
 
-	/**
-	 * This represents the EXIT of a method. It must be matched with a preceding ENTRY. This effectively creates a
-	 * pLogger.trace(EXIT_MARKER, "EXIT {methodName}() with {result} from {pThis}").
-	 * 
-	 * @param pLogger the logger
-	 * @param pThis the object representing 'this'
-	 * @param pResult The result of the method being exited
-	 * @return the same result value passed in
-	 */
-	public static <T> T exit(Logger pLogger, Object pThis, T pResult) {
-		if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+  /**
+   * This represents the EXIT of a method. It must be matched with a preceding ENTRY. This effectively creates a
+   * pLogger.trace(EXIT_MARKER, "EXIT {methodName}() with {result} from {pThis}").
+   * 
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   * @param pResult The result of the method being exited
+   * @return the same result value passed in
+   */
+  public static <T> T exit(Logger pLogger, Object pThis, T pResult) {
+    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
 
-			String indent = MDC.get("DQIndent");
-			if (indent == null)
-				indent = "";
-			if (indent.length() > 1)
-				indent = indent.substring(0, indent.length() - 2);
-			if (indent.length() == 0)
-				MDC.remove("DQIndent");
-			else
-				MDC.put("DQIndent", indent);
+      String indent = MDC.get("DQIndent");
+      if (indent == null)
+        indent = "";
+      if (indent.length() > 1)
+        indent = indent.substring(0, indent.length() - 2);
+      if (indent.length() == 0)
+        MDC.remove("DQIndent");
+      else
+        MDC.put("DQIndent", indent);
 
-			/* Calculate the method name */
+      /* Calculate the method name */
 
-			StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-			String methodName = stackTraceElements[2].getMethodName();
+      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+      String methodName = stackTraceElements[2].getMethodName();
 
-			Stack<String> stack = sENTRY_METHOD.get();
-			@Nullable
-			String oldMethodName = stack.pop();
-			if (methodName.equals(oldMethodName) == false)
-				pLogger.warn("Unmatched LoggingUtils.exit({}) with LoggingUtils.entry({})", methodName, oldMethodName);
+      Stack<String> stack = sENTRY_METHOD.get();
+      @Nullable
+      String oldMethodName = stack.pop();
+      if (methodName.equals(oldMethodName) == false)
+        pLogger.warn("Unmatched LoggingUtils.exit({}) with LoggingUtils.entry({})", methodName, oldMethodName);
 
-			pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_1, methodName, pResult, pThis);
-		}
-		return pResult;
-	}
+      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_1, methodName, pResult, pThis);
+    }
+    return pResult;
+  }
 
-	/**
-	 * This represents the EXIT of a method. It must be matched with a preceding ENTRY. This effectively creates a
-	 * pLogger.trace(EXIT_MARKER, "EXIT {methodName}() from {pThis} with error", pThrowable).
-	 * 
-	 * @param pLogger the logger
-	 * @param pThis the object representing 'this'
-	 * @param pThrowable The exception to report
-	 */
-	public static void exitWithException(Logger pLogger, Object pThis, Throwable pThrowable) {
-		if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+  /**
+   * This represents the EXIT of a method. It must be matched with a preceding ENTRY. This effectively creates a
+   * pLogger.trace(EXIT_MARKER, "EXIT {methodName}() from {pThis} with error", pThrowable).
+   * 
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   * @param pThrowable The exception to report
+   */
+  public static void exitWithException(Logger pLogger, Object pThis, Throwable pThrowable) {
+    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
 
-			String indent = MDC.get("DQIndent");
-			if (indent == null)
-				indent = "";
-			if (indent.length() > 1)
-				indent = indent.substring(0, indent.length() - 2);
-			if (indent.length() == 0)
-				MDC.remove("DQIndent");
-			else
-				MDC.put("DQIndent", indent);
+      String indent = MDC.get("DQIndent");
+      if (indent == null)
+        indent = "";
+      if (indent.length() > 1)
+        indent = indent.substring(0, indent.length() - 2);
+      if (indent.length() == 0)
+        MDC.remove("DQIndent");
+      else
+        MDC.put("DQIndent", indent);
 
-			/* Calculate the method name */
+      /* Calculate the method name */
 
-			StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-			String methodName = stackTraceElements[2].getMethodName();
+      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+      String methodName = stackTraceElements[2].getMethodName();
 
-			Stack<String> stack = sENTRY_METHOD.get();
-			@Nullable
-			String oldMethodName = stack.pop();
-			if (methodName.equals(oldMethodName) == false)
-				pLogger.warn("Unmatched LoggingUtils.exitWithException({}) with LoggingUtils.entry({})", methodName,
-					oldMethodName);
+      Stack<String> stack = sENTRY_METHOD.get();
+      @Nullable
+      String oldMethodName = stack.pop();
+      if (methodName.equals(oldMethodName) == false)
+        pLogger.warn("Unmatched LoggingUtils.exitWithException({}) with LoggingUtils.entry({})", methodName,
+          oldMethodName);
 
-			pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_ERROR, methodName, pThis, pThrowable);
-		}
-	}
+      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_ERROR, methodName, pThis, pThrowable);
+    }
+  }
 
-	/**
-	 * Common internal function to handle the entry routine
-	 * 
-	 * @param pLogger the logger
-	 * @param pThis the object representing 'this'
-	 * @param pWithMeta true if there is meta data in the arguments or false if there isn't.
-	 * @param pMatchEntryExit true if there must be matching exit or false if this is a standalone entry
-	 * @param pArgs any arguments to display
-	 */
-	private static void entryWithMetaInternal(Logger pLogger, @Nullable Object pThis, boolean pWithMeta,
-		boolean pMatchEntryExit, @Nullable Object @Nullable... pArgs) {
-		String messagePattern;
-		if (pArgs == null)
-			pArgs = new Object[0];
-		int argsLen = pArgs.length / (pWithMeta ? 2 : 1);
-		if (argsLen < sENTRY_MESSAGE_ARRAY_LEN)
-			messagePattern = sENTRY_MESSAGE_ARRAY[argsLen];
-		else
-			messagePattern = buildMessagePattern(argsLen);
+  /**
+   * Common internal function to handle the entry routine
+   * 
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   * @param pWithMeta true if there is meta data in the arguments or false if there isn't.
+   * @param pMatchEntryExit true if there must be matching exit or false if this is a standalone entry
+   * @param pArgs any arguments to display
+   */
+  private static void entryWithMetaInternal(Logger pLogger, @Nullable Object pThis, boolean pWithMeta,
+    boolean pMatchEntryExit, @Nullable Object @Nullable... pArgs) {
+    String messagePattern;
+    if (pArgs == null)
+      pArgs = new Object[0];
+    int argsLen = pArgs.length / (pWithMeta ? 2 : 1);
+    if (argsLen < sENTRY_MESSAGE_ARRAY_LEN)
+      messagePattern = sENTRY_MESSAGE_ARRAY[argsLen];
+    else
+      messagePattern = buildMessagePattern(argsLen);
 
-		int expandedLen;
-		if (argsLen == 0)
-			expandedLen = 2;
-		else
-			expandedLen = argsLen + 2;
-		Object[] expandedArgs = new Object[expandedLen];
-		Object[] filteredArgs;
+    int expandedLen;
+    if (argsLen == 0)
+      expandedLen = 2;
+    else
+      expandedLen = argsLen + 2;
+    Object[] expandedArgs = new Object[expandedLen];
+    Object[] filteredArgs;
 
-		/* See if the last entry is a Throwable */
+    /* See if the last entry is a Throwable */
 
-		Object lastEntry = (pArgs.length > 0 ? pArgs[pArgs.length - 1] : null);
+    Object lastEntry = (pArgs.length > 0 ? pArgs[pArgs.length - 1] : null);
 
-		if (expandedLen > 2) {
+    if (expandedLen > 2) {
 
-			if (pWithMeta == false) {
+      if (pWithMeta == false) {
 
-				/* Copy the arguments (skipping the final throwable if it's present */
+        /* Copy the arguments (skipping the final throwable if it's present */
 
-				System.arraycopy(pArgs, 0, expandedArgs, 1, (lastEntry instanceof Throwable ? argsLen - 1 : argsLen));
-				filteredArgs = pArgs;
-			}
-			else {
-				filteredArgs = new Object[argsLen];
-				for (int i = 0; i < argsLen; i++) {
-					int argOffset = i * 2;
-					@SuppressWarnings("unchecked")
-					@Nullable
-					Function<@Nullable Object, @Nullable Object> func =
-						(Function<@Nullable Object, @Nullable Object>) pArgs[argOffset + 1];
-					if (func == null)
-						expandedArgs[1 + i] = pArgs[argOffset];
-					else {
-						expandedArgs[1 + i] = func.apply(pArgs[argOffset]);
-						filteredArgs[i] = expandedArgs[1 + i];
-					}
-				}
-			}
+        System.arraycopy(pArgs, 0, expandedArgs, 1, (lastEntry instanceof Throwable ? argsLen - 1 : argsLen));
+        filteredArgs = pArgs;
+      }
+      else {
+        filteredArgs = new Object[argsLen];
+        for (int i = 0; i < argsLen; i++) {
+          int argOffset = i * 2;
+          @SuppressWarnings("unchecked")
+          @Nullable
+          Function<@Nullable Object, @Nullable Object> func =
+            (Function<@Nullable Object, @Nullable Object>) pArgs[argOffset + 1];
+          if (func == null)
+            expandedArgs[1 + i] = pArgs[argOffset];
+          else {
+            expandedArgs[1 + i] = func.apply(pArgs[argOffset]);
+            filteredArgs[i] = expandedArgs[1 + i];
+          }
+        }
+      }
 
-			/* Add the throwable back in */
+      /* Add the throwable back in */
 
-			if (lastEntry instanceof Throwable)
-				expandedArgs[expandedArgs.length] = lastEntry;
-		}
-		else
-			filteredArgs = pArgs;
+      if (lastEntry instanceof Throwable)
+        expandedArgs[expandedArgs.length] = lastEntry;
+    }
+    else
+      filteredArgs = pArgs;
 
-		/* Calculate the method name */
+    /* Calculate the method name */
 
-		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-		String methodName = stackTraceElements[3].getMethodName();
-		expandedArgs[0] = methodName;
+    StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+    String methodName = stackTraceElements[3].getMethodName();
+    expandedArgs[0] = methodName;
 
-		/* Add the caller object */
+    /* Add the caller object */
 
-		if ("<init>".equals(methodName))
-			expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] = pThis == null ? null
-				: pThis.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(pThis));
-		else
-			expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] = pThis;
+    if ("<init>".equals(methodName))
+      expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] =
+        pThis == null ? null : pThis.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(pThis));
+    else
+      expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] = pThis;
 
-		FormattingTuple tp = MessageFormatter.arrayFormat(messagePattern, expandedArgs);
-		pLogger.trace(sENTRY_MARKER, tp.getMessage(), filteredArgs);
+    FormattingTuple tp = MessageFormatter.arrayFormat(messagePattern, expandedArgs);
+    pLogger.trace(sENTRY_MARKER, tp.getMessage(), filteredArgs);
 
-		if (pMatchEntryExit == true) {
-			String indent = MDC.get("DQIndent");
-			if (indent == null)
-				indent = "  ";
-			else
-				indent = indent + "  ";
-			MDC.put("DQIndent", indent);
+    if (pMatchEntryExit == true) {
+      String indent = MDC.get("DQIndent");
+      if (indent == null)
+        indent = "  ";
+      else
+        indent = indent + "  ";
+      MDC.put("DQIndent", indent);
 
-			Stack<String> stack = sENTRY_METHOD.get();
-			stack.push(methodName);
-		}
+      Stack<String> stack = sENTRY_METHOD.get();
+      stack.push(methodName);
+    }
 
-	}
+  }
 
-	private static String buildMessagePattern(int len) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{}(");
-		for (int i = 0; i < len; i++) {
-			sb.append("{}");
-			if (i != len - 1)
-				sb.append(", ");
-		}
-		sb.append(") from {}");
-		return sb.toString();
-	}
+  private static String buildMessagePattern(int len) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{}(");
+    for (int i = 0; i < len; i++) {
+      sb.append("{}");
+      if (i != (len - 1))
+        sb.append(", ");
+    }
+    sb.append(") from {}");
+    return sb.toString();
+  }
 
 }

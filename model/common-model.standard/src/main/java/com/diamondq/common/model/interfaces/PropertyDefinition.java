@@ -11,123 +11,123 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * A PropertyDefinition defines all metadata about a given property.
  */
 public interface PropertyDefinition
-	extends ResolvableWithContainer<PropertyDefinition, PropertyDefinitionRef, StructureDefinition> {
+  extends ResolvableWithContainer<PropertyDefinition, PropertyDefinitionRef, StructureDefinition> {
 
-	/* Name */
+  /* Name */
 
-	public String getName();
+  public String getName();
 
-	/* Label */
+  /* Label */
 
-	public @Nullable TranslatableString getLabel();
+  public @Nullable TranslatableString getLabel();
 
-	public PropertyDefinition setLabel(@Nullable TranslatableString pValue);
+  public PropertyDefinition setLabel(@Nullable TranslatableString pValue);
 
-	/* Primary Key */
+  /* Primary Key */
 
-	public boolean isPrimaryKey();
+  public boolean isPrimaryKey();
 
-	public PropertyDefinition setPrimaryKey(boolean pValue);
+  public PropertyDefinition setPrimaryKey(boolean pValue);
 
-	/* Type */
+  /* Type */
 
-	public PropertyType getType();
+  public PropertyType getType();
 
-	/* Validation Script */
+  /* Validation Script */
 
-	public @Nullable Script getValidationScript();
+  public @Nullable Script getValidationScript();
 
-	public PropertyDefinition setValidationScript(@Nullable Script pValue);
+  public PropertyDefinition setValidationScript(@Nullable Script pValue);
 
-	/* Default Value */
+  /* Default Value */
 
-	public @Nullable String getDefaultValue();
+  public @Nullable String getDefaultValue();
 
-	public PropertyDefinition setDefaultValue(@Nullable String pValue);
+  public PropertyDefinition setDefaultValue(@Nullable String pValue);
 
-	/* Default Value Script */
+  /* Default Value Script */
 
-	public @Nullable Script getDefaultValueScript();
+  public @Nullable Script getDefaultValueScript();
 
-	public PropertyDefinition setDefaultValueScript(@Nullable Script pValue);
+  public PropertyDefinition setDefaultValueScript(@Nullable Script pValue);
 
-	/* Reference Type */
+  /* Reference Type */
 
-	public Collection<StructureDefinitionRef> getReferenceTypes();
+  public Collection<StructureDefinitionRef> getReferenceTypes();
 
-	public PropertyDefinition addReferenceType(StructureDefinitionRef pValue);
+  public PropertyDefinition addReferenceType(StructureDefinitionRef pValue);
 
-	public PropertyDefinition removeReferenceType(StructureDefinitionRef pValue);
+  public PropertyDefinition removeReferenceType(StructureDefinitionRef pValue);
 
-	/* Min Value */
+  /* Min Value */
 
-	public @Nullable BigDecimal getMinValue();
+  public @Nullable BigDecimal getMinValue();
 
-	public PropertyDefinition setMinValue(@Nullable BigDecimal pValue);
+  public PropertyDefinition setMinValue(@Nullable BigDecimal pValue);
 
-	/* Max Value */
+  /* Max Value */
 
-	public @Nullable BigDecimal getMaxValue();
+  public @Nullable BigDecimal getMaxValue();
 
-	public PropertyDefinition setMaxValue(@Nullable BigDecimal pValue);
+  public PropertyDefinition setMaxValue(@Nullable BigDecimal pValue);
 
-	/* Final */
+  /* Final */
 
-	public boolean isFinal();
+  public boolean isFinal();
 
-	public PropertyDefinition setFinal(boolean pValue);
+  public PropertyDefinition setFinal(boolean pValue);
 
-	/* Max Length */
+  /* Max Length */
 
-	public @Nullable Integer getMaxLength();
+  public @Nullable Integer getMaxLength();
 
-	public PropertyDefinition setMaxLength(Integer pValue);
+  public PropertyDefinition setMaxLength(Integer pValue);
 
-	/* keywords */
+  /* keywords */
 
-	/**
-	 * Returns the Multimap of keywords (ie. key=value pairs).
-	 * 
-	 * @return the multimap
-	 */
-	public Multimap<String, String> getKeywords();
+  /**
+   * Returns the Multimap of keywords (ie. key=value pairs).
+   * 
+   * @return the multimap
+   */
+  public Multimap<String, String> getKeywords();
 
-	/**
-	 * Adds a new keyword to this StructureDefinition
-	 * 
-	 * @param pKey the key
-	 * @param pValue the value
-	 * @return the updated PropertyDefinition
-	 */
-	public PropertyDefinition addKeyword(String pKey, String pValue);
+  /**
+   * Adds a new keyword to this StructureDefinition
+   * 
+   * @param pKey the key
+   * @param pValue the value
+   * @return the updated PropertyDefinition
+   */
+  public PropertyDefinition addKeyword(String pKey, String pValue);
 
-	/**
-	 * Removes a keyword from this StructureDefinition
-	 * 
-	 * @param pKey the key
-	 * @param pValue the value
-	 * @return the updated PropertyDefinition
-	 */
-	public PropertyDefinition removeKeyword(String pKey, String pValue);
+  /**
+   * Removes a keyword from this StructureDefinition
+   * 
+   * @param pKey the key
+   * @param pValue the value
+   * @return the updated PropertyDefinition
+   */
+  public PropertyDefinition removeKeyword(String pKey, String pValue);
 
-	/**
-	 * Returns the order of this property with other primary keys. Only applies if this property is a primary key
-	 * 
-	 * @return the order (returns 0 if it's not a primary key)
-	 */
-	public int getPrimaryKeyOrder();
+  /**
+   * Returns the order of this property with other primary keys. Only applies if this property is a primary key
+   * 
+   * @return the order (returns 0 if it's not a primary key)
+   */
+  public int getPrimaryKeyOrder();
 
-	/**
-	 * Changes the primary order of this primary with other primary keys.
-	 * 
-	 * @param pOrder the new order
-	 * @return the updated PropertyDefinition
-	 */
-	public PropertyDefinition setPrimaryKeyOrder(int pOrder);
+  /**
+   * Changes the primary order of this primary with other primary keys.
+   * 
+   * @param pOrder the new order
+   * @return the updated PropertyDefinition
+   */
+  public PropertyDefinition setPrimaryKeyOrder(int pOrder);
 
-	public PropertyPattern getPropertyPattern();
+  public PropertyPattern getPropertyPattern();
 
-	public PropertyDefinition setPropertyPattern(PropertyPattern pValue);
+  public PropertyDefinition setPropertyPattern(PropertyPattern pValue);
 
-	public Scope getScope();
+  public Scope getScope();
 }

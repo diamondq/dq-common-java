@@ -13,18 +13,18 @@ import io.opentracing.Tracer;
 @ApplicationScoped
 public class SetupGlobalTracer {
 
-	private static final Logger	sLogger	= LoggerFactory.getLogger(SetupGlobalTracer.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(SetupGlobalTracer.class);
 
-	private final Tracer		mTracer;
+  private final Tracer        mTracer;
 
-	@Inject
-	public SetupGlobalTracer(Tracer pTracer) {
-		mTracer = pTracer;
-	}
+  @Inject
+  public SetupGlobalTracer(Tracer pTracer) {
+    mTracer = pTracer;
+  }
 
-	public void setup(@Observes @Initialized(ApplicationScoped.class) Object init) {
-		mTracer.activeSpan();
-		sLogger.info("GlobalTracer setup");
-	}
+  public void setup(@Observes @Initialized(ApplicationScoped.class) Object init) {
+    mTracer.activeSpan();
+    sLogger.info("GlobalTracer setup");
+  }
 
 }

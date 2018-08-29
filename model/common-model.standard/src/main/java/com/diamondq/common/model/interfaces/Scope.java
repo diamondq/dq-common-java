@@ -2,8 +2,8 @@ package com.diamondq.common.model.interfaces;
 
 public interface Scope {
 
-	public String getName();
+  public String getName();
 
-	public Toolkit getToolkit();
+  public Toolkit getToolkit();
 
 }

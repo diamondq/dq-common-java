@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "SSL Activation Response", description = "The current status of the activate request")
 public abstract class AbstractActivateResponse {
 
-	@ApiModelProperty(value = "agreement URL user must acknowledge", required = false)
-	public abstract Optional<String> getRequiresAgreementAck();
+  @ApiModelProperty(value = "agreement URL user must acknowledge", required = false)
+  public abstract Optional<String> getRequiresAgreementAck();
 
 }

@@ -2,14 +2,14 @@ package com.diamondq.common.security.openaz;
 
 public class Code {
 
-	private final String mFQDN;
+  private final String mFQDN;
 
-	public Code(String pFqdn) {
-		mFQDN = pFqdn;
-	}
+  public Code(String pFqdn) {
+    mFQDN = pFqdn;
+  }
 
-	public String getFQDN() {
-		return mFQDN;
-	}
+  public String getFQDN() {
+    return mFQDN;
+  }
 
 }

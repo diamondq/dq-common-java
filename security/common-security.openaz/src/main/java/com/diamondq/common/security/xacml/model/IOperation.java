@@ -9,7 +9,7 @@ import org.immutables.value.Value.Style.ImplementationVisibility;
 @Value.Style(depluralize = true, typeAbstract = "I*", typeImmutable = "*", visibility = ImplementationVisibility.PUBLIC)
 public interface IOperation extends IFunctionArgument {
 
-	public OperationCode getOperation();
+  public OperationCode getOperation();
 
-	public List<IFunctionArgument> getArguments();
+  public List<IFunctionArgument> getArguments();
 }

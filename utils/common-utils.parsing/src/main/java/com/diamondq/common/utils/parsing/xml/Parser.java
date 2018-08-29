@@ -12,20 +12,20 @@ import org.xml.sax.SAXException;
 
 public abstract class Parser {
 
-	private Parser() {
-		throw new UnsupportedOperationException();
-	}
+  private Parser() {
+    throw new UnsupportedOperationException();
+  }
 
-	public static Document parse(InputSource pSource) {
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		documentBuilderFactory.setNamespaceAware(true);
-		try {
-			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-			Document document = documentBuilder.parse(pSource);
-			return document;
-		}
-		catch (ParserConfigurationException | SAXException | IOException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+  public static Document parse(InputSource pSource) {
+    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    documentBuilderFactory.setNamespaceAware(true);
+    try {
+      DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+      Document document = documentBuilder.parse(pSource);
+      return document;
+    }
+    catch (ParserConfigurationException | SAXException | IOException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 }

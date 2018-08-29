@@ -8,105 +8,105 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EditorPropertyDefinition extends EditorComponentDefinition<EditorPropertyDefinition> {
 
-	/* name */
+  /* name */
 
-	public @Nullable String getName();
+  public @Nullable String getName();
 
-	public EditorPropertyDefinition setName(String pName);
+  public EditorPropertyDefinition setName(String pName);
 
-	/* displayType */
+  /* displayType */
 
-	public @Nullable EditorDisplayType getDisplayType();
+  public @Nullable EditorDisplayType getDisplayType();
 
-	public EditorPropertyDefinition setDisplayType(EditorDisplayType pValue);
+  public EditorPropertyDefinition setDisplayType(EditorDisplayType pValue);
 
-	/* enabledIfProperty */
+  /* enabledIfProperty */
 
-	public @Nullable PropertyDefinitionRef getEnabledIfProperty();
+  public @Nullable PropertyDefinitionRef getEnabledIfProperty();
 
-	public EditorPropertyDefinition setEnabledIfProperty(@Nullable PropertyDefinitionRef pValue);
+  public EditorPropertyDefinition setEnabledIfProperty(@Nullable PropertyDefinitionRef pValue);
 
-	/* enabledIfValueEquals */
+  /* enabledIfValueEquals */
 
-	public @Nullable Collection<String> getEnabledIfValueEquals();
+  public @Nullable Collection<String> getEnabledIfValueEquals();
 
-	public EditorPropertyDefinition addEnabledIfValueEquals(String pValue);
+  public EditorPropertyDefinition addEnabledIfValueEquals(String pValue);
 
-	public EditorPropertyDefinition removeEnabledIfValueEquals(String pValue);
+  public EditorPropertyDefinition removeEnabledIfValueEquals(String pValue);
 
-	/* mandatory */
+  /* mandatory */
 
-	public boolean isMandatory();
+  public boolean isMandatory();
 
-	public EditorPropertyDefinition setMandatory(boolean pValue);
+  public EditorPropertyDefinition setMandatory(boolean pValue);
 
-	/* mandatoryReason */
+  /* mandatoryReason */
 
-	public @Nullable TranslatableString getMandatoryReason();
+  public @Nullable TranslatableString getMandatoryReason();
 
-	public EditorPropertyDefinition setMandatoryReason(@Nullable TranslatableString pValue);
+  public EditorPropertyDefinition setMandatoryReason(@Nullable TranslatableString pValue);
 
-	/* valueMapScript */
+  /* valueMapScript */
 
-	/**
-	 * The ValueMap Script is responsible for mapping between a 'key' and a 'display value'. The script must return a
-	 * List of <Key,TranslatableString> pairs.
-	 * 
-	 * @return the Script or null
-	 */
-	public @Nullable Script getValueMapScript();
+  /**
+   * The ValueMap Script is responsible for mapping between a 'key' and a 'display value'. The script must return a List
+   * of <Key,TranslatableString> pairs.
+   * 
+   * @return the Script or null
+   */
+  public @Nullable Script getValueMapScript();
 
-	public EditorPropertyDefinition setValueMapScript(@Nullable Script pValue);
+  public EditorPropertyDefinition setValueMapScript(@Nullable Script pValue);
 
-	/* simpleValueMap */
+  /* simpleValueMap */
 
-	/**
-	 * The Simple ValueMap is a Map of Key,TranslatableString pairs used for mapping between a 'key' and a 'display
-	 * value'. If null, then this is not used for mapping.
-	 * 
-	 * @return the map or null
-	 */
-	public @Nullable Map<String, TranslatableString> getSimpleValueMap();
+  /**
+   * The Simple ValueMap is a Map of Key,TranslatableString pairs used for mapping between a 'key' and a 'display
+   * value'. If null, then this is not used for mapping.
+   * 
+   * @return the map or null
+   */
+  public @Nullable Map<String, TranslatableString> getSimpleValueMap();
 
-	public EditorPropertyDefinition putSimpleValueMapEntry(String pKey, TranslatableString pValue);
+  public EditorPropertyDefinition putSimpleValueMapEntry(String pKey, TranslatableString pValue);
 
-	public EditorPropertyDefinition removeSimpleValueMapEntry(String pKey);
+  public EditorPropertyDefinition removeSimpleValueMapEntry(String pKey);
 
-	/* valueMapProperty */
+  /* valueMapProperty */
 
-	/**
-	 * Returns a PropertyDefinitionRef used to find the property within the given StructureDefinition that will contain
-	 * the display name for mapping.
-	 * 
-	 * @return the PropertyDefinitionRef or null
-	 */
-	public @Nullable PropertyDefinitionRef getValueMapProperty();
+  /**
+   * Returns a PropertyDefinitionRef used to find the property within the given StructureDefinition that will contain
+   * the display name for mapping.
+   * 
+   * @return the PropertyDefinitionRef or null
+   */
+  public @Nullable PropertyDefinitionRef getValueMapProperty();
 
-	public EditorPropertyDefinition setValueMapProperty(@Nullable PropertyDefinitionRef pValue);
+  public EditorPropertyDefinition setValueMapProperty(@Nullable PropertyDefinitionRef pValue);
 
-	/* tableDisplayProperties */
+  /* tableDisplayProperties */
 
-	public @Nullable List<PropertyDefinitionRef> getTableDisplayProperties();
+  public @Nullable List<PropertyDefinitionRef> getTableDisplayProperties();
 
-	public EditorPropertyDefinition addTableDisplayProperty(int pIndex, PropertyDefinitionRef pValue);
+  public EditorPropertyDefinition addTableDisplayProperty(int pIndex, PropertyDefinitionRef pValue);
 
-	public EditorPropertyDefinition removeTableDisplayProperty(int pIndex);
+  public EditorPropertyDefinition removeTableDisplayProperty(int pIndex);
 
-	/* embedTableRowEditor */
+  /* embedTableRowEditor */
 
-	public @Nullable EmbedEditorDirection getEmbedTableRowEditor();
+  public @Nullable EmbedEditorDirection getEmbedTableRowEditor();
 
-	public EditorPropertyDefinition setEmbedTableRowEditor(EmbedEditorDirection pValue);
+  public EditorPropertyDefinition setEmbedTableRowEditor(EmbedEditorDirection pValue);
 
-	/* displayRefImage */
+  /* displayRefImage */
 
-	public @Nullable PropertyDefinitionRef getDisplayRefImage();
+  public @Nullable PropertyDefinitionRef getDisplayRefImage();
 
-	public EditorPropertyDefinition setDisplayRefImage(@Nullable PropertyDefinitionRef pValue);
+  public EditorPropertyDefinition setDisplayRefImage(@Nullable PropertyDefinitionRef pValue);
 
-	/* customScript */
+  /* customScript */
 
-	public @Nullable Script getCustomScript();
+  public @Nullable Script getCustomScript();
 
-	public EditorPropertyDefinition setCustomScript(@Nullable Script pValue);
+  public EditorPropertyDefinition setCustomScript(@Nullable Script pValue);
 }

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate" immediate="false" name="com.diamondq.common.model.standard.toolkit">
-	<implementation class="com.diamondq.common.model.generic.osgi.WrappedToolkit"/>
- <service>
-    <provide interface="com.diamondq.common.model.interfaces.Toolkit"/>
- </service>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate"
+  immediate="false" name="com.diamondq.common.model.standard.toolkit">
+  <implementation
+    class="com.diamondq.common.model.generic.osgi.WrappedToolkit" />
+  <service>
+    <provide
+      interface="com.diamondq.common.model.interfaces.Toolkit" />
+  </service>
 </scr:component>

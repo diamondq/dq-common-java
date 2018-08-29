@@ -9,8 +9,8 @@ import java.util.Map;
 
 public class GenericTombstoneStructure extends GenericStructure implements Tombstone {
 
-	public GenericTombstoneStructure(Scope pScope, StructureDefinition pDefinition, Map<String, Property<?>> pProps) {
-		super(pScope, pDefinition, pProps);
-	}
+  public GenericTombstoneStructure(Scope pScope, StructureDefinition pDefinition, Map<String, Property<?>> pProps) {
+    super(pScope, pDefinition, pProps);
+  }
 
 }

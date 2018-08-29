@@ -33,181 +33,178 @@ import rocks.xmpp.core.stanza.PresenceEvent;
  */
 public class XMPPConnectionImpl extends AbstractOSGiConstructor {
 
-	private static final Logger sLogger = LoggerFactory.getLogger(XMPPConnectionImpl.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(XMPPConnectionImpl.class);
 
-	public XMPPConnectionImpl() {
-		super(ConstructorInfoBuilder.builder().constructorClass(XMPPConnectionImpl.class).factoryMethod("create")
-			.factoryDelete("onDelete").register(XmppClient.class) //
-			.cArg().type(String.class).prop("domain").required().build() //
-			.cArg().type(String.class).prop("host").required().build() //
-			.cArg().type(Integer.TYPE).prop("port").value(5222).required().build() //
-			.cArg().type(Integer.class).prop(".connectTimeout").optional().build() //
-			.cArg().type(Integer.class).prop(".keepAliveInterval").optional().build() //
-			.cArg().type(Boolean.class).prop("secure").optional().build() //
-			.cArg().type(String.class).prop(".proxyHost").optional().build() //
-			.cArg().type(Integer.class).prop(".proxyPort").optional().build() //
-			.cArg().type(String.class).prop(".proxyType").optional().build() //
-			.cArg().type(String.class).prop(".debugger").optional().build() //
-			.cArg().type(Integer.class).prop(".defaultResponseTimeout").optional().build() //
-			.cArg().type(String.class).prop(".locale").optional().build() //
-			.cArg().type(String.class).prop(".reconnectType").optional().build() //
-			.cArg().type(Integer.class).prop(".slotTime").optional().build() //
-			.cArg().type(Integer.class).prop(".ceilingTime").optional().build() //
-			.cArg().type(Integer.class).prop(".afterTime").optional().build() //
-			.cArg().type(Integer.class).prop(".minTime").optional().build() //
-			.cArg().type(Integer.class).prop(".maxTime").optional().build() //
-			.cArg().type(String.class).prop("username").optional().build() //
-			.cArg().type(String.class).prop(".password").optional().build() //
-			.cArg().type(String.class).prop(".resource").optional().build() //
-			.cArg().type(Consumer.class).propFilter(".inboundPresenceListeners").collection().optional().build() //
-		);
-	}
+  public XMPPConnectionImpl() {
+    super(ConstructorInfoBuilder.builder().constructorClass(XMPPConnectionImpl.class).factoryMethod("create")
+      .factoryDelete("onDelete").register(XmppClient.class) //
+      .cArg().type(String.class).prop("domain").required().build() //
+      .cArg().type(String.class).prop("host").required().build() //
+      .cArg().type(Integer.TYPE).prop("port").value(5222).required().build() //
+      .cArg().type(Integer.class).prop(".connectTimeout").optional().build() //
+      .cArg().type(Integer.class).prop(".keepAliveInterval").optional().build() //
+      .cArg().type(Boolean.class).prop("secure").optional().build() //
+      .cArg().type(String.class).prop(".proxyHost").optional().build() //
+      .cArg().type(Integer.class).prop(".proxyPort").optional().build() //
+      .cArg().type(String.class).prop(".proxyType").optional().build() //
+      .cArg().type(String.class).prop(".debugger").optional().build() //
+      .cArg().type(Integer.class).prop(".defaultResponseTimeout").optional().build() //
+      .cArg().type(String.class).prop(".locale").optional().build() //
+      .cArg().type(String.class).prop(".reconnectType").optional().build() //
+      .cArg().type(Integer.class).prop(".slotTime").optional().build() //
+      .cArg().type(Integer.class).prop(".ceilingTime").optional().build() //
+      .cArg().type(Integer.class).prop(".afterTime").optional().build() //
+      .cArg().type(Integer.class).prop(".minTime").optional().build() //
+      .cArg().type(Integer.class).prop(".maxTime").optional().build() //
+      .cArg().type(String.class).prop("username").optional().build() //
+      .cArg().type(String.class).prop(".password").optional().build() //
+      .cArg().type(String.class).prop(".resource").optional().build() //
+      .cArg().type(Consumer.class).propFilter(".inboundPresenceListeners").collection().optional().build() //
+    );
+  }
 
-	public void onDelete(XmppClient pClient) {
-		sLogger.trace("onDelete({}) from {}", pClient, this);
-		try {
-			pClient.close();
-		}
-		catch (XmppException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+  public void onDelete(XmppClient pClient) {
+    sLogger.trace("onDelete({}) from {}", pClient, this);
+    try {
+      pClient.close();
+    }
+    catch (XmppException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 
-	public XmppClient create(String pDomain, String pHostname, int pPort, @Nullable Integer pConnectTimeout,
-		@Nullable Integer pKeepAliveInterval, @Nullable Boolean pSecure, @Nullable String pProxyHost,
-		@Nullable Integer pProxyPort, @Nullable String pProxyType, @Nullable String pDebuggerName,
-		@Nullable Integer pDefaultResponseTimeout, @Nullable String pLocaleStr, @Nullable String pReconnectType,
-		@Nullable Integer pSlotTime, @Nullable Integer pCeilingTime, @Nullable Integer pAfterTime,
-		@Nullable Integer pMinTime, @Nullable Integer pMaxTime, @Nullable String pUserName, @Nullable String pPassword,
-		@Nullable String pResource, @Nullable Collection<Consumer<PresenceEvent>> pInboundPresenceListeners) {
-		sLogger.trace("create({}, {}, ...) from {}", pDomain, pHostname, this);
+  public XmppClient create(String pDomain, String pHostname, int pPort, @Nullable Integer pConnectTimeout,
+    @Nullable Integer pKeepAliveInterval, @Nullable Boolean pSecure, @Nullable String pProxyHost,
+    @Nullable Integer pProxyPort, @Nullable String pProxyType, @Nullable String pDebuggerName,
+    @Nullable Integer pDefaultResponseTimeout, @Nullable String pLocaleStr, @Nullable String pReconnectType,
+    @Nullable Integer pSlotTime, @Nullable Integer pCeilingTime, @Nullable Integer pAfterTime,
+    @Nullable Integer pMinTime, @Nullable Integer pMaxTime, @Nullable String pUserName, @Nullable String pPassword,
+    @Nullable String pResource, @Nullable Collection<Consumer<PresenceEvent>> pInboundPresenceListeners) {
+    sLogger.trace("create({}, {}, ...) from {}", pDomain, pHostname, this);
 
-		List<ConnectionConfiguration> configurationList = new ArrayList<>();
+    List<ConnectionConfiguration> configurationList = new ArrayList<>();
 
-		/* Handle the TCP Configuration */
+    /* Handle the TCP Configuration */
 
-		Builder socketBuilder = SocketConnectionConfiguration.builder();
+    Builder socketBuilder = SocketConnectionConfiguration.builder();
 
-		socketBuilder = socketBuilder.hostname(pHostname);
+    socketBuilder = socketBuilder.hostname(pHostname);
 
-		socketBuilder = socketBuilder.port(pPort);
+    socketBuilder = socketBuilder.port(pPort);
 
-		if (pConnectTimeout != null)
-			socketBuilder = socketBuilder.connectTimeout(pConnectTimeout);
+    if (pConnectTimeout != null)
+      socketBuilder = socketBuilder.connectTimeout(pConnectTimeout);
 
-		if (pKeepAliveInterval != null)
-			socketBuilder.keepAliveInterval(pKeepAliveInterval);
+    if (pKeepAliveInterval != null)
+      socketBuilder.keepAliveInterval(pKeepAliveInterval);
 
-		if (pSecure != null)
-			socketBuilder = socketBuilder.channelEncryption(ChannelEncryption.REQUIRED);
+    if (pSecure != null)
+      socketBuilder = socketBuilder.channelEncryption(ChannelEncryption.REQUIRED);
 
-		if (pProxyHost != null) {
-			if (pProxyPort == null)
-				throw new IllegalArgumentException("The proxyPort is required if proxyHost is provided.");
+    if (pProxyHost != null) {
+      if (pProxyPort == null)
+        throw new IllegalArgumentException("The proxyPort is required if proxyHost is provided.");
 
-			if (pProxyType == null)
-				pProxyType = Proxy.Type.SOCKS.toString();
-			Proxy.Type proxyType = Proxy.Type.valueOf(pProxyType);
+      if (pProxyType == null)
+        pProxyType = Proxy.Type.SOCKS.toString();
+      Proxy.Type proxyType = Proxy.Type.valueOf(pProxyType);
 
-			InetSocketAddress address = new InetSocketAddress(pProxyHost, pProxyPort);
-			Proxy proxy = new Proxy(proxyType, address);
-			socketBuilder = socketBuilder.proxy(proxy);
-		}
+      InetSocketAddress address = new InetSocketAddress(pProxyHost, pProxyPort);
+      Proxy proxy = new Proxy(proxyType, address);
+      socketBuilder = socketBuilder.proxy(proxy);
+    }
 
-		SocketConnectionConfiguration socketConfiguration = socketBuilder.build();
-		configurationList.add(socketConfiguration);
+    SocketConnectionConfiguration socketConfiguration = socketBuilder.build();
+    configurationList.add(socketConfiguration);
 
-		/* Now set up the Session */
+    /* Now set up the Session */
 
-		XmppSessionConfiguration.Builder builder = XmppSessionConfiguration.builder();
+    XmppSessionConfiguration.Builder builder = XmppSessionConfiguration.builder();
 
-		if (pDebuggerName != null) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<? extends XmppDebugger> debuggerClass =
-					(Class<? extends XmppDebugger>) Class.forName(pDebuggerName);
-				builder = builder.debugger(debuggerClass);
-			}
-			catch (ClassNotFoundException ex) {
-				sLogger.warn("Unable to find debugger class {}", pDebuggerName);
-			}
-		}
+    if (pDebuggerName != null) {
+      try {
+        @SuppressWarnings("unchecked")
+        Class<? extends XmppDebugger> debuggerClass = (Class<? extends XmppDebugger>) Class.forName(pDebuggerName);
+        builder = builder.debugger(debuggerClass);
+      }
+      catch (ClassNotFoundException ex) {
+        sLogger.warn("Unable to find debugger class {}", pDebuggerName);
+      }
+    }
 
-		if (pDefaultResponseTimeout != null)
-			builder = builder.defaultResponseTimeout(Duration.ofMillis(pDefaultResponseTimeout));
+    if (pDefaultResponseTimeout != null)
+      builder = builder.defaultResponseTimeout(Duration.ofMillis(pDefaultResponseTimeout));
 
-		if (pLocaleStr != null) {
-			Locale locale = Locale.forLanguageTag(pLocaleStr);
-			builder = builder.language(locale);
-		}
+    if (pLocaleStr != null) {
+      Locale locale = Locale.forLanguageTag(pLocaleStr);
+      builder = builder.language(locale);
+    }
 
-		if (pReconnectType != null) {
-			ReconnectionStrategy reconnectionStrategy;
-			if ("backoff".equals(pReconnectType)) {
-				if (pSlotTime == null)
-					throw new IllegalArgumentException(
-						"The xmpp.session.reconnection-strategy.slot-time is required for a backoff type.");
-				if (pCeilingTime == null)
-					throw new IllegalArgumentException(
-						"The xmpp.session.reconnection-strategy.ceiling is required for a backoff type.");
-				reconnectionStrategy =
-					ReconnectionStrategy.truncatedBinaryExponentialBackoffStrategy(pSlotTime, pCeilingTime);
-			}
-			else if ("after".equals(pReconnectType)) {
-				if (pAfterTime == null)
-					throw new IllegalArgumentException(
-						"The xmpp.session.reconnection-strategy.after-time is required for a after type.");
-				reconnectionStrategy = ReconnectionStrategy.alwaysAfter(Duration.ofMillis(pAfterTime));
-			}
-			else if ("random".equals(pReconnectType)) {
-				if (pMinTime == null)
-					throw new IllegalArgumentException(
-						"The xmpp.session.reconnection-strategy.min-time is required for a random type.");
-				if (pMaxTime == null)
-					throw new IllegalArgumentException(
-						"The xmpp.session.reconnection-strategy.max-time is required for a random type.");
-				reconnectionStrategy =
-					ReconnectionStrategy.alwaysRandomlyAfter(Duration.ofMillis(pMinTime), Duration.ofMillis(pMaxTime));
-			}
-			else
-				throw new IllegalArgumentException("Unrecognized reconnection-strategy type: " + pReconnectType);
+    if (pReconnectType != null) {
+      ReconnectionStrategy reconnectionStrategy;
+      if ("backoff".equals(pReconnectType)) {
+        if (pSlotTime == null)
+          throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.slot-time is required for a backoff type.");
+        if (pCeilingTime == null)
+          throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.ceiling is required for a backoff type.");
+        reconnectionStrategy = ReconnectionStrategy.truncatedBinaryExponentialBackoffStrategy(pSlotTime, pCeilingTime);
+      }
+      else if ("after".equals(pReconnectType)) {
+        if (pAfterTime == null)
+          throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.after-time is required for a after type.");
+        reconnectionStrategy = ReconnectionStrategy.alwaysAfter(Duration.ofMillis(pAfterTime));
+      }
+      else if ("random".equals(pReconnectType)) {
+        if (pMinTime == null)
+          throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.min-time is required for a random type.");
+        if (pMaxTime == null)
+          throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.max-time is required for a random type.");
+        reconnectionStrategy =
+          ReconnectionStrategy.alwaysRandomlyAfter(Duration.ofMillis(pMinTime), Duration.ofMillis(pMaxTime));
+      }
+      else
+        throw new IllegalArgumentException("Unrecognized reconnection-strategy type: " + pReconnectType);
 
-			builder = builder.reconnectionStrategy(reconnectionStrategy);
-		}
+      builder = builder.reconnectionStrategy(reconnectionStrategy);
+    }
 
-		XmppSessionConfiguration sessionConfiguration = builder.build();
+    XmppSessionConfiguration sessionConfiguration = builder.build();
 
-		ClientConnectionConfiguration[] configurations =
-			configurationList.toArray(new ClientConnectionConfiguration[0]);
+    ClientConnectionConfiguration[] configurations = configurationList.toArray(new ClientConnectionConfiguration[0]);
 
-		/* Connect to the domain */
+    /* Connect to the domain */
 
-		XmppClient client = XmppClient.create(pDomain, sessionConfiguration, configurations);
-		try {
-			sLogger.debug("connecting...");
+    XmppClient client = XmppClient.create(pDomain, sessionConfiguration, configurations);
+    try {
+      sLogger.debug("connecting...");
 
-			/* Register the existing listeners before we connect */
+      /* Register the existing listeners before we connect */
 
-			if (pInboundPresenceListeners != null)
-				for (Consumer<PresenceEvent> listener : pInboundPresenceListeners)
-					client.addInboundPresenceListener(listener);
+      if (pInboundPresenceListeners != null)
+        for (Consumer<PresenceEvent> listener : pInboundPresenceListeners)
+          client.addInboundPresenceListener(listener);
 
-			client.connect();
+      client.connect();
 
-			sLogger.debug("connected");
+      sLogger.debug("connected");
 
-			if (pUserName != null) {
-				if (pResource != null)
-					client.login(pUserName, pPassword, pResource);
-				else
-					client.login(pUserName, pPassword);
-			}
-		}
-		catch (XmppException ex) {
-			throw new RuntimeException(ex);
-		}
+      if (pUserName != null) {
+        if (pResource != null)
+          client.login(pUserName, pPassword, pResource);
+        else
+          client.login(pUserName, pPassword);
+      }
+    }
+    catch (XmppException ex) {
+      throw new RuntimeException(ex);
+    }
 
-		return client;
-	}
+    return client;
+  }
 
 }

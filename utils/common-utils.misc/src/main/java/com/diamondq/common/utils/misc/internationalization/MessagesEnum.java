@@ -5,8 +5,8 @@ import java.util.ResourceBundle;
 
 public interface MessagesEnum {
 
-	public String getCode();
+  public String getCode();
 
-	public ResourceBundle getBundle(Locale pLocale);
+  public ResourceBundle getBundle(Locale pLocale);
 
 }

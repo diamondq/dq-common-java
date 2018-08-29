@@ -8,17 +8,17 @@ import io.opentracing.util.ThreadLocalScopeManager;
 
 public class MockTracing {
 
-	public static MockTracer before() {
-		MockTracer mockTracker = new MockTracer(new ThreadLocalScopeManager());
-		CleanupGlobalTracer.cleanup();
-		GlobalTracer.register(mockTracker);
-		return mockTracker;
-	}
+  public static MockTracer before() {
+    MockTracer mockTracker = new MockTracer(new ThreadLocalScopeManager());
+    CleanupGlobalTracer.cleanup();
+    GlobalTracer.register(mockTracker);
+    return mockTracker;
+  }
 
-	public static void after() {
-		CleanupGlobalTracer.cleanup();
-	}
+  public static void after() {
+    CleanupGlobalTracer.cleanup();
+  }
 
-	public static void afterNoCDI() {
-	}
+  public static void afterNoCDI() {
+  }
 }

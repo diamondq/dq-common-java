@@ -7,40 +7,40 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractObjectMapper implements ObjectMapper {
 
-	protected final Class<?>	mClass;
+  protected final Class<?> mClass;
 
-	@Nullable
-	protected MapperRegistry	mRegistry;
+  @Nullable
+  protected MapperRegistry mRegistry;
 
-	@Nullable
-	protected PepConfig			mConfig;
+  @Nullable
+  protected PepConfig      mConfig;
 
-	public AbstractObjectMapper(Class<?> pClass) {
-		mClass = pClass;
-	}
+  public AbstractObjectMapper(Class<?> pClass) {
+    mClass = pClass;
+  }
 
-	/**
-	 * @see org.apache.openaz.pepapi.ObjectMapper#getMappedClass()
-	 */
-	@Override
-	public Class<?> getMappedClass() {
-		return mClass;
-	}
+  /**
+   * @see org.apache.openaz.pepapi.ObjectMapper#getMappedClass()
+   */
+  @Override
+  public Class<?> getMappedClass() {
+    return mClass;
+  }
 
-	/**
-	 * @see org.apache.openaz.pepapi.ObjectMapper#setMapperRegistry(org.apache.openaz.pepapi.MapperRegistry)
-	 */
-	@Override
-	public void setMapperRegistry(MapperRegistry pMapperRegistry) {
-		mRegistry = pMapperRegistry;
-	}
+  /**
+   * @see org.apache.openaz.pepapi.ObjectMapper#setMapperRegistry(org.apache.openaz.pepapi.MapperRegistry)
+   */
+  @Override
+  public void setMapperRegistry(MapperRegistry pMapperRegistry) {
+    mRegistry = pMapperRegistry;
+  }
 
-	/**
-	 * @see org.apache.openaz.pepapi.ObjectMapper#setPepConfig(org.apache.openaz.pepapi.PepConfig)
-	 */
-	@Override
-	public void setPepConfig(PepConfig pPepConfig) {
-		mConfig = pPepConfig;
-	}
+  /**
+   * @see org.apache.openaz.pepapi.ObjectMapper#setPepConfig(org.apache.openaz.pepapi.PepConfig)
+   */
+  @Override
+  public void setPepConfig(PepConfig pPepConfig) {
+    mConfig = pPepConfig;
+  }
 
 }
