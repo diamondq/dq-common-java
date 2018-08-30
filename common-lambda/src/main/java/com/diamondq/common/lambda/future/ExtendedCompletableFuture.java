@@ -92,22 +92,22 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     }
     catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
       try {
-        @SuppressWarnings({"cast", "rawtypes", "unchecked"})
+        @SuppressWarnings({"rawtypes", "unchecked"})
         Constructor<CancelableBiFunction<?, ?, ?>> cbi =
           (Constructor) NoopCancelableBiFunction.class.getConstructor(BiFunction.class);
         biFunctionConstructor = cbi;
 
-        @SuppressWarnings({"cast", "rawtypes", "unchecked"})
+        @SuppressWarnings({"rawtypes", "unchecked"})
         Constructor<CancelableFunction<?, ?>> cf =
           (Constructor) NoopCancelableFunction.class.getConstructor(Function.class);
         functionConstructor = cf;
 
-        @SuppressWarnings({"cast", "rawtypes", "unchecked"})
+        @SuppressWarnings({"rawtypes", "unchecked"})
         Constructor<CancelableSupplier<?>> cs =
           (Constructor) NoopCancelableSupplier.class.getConstructor(Supplier.class);
         supplierConstructor = cs;
 
-        @SuppressWarnings({"cast", "rawtypes", "unchecked"})
+        @SuppressWarnings({"rawtypes", "unchecked"})
         Constructor<CancelableRunnable> cr = (Constructor) NoopCancelableRunnable.class.getConstructor(Runnable.class);
         runnableConstructor = cr;
 
@@ -247,8 +247,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
   }
 
   @Override
-  public <U> ExtendedCompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> pFn,
-    @Nullable Executor pExecutor) {
+  public <U> ExtendedCompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> pFn, Executor pExecutor) {
     return handleAsync((t, ex) -> {
       if (ex != null) {
         if (ex instanceof RuntimeException)
@@ -385,7 +384,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
   @Override
   public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-    BiFunction<? super T, ? super U, ? extends V> pFn, @Nullable Executor pExecutor) {
+    BiFunction<? super T, ? super U, ? extends V> pFn, Executor pExecutor) {
     CancelableBiFunction<? super T, ? super U, ? extends V> ab = wrapBiFunction(pFn);
     try {
       ExtendedCompletableFuture<V> result =
@@ -426,7 +425,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
   @Override
   public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
-    BiConsumer<? super T, ? super U> pAction, @Nullable Executor pExecutor) {
+    BiConsumer<? super T, ? super U> pAction, Executor pExecutor) {
     return thenCombineAsync(pOther, (a, b) -> {
       pAction.accept(a, b);
       return null;
@@ -506,7 +505,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
   @Override
   public <U> ExtendedCompletableFuture<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
-    Function<? super T, U> pFn, @Nullable Executor pExecutor) {
+    Function<? super T, U> pFn, Executor pExecutor) {
     CancelableFunction<? super T, U> ab = wrapFunction(pFn);
     try {
       ExtendedCompletableFuture<U> result =
@@ -707,7 +706,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
   @Override
   public ExtendedCompletableFuture<T> whenCompleteAsync(
-    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction, @Nullable Executor pExecutor) {
+    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction, Executor pExecutor) {
     return handleAsync((t, ex) -> {
       pAction.accept(t, ex);
       return t;
@@ -744,7 +743,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
   @Override
   public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn,
-    @Nullable Executor pExecutor) {
+    Executor pExecutor) {
     CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab = wrapBiFunction(pFn);
     try {
       ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handleAsync(ab, pExecutor));

@@ -71,8 +71,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
   }
 
   @Override
-  public <U> ExtendedCompletionStage<U> thenApplyAsync(Function<? super T, ? extends U> pFn,
-    @Nullable Executor pExecutor) {
+  public <U> ExtendedCompletionStage<U> thenApplyAsync(Function<? super T, ? extends U> pFn, Executor pExecutor) {
     return handleAsync((t, ex) -> {
       if (ex != null) {
         if (ex instanceof RuntimeException)
@@ -209,7 +208,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 
   @Override
   public <U, V> ExtendedCompletionStage<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-    BiFunction<? super T, ? super U, ? extends V> pFn, @Nullable Executor pExecutor) {
+    BiFunction<? super T, ? super U, ? extends V> pFn, Executor pExecutor) {
     CancelableBiFunction<? super T, ? super U, ? extends V> ab = ExtendedCompletableFuture.wrapBiFunction(pFn);
     try {
       ExtendedCompletionStage<V> result =
@@ -250,7 +249,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 
   @Override
   public <U> ExtendedCompletionStage<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
-    BiConsumer<? super T, ? super U> pAction, @Nullable Executor pExecutor) {
+    BiConsumer<? super T, ? super U> pAction, Executor pExecutor) {
     return thenCombineAsync(pOther, (a, b) -> {
       pAction.accept(a, b);
       return null;
@@ -329,7 +328,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 
   @Override
   public <U> ExtendedCompletionStage<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
-    Function<? super T, U> pFn, @Nullable Executor pExecutor) {
+    Function<? super T, U> pFn, Executor pExecutor) {
     CancelableFunction<? super T, U> ab = ExtendedCompletableFuture.wrapFunction(pFn);
     try {
       ExtendedCompletionStage<U> result =
@@ -532,7 +531,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 
   @Override
   public ExtendedCompletionStage<T> whenCompleteAsync(
-    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction, @Nullable Executor pExecutor) {
+    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction, Executor pExecutor) {
     return handleAsync((t, ex) -> {
       pAction.accept(t, ex);
       return t;
@@ -571,7 +570,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
 
   @Override
   public <U> ExtendedCompletionStage<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn,
-    @Nullable Executor pExecutor) {
+    Executor pExecutor) {
     CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab =
       ExtendedCompletableFuture.wrapBiFunction(pFn);
     try {

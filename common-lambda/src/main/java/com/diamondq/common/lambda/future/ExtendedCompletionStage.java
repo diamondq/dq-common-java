@@ -47,8 +47,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
    *      java.util.concurrent.Executor)
    */
   @Override
-  public <U> ExtendedCompletionStage<U> thenApplyAsync(Function<? super T, ? extends U> fn,
-    @SuppressWarnings("null") Executor executor);
+  public <U> ExtendedCompletionStage<U> thenApplyAsync(Function<? super T, ? extends U> fn, Executor executor);
 
   /**
    * @see java.util.concurrent.CompletionStage#thenAccept(java.util.function.Consumer)
@@ -109,7 +108,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
    */
   @Override
   public <U, V> ExtendedCompletionStage<V> thenCombineAsync(CompletionStage<? extends U> other,
-    BiFunction<? super T, ? super U, ? extends V> fn, @SuppressWarnings("null") Executor executor);
+    BiFunction<? super T, ? super U, ? extends V> fn, Executor executor);
 
   /**
    * @see java.util.concurrent.CompletionStage#thenAcceptBoth(java.util.concurrent.CompletionStage,
@@ -133,7 +132,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
    */
   @Override
   public <U> ExtendedCompletionStage<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> other,
-    BiConsumer<? super T, ? super U> action, @SuppressWarnings("null") Executor executor);
+    BiConsumer<? super T, ? super U> action, Executor executor);
 
   /**
    * @see java.util.concurrent.CompletionStage#runAfterBoth(java.util.concurrent.CompletionStage, java.lang.Runnable)
@@ -177,7 +176,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
    */
   @Override
   public <U> ExtendedCompletionStage<U> applyToEitherAsync(CompletionStage<? extends T> other,
-    Function<? super T, U> fn, @SuppressWarnings("null") Executor executor);
+    Function<? super T, U> fn, Executor executor);
 
   /**
    * @see java.util.concurrent.CompletionStage#acceptEither(java.util.concurrent.CompletionStage,
@@ -242,7 +241,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
    */
   @Override
   public <U> ExtendedCompletionStage<U> thenComposeAsync(Function<? super T, ? extends CompletionStage<U>> fn,
-    @SuppressWarnings("null") Executor executor);
+    Executor executor);
 
   /**
    * @see java.util.concurrent.CompletionStage#exceptionally(java.util.function.Function)
@@ -274,7 +273,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
    */
   @Override
   public ExtendedCompletionStage<T> whenCompleteAsync(
-    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> action, @SuppressWarnings("null") Executor executor);
+    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> action, Executor executor);
 
   /**
    * @see java.util.concurrent.CompletionStage#handle(java.util.function.BiFunction)
@@ -293,7 +292,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
    */
   @Override
   public <U> ExtendedCompletionStage<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> fn,
-    @SuppressWarnings("null") Executor executor);
+    Executor executor);
 
   /**
    * @see java.util.concurrent.CompletionStage#toCompletableFuture()
@@ -609,9 +608,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
     /* Setup the LoopState object */
 
     ExtendedCompletionStage<@Nullable LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> applyResult =
-      thenApply(
-        input -> new LoopState<>(
-          input));
+      thenApply(input -> new LoopState<>(input));
     @SuppressWarnings("null")
     ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
       (ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
@@ -663,10 +660,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
     /* Setup the LoopState object */
 
     ExtendedCompletionStage<@Nullable LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> applyResult =
-      thenApplyAsync(
-        input -> new LoopState<>(
-          input),
-        pExecutor);
+      thenApplyAsync(input -> new LoopState<>(input), pExecutor);
     @SuppressWarnings("null")
     ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
       (ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
