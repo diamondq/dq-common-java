@@ -15,6 +15,7 @@ import javax.enterprise.inject.Produces;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@SuppressWarnings("deprecation")
 @ApplicationScoped
 public class ZipkinReporterProvider {
 
