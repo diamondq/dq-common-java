@@ -159,29 +159,7 @@ public class LoggingUtils {
    */
   public static void exit(Logger pLogger, Object pThis) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-
-      String indent = MDC.get("DQIndent");
-      if (indent == null)
-        indent = "";
-      if (indent.length() > 1)
-        indent = indent.substring(0, indent.length() - 2);
-      if (indent.length() == 0)
-        MDC.remove("DQIndent");
-      else
-        MDC.put("DQIndent", indent);
-
-      /* Calculate the method name */
-
-      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-      String methodName = stackTraceElements[2].getMethodName();
-
-      Stack<String> stack = sENTRY_METHOD.get();
-      @Nullable
-      String oldMethodName = stack.pop();
-      if (methodName.equals(oldMethodName) == false)
-        pLogger.warn("Unmatched LoggingUtils.exit({}) with LoggingUtils.entry({})", methodName, oldMethodName);
-
-      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_0, methodName, pThis);
+      exitInternal(pLogger, pThis, true, null, false, null, null);
     }
   }
 
@@ -196,29 +174,25 @@ public class LoggingUtils {
    */
   public static <T> T exit(Logger pLogger, Object pThis, T pResult) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+      exitInternal(pLogger, pThis, true, null, true, pResult, null);
+    }
+    return pResult;
+  }
 
-      String indent = MDC.get("DQIndent");
-      if (indent == null)
-        indent = "";
-      if (indent.length() > 1)
-        indent = indent.substring(0, indent.length() - 2);
-      if (indent.length() == 0)
-        MDC.remove("DQIndent");
-      else
-        MDC.put("DQIndent", indent);
-
-      /* Calculate the method name */
-
-      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-      String methodName = stackTraceElements[2].getMethodName();
-
-      Stack<String> stack = sENTRY_METHOD.get();
-      @Nullable
-      String oldMethodName = stack.pop();
-      if (methodName.equals(oldMethodName) == false)
-        pLogger.warn("Unmatched LoggingUtils.exit({}) with LoggingUtils.entry({})", methodName, oldMethodName);
-
-      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_1, methodName, pResult, pThis);
+  /**
+   * This represents the EXIT of a method. It must be matched with a preceding ENTRY. This effectively creates a
+   * pLogger.trace(EXIT_MARKER, "EXIT {methodName}() with {result} from {pThis}").
+   * 
+   * @param pLogger the logger
+   * @param pThis the object representing 'this'
+   * @param pResult The result of the method being exited
+   * @param pMeta the meta function to convert the result
+   * @return the same result value passed in
+   */
+  public static <T> T exitWithMeta(Logger pLogger, Object pThis, T pResult,
+    Function<@Nullable Object, @Nullable Object> pMeta) {
+    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+      exitInternal(pLogger, pThis, true, null, true, pResult, pMeta);
     }
     return pResult;
   }
@@ -233,7 +207,20 @@ public class LoggingUtils {
    */
   public static void exitWithException(Logger pLogger, Object pThis, Throwable pThrowable) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
+      exitInternal(pLogger, pThis, true, pThrowable, false, null, null);
+    }
+  }
 
+  private static void exitInternal(Logger pLogger, @Nullable Object pThis, boolean pMatchEntryExit,
+    @Nullable Throwable pThrowable, boolean pWithResult, @Nullable Object pResult,
+    @Nullable Function<@Nullable Object, @Nullable Object> pMeta) {
+
+    /* Calculate the method name */
+
+    StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+    String methodName = stackTraceElements[3].getMethodName();
+
+    if (pMatchEntryExit == true) {
       String indent = MDC.get("DQIndent");
       if (indent == null)
         indent = "";
@@ -244,20 +231,30 @@ public class LoggingUtils {
       else
         MDC.put("DQIndent", indent);
 
-      /* Calculate the method name */
-
-      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-      String methodName = stackTraceElements[2].getMethodName();
-
       Stack<String> stack = sENTRY_METHOD.get();
       @Nullable
       String oldMethodName = stack.pop();
       if (methodName.equals(oldMethodName) == false)
         pLogger.warn("Unmatched LoggingUtils.exitWithException({}) with LoggingUtils.entry({})", methodName,
           oldMethodName);
-
-      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_ERROR, methodName, pThis, pThrowable);
     }
+
+    if (pThrowable != null)
+      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_ERROR, methodName, pThis, pThrowable);
+
+    else if (pWithResult == true) {
+      if (pMeta != null) {
+        Object newResult = pMeta.apply(pResult);
+        pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_1, methodName, newResult, pThis);
+      }
+      else {
+        pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_1, methodName, pResult, pThis);
+
+      }
+    }
+    else
+      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_0, methodName, pThis);
+
   }
 
   /**
