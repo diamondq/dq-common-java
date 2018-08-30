@@ -136,6 +136,11 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
+        <artifactId>common-thirdparty.googleauth</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
         <artifactId>common-thirdparty.opentracing.api</artifactId>
         <version>0.31.0_01</version>
       </dependency>
