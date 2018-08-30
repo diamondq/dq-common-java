@@ -162,7 +162,7 @@ public class GenericStructureDefinition implements StructureDefinition {
   @Override
   public StructureDefinition removePropertyDefinition(PropertyDefinition pValue) {
     @NonNull
-    Predicate<PropertyDefinition> equalTo = Predicates.equalTo(pValue);
+    Predicate<@Nullable PropertyDefinition> equalTo = Predicates.equalTo(pValue);
     return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance,
       Maps.filterValues(mProperties, Predicates.not(equalTo)), mParentDefinitions, mKeywords);
   }

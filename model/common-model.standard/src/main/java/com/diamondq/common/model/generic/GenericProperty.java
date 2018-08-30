@@ -252,7 +252,6 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
         if (pValue instanceof Long)
           break;
         if (pValue instanceof Integer) {
-          @SuppressWarnings("cast")
           long asLong = Long.valueOf((Integer) pValue);
           pValue = (TYPE) (Long) asLong;
           break;

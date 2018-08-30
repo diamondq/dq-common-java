@@ -76,7 +76,6 @@ public class GenericStructure implements Structure, Revision<String> {
     Collection<String> names = mDefinition.lookupPropertyDefinitionNamesByKeyword(CommonKeywordKeys.CONTAINER,
       CommonKeywordValues.CONTAINER_PARENT, PropertyType.PropertyRef);
 
-    @SuppressWarnings({"null", "cast"})
     String firstName = Iterables.getFirst(names, null);
     Property<@Nullable PropertyRef<T>> first = firstName == null ? null : lookupPropertyByName(firstName);
     return first == null ? null : first.getValue(this);
@@ -173,7 +172,6 @@ public class GenericStructure implements Structure, Revision<String> {
     Collection<String> names = mDefinition.lookupPropertyDefinitionNamesByKeyword(CommonKeywordKeys.INHERIT_PARENT,
       null, PropertyType.StructureRef);
 
-    @SuppressWarnings({"cast", "null"})
     String firstName = Iterables.getFirst(names, null);
     Property<@Nullable StructureRef> first = firstName == null ? null : lookupPropertyByName(firstName);
     return first == null ? null : first.getValue(this);
@@ -209,19 +207,18 @@ public class GenericStructure implements Structure, Revision<String> {
   /**
    * @see com.diamondq.common.model.interfaces.Structure#lookupPropertyByName(java.lang.String)
    */
-  @SuppressWarnings("cast")
   @Override
   public <@Nullable T> @Nullable Property<T> lookupPropertyByName(String pName) {
     Property<?> prop = mProperties.get(pName);
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Property<T> result = (Property<T>) (Property) prop;
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Nullable Property<T> result = (Property) prop;
     return result;
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.Structure#lookupMandatoryPropertyByName(java.lang.String)
    */
-  @SuppressWarnings({"cast", "null", "unused"})
+  @SuppressWarnings({"null", "unused"})
   @Override
   public <@Nullable T> Property<T> lookupMandatoryPropertyByName(String pName) {
     Property<?> prop = mProperties.get(pName);
@@ -229,7 +226,7 @@ public class GenericStructure implements Structure, Revision<String> {
       throw new IllegalArgumentException(
         "The mandatory property " + pName + " was not found in the Structure " + mDefinition.getName());
     @SuppressWarnings({"unchecked", "rawtypes"})
-    Property<T> result = (Property<T>) (Property) prop;
+    Property<T> result = (Property) prop;
     return result;
   }
 
