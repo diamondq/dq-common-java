@@ -20,6 +20,7 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import com.diamondq.common.utils.misc.logging.LoggingUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -61,8 +62,16 @@ public class WrappedToolkit implements Toolkit {
   }
 
   public void onActivate() {
-    sLogger.trace("onActivate() from {}", this);
-    mToolkit = ToolkitFactory.newInstance().newToolkit();
+    LoggingUtils.entry(sLogger, this);
+    try {
+      mToolkit = ToolkitFactory.newInstance().newToolkit();
+      LoggingUtils.exit(sLogger, this);
+    }
+    catch (RuntimeException ex) {
+      LoggingUtils.exitWithException(sLogger, this, ex);
+      sLogger.error("", ex);
+      throw ex;
+    }
   }
 
   private Scope dewrapScope(Scope pScope) {
@@ -92,7 +101,7 @@ public class WrappedToolkit implements Toolkit {
   }
 
   public void clearModificationState() {
-    sLogger.trace("clearModificationState() from {}", this);
+    LoggingUtils.simpleEntry(sLogger, this);
     mWriteStructure = false;
     mWriteStructureDefinition = false;
     mWriteEditorStructureDefinition = false;
@@ -104,11 +113,18 @@ public class WrappedToolkit implements Toolkit {
   }
 
   public void setPersistenceLayer(Scope pScope, PersistenceLayer pLayer) {
-    sLogger.trace("setPersistenceLayer({}, {}) from {}", pScope, pLayer, this);
-    if (mToolkit instanceof GenericToolkit)
-      ((GenericToolkit) mToolkit).setPersistenceLayer(pScope, pLayer);
-    else
-      throw new UnsupportedOperationException();
+    LoggingUtils.entry(sLogger, this, pScope, pLayer);
+    try {
+      if (mToolkit instanceof GenericToolkit)
+        ((GenericToolkit) mToolkit).setPersistenceLayer(pScope, pLayer);
+      else
+        throw new UnsupportedOperationException();
+      LoggingUtils.exit(sLogger, this);
+    }
+    catch (RuntimeException ex) {
+      LoggingUtils.exitWithException(sLogger, this, ex);
+      throw ex;
+    }
   }
 
   /**
