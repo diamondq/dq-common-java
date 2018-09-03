@@ -38,10 +38,11 @@
     <module>../storage/common-storage.jdo.datanucleus</module>
     <module>../tracing/common-tracing.opentracing</module>
     <module>../tracing/common-tracing.jaeger</module>
-    <module>../utils/common-utils.sync</module>
-    <module>../utils/common-utils.parsing</module>
     <module>../utils/common-utils.log4j2</module>
+    <module>../utils/common-utils.logback</module>
     <module>../utils/common-utils.misc</module>
+    <module>../utils/common-utils.parsing</module>
+    <module>../utils/common-utils.sync</module>
     <module>../xmpp/common-xmpp.standard</module>
     <module>../xmpp/common-xmpp.eclipse.system.fragment</module>
     <module>../deployment/common-deployment.basic</module>
