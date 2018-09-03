@@ -69,6 +69,8 @@ public class LoggingUtils {
 
   private static ThreadLocal<Stack<String>> sENTRY_METHOD            = ThreadLocal.withInitial(() -> new Stack<>());
 
+  private static Marker                     sSIMPLE_ENTRY_MARKER     = MarkerFactory.getMarker("ENTRY_S");
+
   private static Marker                     sENTRY_MARKER            = MarkerFactory.getMarker("ENTRY");
 
   private static Marker                     sEXIT_MARKER             = MarkerFactory.getMarker("EXIT");
@@ -94,7 +96,7 @@ public class LoggingUtils {
    */
   public static void entry(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      entryWithMetaInternal(pLogger, pThis, false, true, pArgs);
+      entryWithMetaInternal(pLogger, sENTRY_MARKER, pThis, false, true, pArgs);
     }
   }
 
@@ -113,7 +115,7 @@ public class LoggingUtils {
    */
   public static void entryWithMeta(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      entryWithMetaInternal(pLogger, pThis, true, true, pArgs);
+      entryWithMetaInternal(pLogger, sENTRY_MARKER, pThis, true, true, pArgs);
     }
   }
 
@@ -126,8 +128,8 @@ public class LoggingUtils {
    * @param pArgs any arguments to display
    */
   public static void simpleEntry(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
-    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      entryWithMetaInternal(pLogger, pThis, false, false, pArgs);
+    if (pLogger.isTraceEnabled(sSIMPLE_ENTRY_MARKER)) {
+      entryWithMetaInternal(pLogger, sSIMPLE_ENTRY_MARKER, pThis, false, false, pArgs);
     }
   }
 
@@ -145,8 +147,8 @@ public class LoggingUtils {
    * @param pArgs any arguments to display
    */
   public static void simpleEntryWithMeta(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
-    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      entryWithMetaInternal(pLogger, pThis, true, false, pArgs);
+    if (pLogger.isTraceEnabled(sSIMPLE_ENTRY_MARKER)) {
+      entryWithMetaInternal(pLogger, sSIMPLE_ENTRY_MARKER, pThis, true, false, pArgs);
     }
   }
 
@@ -261,12 +263,13 @@ public class LoggingUtils {
    * Common internal function to handle the entry routine
    * 
    * @param pLogger the logger
+   * @param pMarker the marker
    * @param pThis the object representing 'this'
    * @param pWithMeta true if there is meta data in the arguments or false if there isn't.
    * @param pMatchEntryExit true if there must be matching exit or false if this is a standalone entry
    * @param pArgs any arguments to display
    */
-  private static void entryWithMetaInternal(Logger pLogger, @Nullable Object pThis, boolean pWithMeta,
+  private static void entryWithMetaInternal(Logger pLogger, Marker pMarker, @Nullable Object pThis, boolean pWithMeta,
     boolean pMatchEntryExit, @Nullable Object @Nullable... pArgs) {
     String messagePattern;
     if (pArgs == null)
@@ -338,7 +341,7 @@ public class LoggingUtils {
       expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] = pThis;
 
     FormattingTuple tp = MessageFormatter.arrayFormat(messagePattern, expandedArgs);
-    pLogger.trace(sENTRY_MARKER, tp.getMessage(), filteredArgs);
+    pLogger.trace(pMarker, tp.getMessage(), filteredArgs);
 
     if (pMatchEntryExit == true) {
       String indent = MDC.get("DQIndent");
