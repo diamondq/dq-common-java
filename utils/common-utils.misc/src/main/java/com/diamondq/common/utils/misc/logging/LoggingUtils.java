@@ -1,5 +1,7 @@
 package com.diamondq.common.utils.misc.logging;
 
+import java.io.StreamCorruptedException;
+import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Stack;
@@ -27,6 +29,8 @@ public class LoggingUtils {
   public static final Function<@Nullable Object, @Nullable Object> sBytesType;
 
   public static final Function<@Nullable Object, @Nullable Object> sX509CertificateType;
+
+  public static final Function<@Nullable Object, @Nullable Object> sKeyPairType;
 
   static {
     sHashType = (i) -> {
@@ -59,6 +63,18 @@ public class LoggingUtils {
         sb.append(", Serial Number=").append(cert.getSerialNumber().toString());
         sb.append(", Validity=[From=").append(cert.getNotBefore());
         sb.append(", To=").append(cert.getNotAfter()).append("]");
+        sb.append("]");
+        return sb.toString();
+      }
+      else
+        return i;
+    };
+    sKeyPairType = (i) -> {
+      if (i instanceof KeyPair) {
+        KeyPair keyPair = (KeyPair) i;
+        StringBuilder sb = new StringBuilder();
+        sb.append("%KEYPAIR[public=");
+        sb.append(keyPair.getPublic());
         sb.append("]");
         return sb.toString();
       }
