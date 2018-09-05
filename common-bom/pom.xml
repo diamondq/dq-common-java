@@ -126,56 +126,6 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.cal10n.api</artifactId>
-        <version>0.8.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.firebase.admin</artifactId>
-        <version>6.3.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.googleauth</artifactId>
-        <version>1.2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.opentracing.api</artifactId>
-        <version>0.31.0_01</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.opentracing.noop</artifactId>
-        <version>0.31.0_01</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.opentracing.util</artifactId>
-        <version>0.31.0_04</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.pcap4j.core</artifactId>
-        <version>1.7.3</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.simple.odf</artifactId>
-        <version>0.8.2</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.twilio</artifactId>
-        <version>7.22.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-thirdparty.unirest.java</artifactId>
-        <version>1.4.9</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
         <artifactId>common-tracing.jaeger</artifactId>
         <version>${project.version}</version>
       </dependency>
