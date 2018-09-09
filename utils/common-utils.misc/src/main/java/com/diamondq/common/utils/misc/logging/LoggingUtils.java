@@ -1,6 +1,5 @@
 package com.diamondq.common.utils.misc.logging;
 
-import java.io.StreamCorruptedException;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
