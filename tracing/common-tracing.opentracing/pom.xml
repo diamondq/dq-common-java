@@ -34,7 +34,6 @@
     <dependency>
       <groupId>rocks.xmpp</groupId>
       <artifactId>xmpp-core-client</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>io.opentracing</groupId>
