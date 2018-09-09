@@ -55,7 +55,6 @@
     <dependency>
       <groupId>com.diamondq.common</groupId>
       <artifactId>common-injection.osgi</artifactId>
-      <optional>true</optional>
     </dependency>
   </dependencies>
   <build>
