@@ -72,6 +72,12 @@ public class DQMDC extends ClassicConverter {
 
       // format: key0=value0, key1=value1
       String r = mdcPropertyMap.get(key);
+      if ((r != null) && ("DQIndent".equals(key))) {
+        String mdcThreadName = mdcPropertyMap.get("DQT");
+        String threadName = Thread.currentThread().getName();
+        if (threadName.equals(mdcThreadName) == false)
+          r = null;
+      }
       if (r == null)
         r = mKeep.get(key);
       if (r == null)
