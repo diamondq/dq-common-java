@@ -1,7 +1,7 @@
-package com.diamondq.common.utils.misc.context.spi;
+package com.diamondq.common.utils.context.spi;
 
-import com.diamondq.common.utils.misc.context.Context;
-import com.diamondq.common.utils.misc.context.impl.ContextFactoryImpl;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -87,12 +87,12 @@ public class ContextClass implements Context {
       for (int i = 0; i < stackTrace.length; i++) {
         if (inFactory == false) {
           String className = stackTrace[i].getClassName();
-          if (className.startsWith("com.diamondq.common.utils.misc.context.impl.ContextFactoryImpl") == true)
+          if (className.startsWith("com.diamondq.common.utils.context.impl.ContextFactoryImpl") == true)
             inFactory = true;
         }
         else {
           String className = stackTrace[i].getClassName();
-          if (className.startsWith("com.diamondq.common.utils.misc.context.") == true)
+          if (className.startsWith("com.diamondq.common.utils.context.") == true)
             continue;
           mLatestStackMethod = stackTrace[i].getMethodName();
           break;
@@ -106,7 +106,7 @@ public class ContextClass implements Context {
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.Context#exit(java.lang.Object)
+   * @see com.diamondq.common.utils.context.Context#exit(java.lang.Object)
    */
   @Override
   public <T> T exit(T pResult) {
@@ -114,7 +114,7 @@ public class ContextClass implements Context {
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.Context#exit()
+   * @see com.diamondq.common.utils.context.Context#exit()
    */
   @Override
   public void exit() {
@@ -122,7 +122,7 @@ public class ContextClass implements Context {
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.Context#exit(java.lang.Object, java.util.function.Function)
+   * @see com.diamondq.common.utils.context.Context#exit(java.lang.Object, java.util.function.Function)
    */
   @Override
   public <T> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
@@ -130,15 +130,63 @@ public class ContextClass implements Context {
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.Context#reportTrace(java.lang.Object[])
+   * @see com.diamondq.common.utils.context.Context#trace(java.lang.Object[])
    */
   @Override
-  public void reportTrace(@Nullable Object @Nullable... pArgs) {
+  public void trace(@Nullable Object @Nullable... pArgs) {
     mFactory.internalReportTrace(this, pArgs);
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.Context#reportThrowable(java.lang.Throwable)
+   * @see com.diamondq.common.utils.context.Context#trace(java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void trace(String pMessage, @Nullable Object @Nullable... pArgs) {
+    mFactory.internalReportTrace(this, pMessage, pArgs);
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#debug(java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void debug(String pMessage, @Nullable Object @Nullable... pArgs) {
+    mFactory.internalReportDebug(this, pMessage, pArgs);
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#info(java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void info(String pMessage, @Nullable Object @Nullable... pArgs) {
+    mFactory.internalReportInfo(this, pMessage, pArgs);
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#warn(java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void warn(String pMessage, @Nullable Object @Nullable... pArgs) {
+    mFactory.internalReportWarn(this, pMessage, pArgs);
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#error(java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void error(String pMessage, @Nullable Object @Nullable... pArgs) {
+    mFactory.internalReportError(this, pMessage, pArgs);
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#error(java.lang.String, java.lang.Throwable)
+   */
+  @Override
+  public void error(String pMessage, @Nullable Throwable pThrowable) {
+    mFactory.internalReportError(this, pMessage, pThrowable);
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#reportThrowable(java.lang.Throwable)
    */
   @Override
   public RuntimeException reportThrowable(Throwable pThrowable) {

@@ -4,8 +4,8 @@ import com.diamondq.common.injection.osgi.ServiceReferenceUtils;
 import com.diamondq.common.injection.osgi.SingletonServiceFactory;
 import com.diamondq.common.jaxrs.model.ApplicationInfo;
 import com.diamondq.common.jaxrs.model.ApplicationInfo.Builder;
+import com.diamondq.common.utils.context.logging.LoggingUtils;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
-import com.diamondq.common.utils.misc.logging.LoggingUtils;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 
 import java.net.URI;

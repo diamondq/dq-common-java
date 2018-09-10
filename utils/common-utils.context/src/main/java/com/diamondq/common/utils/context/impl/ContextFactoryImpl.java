@@ -1,9 +1,9 @@
-package com.diamondq.common.utils.misc.context.impl;
+package com.diamondq.common.utils.context.impl;
 
-import com.diamondq.common.utils.misc.context.Context;
-import com.diamondq.common.utils.misc.context.ContextFactory;
-import com.diamondq.common.utils.misc.context.spi.ContextClass;
-import com.diamondq.common.utils.misc.context.spi.ContextHandler;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextFactory;
+import com.diamondq.common.utils.context.spi.ContextClass;
+import com.diamondq.common.utils.context.spi.ContextHandler;
 
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -44,7 +44,7 @@ public class ContextFactoryImpl implements ContextFactory {
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.ContextFactory#newContextWithMeta(java.lang.Class, java.lang.Object,
+   * @see com.diamondq.common.utils.context.ContextFactory#newContextWithMeta(java.lang.Class, java.lang.Object,
    *      java.lang.Object[])
    */
   @Override
@@ -65,7 +65,7 @@ public class ContextFactoryImpl implements ContextFactory {
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.ContextFactory#newContext(java.lang.Class, java.lang.Object,
+   * @see com.diamondq.common.utils.context.ContextFactory#newContext(java.lang.Class, java.lang.Object,
    *      java.lang.Object[])
    */
   @Override
@@ -93,7 +93,7 @@ public class ContextFactoryImpl implements ContextFactory {
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.ContextFactory#getCurrentContext()
+   * @see com.diamondq.common.utils.context.ContextFactory#getCurrentContext()
    */
   @Override
   public Context getCurrentContext() {
@@ -103,7 +103,7 @@ public class ContextFactoryImpl implements ContextFactory {
   }
 
   /**
-   * @see com.diamondq.common.utils.misc.context.ContextFactory#reportThrowable(java.lang.Class, java.lang.Object,
+   * @see com.diamondq.common.utils.context.ContextFactory#reportThrowable(java.lang.Class, java.lang.Object,
    *      java.lang.Throwable)
    */
   @Override
@@ -124,7 +124,7 @@ public class ContextFactoryImpl implements ContextFactory {
       context.setData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
       for (ContextHandler handler : mHandlers)
         handler.executeOnContextStart(context);
-      context.reportTrace(pArgs);
+      context.trace(pArgs);
     }
   }
 
@@ -158,7 +158,46 @@ public class ContextFactoryImpl implements ContextFactory {
 
   public void internalReportTrace(ContextClass pContext, @Nullable Object @Nullable [] pArgs) {
     for (ContextHandler handler : mHandlers) {
-      handler.executeOnContextReportTrace(pContext, pArgs);
+      handler.executeOnContextReportTrace(pContext, null, pArgs);
+    }
+  }
+
+  public void internalReportTrace(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
+    for (ContextHandler handler : mHandlers) {
+      handler.executeOnContextReportTrace(pContext, pMessage, pArgs);
+    }
+  }
+
+  public void internalReportDebug(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
+    for (ContextHandler handler : mHandlers) {
+      handler.executeOnContextReportDebug(pContext, pMessage, pArgs);
+    }
+  }
+
+  public void internalReportInfo(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
+    for (ContextHandler handler : mHandlers) {
+      handler.executeOnContextReportInfo(pContext, pMessage, pArgs);
+    }
+  }
+
+  public void internalReportWarn(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
+    for (ContextHandler handler : mHandlers) {
+      handler.executeOnContextReportWarn(pContext, pMessage, pArgs);
+    }
+  }
+
+  public void internalReportError(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
+    for (ContextHandler handler : mHandlers) {
+      handler.executeOnContextReportError(pContext, pMessage, pArgs);
+    }
+  }
+
+  public void internalReportError(ContextClass pContext, String pMessage, @Nullable Throwable pThrowable) {
+    for (ContextHandler handler : mHandlers) {
+      if (pThrowable == null)
+        handler.executeOnContextReportError(pContext, pMessage, (Object[]) null);
+      else
+        handler.executeOnContextReportError(pContext, pMessage, pThrowable);
     }
   }
 

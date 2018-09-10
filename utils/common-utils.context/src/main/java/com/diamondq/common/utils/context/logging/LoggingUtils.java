@@ -1,4 +1,4 @@
-package com.diamondq.common.utils.misc.logging;
+package com.diamondq.common.utils.context.logging;
 
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
@@ -239,12 +239,18 @@ public class LoggingUtils {
 
     if (pMatchEntryExit == true) {
       String indent = MDC.get("DQIndent");
+      String mdcThreadName = MDC.get("DQT");
+      String threadName = Thread.currentThread().getName();
+      if ((indent != null) && (threadName.equals(mdcThreadName) == false))
+        indent = null;
       if (indent == null)
         indent = "";
       if (indent.length() > 1)
         indent = indent.substring(0, indent.length() - 2);
-      if (indent.length() == 0)
+      if (indent.length() == 0) {
         MDC.remove("DQIndent");
+        MDC.remove("DQT");
+      }
       else
         MDC.put("DQIndent", indent);
 
@@ -366,11 +372,16 @@ public class LoggingUtils {
 
     if (pMatchEntryExit == true) {
       String indent = MDC.get("DQIndent");
+      String mdcThreadName = MDC.get("DQT");
+      String threadName = Thread.currentThread().getName();
+      if ((indent != null) && (threadName.equals(mdcThreadName) == false))
+        indent = null;
       if (indent == null)
         indent = "  ";
       else
         indent = indent + "  ";
       MDC.put("DQIndent", indent);
+      MDC.put("DQT", threadName);
 
       Stack<String> stack = sENTRY_METHOD.get();
       stack.push(pMethodName);

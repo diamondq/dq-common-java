@@ -1,6 +1,6 @@
 package com.diamondq.common.jaxrs.osgi;
 
-import com.diamondq.common.utils.misc.logging.LoggingUtils;
+import com.diamondq.common.utils.context.logging.LoggingUtils;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;

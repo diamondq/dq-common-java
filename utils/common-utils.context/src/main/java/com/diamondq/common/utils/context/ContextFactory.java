@@ -1,6 +1,6 @@
-package com.diamondq.common.utils.misc.context;
+package com.diamondq.common.utils.context;
 
-import com.diamondq.common.utils.misc.context.impl.ContextFactoryImpl;
+import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 

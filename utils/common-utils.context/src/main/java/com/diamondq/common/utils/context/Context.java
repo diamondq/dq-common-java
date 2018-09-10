@@ -1,4 +1,4 @@
-package com.diamondq.common.utils.misc.context;
+package com.diamondq.common.utils.context;
 
 import java.util.function.Function;
 
@@ -31,12 +31,24 @@ public interface Context extends AutoCloseable {
    */
   public <T> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
 
+  public void trace(String pMessage, @Nullable Object @Nullable... pArgs);
+
   /**
    * Report trace level entry
    * 
    * @param pArgs the arguments
    */
-  public void reportTrace(@Nullable Object @Nullable... pArgs);
+  public void trace(@Nullable Object @Nullable... pArgs);
+
+  public void debug(String pMessage, @Nullable Object @Nullable... pArgs);
+
+  public void info(String pMessage, @Nullable Object @Nullable... pArgs);
+
+  public void warn(String pMessage, @Nullable Object @Nullable... pArgs);
+
+  public void error(String pMessage, @Nullable Object @Nullable... pArgs);
+
+  public void error(String pMessage, @Nullable Throwable pThrowable);
 
   /**
    * Reports a throwable within this context
@@ -51,4 +63,5 @@ public interface Context extends AutoCloseable {
    */
   @Override
   public void close();
+
 }

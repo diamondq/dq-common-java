@@ -20,7 +20,7 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
 import com.diamondq.common.model.interfaces.TranslatableString;
-import com.diamondq.common.utils.misc.logging.LoggingUtils;
+import com.diamondq.common.utils.context.logging.LoggingUtils;
 
 import java.util.Collection;
 import java.util.List;

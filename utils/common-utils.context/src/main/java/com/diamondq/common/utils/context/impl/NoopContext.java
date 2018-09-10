@@ -1,6 +1,6 @@
-package com.diamondq.common.utils.misc.context.impl;
+package com.diamondq.common.utils.context.impl;
 
-import com.diamondq.common.utils.misc.context.spi.ContextClass;
+import com.diamondq.common.utils.context.spi.ContextClass;
 
 public class NoopContext extends ContextClass {
 

@@ -1,4 +1,4 @@
-package com.diamondq.common.utils.misc.context.spi;
+package com.diamondq.common.utils.context.spi;
 
 import java.util.function.Function;
 
@@ -58,5 +58,21 @@ public interface ContextHandler {
    */
   public void executeOnContextExplicitThrowable(ContextClass pContext, Throwable pThrowable);
 
-  public void executeOnContextReportTrace(ContextClass pContext, @Nullable Object @Nullable... pArgs);
+  public void executeOnContextReportTrace(ContextClass pContext, @Nullable String pMessage,
+    @Nullable Object @Nullable... pArgs);
+
+  public void executeOnContextReportDebug(ContextClass pContext, @Nullable String pMessage,
+    @Nullable Object @Nullable... pArgs);
+
+  public void executeOnContextReportInfo(ContextClass pContext, @Nullable String pMessage,
+    @Nullable Object @Nullable... pArgs);
+
+  public void executeOnContextReportWarn(ContextClass pContext, @Nullable String pMessage,
+    @Nullable Object @Nullable... pArgs);
+
+  public void executeOnContextReportError(ContextClass pContext, @Nullable String pMessage, Throwable pThrowable);
+
+  public void executeOnContextReportError(ContextClass pContext, @Nullable String pMessage,
+    @Nullable Object @Nullable... pArgs);
+
 }
