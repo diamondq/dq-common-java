@@ -84,11 +84,11 @@ public class LoggingUtils {
 
   private static ThreadLocal<Stack<String>> sENTRY_METHOD            = ThreadLocal.withInitial(() -> new Stack<>());
 
-  private static Marker                     sSIMPLE_ENTRY_MARKER     = MarkerFactory.getMarker("ENTRY_S");
+  public static Marker                      sSIMPLE_ENTRY_MARKER     = MarkerFactory.getMarker("ENTRY_S");
 
-  private static Marker                     sENTRY_MARKER            = MarkerFactory.getMarker("ENTRY");
+  public static Marker                      sENTRY_MARKER            = MarkerFactory.getMarker("ENTRY");
 
-  private static Marker                     sEXIT_MARKER             = MarkerFactory.getMarker("EXIT");
+  public static Marker                      sEXIT_MARKER             = MarkerFactory.getMarker("EXIT");
 
   private static String                     sEXIT_MESSAGE_0          = "EXIT {}() from {}";
 
@@ -111,7 +111,7 @@ public class LoggingUtils {
    */
   public static void entry(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      entryWithMetaInternal(pLogger, sENTRY_MARKER, pThis, false, true, pArgs);
+      entryWithMetaInternal(pLogger, sENTRY_MARKER, pThis, null, false, true, pArgs);
     }
   }
 
@@ -130,7 +130,7 @@ public class LoggingUtils {
    */
   public static void entryWithMeta(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      entryWithMetaInternal(pLogger, sENTRY_MARKER, pThis, true, true, pArgs);
+      entryWithMetaInternal(pLogger, sENTRY_MARKER, pThis, null, true, true, pArgs);
     }
   }
 
@@ -144,7 +144,7 @@ public class LoggingUtils {
    */
   public static void simpleEntry(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
     if (pLogger.isTraceEnabled(sSIMPLE_ENTRY_MARKER)) {
-      entryWithMetaInternal(pLogger, sSIMPLE_ENTRY_MARKER, pThis, false, false, pArgs);
+      entryWithMetaInternal(pLogger, sSIMPLE_ENTRY_MARKER, pThis, null, false, false, pArgs);
     }
   }
 
@@ -163,7 +163,7 @@ public class LoggingUtils {
    */
   public static void simpleEntryWithMeta(Logger pLogger, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
     if (pLogger.isTraceEnabled(sSIMPLE_ENTRY_MARKER)) {
-      entryWithMetaInternal(pLogger, sSIMPLE_ENTRY_MARKER, pThis, true, false, pArgs);
+      entryWithMetaInternal(pLogger, sSIMPLE_ENTRY_MARKER, pThis, null, true, false, pArgs);
     }
   }
 
@@ -174,7 +174,7 @@ public class LoggingUtils {
    * @param pLogger the logger
    * @param pThis the object representing 'this'
    */
-  public static void exit(Logger pLogger, Object pThis) {
+  public static void exit(Logger pLogger, @Nullable Object pThis) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
       exitInternal(pLogger, pThis, true, null, false, null, null);
     }
@@ -189,7 +189,7 @@ public class LoggingUtils {
    * @param pResult The result of the method being exited
    * @return the same result value passed in
    */
-  public static <T> T exit(Logger pLogger, Object pThis, T pResult) {
+  public static <T> T exit(Logger pLogger, @Nullable Object pThis, T pResult) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
       exitInternal(pLogger, pThis, true, null, true, pResult, null);
     }
@@ -206,8 +206,8 @@ public class LoggingUtils {
    * @param pMeta the meta function to convert the result
    * @return the same result value passed in
    */
-  public static <T> T exitWithMeta(Logger pLogger, Object pThis, T pResult,
-    Function<@Nullable Object, @Nullable Object> pMeta) {
+  public static <T> T exitWithMeta(Logger pLogger, @Nullable Object pThis, T pResult,
+    @Nullable Function<@Nullable Object, @Nullable Object> pMeta) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
       exitInternal(pLogger, pThis, true, null, true, pResult, pMeta);
     }
@@ -222,7 +222,7 @@ public class LoggingUtils {
    * @param pThis the object representing 'this'
    * @param pThrowable The exception to report
    */
-  public static void exitWithException(Logger pLogger, Object pThis, Throwable pThrowable) {
+  public static void exitWithException(Logger pLogger, @Nullable Object pThis, Throwable pThrowable) {
     if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
       exitInternal(pLogger, pThis, true, pThrowable, false, null, null);
     }
@@ -280,12 +280,13 @@ public class LoggingUtils {
    * @param pLogger the logger
    * @param pMarker the marker
    * @param pThis the object representing 'this'
+   * @param pMethodName the method name (if null, then it's calculated)
    * @param pWithMeta true if there is meta data in the arguments or false if there isn't.
    * @param pMatchEntryExit true if there must be matching exit or false if this is a standalone entry
    * @param pArgs any arguments to display
    */
-  private static void entryWithMetaInternal(Logger pLogger, Marker pMarker, @Nullable Object pThis, boolean pWithMeta,
-    boolean pMatchEntryExit, @Nullable Object @Nullable... pArgs) {
+  public static void entryWithMetaInternal(Logger pLogger, Marker pMarker, @Nullable Object pThis,
+    @Nullable String pMethodName, boolean pWithMeta, boolean pMatchEntryExit, @Nullable Object @Nullable... pArgs) {
     String messagePattern;
     if (pArgs == null)
       pArgs = new Object[0];
@@ -343,13 +344,18 @@ public class LoggingUtils {
 
     /* Calculate the method name */
 
-    StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-    String methodName = stackTraceElements[3].getMethodName();
-    expandedArgs[0] = methodName;
+    if (pMethodName == null) {
+      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+      String methodName = stackTraceElements[3].getMethodName();
+      expandedArgs[0] = methodName;
+      pMethodName = methodName;
+    }
+    else
+      expandedArgs[0] = pMethodName;
 
     /* Add the caller object */
 
-    if ("<init>".equals(methodName))
+    if ("<init>".equals(pMethodName))
       expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] =
         pThis == null ? null : pThis.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(pThis));
     else
@@ -367,7 +373,7 @@ public class LoggingUtils {
       MDC.put("DQIndent", indent);
 
       Stack<String> stack = sENTRY_METHOD.get();
-      stack.push(methodName);
+      stack.push(pMethodName);
     }
 
   }

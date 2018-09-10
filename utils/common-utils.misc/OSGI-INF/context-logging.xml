@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0"
+  configuration-policy="optional" immediate="false"
+  name="com.diamondq.common.utils.misc.logging.loggingcontexthandler">
+  <implementation
+    class="com.diamondq.common.utils.misc.logging.LoggingContextHandler" />
+  <service>
+     <provide interface="com.diamondq.common.utils.misc.context.spi.ContextHandler"/>
+  </service>
+</scr:component>
