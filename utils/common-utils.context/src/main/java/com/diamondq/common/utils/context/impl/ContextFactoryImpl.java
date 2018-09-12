@@ -85,11 +85,16 @@ public class ContextFactoryImpl implements ContextFactory {
     return context;
   }
 
-  public void closeContext(Context pContext) {
+  public void closeContext(ContextClass pContext) {
     Context peek = mThreadLocalContexts.get().peek();
     if (pContext.equals(peek) == false)
       throw new IllegalStateException();
     mThreadLocalContexts.get().pop();
+    Object hasExited = pContext.getData(ContextHandler.sHAS_EXPLICIT_EXITED);
+
+    for (ContextHandler handler : mHandlers)
+      handler.executeOnContextClose(pContext, hasExited != null);
+
   }
 
   /**
