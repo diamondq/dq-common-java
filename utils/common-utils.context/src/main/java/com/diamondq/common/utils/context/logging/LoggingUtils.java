@@ -175,8 +175,8 @@ public class LoggingUtils {
    * @param pThis the object representing 'this'
    */
   public static void exit(Logger pLogger, @Nullable Object pThis) {
-    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      exitInternal(pLogger, pThis, true, null, false, null, null);
+    if (pLogger.isTraceEnabled(sEXIT_MARKER)) {
+      exitInternal(pLogger, pThis, null, true, null, false, null, null);
     }
   }
 
@@ -190,8 +190,8 @@ public class LoggingUtils {
    * @return the same result value passed in
    */
   public static <T> T exit(Logger pLogger, @Nullable Object pThis, T pResult) {
-    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      exitInternal(pLogger, pThis, true, null, true, pResult, null);
+    if (pLogger.isTraceEnabled(sEXIT_MARKER)) {
+      exitInternal(pLogger, pThis, null, true, null, true, pResult, null);
     }
     return pResult;
   }
@@ -208,8 +208,8 @@ public class LoggingUtils {
    */
   public static <T> T exitWithMeta(Logger pLogger, @Nullable Object pThis, T pResult,
     @Nullable Function<@Nullable Object, @Nullable Object> pMeta) {
-    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      exitInternal(pLogger, pThis, true, null, true, pResult, pMeta);
+    if (pLogger.isTraceEnabled(sEXIT_MARKER)) {
+      exitInternal(pLogger, pThis, null, true, null, true, pResult, pMeta);
     }
     return pResult;
   }
@@ -223,19 +223,24 @@ public class LoggingUtils {
    * @param pThrowable The exception to report
    */
   public static void exitWithException(Logger pLogger, @Nullable Object pThis, Throwable pThrowable) {
-    if (pLogger.isTraceEnabled(sENTRY_MARKER)) {
-      exitInternal(pLogger, pThis, true, pThrowable, false, null, null);
+    if (pLogger.isTraceEnabled(sEXIT_MARKER)) {
+      exitInternal(pLogger, pThis, null, true, pThrowable, false, null, null);
     }
   }
 
-  private static void exitInternal(Logger pLogger, @Nullable Object pThis, boolean pMatchEntryExit,
-    @Nullable Throwable pThrowable, boolean pWithResult, @Nullable Object pResult,
+  public static void exitInternal(Logger pLogger, @Nullable Object pThis, @Nullable String pMethodName,
+    boolean pMatchEntryExit, @Nullable Throwable pThrowable, boolean pWithResult, @Nullable Object pResult,
     @Nullable Function<@Nullable Object, @Nullable Object> pMeta) {
 
-    /* Calculate the method name */
+    String methodName;
+    if (pMethodName == null) {
+      /* Calculate the method name */
 
-    StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-    String methodName = stackTraceElements[3].getMethodName();
+      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+      methodName = stackTraceElements[3].getMethodName();
+    }
+    else
+      methodName = pMethodName;
 
     if (pMatchEntryExit == true) {
       String indent = MDC.get("DQIndent");
