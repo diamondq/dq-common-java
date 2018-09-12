@@ -50,7 +50,10 @@ public class LoggingContextHandler implements ContextHandler {
         if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
           logger = newLogger;
       }
-      LoggingUtils.exit(logger, pContext.startThis);
+      if (logger.isTraceEnabled(LoggingUtils.sEXIT_MARKER)) {
+        String methodName = pContext.getLatestStackMethod();
+        LoggingUtils.exitInternal(logger, pContext.startThis, methodName, true, null, false, null, null);
+      }
     }
   }
 
@@ -65,7 +68,10 @@ public class LoggingContextHandler implements ContextHandler {
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
         logger = newLogger;
     }
-    LoggingUtils.exit(logger, pContext.startThis);
+    if (logger.isTraceEnabled(LoggingUtils.sEXIT_MARKER)) {
+      String methodName = pContext.getLatestStackMethod();
+      LoggingUtils.exitInternal(logger, pContext.startThis, methodName, true, null, false, null, null);
+    }
   }
 
   /**
@@ -80,7 +86,10 @@ public class LoggingContextHandler implements ContextHandler {
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
         logger = newLogger;
     }
-    LoggingUtils.exit(logger, pContext.startThis, pArg);
+    if (logger.isTraceEnabled(LoggingUtils.sEXIT_MARKER)) {
+      String methodName = pContext.getLatestStackMethod();
+      LoggingUtils.exitInternal(logger, pContext.startThis, methodName, true, null, true, pArg, null);
+    }
   }
 
   /**
@@ -96,7 +105,10 @@ public class LoggingContextHandler implements ContextHandler {
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
         logger = newLogger;
     }
-    LoggingUtils.exitWithMeta(logger, pContext.startThis, pArg, pMeta);
+    if (logger.isTraceEnabled(LoggingUtils.sEXIT_MARKER)) {
+      String methodName = pContext.getLatestStackMethod();
+      LoggingUtils.exitInternal(logger, pContext.startThis, methodName, true, null, true, pArg, pMeta);
+    }
   }
 
   /**
@@ -111,7 +123,10 @@ public class LoggingContextHandler implements ContextHandler {
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
         logger = newLogger;
     }
-    LoggingUtils.exitWithException(logger, pContext.startThis, pThrowable);
+    if (logger.isTraceEnabled(LoggingUtils.sEXIT_MARKER)) {
+      String methodName = pContext.getLatestStackMethod();
+      LoggingUtils.exitInternal(logger, pContext.startThis, methodName, true, pThrowable, false, null, null);
+    }
   }
 
   /**
