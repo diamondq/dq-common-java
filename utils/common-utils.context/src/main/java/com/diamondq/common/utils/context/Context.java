@@ -40,15 +40,50 @@ public interface Context extends AutoCloseable {
    */
   public void trace(@Nullable Object @Nullable... pArgs);
 
+  /**
+   * Returns whether trace is enabled
+   * 
+   * @return true if it is or false if it is not
+   */
+  public boolean isTraceEnabled();
+
   public void debug(String pMessage, @Nullable Object @Nullable... pArgs);
+
+  /**
+   * Returns whether debug is enabled
+   * 
+   * @return true if it is or false if it is not
+   */
+  public boolean isDebugEnabled();
 
   public void info(String pMessage, @Nullable Object @Nullable... pArgs);
 
+  /**
+   * Returns whether info is enabled
+   * 
+   * @return true if it is or false if it is not
+   */
+  public boolean isInfoEnabled();
+
   public void warn(String pMessage, @Nullable Object @Nullable... pArgs);
+
+  /**
+   * Returns whether warn is enabled
+   * 
+   * @return true if it is or false if it is not
+   */
+  public boolean isWarnEnabled();
 
   public void error(String pMessage, @Nullable Object @Nullable... pArgs);
 
   public void error(String pMessage, @Nullable Throwable pThrowable);
+
+  /**
+   * Returns whether error is enabled
+   * 
+   * @return true if it is or false if it is not
+   */
+  public boolean isErrorEnabled();
 
   /**
    * Reports a throwable within this context

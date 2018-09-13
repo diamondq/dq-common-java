@@ -156,6 +156,16 @@ public class LoggingContextHandler implements ContextHandler {
     }
   }
 
+  public boolean isTraceEnabled(ContextClass pContext) {
+    Logger logger = mLoggerMap.get(pContext.startClass);
+    if (logger == null) {
+      Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
+      if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
+        logger = newLogger;
+    }
+    return logger.isTraceEnabled();
+  }
+
   /**
    * @see com.diamondq.common.utils.context.spi.ContextHandler#executeOnContextReportDebug(com.diamondq.common.utils.context.spi.ContextClass,
    *      java.lang.String, java.lang.Object[])
@@ -172,6 +182,16 @@ public class LoggingContextHandler implements ContextHandler {
     if (logger.isDebugEnabled()) {
       logger.debug(pMessage, pArgs);
     }
+  }
+
+  public boolean isDebugEnabled(ContextClass pContext) {
+    Logger logger = mLoggerMap.get(pContext.startClass);
+    if (logger == null) {
+      Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
+      if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
+        logger = newLogger;
+    }
+    return logger.isDebugEnabled();
   }
 
   /**
@@ -192,6 +212,16 @@ public class LoggingContextHandler implements ContextHandler {
     }
   }
 
+  public boolean isInfoEnabled(ContextClass pContext) {
+    Logger logger = mLoggerMap.get(pContext.startClass);
+    if (logger == null) {
+      Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
+      if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
+        logger = newLogger;
+    }
+    return logger.isInfoEnabled();
+  }
+
   /**
    * @see com.diamondq.common.utils.context.spi.ContextHandler#executeOnContextReportWarn(com.diamondq.common.utils.context.spi.ContextClass,
    *      java.lang.String, java.lang.Object[])
@@ -208,6 +238,16 @@ public class LoggingContextHandler implements ContextHandler {
     if (logger.isWarnEnabled()) {
       logger.warn(pMessage, pArgs);
     }
+  }
+
+  public boolean isWarnEnabled(ContextClass pContext) {
+    Logger logger = mLoggerMap.get(pContext.startClass);
+    if (logger == null) {
+      Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
+      if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
+        logger = newLogger;
+    }
+    return logger.isWarnEnabled();
   }
 
   /**
@@ -243,5 +283,15 @@ public class LoggingContextHandler implements ContextHandler {
     if (logger.isErrorEnabled()) {
       logger.error(pMessage, pThrowable);
     }
+  }
+
+  public boolean isErrorEnabled(ContextClass pContext) {
+    Logger logger = mLoggerMap.get(pContext.startClass);
+    if (logger == null) {
+      Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
+      if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
+        logger = newLogger;
+    }
+    return logger.isErrorEnabled();
   }
 }

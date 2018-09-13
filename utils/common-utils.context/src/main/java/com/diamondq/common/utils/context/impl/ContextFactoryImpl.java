@@ -2,6 +2,7 @@ package com.diamondq.common.utils.context.impl;
 
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
+import com.diamondq.common.utils.context.logging.LoggingContextHandler;
 import com.diamondq.common.utils.context.spi.ContextClass;
 import com.diamondq.common.utils.context.spi.ContextHandler;
 
@@ -19,9 +20,12 @@ public class ContextFactoryImpl implements ContextFactory {
 
   private final CopyOnWriteArrayList<ContextHandler> mHandlers            = new CopyOnWriteArrayList<>();
 
+  private volatile LoggingContextHandler             mLoggingHandler;
+
   private final ThreadLocal<Stack<Context>>          mThreadLocalContexts =
     ThreadLocal.withInitial(() -> new Stack<>());
 
+  @SuppressWarnings("null")
   public ContextFactoryImpl() {
   }
 
@@ -36,7 +40,9 @@ public class ContextFactoryImpl implements ContextFactory {
   }
 
   public void addContextHandler(ContextHandler pHandler) {
-    mHandlers.addIfAbsent(pHandler);
+    if (mHandlers.addIfAbsent(pHandler) == true)
+      if (pHandler instanceof LoggingContextHandler)
+        mLoggingHandler = (LoggingContextHandler) pHandler;
   }
 
   public void removeContextHandler(ContextHandler pHandler) {
@@ -173,10 +179,18 @@ public class ContextFactoryImpl implements ContextFactory {
     }
   }
 
+  public boolean internalIsTraceEnabled(ContextClass pContext) {
+    return mLoggingHandler.isTraceEnabled(pContext);
+  }
+
   public void internalReportDebug(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
     for (ContextHandler handler : mHandlers) {
       handler.executeOnContextReportDebug(pContext, pMessage, pArgs);
     }
+  }
+
+  public boolean internalIsDebugEnabled(ContextClass pContext) {
+    return mLoggingHandler.isDebugEnabled(pContext);
   }
 
   public void internalReportInfo(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
@@ -185,10 +199,18 @@ public class ContextFactoryImpl implements ContextFactory {
     }
   }
 
+  public boolean internalIsInfoEnabled(ContextClass pContext) {
+    return mLoggingHandler.isInfoEnabled(pContext);
+  }
+
   public void internalReportWarn(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
     for (ContextHandler handler : mHandlers) {
       handler.executeOnContextReportWarn(pContext, pMessage, pArgs);
     }
+  }
+
+  public boolean internalIsWarnEnabled(ContextClass pContext) {
+    return mLoggingHandler.isWarnEnabled(pContext);
   }
 
   public void internalReportError(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
@@ -204,6 +226,10 @@ public class ContextFactoryImpl implements ContextFactory {
       else
         handler.executeOnContextReportError(pContext, pMessage, pThrowable);
     }
+  }
+
+  public boolean internalIsErrorEnabled(ContextClass pContext) {
+    return mLoggingHandler.isErrorEnabled(pContext);
   }
 
   public RuntimeException internalReportThrowable(ContextClass pContext, Throwable pThrowable) {

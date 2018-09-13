@@ -7,5 +7,6 @@
     class="com.diamondq.common.utils.context.logging.LoggingContextHandler" />
   <service>
      <provide interface="com.diamondq.common.utils.context.spi.ContextHandler"/>
+     <provide interface="com.diamondq.common.utils.context.logging.LoggingContextHandler"/>
   </service>
 </scr:component>

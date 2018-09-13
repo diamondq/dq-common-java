@@ -138,6 +138,14 @@ public class ContextClass implements Context {
   }
 
   /**
+   * @see com.diamondq.common.utils.context.Context#isTraceEnabled()
+   */
+  @Override
+  public boolean isTraceEnabled() {
+    return mFactory.internalIsTraceEnabled(this);
+  }
+
+  /**
    * @see com.diamondq.common.utils.context.Context#trace(java.lang.String, java.lang.Object[])
    */
   @Override
@@ -154,6 +162,14 @@ public class ContextClass implements Context {
   }
 
   /**
+   * @see com.diamondq.common.utils.context.Context#isDebugEnabled()
+   */
+  @Override
+  public boolean isDebugEnabled() {
+    return mFactory.internalIsDebugEnabled(this);
+  }
+
+  /**
    * @see com.diamondq.common.utils.context.Context#info(java.lang.String, java.lang.Object[])
    */
   @Override
@@ -162,11 +178,27 @@ public class ContextClass implements Context {
   }
 
   /**
+   * @see com.diamondq.common.utils.context.Context#isInfoEnabled()
+   */
+  @Override
+  public boolean isInfoEnabled() {
+    return mFactory.internalIsInfoEnabled(this);
+  }
+
+  /**
    * @see com.diamondq.common.utils.context.Context#warn(java.lang.String, java.lang.Object[])
    */
   @Override
   public void warn(String pMessage, @Nullable Object @Nullable... pArgs) {
     mFactory.internalReportWarn(this, pMessage, pArgs);
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#isWarnEnabled()
+   */
+  @Override
+  public boolean isWarnEnabled() {
+    return mFactory.internalIsWarnEnabled(this);
   }
 
   /**
@@ -183,6 +215,14 @@ public class ContextClass implements Context {
   @Override
   public void error(String pMessage, @Nullable Throwable pThrowable) {
     mFactory.internalReportError(this, pMessage, pThrowable);
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#isErrorEnabled()
+   */
+  @Override
+  public boolean isErrorEnabled() {
+    return mFactory.internalIsErrorEnabled(this);
   }
 
   /**
