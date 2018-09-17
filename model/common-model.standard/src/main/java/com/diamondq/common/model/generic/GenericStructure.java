@@ -211,7 +211,8 @@ public class GenericStructure implements Structure, Revision<String> {
   public <@Nullable T> @Nullable Property<T> lookupPropertyByName(String pName) {
     Property<?> prop = mProperties.get(pName);
     @SuppressWarnings({"rawtypes", "unchecked"})
-    @Nullable Property<T> result = (Property) prop;
+    @Nullable
+    Property<T> result = (@Nullable Property) prop;
     return result;
   }
 
