@@ -125,7 +125,7 @@ public class LoggingContextHandler implements ContextHandler {
     }
     if (logger.isTraceEnabled(LoggingUtils.sEXIT_MARKER)) {
       String methodName = pContext.getLatestStackMethod();
-      LoggingUtils.exitInternal(logger, pContext.startThis, methodName, true, pThrowable, false, null, null);
+      LoggingUtils.exitInternal(logger, pContext.startThis, methodName, false, pThrowable, false, null, null);
     }
   }
 
