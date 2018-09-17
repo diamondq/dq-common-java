@@ -9,7 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class ConstructorInfo {
 
   public static enum SpecialTypes {
-    NA, BUNDLECONTEXT, COMPONENTCONTEXT
+    NA, BUNDLECONTEXT, COMPONENTCONTEXT, CONTEXTFACTORY
   }
 
   public static class ConstructionArg {

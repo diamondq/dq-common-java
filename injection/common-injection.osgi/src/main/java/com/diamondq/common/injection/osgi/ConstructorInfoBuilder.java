@@ -95,6 +95,11 @@ public class ConstructorInfoBuilder {
       return this;
     }
 
+    public ConstructorArgBuilder injectContextFactory() {
+      mSpecialType = SpecialTypes.CONTEXTFACTORY;
+      return this;
+    }
+
     public ConstructorArgBuilder injectComponentContext() {
       mSpecialType = SpecialTypes.COMPONENTCONTEXT;
       return this;

@@ -3,7 +3,8 @@ package com.diamondq.common.injection.osgi;
 import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
 import com.diamondq.common.injection.osgi.ConstructorInfo.SpecialTypes;
 import com.diamondq.common.injection.osgi.i18n.Messages;
-import com.diamondq.common.utils.context.logging.LoggingUtils;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.collect.ImmutableMap;
@@ -67,6 +68,8 @@ public class AbstractOSGiConstructor {
 
   protected final ConstructorInfo            mInfo;
 
+  protected volatile ContextFactory          mContextFactory;
+
   protected volatile ComponentContext        mComponentContext;
 
   protected volatile Map<String, Object>     mCurrentProps;
@@ -77,58 +80,53 @@ public class AbstractOSGiConstructor {
 
   @SuppressWarnings("null")
   public AbstractOSGiConstructor(ConstructorInfoBuilder pBuilder) {
-    LoggingUtils.entry(sLogger, this);
+    ContextFactory.staticReportTrace(AbstractOSGiConstructor.class, this, pBuilder);
     try {
       mInfo = pBuilder.build();
       if ((mInfo.method != null) && (AbstractOSGiConstructor.class.isAssignableFrom(mInfo.constructionClass) == false))
         throw new ExtendedIllegalArgumentException(Messages.METHOD_ONLY_ON_FACTORY);
       mComponentContext = null;
       mCurrentProps = Collections.emptyMap();
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      throw ex;
+      throw ContextFactory.staticReportThrowable(AbstractOSGiConstructor.class, this, ex);
     }
   }
 
+  public void setContextFactory(ContextFactory pContextFactory) {
+    ContextFactory.staticReportTrace(AbstractOSGiConstructor.class, this, pContextFactory);
+    mContextFactory = pContextFactory;
+  }
+
   public void onActivate(ComponentContext pContext, Map<String, Object> pProps) {
-    LoggingUtils.entry(sLogger, this, pContext, pProps);
-    try {
+    try (Context context = mContextFactory.newContext(AbstractOSGiConstructor.class, this, pContext, pProps)) {
       synchronized (this) {
         mComponentContext = pContext;
         mCurrentProps = ImmutableMap.copyOf(pProps);
       }
       processProperties();
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(AbstractOSGiConstructor.class, this, ex);
     }
   }
 
   public void onModified(ComponentContext pContext, Map<String, Object> pProps) {
-    LoggingUtils.entry(sLogger, this, pContext, pProps);
-    try {
+    try (Context context = mContextFactory.newContext(AbstractOSGiConstructor.class, this, pContext, pProps)) {
+
       synchronized (this) {
         mComponentContext = pContext;
         mCurrentProps = ImmutableMap.copyOf(pProps);
       }
       processProperties();
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(AbstractOSGiConstructor.class, this, ex);
     }
   }
 
   public void onDeactivate(ComponentContext pContext) {
-    LoggingUtils.entry(sLogger, this, pContext);
-    try {
+    try (Context context = mContextFactory.newContext(AbstractOSGiConstructor.class, this, pContext)) {
       ServiceRegistration<?> registration = mRegistration;
       if (registration != null) {
         sLogger.trace("Clearing old registration");
@@ -142,18 +140,14 @@ public class AbstractOSGiConstructor {
           }
         mRegistration = null;
       }
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(AbstractOSGiConstructor.class, this, ex);
     }
   }
 
   protected void processProperties() {
-    LoggingUtils.entry(sLogger, this);
-    try {
+    try (Context context = mContextFactory.newContext(AbstractOSGiConstructor.class, this)) {
 
       synchronized (this) {
 
@@ -207,17 +201,13 @@ public class AbstractOSGiConstructor {
           tracker.setNotify((f) -> build());
       }
 
-      LoggingUtils.exit(sLogger, this);
     }
-    catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      throw ex;
-    }
+
   }
 
   protected void build() {
-    LoggingUtils.entry(sLogger, this);
-    try {
+    try (Context context = mContextFactory.newContext(AbstractOSGiConstructor.class, this)) {
+
       synchronized (this) {
 
         /* Now that all the filters are active, create the initial output, and then turn on future notifications */
@@ -318,6 +308,9 @@ public class AbstractOSGiConstructor {
             case BUNDLECONTEXT:
               value = mComponentContext.getBundleContext();
               break;
+            case CONTEXTFACTORY:
+              value = mContextFactory;
+              break;
             case COMPONENTCONTEXT:
               value = mComponentContext;
               break;
@@ -387,11 +380,6 @@ public class AbstractOSGiConstructor {
         }
 
       }
-      LoggingUtils.exit(sLogger, this);
-    }
-    catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      throw ex;
     }
   }
 
