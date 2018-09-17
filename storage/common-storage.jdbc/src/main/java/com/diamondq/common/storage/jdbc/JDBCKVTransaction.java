@@ -1,6 +1,8 @@
 package com.diamondq.common.storage.jdbc;
 
 import com.diamondq.common.storage.kv.IKVTransaction;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
@@ -24,16 +26,19 @@ import org.slf4j.LoggerFactory;
  */
 public class JDBCKVTransaction implements IKVTransaction {
 
-  private static final Logger sLogger = LoggerFactory.getLogger(JDBCKVTransaction.class);
+  private static final Logger  sLogger = LoggerFactory.getLogger(JDBCKVTransaction.class);
 
-  private final JDBCKVStore   mStore;
+  private final ContextFactory mContextFactory;
 
-  private final DataSource    mDataSource;
+  private final JDBCKVStore    mStore;
+
+  private final DataSource     mDataSource;
 
   @Nullable
-  private Connection          mConnection;
+  private Connection           mConnection;
 
-  public JDBCKVTransaction(JDBCKVStore pStore, DataSource pDataSource) {
+  public JDBCKVTransaction(ContextFactory pContextFactory, JDBCKVStore pStore, DataSource pDataSource) {
+    mContextFactory = pContextFactory;
     mStore = pStore;
     mDataSource = pDataSource;
   }
@@ -51,25 +56,27 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public <@Nullable O> O getByKey(String pTable, String pKey1, @Nullable String pKey2, Class<O> pClass) {
-    try {
-      validateConnection();
-      Connection c = mConnection;
-      if (c == null)
-        throw new IllegalStateException();
-      JDBCTableInfo info = mStore.validateTable(c, pTable, pClass);
-      try (PreparedStatement ps = c.prepareStatement(info.getBySQL)) {
-        ps.setString(1, pKey1);
-        ps.setString(2, pKey2);
-        sLogger.trace("{} -> {}, {}", info.getBySQL, pKey1, pKey2);
-        try (ResultSet rs = ps.executeQuery()) {
-          if (rs.next() == false)
-            return null;
-          return info.deserializer.deserializeFromResultSet(rs, pClass);
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable, pKey1, pKey2, pClass)) {
+      try {
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        JDBCTableInfo info = mStore.validateTable(c, pTable, pClass);
+        try (PreparedStatement ps = c.prepareStatement(info.getBySQL)) {
+          ps.setString(1, pKey1);
+          ps.setString(2, pKey2);
+          sLogger.trace("{} -> {}, {}", info.getBySQL, pKey1, pKey2);
+          try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next() == false)
+              return context.exit(null);
+            return context.exit(info.deserializer.deserializeFromResultSet(rs, pClass));
+          }
         }
       }
-    }
-    catch (SQLException ex) {
-      throw new RuntimeException(ex);
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
     }
   }
 
@@ -79,53 +86,55 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public <@Nullable O> void putByKey(String pTable, String pKey1, @Nullable String pKey2, O pObj) {
-    try {
-      validateConnection();
-      Connection c = mConnection;
-      if (c == null)
-        throw new IllegalStateException();
-      JDBCTableInfo info = mStore.validateTable(c, pTable, (pObj == null ? null : pObj.getClass()));
-      if (info.supportsUpsert == true) {
-        try (PreparedStatement ps = c.prepareStatement(info.putBySQL)) {
-          ps.setString(1, pKey1);
-          ps.setString(2, pKey2);
-          info.serializer.serializeToPreparedStatement(pObj, ps, 2);
-          sLogger.trace("{} -> {}, {}", info.putBySQL, pKey1, pKey2);
-          ps.execute();
-        }
-      }
-      else {
-        boolean exists;
-        try (PreparedStatement qps = c.prepareStatement(info.putQueryBySQL)) {
-          qps.setString(1, pKey1);
-          qps.setString(2, pKey2);
-          sLogger.trace("{} -> {}, {}", info.putQueryBySQL, pKey1, pKey2);
-          try (ResultSet rs = qps.executeQuery()) {
-            exists = rs.next();
-          }
-        }
-        if (exists == false) {
-          try (PreparedStatement ps = c.prepareStatement(info.putInsertBySQL)) {
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable, pKey1, pKey2, pObj)) {
+      try {
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        JDBCTableInfo info = mStore.validateTable(c, pTable, (pObj == null ? null : pObj.getClass()));
+        if (info.supportsUpsert == true) {
+          try (PreparedStatement ps = c.prepareStatement(info.putBySQL)) {
             ps.setString(1, pKey1);
             ps.setString(2, pKey2);
-            info.serializer.serializeToPreparedStatement(pObj, ps, 3);
-            sLogger.trace("{} -> {}, {}", info.putInsertBySQL, pKey1, pKey2);
+            info.serializer.serializeToPreparedStatement(pObj, ps, 2);
+            sLogger.trace("{} -> {}, {}", info.putBySQL, pKey1, pKey2);
             ps.execute();
           }
         }
         else {
-          try (PreparedStatement ps = c.prepareStatement(info.putUpdateBySQL)) {
-            int offset = info.serializer.serializeToPreparedStatement(pObj, ps, 1);
-            ps.setString(offset, pKey1);
-            ps.setString(offset + 1, pKey2);
-            sLogger.trace("{} -> {}, {}", info.putUpdateBySQL, pKey1, pKey2);
-            ps.execute();
+          boolean exists;
+          try (PreparedStatement qps = c.prepareStatement(info.putQueryBySQL)) {
+            qps.setString(1, pKey1);
+            qps.setString(2, pKey2);
+            sLogger.trace("{} -> {}, {}", info.putQueryBySQL, pKey1, pKey2);
+            try (ResultSet rs = qps.executeQuery()) {
+              exists = rs.next();
+            }
+          }
+          if (exists == false) {
+            try (PreparedStatement ps = c.prepareStatement(info.putInsertBySQL)) {
+              ps.setString(1, pKey1);
+              ps.setString(2, pKey2);
+              info.serializer.serializeToPreparedStatement(pObj, ps, 3);
+              sLogger.trace("{} -> {}, {}", info.putInsertBySQL, pKey1, pKey2);
+              ps.execute();
+            }
+          }
+          else {
+            try (PreparedStatement ps = c.prepareStatement(info.putUpdateBySQL)) {
+              int offset = info.serializer.serializeToPreparedStatement(pObj, ps, 1);
+              ps.setString(offset, pKey1);
+              ps.setString(offset + 1, pKey2);
+              sLogger.trace("{} -> {}, {}", info.putUpdateBySQL, pKey1, pKey2);
+              ps.execute();
+            }
           }
         }
       }
-    }
-    catch (SQLException ex) {
-      throw new RuntimeException(ex);
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
     }
   }
 
@@ -135,23 +144,25 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public boolean removeByKey(String pTable, String pKey1, @Nullable String pKey2) {
-    try {
-      validateConnection();
-      Connection c = mConnection;
-      if (c == null)
-        throw new IllegalStateException();
-      JDBCTableInfo info = mStore.validateTable(c, pTable, null);
-      try (PreparedStatement ps = c.prepareStatement(info.removeBySQL)) {
-        ps.setString(1, pKey1);
-        ps.setString(2, pKey2);
-        sLogger.trace("{} -> {}, {}", info.removeBySQL, pKey1, pKey2);
-        if (ps.executeUpdate() > 0)
-          return true;
-        return false;
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable, pKey1, pKey2)) {
+      try {
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        try (PreparedStatement ps = c.prepareStatement(info.removeBySQL)) {
+          ps.setString(1, pKey1);
+          ps.setString(2, pKey2);
+          sLogger.trace("{} -> {}, {}", info.removeBySQL, pKey1, pKey2);
+          if (ps.executeUpdate() > 0)
+            return context.exit(true);
+          return context.exit(false);
+        }
       }
-    }
-    catch (SQLException ex) {
-      throw new RuntimeException(ex);
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
     }
   }
 
@@ -160,37 +171,39 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public Iterator<@NonNull String> keyIterator(String pTable) {
-    try {
-      validateConnection();
-      Connection c = mConnection;
-      if (c == null)
-        throw new IllegalStateException();
-      JDBCTableInfo info = mStore.validateTable(c, pTable, null);
-      PreparedStatement ps = c.prepareStatement(info.keyIteratorSQL);
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable)) {
       try {
-        sLogger.trace("{}", info.keyIteratorSQL);
-        ResultSet rs = ps.executeQuery();
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        PreparedStatement ps = c.prepareStatement(info.keyIteratorSQL);
         try {
-          JDBCResultSetIterator result = new JDBCResultSetIterator(ps, rs);
-          rs = null;
-          ps = null;
-          @SuppressWarnings("null")
-          Iterator<@NonNull String> filtered =
-            (Iterator<@NonNull String>) Iterators.filter(result, Predicates.notNull());
-          return filtered;
+          sLogger.trace("{}", info.keyIteratorSQL);
+          ResultSet rs = ps.executeQuery();
+          try {
+            JDBCResultSetIterator result = new JDBCResultSetIterator(ps, rs);
+            rs = null;
+            ps = null;
+            @SuppressWarnings("null")
+            Iterator<@NonNull String> filtered =
+              (Iterator<@NonNull String>) Iterators.filter(result, Predicates.notNull());
+            return filtered;
+          }
+          finally {
+            if (rs != null)
+              rs.close();
+          }
         }
         finally {
-          if (rs != null)
-            rs.close();
+          if (ps != null)
+            ps.close();
         }
       }
-      finally {
-        if (ps != null)
-          ps.close();
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
       }
-    }
-    catch (SQLException ex) {
-      throw new RuntimeException(ex);
     }
   }
 
@@ -199,38 +212,40 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public Iterator<@NonNull String> keyIterator2(String pTable, String pKey1) {
-    try {
-      validateConnection();
-      Connection c = mConnection;
-      if (c == null)
-        throw new IllegalStateException();
-      JDBCTableInfo info = mStore.validateTable(c, pTable, null);
-      PreparedStatement ps = c.prepareStatement(info.keyIterator2SQL);
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable, pKey1)) {
       try {
-        ps.setString(1, pKey1);
-        sLogger.trace("{} -> {}", info.keyIterator2SQL, pKey1);
-        ResultSet rs = ps.executeQuery();
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        PreparedStatement ps = c.prepareStatement(info.keyIterator2SQL);
         try {
-          JDBCResultSetIterator result = new JDBCResultSetIterator(ps, rs);
-          rs = null;
-          ps = null;
-          @SuppressWarnings("null")
-          Iterator<@NonNull String> filtered =
-            (Iterator<@NonNull String>) Iterators.filter(result, Predicates.notNull());
-          return filtered;
+          ps.setString(1, pKey1);
+          sLogger.trace("{} -> {}", info.keyIterator2SQL, pKey1);
+          ResultSet rs = ps.executeQuery();
+          try {
+            JDBCResultSetIterator result = new JDBCResultSetIterator(ps, rs);
+            rs = null;
+            ps = null;
+            @SuppressWarnings("null")
+            Iterator<@NonNull String> filtered =
+              (Iterator<@NonNull String>) Iterators.filter(result, Predicates.notNull());
+            return filtered;
+          }
+          finally {
+            if (rs != null)
+              rs.close();
+          }
         }
         finally {
-          if (rs != null)
-            rs.close();
+          if (ps != null)
+            ps.close();
         }
       }
-      finally {
-        if (ps != null)
-          ps.close();
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
       }
-    }
-    catch (SQLException ex) {
-      throw new RuntimeException(ex);
     }
   }
 
@@ -239,19 +254,21 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public void clear(String pTable) {
-    try {
-      validateConnection();
-      Connection c = mConnection;
-      if (c == null)
-        throw new IllegalStateException();
-      JDBCTableInfo info = mStore.validateTable(c, pTable, null);
-      try (PreparedStatement ps = c.prepareStatement(info.clearSQL)) {
-        sLogger.trace("{}", info.clearSQL);
-        ps.executeUpdate();
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable)) {
+      try {
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        try (PreparedStatement ps = c.prepareStatement(info.clearSQL)) {
+          sLogger.trace("{}", info.clearSQL);
+          ps.executeUpdate();
+        }
       }
-    }
-    catch (SQLException ex) {
-      throw new RuntimeException(ex);
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
     }
   }
 
@@ -260,23 +277,25 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public long getCount(String pTable) {
-    try {
-      validateConnection();
-      Connection c = mConnection;
-      if (c == null)
-        throw new IllegalStateException();
-      JDBCTableInfo info = mStore.validateTable(c, pTable, null);
-      try (PreparedStatement ps = c.prepareStatement(info.getCountSQL)) {
-        sLogger.trace("{}", info.getCountSQL);
-        try (ResultSet rs = ps.executeQuery()) {
-          if (rs.next() == false)
-            return 0L;
-          return rs.getLong(1);
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable)) {
+      try {
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        try (PreparedStatement ps = c.prepareStatement(info.getCountSQL)) {
+          sLogger.trace("{}", info.getCountSQL);
+          try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next() == false)
+              return context.exit(0L);
+            return context.exit(rs.getLong(1));
+          }
         }
       }
-    }
-    catch (SQLException ex) {
-      throw new RuntimeException(ex);
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
     }
   }
 
@@ -285,24 +304,26 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public Iterator<@NonNull String> getTableList() {
-    try {
-      validateConnection();
-      Connection c = mConnection;
-      if (c == null)
-        throw new IllegalStateException();
-      ImmutableList.Builder<@NonNull String> results = ImmutableList.builder();
-      try (ResultSet rs = c.getMetaData().getTables(null, mStore.getTableSchema(), null, null)) {
-        while (rs.next() == true) {
-          String str = rs.getString(3);
-          if (str == null)
-            continue;
-          results.add(str);
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this)) {
+      try {
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        ImmutableList.Builder<@NonNull String> results = ImmutableList.builder();
+        try (ResultSet rs = c.getMetaData().getTables(null, mStore.getTableSchema(), null, null)) {
+          while (rs.next() == true) {
+            String str = rs.getString(3);
+            if (str == null)
+              continue;
+            results.add(str);
+          }
         }
+        return results.build().iterator();
       }
-      return results.build().iterator();
-    }
-    catch (SQLException ex) {
-      throw new RuntimeException(ex);
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
     }
   }
 
@@ -311,24 +332,26 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public void commit() {
-    try {
-      Connection c = mConnection;
-      if (c != null) {
-        mConnection = null;
-        c.commit();
-        c.close();
-      }
-    }
-    catch (SQLException ex) {
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this)) {
       try {
         Connection c = mConnection;
-        if (c != null)
+        if (c != null) {
+          mConnection = null;
+          c.commit();
           c.close();
+        }
       }
-      catch (SQLException ex2) {
-        throw new RuntimeException(ex2);
+      catch (SQLException ex) {
+        try {
+          Connection c = mConnection;
+          if (c != null)
+            c.close();
+        }
+        catch (SQLException ex2) {
+          throw new RuntimeException(ex2);
+        }
+        throw new RuntimeException(ex);
       }
-      throw new RuntimeException(ex);
     }
   }
 
@@ -337,24 +360,26 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public void rollback() {
-    try {
-      Connection c = mConnection;
-      if (c != null) {
-        mConnection = null;
-        c.rollback();
-        c.close();
-      }
-    }
-    catch (SQLException ex) {
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this)) {
       try {
         Connection c = mConnection;
-        if (c != null)
+        if (c != null) {
+          mConnection = null;
+          c.rollback();
           c.close();
+        }
       }
-      catch (SQLException ex2) {
-        throw new RuntimeException(ex2);
+      catch (SQLException ex) {
+        try {
+          Connection c = mConnection;
+          if (c != null)
+            c.close();
+        }
+        catch (SQLException ex2) {
+          throw new RuntimeException(ex2);
+        }
+        throw new RuntimeException(ex);
       }
-      throw new RuntimeException(ex);
     }
   }
 

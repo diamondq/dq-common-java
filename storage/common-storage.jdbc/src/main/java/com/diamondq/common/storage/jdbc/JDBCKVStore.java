@@ -13,6 +13,8 @@ import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
 import com.diamondq.common.storage.kv.SyncWrapperAsyncKVTransaction;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.builders.IBuilder;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.cache.Cache;
@@ -49,18 +51,27 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
   static final BigDecimal     sLONG_MAX_VALUE = BigDecimal.valueOf(Long.MAX_VALUE);
 
   public static class JDBCKVStoreBuilder implements IBuilder<IKVStore> {
-    @Nullable
-    protected DataSource   datasource;
 
     @Nullable
-    protected IJDBCDialect dialect;
+    protected ContextFactory contextFactory;
 
     @Nullable
-    protected String       mTableSchema;
+    protected DataSource     datasource;
+
+    @Nullable
+    protected IJDBCDialect   dialect;
+
+    @Nullable
+    protected String         mTableSchema;
 
     @Deprecated
     public JDBCKVStoreBuilder database(DataSource pDatabase) {
       datasource = pDatabase;
+      return this;
+    }
+
+    public JDBCKVStoreBuilder contextFactory(ContextFactory pContextFactory) {
+      contextFactory = pContextFactory;
       return this;
     }
 
@@ -91,9 +102,15 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
       IJDBCDialect localDialect = dialect;
       if (localDialect == null)
         throw new IllegalArgumentException("dialect not set in JDBCKVStoreBuilder");
-      return new JDBCKVStore(localDatabase, localDialect, mTableSchema);
+      ContextFactory localContextFactory = contextFactory;
+      if (localContextFactory == null)
+        throw new IllegalArgumentException("contextFactory not set in JDBCKVStoreBuilder");
+      return new JDBCKVStore(localContextFactory, localDatabase, localDialect, mTableSchema);
     }
   }
+
+  @SuppressWarnings("unused")
+  private final ContextFactory               mContextFactory;
 
   private final DataSource                   mDatabase;
 
@@ -104,7 +121,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
   private final Cache<String, JDBCTableInfo> mTableCache;
 
-  public JDBCKVStore(DataSource pDatabase, IJDBCDialect pDialect, @Nullable String pTableSchema) {
+  public JDBCKVStore(ContextFactory pContextFactory, DataSource pDatabase, IJDBCDialect pDialect,
+    @Nullable String pTableSchema) {
+    mContextFactory = pContextFactory;
     mDatabase = pDatabase;
     mDialect = pDialect;
     mTableSchema = (pTableSchema == null ? null : pTableSchema.toLowerCase());
@@ -127,7 +146,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
    */
   @Override
   public IKVTransaction startTransaction() {
-    return new JDBCKVTransaction(this, mDatabase);
+    return new JDBCKVTransaction(mContextFactory, this, mDatabase);
   }
 
   /**
@@ -239,285 +258,288 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
    */
   @Override
   public void addTableDefinition(IKVTableDefinition pDefinition) {
-    JDBCTableInfo tableInfo = mTableCache.getIfPresent(pDefinition.getTableName());
-    if (tableInfo == null) {
-      String mungedTableName = escapeTableName(pDefinition.getTableName());
+    try (Context context = mContextFactory.newContext(JDBCKVStore.class, this, pDefinition)) {
+      JDBCTableInfo tableInfo = mTableCache.getIfPresent(pDefinition.getTableName());
+      if (tableInfo == null) {
+        String mungedTableName = escapeTableName(pDefinition.getTableName());
 
-      /* Query the database to see if the table exists */
+        /* Query the database to see if the table exists */
 
-      String tableSchema = getTableSchema();
+        String tableSchema = getTableSchema();
 
-      try {
-        try (Connection connection = mDatabase.getConnection()) {
-          connection.setAutoCommit(true);
+        try {
+          try (Connection connection = mDatabase.getConnection()) {
+            connection.setAutoCommit(true);
 
-          String matchingSchema = null;
-          if (tableSchema != null) {
+            String matchingSchema = null;
+            if (tableSchema != null) {
 
-            /* Check the schema */
+              /* Check the schema */
 
-            boolean missingSchema = true;
-            try (ResultSet rs = connection.getMetaData().getSchemas(null, null)) {
-              while (rs.next() == true) {
-                String str = rs.getString(1);
-                if (str == null)
-                  continue;
-                String testName = str.toLowerCase();
-                if (tableSchema.equals(testName) == true) {
-                  missingSchema = false;
-                  matchingSchema = testName;
-                  break;
-                }
-              }
-            }
-
-            if (missingSchema == true) {
-              try (PreparedStatement ps = connection.prepareStatement(mDialect.generateCreateSchemaSQL(tableSchema))) {
-                ps.execute();
-              }
-
+              boolean missingSchema = true;
               try (ResultSet rs = connection.getMetaData().getSchemas(null, null)) {
                 while (rs.next() == true) {
-                  String testName = rs.getString(1);
+                  String str = rs.getString(1);
+                  if (str == null)
+                    continue;
+                  String testName = str.toLowerCase();
                   if (tableSchema.equals(testName) == true) {
+                    missingSchema = false;
                     matchingSchema = testName;
                     break;
                   }
                 }
               }
-            }
-          }
 
-          /* Check the table itself */
-
-          boolean missingTable = true;
-          try (ResultSet rs = connection.getMetaData().getTables(null, matchingSchema, null, null)) {
-            while (rs.next() == true) {
-              String str = rs.getString(3);
-              if (str == null)
-                continue;
-              String testName = str.toLowerCase();
-              if (mungedTableName.equals(testName) == true) {
-
-                /* Validate the fields */
-
-                missingTable = false;
-                break;
-              }
-            }
-          }
-
-          if (missingTable == true) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("CREATE TABLE ");
-            if (tableSchema != null)
-              sb.append(tableSchema).append('.');
-            sb.append(mungedTableName);
-            sb.append(" (");
-            sb.append(sPRIMARY_KEY_1);
-            sb.append(" varchar(1024),");
-            sb.append(sPRIMARY_KEY_2);
-            sb.append(" varchar(1024)");
-            for (IKVColumnDefinition cd : pDefinition.getColumnDefinitions()) {
-              sb.append(", ");
-              sb.append(escapeColumnName(cd.getName()));
-              sb.append(' ');
-              switch (cd.getType()) {
-              case Boolean: {
-                sb.append(mDialect.getBooleanType());
-                break;
-              }
-              case Decimal: {
-
-                /* If the decimal is actually the long range, then let's use long support */
-
-                BigDecimal minValue = cd.getMinValue();
-                BigDecimal maxValue = cd.getMaxValue();
-                if ((minValue != null) && (minValue.equals(sLONG_MIN_VALUE)) && (maxValue != null)
-                  && (maxValue.equals(sLONG_MAX_VALUE))) {
-                  sb.append(mDialect.getLongType());
+              if (missingSchema == true) {
+                try (
+                  PreparedStatement ps = connection.prepareStatement(mDialect.generateCreateSchemaSQL(tableSchema))) {
+                  ps.execute();
                 }
-                else
-                  sb.append(mDialect.getUnlimitedDecimalType());
-                break;
-              }
-              case Integer: {
-                sb.append(mDialect.getIntegerType());
-                break;
-              }
-              case Long: {
-                sb.append(mDialect.getLongType());
-                break;
-              }
-              case String: {
-                Integer maxLength = cd.getMaxLength();
-                if (maxLength != null)
-                  sb.append(mDialect.getTextType(maxLength));
-                else
-                  sb.append(mDialect.getUnlimitedTextType());
-                break;
-              }
-              case Timestamp: {
-                sb.append(mDialect.getTimestampType());
-                break;
-              }
+
+                try (ResultSet rs = connection.getMetaData().getSchemas(null, null)) {
+                  while (rs.next() == true) {
+                    String testName = rs.getString(1);
+                    if (tableSchema.equals(testName) == true) {
+                      matchingSchema = testName;
+                      break;
+                    }
+                  }
+                }
               }
             }
-            sb.append(", PRIMARY KEY(");
-            sb.append(sPRIMARY_KEY_1);
-            sb.append(',');
-            sb.append(sPRIMARY_KEY_2);
-            sb.append(')');
-            sb.append(")");
 
-            sLogger.info("Constructing table via {}", sb.toString());
+            /* Check the table itself */
 
-            try (PreparedStatement ps = connection.prepareStatement(sb.toString())) {
-              ps.execute();
+            boolean missingTable = true;
+            try (ResultSet rs = connection.getMetaData().getTables(null, matchingSchema, null, null)) {
+              while (rs.next() == true) {
+                String str = rs.getString(3);
+                if (str == null)
+                  continue;
+                String testName = str.toLowerCase();
+                if (mungedTableName.equals(testName) == true) {
+
+                  /* Validate the fields */
+
+                  missingTable = false;
+                  break;
+                }
+              }
+            }
+
+            if (missingTable == true) {
+              StringBuilder sb = new StringBuilder();
+              sb.append("CREATE TABLE ");
+              if (tableSchema != null)
+                sb.append(tableSchema).append('.');
+              sb.append(mungedTableName);
+              sb.append(" (");
+              sb.append(sPRIMARY_KEY_1);
+              sb.append(" varchar(1024),");
+              sb.append(sPRIMARY_KEY_2);
+              sb.append(" varchar(1024)");
+              for (IKVColumnDefinition cd : pDefinition.getColumnDefinitions()) {
+                sb.append(", ");
+                sb.append(escapeColumnName(cd.getName()));
+                sb.append(' ');
+                switch (cd.getType()) {
+                case Boolean: {
+                  sb.append(mDialect.getBooleanType());
+                  break;
+                }
+                case Decimal: {
+
+                  /* If the decimal is actually the long range, then let's use long support */
+
+                  BigDecimal minValue = cd.getMinValue();
+                  BigDecimal maxValue = cd.getMaxValue();
+                  if ((minValue != null) && (minValue.equals(sLONG_MIN_VALUE)) && (maxValue != null)
+                    && (maxValue.equals(sLONG_MAX_VALUE))) {
+                    sb.append(mDialect.getLongType());
+                  }
+                  else
+                    sb.append(mDialect.getUnlimitedDecimalType());
+                  break;
+                }
+                case Integer: {
+                  sb.append(mDialect.getIntegerType());
+                  break;
+                }
+                case Long: {
+                  sb.append(mDialect.getLongType());
+                  break;
+                }
+                case String: {
+                  Integer maxLength = cd.getMaxLength();
+                  if (maxLength != null)
+                    sb.append(mDialect.getTextType(maxLength));
+                  else
+                    sb.append(mDialect.getUnlimitedTextType());
+                  break;
+                }
+                case Timestamp: {
+                  sb.append(mDialect.getTimestampType());
+                  break;
+                }
+                }
+              }
+              sb.append(", PRIMARY KEY(");
+              sb.append(sPRIMARY_KEY_1);
+              sb.append(',');
+              sb.append(sPRIMARY_KEY_2);
+              sb.append(')');
+              sb.append(")");
+
+              sLogger.info("Constructing table via {}", sb.toString());
+
+              try (PreparedStatement ps = connection.prepareStatement(sb.toString())) {
+                ps.execute();
+              }
             }
           }
         }
-      }
-      catch (SQLException ex) {
-        throw new RuntimeException(ex);
-      }
+        catch (SQLException ex) {
+          throw new RuntimeException(ex);
+        }
 
-      /* Generate all the SQL */
+        /* Generate all the SQL */
 
-      /* Get By */
+        /* Get By */
 
-      StringBuilder sb = new StringBuilder();
-      sb.append("SELECT ");
-      if (pDefinition.getColumnDefinitions().isEmpty())
-        sb.append("1");
-      else
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ");
+        if (pDefinition.getColumnDefinitions().isEmpty())
+          sb.append("1");
+        else
+          sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
+            (cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
+        sb.append(" FROM ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
+        sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
+        String getBySQL = sb.toString();
+
+        /* Supports Upsert */
+
+        boolean supportsUpsert = false;
+
+        /* putBySQL */
+
+        String putBySQL = "";
+
+        /* put query */
+
+        sb = new StringBuilder();
+        sb.append("SELECT 1 FROM ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
+        sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
+        String putQueryBySQL = sb.toString();
+
+        /* put insert */
+
+        sb = new StringBuilder();
+        sb.append("INSERT INTO ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        sb.append('(');
+        sb.append(sPRIMARY_KEY_1).append(',');
+        sb.append(sPRIMARY_KEY_2);
+        if (pDefinition.getColumnDefinitions().isEmpty() == false) {
+          sb.append(',');
+          sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
+            (cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
+        }
+        sb.append(") VALUES (?, ?");
+        if (pDefinition.getColumnDefinitions().isEmpty() == false) {
+          sb.append(", ");
+          sb.append(String.join(", ", Iterables.transform(pDefinition.getColumnDefinitions(), (cd) -> "?")));
+        }
+        sb.append(")");
+        String putInsertBySQL = sb.toString();
+
+        /* put update */
+
+        sb = new StringBuilder();
+        sb.append("UPDATE ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        sb.append(" SET ");
         sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
-          (cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
-      sb.append(" FROM ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
-      sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
-      String getBySQL = sb.toString();
+          (cd) -> cd == null ? null : escapeColumnName(cd.getName()) + "=?")));
+        sb.append(" WHERE ");
+        sb.append(sPRIMARY_KEY_1).append("=? AND ");
+        sb.append(sPRIMARY_KEY_2).append("=?");
+        String putUpdateBySQL = sb.toString();
 
-      /* Supports Upsert */
+        /* remove */
 
-      boolean supportsUpsert = false;
+        sb = new StringBuilder();
+        sb.append("DELETE FROM ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        sb.append(" WHERE ");
+        sb.append(sPRIMARY_KEY_1).append("=? AND ");
+        sb.append(sPRIMARY_KEY_2).append("=?");
+        String removeBySQL = sb.toString();
 
-      /* putBySQL */
+        /* get count */
 
-      String putBySQL = "";
+        sb = new StringBuilder();
+        sb.append("SELECT count(1) FROM ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        String getCountSQL = sb.toString();
 
-      /* put query */
+        /* clear sql */
 
-      sb = new StringBuilder();
-      sb.append("SELECT 1 FROM ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      sb.append(" WHERE ").append(sPRIMARY_KEY_1).append("=?");
-      sb.append(" AND ").append(sPRIMARY_KEY_2).append("=?");
-      String putQueryBySQL = sb.toString();
+        sb = new StringBuilder();
+        sb.append("DELETE FROM ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        String clearSQL = sb.toString();
 
-      /* put insert */
+        /* key iterator */
 
-      sb = new StringBuilder();
-      sb.append("INSERT INTO ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      sb.append('(');
-      sb.append(sPRIMARY_KEY_1).append(',');
-      sb.append(sPRIMARY_KEY_2);
-      if (pDefinition.getColumnDefinitions().isEmpty() == false) {
-        sb.append(',');
-        sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
-          (cd) -> cd == null ? null : escapeColumnName(cd.getName()))));
+        sb = new StringBuilder();
+        sb.append("SELECT distinct ");
+        sb.append(sPRIMARY_KEY_1);
+        sb.append(" FROM ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        String keyIteratorSQL = sb.toString();
+
+        /* key iterator 2 */
+
+        sb = new StringBuilder();
+        sb.append("SELECT ");
+        sb.append(sPRIMARY_KEY_2);
+        sb.append(" FROM ");
+        if (tableSchema != null)
+          sb.append(tableSchema).append('.');
+        sb.append(mungedTableName);
+        sb.append(" WHERE ");
+        sb.append(sPRIMARY_KEY_1).append("=?");
+        String keyIterator2SQL = sb.toString();
+
+        IResultSetDeserializer deserializer = new JDBCColumnDeserializer(mDialect, pDefinition);
+        IPreparedStatementSerializer serializer = new JDBCColumnSerializer(mDialect, pDefinition);
+
+        tableInfo = new JDBCTableInfo(getBySQL, supportsUpsert, putBySQL, putQueryBySQL, putInsertBySQL, putUpdateBySQL,
+          deserializer, serializer, removeBySQL, getCountSQL, clearSQL, keyIteratorSQL, keyIterator2SQL);
+        mTableCache.put(pDefinition.getTableName(), tableInfo);
       }
-      sb.append(") VALUES (?, ?");
-      if (pDefinition.getColumnDefinitions().isEmpty() == false) {
-        sb.append(", ");
-        sb.append(String.join(", ", Iterables.transform(pDefinition.getColumnDefinitions(), (cd) -> "?")));
-      }
-      sb.append(")");
-      String putInsertBySQL = sb.toString();
-
-      /* put update */
-
-      sb = new StringBuilder();
-      sb.append("UPDATE ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      sb.append(" SET ");
-      sb.append(String.join(",", Iterables.transform(pDefinition.getColumnDefinitions(),
-        (cd) -> cd == null ? null : escapeColumnName(cd.getName()) + "=?")));
-      sb.append(" WHERE ");
-      sb.append(sPRIMARY_KEY_1).append("=? AND ");
-      sb.append(sPRIMARY_KEY_2).append("=?");
-      String putUpdateBySQL = sb.toString();
-
-      /* remove */
-
-      sb = new StringBuilder();
-      sb.append("DELETE FROM ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      sb.append(" WHERE ");
-      sb.append(sPRIMARY_KEY_1).append("=? AND ");
-      sb.append(sPRIMARY_KEY_2).append("=?");
-      String removeBySQL = sb.toString();
-
-      /* get count */
-
-      sb = new StringBuilder();
-      sb.append("SELECT count(1) FROM ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      String getCountSQL = sb.toString();
-
-      /* clear sql */
-
-      sb = new StringBuilder();
-      sb.append("DELETE FROM ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      String clearSQL = sb.toString();
-
-      /* key iterator */
-
-      sb = new StringBuilder();
-      sb.append("SELECT distinct ");
-      sb.append(sPRIMARY_KEY_1);
-      sb.append(" FROM ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      String keyIteratorSQL = sb.toString();
-
-      /* key iterator 2 */
-
-      sb = new StringBuilder();
-      sb.append("SELECT ");
-      sb.append(sPRIMARY_KEY_2);
-      sb.append(" FROM ");
-      if (tableSchema != null)
-        sb.append(tableSchema).append('.');
-      sb.append(mungedTableName);
-      sb.append(" WHERE ");
-      sb.append(sPRIMARY_KEY_1).append("=?");
-      String keyIterator2SQL = sb.toString();
-
-      IResultSetDeserializer deserializer = new JDBCColumnDeserializer(mDialect, pDefinition);
-      IPreparedStatementSerializer serializer = new JDBCColumnSerializer(mDialect, pDefinition);
-
-      tableInfo = new JDBCTableInfo(getBySQL, supportsUpsert, putBySQL, putQueryBySQL, putInsertBySQL, putUpdateBySQL,
-        deserializer, serializer, removeBySQL, getCountSQL, clearSQL, keyIteratorSQL, keyIterator2SQL);
-      mTableCache.put(pDefinition.getTableName(), tableInfo);
     }
   }
 
