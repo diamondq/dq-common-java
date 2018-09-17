@@ -1,6 +1,7 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.config.Config;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.collect.Maps;
 
 import java.io.File;
@@ -15,7 +16,14 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
    */
   public static class DynamicPropertiesFilePersistenceLayerBuilder {
 
-    private @Nullable String mAccessKey;
+    private @Nullable String         mAccessKey;
+
+    private @Nullable ContextFactory mContextFactory;
+
+    public DynamicPropertiesFilePersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
+      mContextFactory = pContextFactory;
+      return this;
+    }
 
     /**
      * Sets the structure directory
@@ -37,7 +45,10 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
       String accessKey = mAccessKey;
       if (accessKey == null)
         throw new IllegalArgumentException("The mandatory field accessKey was not set");
-      return new DynamicPropertiesFilePersistenceLayer(accessKey);
+      ContextFactory contextFactory = mContextFactory;
+      if (contextFactory == null)
+        throw new IllegalArgumentException("The contextFactory is not set");
+      return new DynamicPropertiesFilePersistenceLayer(contextFactory, accessKey);
     }
   }
 
@@ -45,9 +56,9 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
 
   private final String                   mAccessKey;
 
-  public DynamicPropertiesFilePersistenceLayer(String pAccessKey) {
-    super(new File("placeholder"), false, -1, new File("placeholder"), false, -1, new File("placeholder"), false, -1,
-      new File("placeholder"), false, -1);
+  public DynamicPropertiesFilePersistenceLayer(ContextFactory pContextFactory, String pAccessKey) {
+    super(pContextFactory, new File("placeholder"), false, -1, new File("placeholder"), false, -1,
+      new File("placeholder"), false, -1, new File("placeholder"), false, -1);
     mAccessKey = pAccessKey;
   }
 

@@ -10,4 +10,5 @@
     <provide
       interface="com.diamondq.common.model.generic.osgi.OSGiPropertiesFilePersistenceLayer" />
   </service>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
 </scr:component>

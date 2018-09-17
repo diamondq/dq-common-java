@@ -4,6 +4,7 @@ import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.persistence.ResourceBundlePersistenceLayer;
+import com.diamondq.common.utils.context.ContextFactory;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.wiring.BundleWiring;
@@ -19,11 +20,12 @@ public class OSGiResourceBundlePersistenceLayer extends AbstractOSGiConstructor 
       .factoryMethod("create") //
       .register(PersistenceLayer.class) //
       .cArg().type(BundleContext.class).injectBundleContext().required().build() //
+      .cArg().type(ContextFactory.class).injectContextFactory().required().build() //
       .cArg().type(String.class).prop(".resourceBaseName").required().build() //
     );
   }
 
-  public PersistenceLayer create(BundleContext pContext, String pResourceBaseName) {
+  public PersistenceLayer create(BundleContext pContext, ContextFactory pContextFactory, String pResourceBaseName) {
     sLogger.trace("create({}, {}) from {}", pContext, pResourceBaseName, this);
 
     BundleWiring bundleWiring = pContext.getBundle().adapt(BundleWiring.class);
@@ -31,7 +33,7 @@ public class OSGiResourceBundlePersistenceLayer extends AbstractOSGiConstructor 
       throw new IllegalStateException();
     ClassLoader classLoader = bundleWiring.getClassLoader();
 
-    return new ResourceBundlePersistenceLayer(pResourceBaseName, classLoader);
+    return new ResourceBundlePersistenceLayer(pContextFactory, pResourceBaseName, classLoader);
   }
 
 }

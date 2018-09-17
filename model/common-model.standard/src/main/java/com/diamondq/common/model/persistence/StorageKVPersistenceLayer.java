@@ -22,6 +22,8 @@ import com.diamondq.common.storage.kv.KVColumnType;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.builders.IBuilder;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
@@ -56,6 +58,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
     protected @Nullable IBuilder<IKVStore> kvStoreBuilder;
 
+    protected @Nullable ContextFactory     contextFactory;
+
     /**
      * Sets the store
      *
@@ -64,6 +68,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
      */
     public StorageKVPersistenceLayerBuilder kvStore(IKVStore pStore) {
       kvStore = pStore;
+      return this;
+    }
+
+    public StorageKVPersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
+      contextFactory = pContextFactory;
       return this;
     }
 
@@ -92,7 +101,10 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           throw new IllegalArgumentException("The one of kvStore or kvStoreBuilder must be set");
         localStore = localBuilder.build();
       }
-      return new StorageKVPersistenceLayer(localStore);
+      ContextFactory localContextFactory = contextFactory;
+      if (localContextFactory == null)
+        throw new IllegalArgumentException("The contextFactory must be set");
+      return new StorageKVPersistenceLayer(localContextFactory, localStore);
     }
   }
 
@@ -127,10 +139,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   /**
    * Default constructor
    *
+   * @param pContextFactory the context factory
    * @param pStructureStore the KV store for structures
    */
-  public StorageKVPersistenceLayer(IKVStore pStructureStore) {
-    super(true, false, -1, false, false, -1, false, false, -1, false, false, -1);
+  public StorageKVPersistenceLayer(ContextFactory pContextFactory, IKVStore pStructureStore) {
+    super(pContextFactory, true, false, -1, false, false, -1, false, false, -1, false, false, -1);
     mStructureStore = pStructureStore;
 
     mConfiguredTableDefinitions = Maps.newConcurrentMap();
@@ -154,140 +167,147 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   }
 
   protected void validateKVStoreManyToManySetup(Toolkit pToolkit, Scope pScope, String pTableName) {
-    IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
-    if (tableDefinitionSupport != null) {
-      synchronized (this) {
-        if (mConfiguredTableDefinitions.putIfAbsent(pTableName, "") == null) {
-          KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
-          builder = builder.tableName(pTableName);
-          builder.addColumn(tableDefinitionSupport.createColumnDefinitionBuilder().name("dateCreated")
-            .type(KVColumnType.Timestamp).build());
-          tableDefinitionSupport.addTableDefinition(builder.build());
+    try (Context context =
+      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pTableName)) {
+      IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
+      if (tableDefinitionSupport != null) {
+        synchronized (this) {
+          if (mConfiguredTableDefinitions.putIfAbsent(pTableName, "") == null) {
+            KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
+            builder = builder.tableName(pTableName);
+            builder.addColumn(tableDefinitionSupport.createColumnDefinitionBuilder().name("dateCreated")
+              .type(KVColumnType.Timestamp).build());
+            tableDefinitionSupport.addTableDefinition(builder.build());
+          }
         }
       }
     }
   }
 
   protected void validateKVStoreTableSetup(Toolkit pToolkit, Scope pScope, String pTableName) {
-    IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
-    if (tableDefinitionSupport != null) {
-      synchronized (this) {
-        if (mConfiguredTableDefinitions.containsKey(pTableName) == false) {
-          String singlePrimaryKey = "";
-          try {
-            KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
-            builder = builder.tableName(pTableName);
-            StructureDefinition sd = pToolkit.lookupStructureDefinitionByName(pScope, pTableName);
-            if (sd == null)
-              throw new IllegalArgumentException("Unable to find the structure definition " + pTableName);
-            Map<String, PropertyDefinition> allProperties = sd.getAllProperties();
+    try (Context context =
+      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pTableName)) {
+      IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
+      if (tableDefinitionSupport != null) {
+        synchronized (this) {
+          if (mConfiguredTableDefinitions.containsKey(pTableName) == false) {
+            String singlePrimaryKey = "";
+            try {
+              KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
+              builder = builder.tableName(pTableName);
+              StructureDefinition sd = pToolkit.lookupStructureDefinitionByName(pScope, pTableName);
+              if (sd == null)
+                throw new IllegalArgumentException("Unable to find the structure definition " + pTableName);
+              Map<String, PropertyDefinition> allProperties = sd.getAllProperties();
 
-            /* Determine if there is multiple primary keys */
+              /* Determine if there is multiple primary keys */
 
-            int primaryKeyCount =
-              Iterables.size(Iterables.filter(allProperties.values(), (pd) -> (pd != null) && pd.isPrimaryKey()));
+              int primaryKeyCount =
+                Iterables.size(Iterables.filter(allProperties.values(), (pd) -> (pd != null) && pd.isPrimaryKey()));
 
-            for (PropertyDefinition pd : allProperties.values()) {
+              for (PropertyDefinition pd : allProperties.values()) {
 
-              /*
-               * Primary keys are already included in the KV's primary key, so skip those. However, if there is multiple
-               * primary keys, then include them, so that they can be accessed independently of the primary key
-               */
+                /*
+                 * Primary keys are already included in the KV's primary key, so skip those. However, if there is
+                 * multiple primary keys, then include them, so that they can be accessed independently of the primary
+                 * key
+                 */
 
-              if ((pd.isPrimaryKey() == true) && (primaryKeyCount == 1)) {
-                singlePrimaryKey = pd.getName();
-                continue;
-              }
-
-              /* If it's a Container reference to the parent, then we don't include it */
-
-              Collection<String> containerValue = pd.getKeywords().get(CommonKeywordKeys.CONTAINER);
-              if (containerValue.contains(CommonKeywordValues.CONTAINER_PARENT)) {
-                continue;
-              }
-
-              if (containerValue.contains(CommonKeywordValues.CONTAINER_CHILDREN)) {
-
-                Collection<StructureDefinitionRef> types = pd.getReferenceTypes();
-                for (StructureDefinitionRef type : types) {
-                  StringBuilder sb = new StringBuilder();
-                  sb.append(pTableName).append('_');
-                  sb.append(pd.getName());
-                  sb.append('_');
-                  sb.append(type.getSerializedString());
-                  validateKVStoreManyToManySetup(pToolkit, pScope, sb.toString());
+                if ((pd.isPrimaryKey() == true) && (primaryKeyCount == 1)) {
+                  singlePrimaryKey = pd.getName();
+                  continue;
                 }
 
-                continue;
-              }
+                /* If it's a Container reference to the parent, then we don't include it */
 
-              KVColumnDefinitionBuilder<?> colBuilder = tableDefinitionSupport.createColumnDefinitionBuilder();
+                Collection<String> containerValue = pd.getKeywords().get(CommonKeywordKeys.CONTAINER);
+                if (containerValue.contains(CommonKeywordValues.CONTAINER_PARENT)) {
+                  continue;
+                }
 
-              String colName = pd.getName();
-              colBuilder = colBuilder.name(colName);
+                if (containerValue.contains(CommonKeywordValues.CONTAINER_CHILDREN)) {
 
-              switch (pd.getType()) {
-              case String: {
-                colBuilder = colBuilder.type(KVColumnType.String);
-                Integer maxLength = pd.getMaxLength();
-                if (maxLength != null)
-                  colBuilder = colBuilder.maxLength(maxLength);
-                break;
-              }
-              case Binary:
-                throw new UnsupportedOperationException();
-              case Boolean: {
-                colBuilder = colBuilder.type(KVColumnType.Boolean);
-                break;
-              }
-              case Decimal: {
-                colBuilder = colBuilder.type(KVColumnType.Decimal);
-                BigDecimal minValue = pd.getMinValue();
-                if (minValue != null)
-                  colBuilder = colBuilder.minValue(minValue);
-                BigDecimal maxValue = pd.getMaxValue();
-                if (maxValue != null)
-                  colBuilder = colBuilder.maxValue(maxValue);
-                break;
-              }
-              case EmbeddedStructureList:
-                throw new UnsupportedOperationException();
-              case Image:
-                throw new UnsupportedOperationException();
-              case Integer: {
-                colBuilder = colBuilder.type(KVColumnType.Integer);
-                break;
-              }
-              case Long: {
-                colBuilder = colBuilder.type(KVColumnType.Long);
-                break;
-              }
-              case PropertyRef: {
-                colBuilder = colBuilder.type(KVColumnType.String);
-                break;
-              }
-              case StructureRef: {
-                colBuilder = colBuilder.type(KVColumnType.String);
-                break;
-              }
-              case StructureRefList: {
-                colBuilder = colBuilder.type(KVColumnType.String);
-                break;
-              }
-              case Timestamp: {
-                colBuilder = colBuilder.type(KVColumnType.Timestamp);
-              }
-              }
+                  Collection<StructureDefinitionRef> types = pd.getReferenceTypes();
+                  for (StructureDefinitionRef type : types) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(pTableName).append('_');
+                    sb.append(pd.getName());
+                    sb.append('_');
+                    sb.append(type.getSerializedString());
+                    validateKVStoreManyToManySetup(pToolkit, pScope, sb.toString());
+                  }
 
-              builder = builder.addColumn(colBuilder.build());
+                  continue;
+                }
+
+                KVColumnDefinitionBuilder<?> colBuilder = tableDefinitionSupport.createColumnDefinitionBuilder();
+
+                String colName = pd.getName();
+                colBuilder = colBuilder.name(colName);
+
+                switch (pd.getType()) {
+                case String: {
+                  colBuilder = colBuilder.type(KVColumnType.String);
+                  Integer maxLength = pd.getMaxLength();
+                  if (maxLength != null)
+                    colBuilder = colBuilder.maxLength(maxLength);
+                  break;
+                }
+                case Binary:
+                  throw new UnsupportedOperationException();
+                case Boolean: {
+                  colBuilder = colBuilder.type(KVColumnType.Boolean);
+                  break;
+                }
+                case Decimal: {
+                  colBuilder = colBuilder.type(KVColumnType.Decimal);
+                  BigDecimal minValue = pd.getMinValue();
+                  if (minValue != null)
+                    colBuilder = colBuilder.minValue(minValue);
+                  BigDecimal maxValue = pd.getMaxValue();
+                  if (maxValue != null)
+                    colBuilder = colBuilder.maxValue(maxValue);
+                  break;
+                }
+                case EmbeddedStructureList:
+                  throw new UnsupportedOperationException();
+                case Image:
+                  throw new UnsupportedOperationException();
+                case Integer: {
+                  colBuilder = colBuilder.type(KVColumnType.Integer);
+                  break;
+                }
+                case Long: {
+                  colBuilder = colBuilder.type(KVColumnType.Long);
+                  break;
+                }
+                case PropertyRef: {
+                  colBuilder = colBuilder.type(KVColumnType.String);
+                  break;
+                }
+                case StructureRef: {
+                  colBuilder = colBuilder.type(KVColumnType.String);
+                  break;
+                }
+                case StructureRefList: {
+                  colBuilder = colBuilder.type(KVColumnType.String);
+                  break;
+                }
+                case Timestamp: {
+                  colBuilder = colBuilder.type(KVColumnType.Timestamp);
+                }
+                }
+
+                builder = builder.addColumn(colBuilder.build());
+              }
+              tableDefinitionSupport.addTableDefinition(builder.build());
             }
-            tableDefinitionSupport.addTableDefinition(builder.build());
+            catch (RuntimeException ex) {
+              mConfiguredTableDefinitions.remove(pTableName);
+              throw ex;
+            }
+            mConfiguredTableDefinitions.put(pTableName, singlePrimaryKey);
           }
-          catch (RuntimeException ex) {
-            mConfiguredTableDefinitions.remove(pTableName);
-            throw ex;
-          }
-          mConfiguredTableDefinitions.put(pTableName, singlePrimaryKey);
         }
       }
     }
@@ -299,18 +319,21 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
    */
   @Override
   protected void internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
+    try (
+      Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pValue)) {
 
-    /*
-     * Handle the table validation. NOTE: This makes the assumption that this persistence layer is part of a
-     * CombinedLayer, and the 'real' layer is earlier for StructureDefinitions (ie. it's already been persisted and can
-     * now be looked up)
-     */
+      /*
+       * Handle the table validation. NOTE: This makes the assumption that this persistence layer is part of a
+       * CombinedLayer, and the 'real' layer is earlier for StructureDefinitions (ie. it's already been persisted and
+       * can now be looked up)
+       */
 
-    validateKVStoreTableSetup(pToolkit, pScope, pValue.getName());
+      validateKVStoreTableSetup(pToolkit, pScope, pValue.getName());
 
-    /* Let the super handle it normally */
+      /* Let the super handle it normally */
 
-    super.internalWriteStructureDefinition(pToolkit, pScope, pValue);
+      super.internalWriteStructureDefinition(pToolkit, pScope, pValue);
+    }
   }
 
   /**
@@ -322,33 +345,36 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected @Nullable Map<String, Object> loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
     String pKey, boolean pCreateIfMissing) {
-    IKVTransaction transaction = mStructureStore.startTransaction();
-    boolean success = false;
-    try {
-      validateKVStoreTableSetup(pToolkit, pScope, pDefName);
-      ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
-      @SuppressWarnings("unchecked")
-      Map<String, Object> configMap =
-        transaction.getByKey(pDefName, containerAndPrimaryKey.container, containerAndPrimaryKey.primary, Map.class);
-      if ((configMap == null) && (pCreateIfMissing == true))
-        configMap = Maps.newHashMap();
-      if (configMap != null) {
-        Integer revision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, pDefName);
-        if (revision == null)
-          throw new IllegalArgumentException();
-        configMap.put("structureDef", new StringBuilder(pDefName).append(':').append(revision).toString());
-        String primaryKey = mConfiguredTableDefinitions.get(pDefName);
-        if ((primaryKey != null) && (primaryKey.isEmpty() == false))
-          configMap.put(primaryKey, unescapeValue(containerAndPrimaryKey.primary));
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pDefName,
+      pKey, pCreateIfMissing)) {
+      IKVTransaction transaction = mStructureStore.startTransaction();
+      boolean success = false;
+      try {
+        validateKVStoreTableSetup(pToolkit, pScope, pDefName);
+        ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> configMap =
+          transaction.getByKey(pDefName, containerAndPrimaryKey.container, containerAndPrimaryKey.primary, Map.class);
+        if ((configMap == null) && (pCreateIfMissing == true))
+          configMap = Maps.newHashMap();
+        if (configMap != null) {
+          Integer revision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, pDefName);
+          if (revision == null)
+            throw new IllegalArgumentException();
+          configMap.put("structureDef", new StringBuilder(pDefName).append(':').append(revision).toString());
+          String primaryKey = mConfiguredTableDefinitions.get(pDefName);
+          if ((primaryKey != null) && (primaryKey.isEmpty() == false))
+            configMap.put(primaryKey, unescapeValue(containerAndPrimaryKey.primary));
+        }
+        success = true;
+        return context.exit(configMap);
       }
-      success = true;
-      return configMap;
-    }
-    finally {
-      if (success == true)
-        transaction.commit();
-      else
-        transaction.rollback();
+      finally {
+        if (success == true)
+          transaction.commit();
+        else
+          transaction.rollback();
+      }
     }
   }
 
@@ -555,58 +581,61 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Map<String, Object> pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
-    IKVTransaction transaction = mStructureStore.startTransaction();
-    boolean success = false;
-    try {
-      validateKVStoreTableSetup(pToolkit, pScope, pDefName);
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pDefName,
+      pKey, pConfig, pMustMatchOptimisticObj, pOptimisticObj)) {
+      IKVTransaction transaction = mStructureStore.startTransaction();
+      boolean success = false;
+      try {
+        validateKVStoreTableSetup(pToolkit, pScope, pDefName);
 
-      ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
+        ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
 
-      /* Save the main object */
+        /* Save the main object */
 
-      transaction.putByKey(pDefName, containerAndPrimaryKey.container, containerAndPrimaryKey.primary, pConfig);
+        transaction.putByKey(pDefName, containerAndPrimaryKey.container, containerAndPrimaryKey.primary, pConfig);
 
-      /* Then, for each subcomponent, make sure it's listed */
+        /* Then, for each subcomponent, make sure it's listed */
 
-      String[] parts = pKey.split("/");
-      if (parts.length > 2) {
-        for (int i = 0; i < (parts.length - 2); i += 3) {
-          StringBuilder typeBuilder = new StringBuilder();
-          typeBuilder.append(parts[i]).append('_').append(parts[i + 2]).append('_').append(parts[i + 3]);
+        String[] parts = pKey.split("/");
+        if (parts.length > 2) {
+          for (int i = 0; i < (parts.length - 2); i += 3) {
+            StringBuilder typeBuilder = new StringBuilder();
+            typeBuilder.append(parts[i]).append('_').append(parts[i + 2]).append('_').append(parts[i + 3]);
 
-          StringBuilder leftKeyBuilder = new StringBuilder();
-          boolean isFirst = true;
-          for (int o = 0; o <= (i + 1); o++) {
-            if (isFirst == true)
-              isFirst = false;
-            else
-              leftKeyBuilder.append('/');
-            leftKeyBuilder.append(parts[o]);
+            StringBuilder leftKeyBuilder = new StringBuilder();
+            boolean isFirst = true;
+            for (int o = 0; o <= (i + 1); o++) {
+              if (isFirst == true)
+                isFirst = false;
+              else
+                leftKeyBuilder.append('/');
+              leftKeyBuilder.append(parts[o]);
+            }
+
+            String tableName = typeBuilder.toString();
+            String leftKey = leftKeyBuilder.toString();
+            String rightKey = parts[i + 4];
+
+            validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> lookupDate = transaction.getByKey(tableName, leftKey, rightKey, Map.class);
+            if (lookupDate == null)
+              transaction.putByKey(tableName, leftKey, rightKey,
+                Collections.singletonMap("dateCreated", new Date().getTime()));
           }
-
-          String tableName = typeBuilder.toString();
-          String leftKey = leftKeyBuilder.toString();
-          String rightKey = parts[i + 4];
-
-          validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
-
-          @SuppressWarnings("unchecked")
-          Map<String, Object> lookupDate = transaction.getByKey(tableName, leftKey, rightKey, Map.class);
-          if (lookupDate == null)
-            transaction.putByKey(tableName, leftKey, rightKey,
-              Collections.singletonMap("dateCreated", new Date().getTime()));
         }
-      }
 
-      success = true;
+        success = true;
+      }
+      finally {
+        if (success == true)
+          transaction.commit();
+        else
+          transaction.rollback();
+      }
+      return context.exit(true);
     }
-    finally {
-      if (success == true)
-        transaction.commit();
-      else
-        transaction.rollback();
-    }
-    return true;
   }
 
   private String unescape(String pValue) {
@@ -635,53 +664,57 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Structure pStructure) {
-    IKVTransaction transaction = mStructureStore.startTransaction();
-    boolean success = false;
-    try {
-      String defName = pStructure.getDefinition().getName();
-      validateKVStoreTableSetup(pToolkit, pScope, defName);
+    try (Context context =
+      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pDefName, pKey, pStructure)) {
 
-      ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
+      IKVTransaction transaction = mStructureStore.startTransaction();
+      boolean success = false;
+      try {
+        String defName = pStructure.getDefinition().getName();
+        validateKVStoreTableSetup(pToolkit, pScope, defName);
 
-      transaction.removeByKey(defName, containerAndPrimaryKey.container, containerAndPrimaryKey.primary);
+        ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
 
-      /* Then, for each subcomponent, make sure it's listed */
+        transaction.removeByKey(defName, containerAndPrimaryKey.container, containerAndPrimaryKey.primary);
 
-      String[] parts = pKey.split("/");
-      if (parts.length > 2) {
-        for (int i = 0; i < (parts.length - 2); i += 3) {
-          StringBuilder typeBuilder = new StringBuilder();
-          typeBuilder.append(parts[i]).append('_').append(parts[i + 2]).append('_').append(parts[i + 3]);
+        /* Then, for each subcomponent, make sure it's listed */
 
-          StringBuilder leftKeyBuilder = new StringBuilder();
-          boolean isFirst = true;
-          for (int o = 0; o <= (i + 1); o++) {
-            if (isFirst == true)
-              isFirst = false;
-            else
-              leftKeyBuilder.append('/');
-            leftKeyBuilder.append(parts[o]);
+        String[] parts = pKey.split("/");
+        if (parts.length > 2) {
+          for (int i = 0; i < (parts.length - 2); i += 3) {
+            StringBuilder typeBuilder = new StringBuilder();
+            typeBuilder.append(parts[i]).append('_').append(parts[i + 2]).append('_').append(parts[i + 3]);
+
+            StringBuilder leftKeyBuilder = new StringBuilder();
+            boolean isFirst = true;
+            for (int o = 0; o <= (i + 1); o++) {
+              if (isFirst == true)
+                isFirst = false;
+              else
+                leftKeyBuilder.append('/');
+              leftKeyBuilder.append(parts[o]);
+            }
+
+            String tableName = typeBuilder.toString();
+            String leftKey = leftKeyBuilder.toString();
+            String rightKey = parts[i + 4];
+
+            validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
+
+            transaction.removeByKey(tableName, leftKey, rightKey);
           }
-
-          String tableName = typeBuilder.toString();
-          String leftKey = leftKeyBuilder.toString();
-          String rightKey = parts[i + 4];
-
-          validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
-
-          transaction.removeByKey(tableName, leftKey, rightKey);
         }
-      }
 
-      success = true;
+        success = true;
+      }
+      finally {
+        if (success == true)
+          transaction.commit();
+        else
+          transaction.rollback();
+      }
+      return context.exit(true);
     }
-    finally {
-      if (success == true)
-        transaction.commit();
-      else
-        transaction.rollback();
-    }
-    return true;
   }
 
   /**
@@ -694,82 +727,84 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope,
     @Nullable Map<String, Object> pConfig, StructureDefinition pStructureDefinition, String pStructureDefName,
     @Nullable String pKey, @Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
-    IKVTransaction transaction = mStructureStore.startTransaction();
-    boolean success = false;
-    try {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pConfig,
+      pStructureDefinition, pStructureDefName, pKey, pPropDef, pStructureRefListBuilder)) {
+      IKVTransaction transaction = mStructureStore.startTransaction();
+      boolean success = false;
+      try {
 
-      if ((pKey == null) || (pPropDef == null)) {
+        if ((pKey == null) || (pPropDef == null)) {
 
-        /* This is a root level lookup */
+          /* This is a root level lookup */
 
-        validateKVStoreTableSetup(pToolkit, pScope, pStructureDefName);
+          validateKVStoreTableSetup(pToolkit, pScope, pStructureDefName);
 
-        List<String> containerKeys = Lists.newArrayList(transaction.keyIterator(pStructureDefName));
-        for (String containerKey : containerKeys) {
+          List<String> containerKeys = Lists.newArrayList(transaction.keyIterator(pStructureDefName));
+          for (String containerKey : containerKeys) {
+            StringBuilder refBuilder = new StringBuilder();
+            if ("__ROOT__".equals(containerKey) == false)
+              refBuilder.append(containerKey).append('/');
+            refBuilder.append(pStructureDefName).append('/');
+            int refOffset = refBuilder.length();
+            for (Iterator<String> i = transaction.keyIterator2(pStructureDefName, containerKey); i.hasNext();) {
+              String primaryKey = i.next();
+              refBuilder.setLength(refOffset);
+              refBuilder.append(primaryKey);
+              pStructureRefListBuilder
+                .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
+
+            }
+          }
+        }
+        else {
+          StringBuilder tableNameBuilder = new StringBuilder();
+          int lastSlash = pKey.lastIndexOf('/');
+          if (lastSlash == -1)
+            throw new IllegalArgumentException("The key isn't in the right format: " + pKey);
+          int nextLastSlash = pKey.lastIndexOf('/', lastSlash - 1);
+          if (nextLastSlash == -1)
+            tableNameBuilder.append(pKey.substring(0, lastSlash));
+          else
+            tableNameBuilder.append(pKey.substring(nextLastSlash + 1, lastSlash));
+          tableNameBuilder.append('_');
+          tableNameBuilder.append(pPropDef.getName()).append('_');
+          Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
+          int builderLength = tableNameBuilder.length();
           StringBuilder refBuilder = new StringBuilder();
-          if ("__ROOT__".equals(containerKey) == false)
-            refBuilder.append(containerKey).append('/');
-          refBuilder.append(pStructureDefName).append('/');
-          int refOffset = refBuilder.length();
-          for (Iterator<String> i = transaction.keyIterator2(pStructureDefName, containerKey); i.hasNext();) {
-            String primaryKey = i.next();
-            refBuilder.setLength(refOffset);
-            refBuilder.append(primaryKey);
-            pStructureRefListBuilder
-              .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
+          refBuilder.append(pKey);
+          refBuilder.append('/');
+          int refBuilderLength = refBuilder.length();
+          for (StructureDefinitionRef sdr : referenceTypes) {
+            StructureDefinition sd = sdr.resolve();
+            if (sd == null)
+              continue;
+            tableNameBuilder.setLength(builderLength);
+            tableNameBuilder.append(sd.getName());
+            refBuilder.setLength(refBuilderLength);
+            refBuilder.append(pPropDef.getName()).append('/');
+            refBuilder.append(sd.getName()).append('/');
+            int finalRefBuilderLength = refBuilder.length();
+            String tableName = tableNameBuilder.toString();
+            validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
+            for (Iterator<String> iterator = transaction.keyIterator2(tableName, pKey); iterator.hasNext();) {
+              String childKey = iterator.next();
+
+              refBuilder.setLength(finalRefBuilderLength);
+              refBuilder.append(childKey);
+              pStructureRefListBuilder
+                .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
+            }
 
           }
         }
+        success = true;
       }
-      else {
-        StringBuilder tableNameBuilder = new StringBuilder();
-        int lastSlash = pKey.lastIndexOf('/');
-        if (lastSlash == -1)
-          throw new IllegalArgumentException("The key isn't in the right format: " + pKey);
-        int nextLastSlash = pKey.lastIndexOf('/', lastSlash - 1);
-        if (nextLastSlash == -1)
-          tableNameBuilder.append(pKey.substring(0, lastSlash));
+      finally {
+        if (success == true)
+          transaction.commit();
         else
-          tableNameBuilder.append(pKey.substring(nextLastSlash + 1, lastSlash));
-        tableNameBuilder.append('_');
-        tableNameBuilder.append(pPropDef.getName()).append('_');
-        Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
-        int builderLength = tableNameBuilder.length();
-        StringBuilder refBuilder = new StringBuilder();
-        refBuilder.append(pKey);
-        refBuilder.append('/');
-        int refBuilderLength = refBuilder.length();
-        for (StructureDefinitionRef sdr : referenceTypes) {
-          StructureDefinition sd = sdr.resolve();
-          if (sd == null)
-            continue;
-          tableNameBuilder.setLength(builderLength);
-          tableNameBuilder.append(sd.getName());
-          refBuilder.setLength(refBuilderLength);
-          refBuilder.append(pPropDef.getName()).append('/');
-          refBuilder.append(sd.getName()).append('/');
-          int finalRefBuilderLength = refBuilder.length();
-          String tableName = tableNameBuilder.toString();
-          validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
-          for (Iterator<String> iterator = transaction.keyIterator2(tableName, pKey); iterator.hasNext();) {
-            String childKey = iterator.next();
-
-            refBuilder.setLength(finalRefBuilderLength);
-            refBuilder.append(childKey);
-            pStructureRefListBuilder
-              .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
-          }
-
-        }
+          transaction.rollback();
       }
-      success = true;
-    }
-    finally {
-      if (success == true)
-        transaction.commit();
-      else
-        transaction.rollback();
     }
   }
-
 }

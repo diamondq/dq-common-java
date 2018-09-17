@@ -10,6 +10,7 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Tombstone;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -34,6 +35,8 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
    */
   public static class CombinedReadWritePersistenceLayerBuilder {
 
+    private @Nullable ContextFactory   mContextFactory;
+
     private @Nullable Scope            mScope;
 
     private @Nullable PersistenceLayer mStructureReadLayer;
@@ -51,6 +54,11 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
     private @Nullable PersistenceLayer mResourceReadLayer;
 
     private @Nullable PersistenceLayer mResourceWriteLayer;
+
+    public CombinedReadWritePersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
+      mContextFactory = pContextFactory;
+      return this;
+    }
 
     /**
      * Sets the scope
@@ -157,22 +165,25 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
      * @return the layer
      */
     public CombinedReadWritePersistenceLayer build() {
+      ContextFactory contextFactory = mContextFactory;
+      if (contextFactory == null)
+        throw new IllegalArgumentException("The mandatory field contextFactory was not set");
       Scope scope = mScope;
       if (scope == null)
         throw new IllegalArgumentException("The mandatory field scope was not set");
       PersistenceLayer structureWriteLayer = mStructureWriteLayer;
       if (structureWriteLayer == null)
-        structureWriteLayer = new NewMemoryPersistenceLayer();
+        structureWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
       PersistenceLayer structureDefinitionWriteLayer = mStructureDefinitionWriteLayer;
       if (structureDefinitionWriteLayer == null)
-        structureDefinitionWriteLayer = new NewMemoryPersistenceLayer();
+        structureDefinitionWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
       PersistenceLayer editorStructureDefinitionWriteLayer = mEditorStructureDefinitionWriteLayer;
       if (editorStructureDefinitionWriteLayer == null)
-        editorStructureDefinitionWriteLayer = new NewMemoryPersistenceLayer();
+        editorStructureDefinitionWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
       PersistenceLayer resourceWriteLayer = mResourceWriteLayer;
       if (resourceWriteLayer == null)
-        resourceWriteLayer = new NewMemoryPersistenceLayer();
-      return new CombinedReadWritePersistenceLayer(mStructureReadLayer, structureWriteLayer,
+        resourceWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
+      return new CombinedReadWritePersistenceLayer(contextFactory, mStructureReadLayer, structureWriteLayer,
         mStructureDefinitionReadLayer, structureDefinitionWriteLayer, mEditorStructureDefinitionReadLayer,
         editorStructureDefinitionWriteLayer, mResourceReadLayer, resourceWriteLayer);
     }
@@ -195,11 +206,13 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   private final PersistenceLayer           mResourceWriteLayer;
 
-  public CombinedReadWritePersistenceLayer(@Nullable PersistenceLayer pStructureReadLayer,
-    PersistenceLayer pStructureWriteLayer, @Nullable PersistenceLayer pStructureDefinitionReadLayer,
-    PersistenceLayer pStructureDefinitionWriteLayer, @Nullable PersistenceLayer pEditorStructureDefinitionReadLayer,
+  public CombinedReadWritePersistenceLayer(ContextFactory pContextFactory,
+    @Nullable PersistenceLayer pStructureReadLayer, PersistenceLayer pStructureWriteLayer,
+    @Nullable PersistenceLayer pStructureDefinitionReadLayer, PersistenceLayer pStructureDefinitionWriteLayer,
+    @Nullable PersistenceLayer pEditorStructureDefinitionReadLayer,
     PersistenceLayer pEditorStructureDefinitionWriteLayer, @Nullable PersistenceLayer pResourceReadLayer,
     PersistenceLayer pResourceWriteLayer) {
+    super(pContextFactory);
     mStructureReadLayer = pStructureReadLayer;
     mStructureWriteLayer = pStructureWriteLayer;
     mStructureDefinitionReadLayer = pStructureDefinitionReadLayer;

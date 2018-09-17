@@ -6,6 +6,7 @@ import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
@@ -21,7 +22,7 @@ public class ToolkitProvider {
 
   @Produces
   @ApplicationScoped
-  public Toolkit createToolkit(Config pConfig, BeanManager pManager) {
+  public Toolkit createToolkit(Config pConfig, ContextFactory pContextFactory, BeanManager pManager) {
     ToolkitFactory factory = ToolkitFactory.newInstance();
     Toolkit toolkit = factory.newToolkit();
     GenericToolkit gt = (GenericToolkit) toolkit;
@@ -49,10 +50,10 @@ public class ToolkitProvider {
             "The config key persistence.scope-" + scopeName + ".resources requires at least one definition");
 
         gt.setPersistenceLayer(scope,
-          new CombinedPersistenceLayer(
-            structureLayers, ImmutableList.<PersistenceLayer> builder().add(new MemoryPersistenceLayer())
+          new CombinedPersistenceLayer(pContextFactory, structureLayers,
+            ImmutableList.<PersistenceLayer> builder().add(new MemoryPersistenceLayer(pContextFactory))
               .addAll(structureLayers).build(),
-            Collections.singletonList(new MemoryPersistenceLayer()), resourceLayers));
+            Collections.singletonList(new MemoryPersistenceLayer(pContextFactory)), resourceLayers));
       }
     }
     return toolkit;

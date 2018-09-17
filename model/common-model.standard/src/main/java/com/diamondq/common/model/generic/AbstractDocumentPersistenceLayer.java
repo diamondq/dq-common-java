@@ -15,6 +15,8 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -50,14 +52,15 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 
   protected final boolean mPersistResources;
 
-  public AbstractDocumentPersistenceLayer(boolean pPersistStructures, boolean pCacheStructures,
-    int pCacheStructuresSeconds, boolean pPersistStructureDefinitions, boolean pCacheStructureDefinitions,
-    int pCacheStructureDefinitionsSeconds, boolean pPersistEditorStructureDefinitions,
-    boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds, boolean pPersistResources,
-    boolean pCacheResources, int pCacheResourcesSeconds) {
-    super(pCacheStructures, pCacheStructuresSeconds, pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds,
-      pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds, pCacheResources,
-      pCacheResourcesSeconds);
+  public AbstractDocumentPersistenceLayer(ContextFactory pContextFactory, boolean pPersistStructures,
+    boolean pCacheStructures, int pCacheStructuresSeconds, boolean pPersistStructureDefinitions,
+    boolean pCacheStructureDefinitions, int pCacheStructureDefinitionsSeconds,
+    boolean pPersistEditorStructureDefinitions, boolean pCacheEditorStructureDefinitions,
+    int pCacheEditorStructureDefinitionsSeconds, boolean pPersistResources, boolean pCacheResources,
+    int pCacheResourcesSeconds) {
+    super(pContextFactory, pCacheStructures, pCacheStructuresSeconds, pCacheStructureDefinitions,
+      pCacheStructureDefinitionsSeconds, pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds,
+      pCacheResources, pCacheResourcesSeconds);
     mPersistStructures = pPersistStructures;
     mPersistStructureDefinitions = pPersistStructureDefinitions;
     mPersistEditorStructureDefinitions = pPersistEditorStructureDefinitions;
@@ -470,250 +473,257 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
   @Override
   protected @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName,
     String pKey) {
-    if (mPersistStructures == false)
-      return null;
+    try (Context context =
+      mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pToolkit, pScope, pDefName, pKey)) {
 
-    @Nullable
-    STRUCTURECONFIGOBJ config = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
-    if (config == null)
-      return null;
+      if (mPersistStructures == false)
+        return context.exit(null);
 
-    String fullStructureDefName =
-      getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
-    if (fullStructureDefName == null)
-      throw new IllegalArgumentException("The mandatory property structureDef doesn't exist");
-    int revisionOffset = fullStructureDefName.lastIndexOf(':');
-    int revision;
-    String structureDefName;
-    if (revisionOffset == -1) {
-      revision = 1;
-      structureDefName = fullStructureDefName;
-    }
-    else {
-      revision = Integer.parseInt(fullStructureDefName.substring(revisionOffset + 1));
-      structureDefName = fullStructureDefName.substring(0, revisionOffset);
-    }
-    StructureDefinition structureDef =
-      pScope.getToolkit().lookupStructureDefinitionByNameAndRevision(pScope, structureDefName, revision);
-    if (structureDef == null)
-      throw new IllegalArgumentException("The structure at " + pKey + " refers to a StructureDefinition "
-        + structureDefName + ":" + String.valueOf(revision) + " that does not exist");
+      @Nullable
+      STRUCTURECONFIGOBJ config = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
+      if (config == null)
+        return context.exit(null);
 
-    Structure structure = pScope.getToolkit().createNewStructure(pScope, structureDef);
-    int lastSlash = pKey.lastIndexOf('/');
-    int secondLastSlash = pKey.lastIndexOf('/', lastSlash - 1);
-    String parentRef = null;
-    if (secondLastSlash != -1)
-      parentRef = pKey.substring(0, secondLastSlash);
-    if (parentRef != null) {
-      Collection<Property<@Nullable PropertyRef<?>>> parentProps = structure.lookupPropertiesByKeyword(
-        CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT, PropertyType.PropertyRef);
-      structure = structure.updateProperty(
-        Iterables.get(parentProps, 0).setValue(pScope.getToolkit().createPropertyRefFromSerialized(pScope, parentRef)));
-    }
+      String fullStructureDefName =
+        getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
+      if (fullStructureDefName == null)
+        throw new IllegalArgumentException("The mandatory property structureDef doesn't exist");
+      int revisionOffset = fullStructureDefName.lastIndexOf(':');
+      int revision;
+      String structureDefName;
+      if (revisionOffset == -1) {
+        revision = 1;
+        structureDefName = fullStructureDefName;
+      }
+      else {
+        revision = Integer.parseInt(fullStructureDefName.substring(revisionOffset + 1));
+        structureDefName = fullStructureDefName.substring(0, revisionOffset);
+      }
+      StructureDefinition structureDef =
+        pScope.getToolkit().lookupStructureDefinitionByNameAndRevision(pScope, structureDefName, revision);
+      if (structureDef == null)
+        throw new IllegalArgumentException("The structure at " + pKey + " refers to a StructureDefinition "
+          + structureDefName + ":" + String.valueOf(revision) + " that does not exist");
 
-    /* See if there are children */
+      Structure structure = pScope.getToolkit().createNewStructure(pScope, structureDef);
+      int lastSlash = pKey.lastIndexOf('/');
+      int secondLastSlash = pKey.lastIndexOf('/', lastSlash - 1);
+      String parentRef = null;
+      if (secondLastSlash != -1)
+        parentRef = pKey.substring(0, secondLastSlash);
+      if (parentRef != null) {
+        Collection<Property<@Nullable PropertyRef<?>>> parentProps = structure.lookupPropertiesByKeyword(
+          CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT, PropertyType.PropertyRef);
+        structure = structure.updateProperty(Iterables.get(parentProps, 0)
+          .setValue(pScope.getToolkit().createPropertyRefFromSerialized(pScope, parentRef)));
+      }
 
-    Collection<String> childrenPropNames = structureDef.lookupPropertyDefinitionNamesByKeyword(
-      CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_CHILDREN, null);
-    if (childrenPropNames.isEmpty() == false) {
-      for (String childrenPropName : childrenPropNames) {
-        PropertyDefinition propDef = structureDef.lookupPropertyDefinitionByName(childrenPropName);
-        Property<@Nullable List<StructureRef>> childProp = structure.lookupPropertyByName(childrenPropName);
-        if ((propDef == null) || (childProp == null))
-          continue;
-        String lazyLoadStr =
-          Iterables.getFirst(propDef.getKeywords().get(CommonKeywordKeys.LAZY_LOAD), CommonKeywordValues.FALSE);
-        boolean lazyLoad = CommonKeywordValues.TRUE.equals(lazyLoadStr);
-        if (lazyLoad == true) {
-          Supplier<List<StructureRef>> lazySupplier = new Supplier<List<StructureRef>>() {
+      /* See if there are children */
 
-            /**
-             * @see java.util.function.Supplier#get()
-             */
-            @Override
-            public List<StructureRef> get() {
-              ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
-              internalPopulateChildStructureList(pToolkit, pScope, null, structureDef, structureDefName, pKey, propDef,
-                builder);
-              return builder.build();
-            }
-          };
-          structure = structure.updateProperty(childProp.setLazyLoadSupplier(lazySupplier));
-        }
-        else {
-          ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
-          internalPopulateChildStructureList(pToolkit, pScope, config, structureDef, structureDefName, pKey, propDef,
-            builder);
-          structure = structure.updateProperty(childProp.setValue(builder.build()));
-        }
-      }
-    }
+      Collection<String> childrenPropNames = structureDef.lookupPropertyDefinitionNamesByKeyword(
+        CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_CHILDREN, null);
+      if (childrenPropNames.isEmpty() == false) {
+        for (String childrenPropName : childrenPropNames) {
+          PropertyDefinition propDef = structureDef.lookupPropertyDefinitionByName(childrenPropName);
+          Property<@Nullable List<StructureRef>> childProp = structure.lookupPropertyByName(childrenPropName);
+          if ((propDef == null) || (childProp == null))
+            continue;
+          String lazyLoadStr =
+            Iterables.getFirst(propDef.getKeywords().get(CommonKeywordKeys.LAZY_LOAD), CommonKeywordValues.FALSE);
+          boolean lazyLoad = CommonKeywordValues.TRUE.equals(lazyLoadStr);
+          if (lazyLoad == true) {
+            Supplier<List<StructureRef>> lazySupplier = new Supplier<List<StructureRef>>() {
 
-    for (Property<@Nullable ?> p : structure.getProperties().values()) {
-      String propName = p.getDefinition().getName();
-      switch (p.getDefinition().getType()) {
-      case String: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          @Nullable
-          String string = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String);
-          if ("".equals(string))
-            string = null;
-          @SuppressWarnings("unchecked")
-          Property<@Nullable String> ap = (Property<@Nullable String>) p;
-          ap = ap.setValue(string);
-          structure = structure.updateProperty(ap);
+              /**
+               * @see java.util.function.Supplier#get()
+               */
+              @Override
+              public List<StructureRef> get() {
+                ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
+                internalPopulateChildStructureList(pToolkit, pScope, null, structureDef, structureDefName, pKey,
+                  propDef, builder);
+                return builder.build();
+              }
+            };
+            structure = structure.updateProperty(childProp.setLazyLoadSupplier(lazySupplier));
+          }
+          else {
+            ImmutableList.Builder<StructureRef> builder = ImmutableList.builder();
+            internalPopulateChildStructureList(pToolkit, pScope, config, structureDef, structureDefName, pKey, propDef,
+              builder);
+            structure = structure.updateProperty(childProp.setValue(builder.build()));
+          }
         }
-        break;
       }
-      case Boolean: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          boolean value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean);
-          @SuppressWarnings("unchecked")
-          Property<@Nullable Boolean> ap = (Property<@Nullable Boolean>) p;
-          ap = ap.setValue(value);
-          structure = structure.updateProperty(ap);
-        }
-        break;
-      }
-      case Decimal: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          BigDecimal value =
-            getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal);
-          @SuppressWarnings("unchecked")
-          Property<@Nullable BigDecimal> ap = (Property<@Nullable BigDecimal>) p;
-          ap = ap.setValue(value);
-          structure = structure.updateProperty(ap);
-        }
-        break;
-      }
-      case Integer: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          int value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer);
-          @SuppressWarnings("unchecked")
-          Property<@Nullable Integer> ap = (Property<@Nullable Integer>) p;
-          ap = ap.setValue(value);
-          structure = structure.updateProperty(ap);
-        }
-        break;
-      }
-      case Long: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          long value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long);
-          @SuppressWarnings("unchecked")
-          Property<@Nullable Long> ap = (Property<@Nullable Long>) p;
-          ap = ap.setValue(value);
-          structure = structure.updateProperty(ap);
-        }
-        break;
-      }
-      case PropertyRef: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          String string =
-            getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.PropertyRef);
-          if ("".equals(string))
-            string = null;
-          PropertyRef<?> ref = (string == null ? null : pToolkit.createPropertyRefFromSerialized(pScope, string));
-          @SuppressWarnings("unchecked")
-          Property<@Nullable PropertyRef<?>> ap = (Property<@Nullable PropertyRef<?>>) p;
-          ap = ap.setValue(ref);
-          structure = structure.updateProperty(ap);
-        }
-        break;
-      }
-      case StructureRef: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          String string =
-            getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRef);
-          if ("".equals(string))
-            string = null;
-          StructureRef ref = (string == null ? null : pToolkit.createStructureRefFromSerialized(pScope, string));
-          @SuppressWarnings("unchecked")
-          Property<@Nullable StructureRef> ap = (Property<@Nullable StructureRef>) p;
-          ap = ap.setValue(ref);
-          structure = structure.updateProperty(ap);
-        }
-        break;
-      }
-      case StructureRefList: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          throw new UnsupportedOperationException();
-        }
-        break;
-      }
-      case EmbeddedStructureList: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          throw new UnsupportedOperationException();
-        }
-        break;
-      }
-      case Image: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          throw new UnsupportedOperationException();
-        }
-        break;
-      }
-      case Binary: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          byte @Nullable [] bytes =
-            getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary);
-          @SuppressWarnings("unchecked")
-          Property<byte @Nullable []> ap = (Property<byte @Nullable []>) p;
-          ap = ap.setValue(bytes);
-          structure = structure.updateProperty(ap);
-        }
-        break;
-      }
-      case Timestamp: {
-        if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
-          Long value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp);
-          @SuppressWarnings("unchecked")
-          Property<@Nullable Long> ap = (Property<@Nullable Long>) p;
-          ap = ap.setValue(value);
-          structure = structure.updateProperty(ap);
-        }
-        break;
-      }
-      }
-    }
 
-    /* If the revision is not the latest, then we need to do a migration */
+      for (Property<@Nullable ?> p : structure.getProperties().values()) {
+        String propName = p.getDefinition().getName();
+        switch (p.getDefinition().getType()) {
+        case String: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            @Nullable
+            String string =
+              getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String);
+            if ("".equals(string))
+              string = null;
+            @SuppressWarnings("unchecked")
+            Property<@Nullable String> ap = (Property<@Nullable String>) p;
+            ap = ap.setValue(string);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case Boolean: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            boolean value =
+              getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean);
+            @SuppressWarnings("unchecked")
+            Property<@Nullable Boolean> ap = (Property<@Nullable Boolean>) p;
+            ap = ap.setValue(value);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case Decimal: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            BigDecimal value =
+              getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal);
+            @SuppressWarnings("unchecked")
+            Property<@Nullable BigDecimal> ap = (Property<@Nullable BigDecimal>) p;
+            ap = ap.setValue(value);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case Integer: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            int value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer);
+            @SuppressWarnings("unchecked")
+            Property<@Nullable Integer> ap = (Property<@Nullable Integer>) p;
+            ap = ap.setValue(value);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case Long: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            long value = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long);
+            @SuppressWarnings("unchecked")
+            Property<@Nullable Long> ap = (Property<@Nullable Long>) p;
+            ap = ap.setValue(value);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case PropertyRef: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            String string =
+              getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.PropertyRef);
+            if ("".equals(string))
+              string = null;
+            PropertyRef<?> ref = (string == null ? null : pToolkit.createPropertyRefFromSerialized(pScope, string));
+            @SuppressWarnings("unchecked")
+            Property<@Nullable PropertyRef<?>> ap = (Property<@Nullable PropertyRef<?>>) p;
+            ap = ap.setValue(ref);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case StructureRef: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            String string =
+              getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRef);
+            if ("".equals(string))
+              string = null;
+            StructureRef ref = (string == null ? null : pToolkit.createStructureRefFromSerialized(pScope, string));
+            @SuppressWarnings("unchecked")
+            Property<@Nullable StructureRef> ap = (Property<@Nullable StructureRef>) p;
+            ap = ap.setValue(ref);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case StructureRefList: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            throw new UnsupportedOperationException();
+          }
+          break;
+        }
+        case EmbeddedStructureList: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            throw new UnsupportedOperationException();
+          }
+          break;
+        }
+        case Image: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            throw new UnsupportedOperationException();
+          }
+          break;
+        }
+        case Binary: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            byte @Nullable [] bytes =
+              getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary);
+            @SuppressWarnings("unchecked")
+            Property<byte @Nullable []> ap = (Property<byte @Nullable []>) p;
+            ap = ap.setValue(bytes);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case Timestamp: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            Long value =
+              getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp);
+            @SuppressWarnings("unchecked")
+            Property<@Nullable Long> ap = (Property<@Nullable Long>) p;
+            ap = ap.setValue(value);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        }
+      }
 
-    Integer latestRevision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, structureDefName);
-    if (latestRevision == null)
-      throw new IllegalArgumentException();
+      /* If the revision is not the latest, then we need to do a migration */
 
-    if (revision != latestRevision) {
-      if (revision > latestRevision)
+      Integer latestRevision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, structureDefName);
+      if (latestRevision == null)
         throw new IllegalArgumentException();
 
-      /* We need to find the migration path to move us from one to the other */
-
-      List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> migrationPath =
-        pToolkit.determineMigrationPath(pScope, structureDefName, revision, latestRevision);
-      if (migrationPath == null)
-        throw new IllegalArgumentException();
-
-      Structure oldStructure = structure;
-      for (Pair<Integer, List<BiFunction<Structure, Structure, Structure>>> pair : migrationPath) {
-
-        StructureDefinition newStructureDef =
-          pToolkit.lookupStructureDefinitionByNameAndRevision(pScope, structureDefName, pair.getValue0());
-        if (newStructureDef == null)
+      if (revision != latestRevision) {
+        if (revision > latestRevision)
           throw new IllegalArgumentException();
-        Structure newStructure = pToolkit.createNewStructure(pScope, newStructureDef);
-        for (BiFunction<@NonNull Structure, @NonNull Structure, @NonNull Structure> migrator : pair.getValue1()) {
-          @SuppressWarnings("null")
-          Structure replaceStructure = migrator.apply(oldStructure, newStructure);
-          newStructure = replaceStructure;
+
+        /* We need to find the migration path to move us from one to the other */
+
+        List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> migrationPath =
+          pToolkit.determineMigrationPath(pScope, structureDefName, revision, latestRevision);
+        if (migrationPath == null)
+          throw new IllegalArgumentException();
+
+        Structure oldStructure = structure;
+        for (Pair<Integer, List<BiFunction<Structure, Structure, Structure>>> pair : migrationPath) {
+
+          StructureDefinition newStructureDef =
+            pToolkit.lookupStructureDefinitionByNameAndRevision(pScope, structureDefName, pair.getValue0());
+          if (newStructureDef == null)
+            throw new IllegalArgumentException();
+          Structure newStructure = pToolkit.createNewStructure(pScope, newStructureDef);
+          for (BiFunction<@NonNull Structure, @NonNull Structure, @NonNull Structure> migrator : pair.getValue1()) {
+            @SuppressWarnings("null")
+            Structure replaceStructure = migrator.apply(oldStructure, newStructure);
+            newStructure = replaceStructure;
+          }
+
+          oldStructure = newStructure;
         }
 
-        oldStructure = newStructure;
+        structure = oldStructure;
       }
-
-      structure = oldStructure;
+      return context.exit(structure);
     }
-    return structure;
   }
 
   /**

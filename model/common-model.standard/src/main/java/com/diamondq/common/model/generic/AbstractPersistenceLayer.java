@@ -22,6 +22,7 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
 import com.diamondq.common.model.interfaces.WhereOperator;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -50,6 +51,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
 
 public abstract class AbstractPersistenceLayer implements PersistenceLayer {
+
+  protected final ContextFactory                                                                                                           mContextFactory;
 
   protected volatile Locale                                                                                                                mGlobalDefaultLocale       =
     Locale.US;
@@ -84,8 +87,9 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
     sInvalidPrimayKeyBitSet = b;
   }
 
-  public AbstractPersistenceLayer() {
+  public AbstractPersistenceLayer(ContextFactory pContextFactory) {
     super();
+    mContextFactory = pContextFactory;
     mMigrationFunctions = Maps.newConcurrentMap();
     CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
     mMigrationCache = builder.build();

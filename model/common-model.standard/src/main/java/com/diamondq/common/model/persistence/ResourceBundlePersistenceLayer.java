@@ -8,6 +8,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.cache.Cache;
 
 import java.util.Collection;
@@ -30,9 +31,16 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
    */
   public static class ResourceBundlePersistenceLayerBuilder {
 
-    private @Nullable String      mResourceBaseName;
+    private @Nullable String         mResourceBaseName;
 
-    private @Nullable ClassLoader mClassLoader;
+    private @Nullable ClassLoader    mClassLoader;
+
+    private @Nullable ContextFactory mContextFactory;
+
+    public ResourceBundlePersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
+      mContextFactory = pContextFactory;
+      return this;
+    }
 
     /**
      * Sets the resource base name
@@ -59,7 +67,10 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
       String resourceBaseName = mResourceBaseName;
       if (resourceBaseName == null)
         throw new IllegalArgumentException("The mandatory field resourceBaseName was not set");
-      return new ResourceBundlePersistenceLayer(resourceBaseName, mClassLoader);
+      ContextFactory contextFactory = mContextFactory;
+      if (contextFactory == null)
+        throw new IllegalArgumentException("The contextFactory is not set");
+      return new ResourceBundlePersistenceLayer(contextFactory, resourceBaseName, mClassLoader);
     }
   }
 
@@ -67,8 +78,9 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   protected final @Nullable ClassLoader mClassLoader;
 
-  public ResourceBundlePersistenceLayer(String pResourceBaseName, @Nullable ClassLoader pClassLoader) {
-    super(false, -1, false, -1, false, -1, true, -1);
+  public ResourceBundlePersistenceLayer(ContextFactory pContextFactory, String pResourceBaseName,
+    @Nullable ClassLoader pClassLoader) {
+    super(pContextFactory, false, -1, false, -1, false, -1, true, -1);
     sLogger.trace("ResourceBundlePersistenceLayer({}) from {}", pResourceBaseName, this);
     mBaseName = pResourceBaseName;
     mClassLoader = pClassLoader;

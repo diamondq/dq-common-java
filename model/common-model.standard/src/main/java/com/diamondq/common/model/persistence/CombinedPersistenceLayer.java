@@ -9,6 +9,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -41,10 +42,11 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   private final transient boolean      mResourcePersistenceLayerIsSingleton;
 
-  public CombinedPersistenceLayer(List<PersistenceLayer> pStructurePersistenceLayer,
+  public CombinedPersistenceLayer(ContextFactory pContextFactory, List<PersistenceLayer> pStructurePersistenceLayer,
     List<PersistenceLayer> pStructureDefinitionPersistenceLayer,
     List<PersistenceLayer> pEditorStructureDefinitionPersistenceLayer,
     List<PersistenceLayer> pResourcePersistenceLayer) {
+    super(pContextFactory);
     mStructurePersistenceLayer = ImmutableList.copyOf(pStructurePersistenceLayer);
     mStructurePersistenceLayerIsSingleton = (mStructurePersistenceLayer.size() == 1);
     mStructureDefinitionPersistenceLayer = ImmutableList.copyOf(pStructureDefinitionPersistenceLayer);

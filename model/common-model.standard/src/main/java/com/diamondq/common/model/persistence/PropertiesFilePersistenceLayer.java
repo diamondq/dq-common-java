@@ -10,6 +10,8 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList.Builder;
 
@@ -43,13 +45,20 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
    */
   public static class PropertiesFilePersistenceLayerBuilder {
 
-    private @Nullable File    mStructureDir;
+    private @Nullable File           mStructureDir;
 
-    private @Nullable Integer mCacheStructuresSeconds;
+    private @Nullable Integer        mCacheStructuresSeconds;
 
-    private @Nullable File    mStructureDefDir;
+    private @Nullable File           mStructureDefDir;
 
-    private @Nullable File    mEditorStructureDefDir;
+    private @Nullable File           mEditorStructureDefDir;
+
+    private @Nullable ContextFactory mContextFactory;
+
+    public PropertiesFilePersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
+      mContextFactory = pContextFactory;
+      return this;
+    }
 
     /**
      * Sets the structure directory
@@ -104,7 +113,10 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
       Integer cacheStructuresSeconds = mCacheStructuresSeconds;
       if (cacheStructuresSeconds == null)
         cacheStructuresSeconds = -1;
-      return new PropertiesFilePersistenceLayer(mStructureDir, cacheStructuresSeconds, mStructureDefDir,
+      ContextFactory contextFactory = mContextFactory;
+      if (contextFactory == null)
+        throw new IllegalArgumentException("The contextFactory is not set");
+      return new PropertiesFilePersistenceLayer(contextFactory, mStructureDir, cacheStructuresSeconds, mStructureDefDir,
         mEditorStructureDefDir);
     }
   }
@@ -122,16 +134,17 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * Default constructor
-   *
+   * 
+   * @param pContextFactory the context factory
    * @param pStructureBaseDir the directory for structures
    * @param pCacheStructuresSeconds the number of seconds to cache
    * @param pStructureDefBaseDir the directory for structure definitions
    * @param pEditorStructureDefBaseDir the directory for editor structure definitions
    */
-  public PropertiesFilePersistenceLayer(@Nullable File pStructureBaseDir, int pCacheStructuresSeconds,
-    @Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
-    super(pStructureBaseDir != null, true, pCacheStructuresSeconds, pStructureDefBaseDir != null, true, -1,
-      pEditorStructureDefBaseDir != null, true, -1, false, true, -1);
+  public PropertiesFilePersistenceLayer(ContextFactory pContextFactory, @Nullable File pStructureBaseDir,
+    int pCacheStructuresSeconds, @Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
+    super(pContextFactory, pStructureBaseDir != null, true, pCacheStructuresSeconds, pStructureDefBaseDir != null, true,
+      -1, pEditorStructureDefBaseDir != null, true, -1, false, true, -1);
     sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}) from {}", pStructureBaseDir, pCacheStructuresSeconds,
       pStructureDefBaseDir, pEditorStructureDefBaseDir, this);
     mStructureBaseDir = pStructureBaseDir;
@@ -142,7 +155,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * Additional constructor
-   *
+   * 
+   * @param pContextFactory the context factory
    * @param pStructureBaseDir the directory for structures
    * @param pCacheStructures
    * @param pCacheStructuresSeconds the number of seconds to cache
@@ -156,15 +170,16 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
    * @param pCacheResources
    * @param pCacheResourcesSeconds
    */
-  public PropertiesFilePersistenceLayer(@Nullable File pStructureBaseDir, boolean pCacheStructures,
-    int pCacheStructuresSeconds, @Nullable File pStructureDefBaseDir, boolean pCacheStructureDefinitions,
-    int pCacheStructureDefinitionsSeconds, @Nullable File pEditorStructureDefBaseDir,
-    boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds,
-    @Nullable File pResourcesBaseDir, boolean pCacheResources, int pCacheResourcesSeconds) {
-    super(pStructureBaseDir != null, pCacheStructures, pCacheStructuresSeconds, pStructureDefBaseDir != null,
-      pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir != null,
-      pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir != null,
-      pCacheResources, pCacheResourcesSeconds);
+  public PropertiesFilePersistenceLayer(ContextFactory pContextFactory, @Nullable File pStructureBaseDir,
+    boolean pCacheStructures, int pCacheStructuresSeconds, @Nullable File pStructureDefBaseDir,
+    boolean pCacheStructureDefinitions, int pCacheStructureDefinitionsSeconds,
+    @Nullable File pEditorStructureDefBaseDir, boolean pCacheEditorStructureDefinitions,
+    int pCacheEditorStructureDefinitionsSeconds, @Nullable File pResourcesBaseDir, boolean pCacheResources,
+    int pCacheResourcesSeconds) {
+    super(pContextFactory, pStructureBaseDir != null, pCacheStructures, pCacheStructuresSeconds,
+      pStructureDefBaseDir != null, pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds,
+      pEditorStructureDefBaseDir != null, pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds,
+      pResourcesBaseDir != null, pCacheResources, pCacheResourcesSeconds);
     sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) from {}",
       pStructureBaseDir, pCacheStructures, pCacheStructuresSeconds, pStructureDefBaseDir, pCacheStructureDefinitions,
       pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir, pCacheEditorStructureDefinitions,
@@ -180,21 +195,24 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   }
 
   protected @Nullable File getStructureFile(String pKey, boolean pCreateIfMissing) {
-    @NonNull
-    String[] parts = pKey.split("/");
-    parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
-    File structureFile = getStructureBaseDir();
-    if (structureFile == null)
-      throw new IllegalStateException("Constructor was called with a null structureFile");
-    for (String p : parts)
-      structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
-    if (structureFile.exists() == false) {
-      if (pCreateIfMissing == false)
-        return null;
-      if (structureFile.getParentFile().exists() == false)
-        structureFile.getParentFile().mkdirs();
+    try (Context context =
+      mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pKey, pCreateIfMissing)) {
+      @NonNull
+      String[] parts = pKey.split("/");
+      parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
+      File structureFile = getStructureBaseDir();
+      if (structureFile == null)
+        throw new IllegalStateException("Constructor was called with a null structureFile");
+      for (String p : parts)
+        structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
+      if (structureFile.exists() == false) {
+        if (pCreateIfMissing == false)
+          return context.exit(null);
+        if (structureFile.getParentFile().exists() == false)
+          structureFile.getParentFile().mkdirs();
+      }
+      return context.exit(structureFile);
     }
-    return structureFile;
   }
 
   protected @Nullable File getStructureDir(@Nullable String pKey, boolean pCreateIfMissing) {
@@ -219,22 +237,25 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   @Override
   protected @Nullable Properties loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     boolean pCreateIfMissing) {
-    File structureFile = getStructureFile(pKey, pCreateIfMissing);
-    if (structureFile == null)
-      return null;
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
+      pDefName, pKey, pCreateIfMissing)) {
+      File structureFile = getStructureFile(pKey, pCreateIfMissing);
+      if (structureFile == null)
+        return context.exit(null);
 
-    Properties p = new Properties();
-    if (structureFile.exists() == true) {
-      try {
-        try (FileInputStream fis = new FileInputStream(structureFile)) {
-          p.load(fis);
+      Properties p = new Properties();
+      if (structureFile.exists() == true) {
+        try {
+          try (FileInputStream fis = new FileInputStream(structureFile)) {
+            p.load(fis);
+          }
+        }
+        catch (IOException ex) {
+          throw new RuntimeException(ex);
         }
       }
-      catch (IOException ex) {
-        throw new RuntimeException(ex);
-      }
+      return context.exit(p);
     }
-    return p;
   }
 
   /**
@@ -442,27 +463,30 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   @Override
   protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Properties pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
-    File structureFile = getStructureFile(pKey, true);
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
+      pDefName, pKey, pConfig, pMustMatchOptimisticObj, pOptimisticObj)) {
+      File structureFile = getStructureFile(pKey, true);
 
-    if (pMustMatchOptimisticObj == true) {
-      @Nullable
-      Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
-      @Nullable
-      String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
-      if (Objects.equals(pOptimisticObj, oldOptimistic) == false)
-        return false;
-    }
-
-    try {
-      try (FileOutputStream fos = new FileOutputStream(structureFile)) {
-        pConfig.store(fos, "");
+      if (pMustMatchOptimisticObj == true) {
+        @Nullable
+        Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
+        @Nullable
+        String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
+        if (Objects.equals(pOptimisticObj, oldOptimistic) == false)
+          return context.exit(false);
       }
-    }
-    catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
 
-    return true;
+      try {
+        try (FileOutputStream fos = new FileOutputStream(structureFile)) {
+          pConfig.store(fos, "");
+        }
+      }
+      catch (IOException ex) {
+        throw new RuntimeException(ex);
+      }
+
+      return context.exit(true);
+    }
   }
 
   private String unescape(String pValue) {
@@ -491,19 +515,22 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   @Override
   protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Structure pStructure) {
-    File structureFile = getStructureFile(pKey, false);
-    if (structureFile == null)
-      return false;
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
+      pDefName, pKey, pStructure)) {
+      File structureFile = getStructureFile(pKey, false);
+      if (structureFile == null)
+        return context.exit(false);
 
-    String optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pStructure);
-    Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
-    String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
-    if (Objects.equals(optimisticObj, oldOptimistic) == false)
-      return false;
+      String optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pStructure);
+      Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
+      String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
+      if (Objects.equals(optimisticObj, oldOptimistic) == false)
+        return context.exit(false);
 
-    structureFile.delete();
+      structureFile.delete();
 
-    return true;
+      return context.exit(true);
+    }
   }
 
   /**
@@ -516,69 +543,72 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, @Nullable Properties pConfig,
     StructureDefinition pStructureDefinition, String pStructureDefName, @Nullable String pKey,
     @Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
-    File structureDir = getStructureDir(pKey, false);
-    if (structureDir == null)
-      return;
-    File childDir = (pPropDef == null ? structureDir : new File(structureDir, pPropDef.getName()));
-    if (childDir.exists() == false)
-      return;
-    File[] listTypeDirs = childDir.listFiles((File pFile) -> pFile.isDirectory());
-    if (listTypeDirs == null)
-      throw new IllegalArgumentException("Unable to list the content of " + childDir.toString());
-    StringBuilder refBuilder = new StringBuilder();
-    if (pKey != null)
-      refBuilder.append(pKey).append('/');
-    if (pPropDef != null)
-      refBuilder.append(pPropDef.getName()).append('/');
-    int preTypeOffset = refBuilder.length();
-    for (File listTypeDir : listTypeDirs) {
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
+      pConfig, pStructureDefinition, pStructureDefName, pKey, pPropDef, pStructureRefListBuilder)) {
+      File structureDir = getStructureDir(pKey, false);
+      if (structureDir == null)
+        return;
+      File childDir = (pPropDef == null ? structureDir : new File(structureDir, pPropDef.getName()));
+      if (childDir.exists() == false)
+        return;
+      File[] listTypeDirs = childDir.listFiles((File pFile) -> pFile.isDirectory());
+      if (listTypeDirs == null)
+        throw new IllegalArgumentException("Unable to list the content of " + childDir.toString());
+      StringBuilder refBuilder = new StringBuilder();
+      if (pKey != null)
+        refBuilder.append(pKey).append('/');
+      if (pPropDef != null)
+        refBuilder.append(pPropDef.getName()).append('/');
+      int preTypeOffset = refBuilder.length();
+      for (File listTypeDir : listTypeDirs) {
 
-      /* If the PropertyDefinition has type restrictions, then make sure that this directory/type is valid */
+        /* If the PropertyDefinition has type restrictions, then make sure that this directory/type is valid */
 
-      String typeName = unescapeValue(listTypeDir.getName());
+        String typeName = unescapeValue(listTypeDir.getName());
 
-      if (pPropDef != null) {
-        Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
-        if (referenceTypes.isEmpty() == false) {
-          boolean match = false;
-          for (StructureDefinitionRef sdr : referenceTypes) {
-            StructureDefinition sd = sdr.resolve();
-            if (sd == null)
-              continue;
-            String testName = sd.getName();
-            if (typeName.equals(testName)) {
-              match = true;
-              break;
+        if (pPropDef != null) {
+          Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
+          if (referenceTypes.isEmpty() == false) {
+            boolean match = false;
+            for (StructureDefinitionRef sdr : referenceTypes) {
+              StructureDefinition sd = sdr.resolve();
+              if (sd == null)
+                continue;
+              String testName = sd.getName();
+              if (typeName.equals(testName)) {
+                match = true;
+                break;
+              }
             }
+            if (match == false)
+              continue;
           }
-          if (match == false)
+        }
+        else if (pKey == null) {
+          /*
+           * Special case where there is no parent key. In this case, the StructureDefinition is the restriction
+           */
+
+          if (typeName.equals(pStructureDefName) == false)
             continue;
         }
+
+        refBuilder.setLength(preTypeOffset);
+        refBuilder.append(typeName).append('/');
+        int preNameOffset = refBuilder.length();
+
+        File[] listFiles = listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties"));
+        for (File f : listFiles) {
+          String name = unescapeValue(f.getName().substring(0, f.getName().length() - ".properties".length()));
+
+          refBuilder.setLength(preNameOffset);
+          refBuilder.append(name);
+          pStructureRefListBuilder
+            .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
+        }
       }
-      else if (pKey == null) {
-        /*
-         * Special case where there is no parent key. In this case, the StructureDefinition is the restriction
-         */
-
-        if (typeName.equals(pStructureDefName) == false)
-          continue;
-      }
-
-      refBuilder.setLength(preTypeOffset);
-      refBuilder.append(typeName).append('/');
-      int preNameOffset = refBuilder.length();
-
-      File[] listFiles = listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties"));
-      for (File f : listFiles) {
-        String name = unescapeValue(f.getName().substring(0, f.getName().length() - ".properties".length()));
-
-        refBuilder.setLength(preNameOffset);
-        refBuilder.append(name);
-        pStructureRefListBuilder
-          .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
-      }
+      return;
     }
-    return;
   }
 
   public static PropertiesFilePersistenceLayerBuilder builder() {

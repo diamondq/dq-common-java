@@ -7,7 +7,8 @@ import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.persistence.CombinedPersistenceLayer;
 import com.diamondq.common.model.persistence.NewMemoryPersistenceLayer;
-import com.diamondq.common.utils.context.logging.LoggingUtils;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.builders.IBuilder;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.collect.ImmutableList;
@@ -41,6 +42,8 @@ public class WrappedScope implements Scope {
 
   protected Toolkit                                                              mToolkit;
 
+  protected ContextFactory                                                       mContextFactory;
+
   protected @Nullable String                                                     mName;
 
   protected final ConcurrentMap<PersistenceLayer, Map<String, Object>>           mLayers        =
@@ -61,7 +64,7 @@ public class WrappedScope implements Scope {
 
   @SuppressWarnings("null")
   public WrappedScope() {
-    LoggingUtils.simpleEntry(sLogger, this);
+    ContextFactory.staticReportTrace(WrappedScope.class, this);
     mScope = null;
     mFilters = new Filter[sFILTER_KEYS.length];
     mDefaultLayers = new boolean[sFILTER_KEYS.length];
@@ -72,71 +75,59 @@ public class WrappedScope implements Scope {
   }
 
   public void setToolkit(Toolkit pToolkit) {
-    LoggingUtils.simpleEntry(sLogger, this, pToolkit);
+    ContextFactory.staticReportTrace(WrappedScope.class, this, pToolkit);
     mToolkit = pToolkit;
   }
 
+  public void setContextFactory(ContextFactory pContextFactory) {
+    ContextFactory.staticReportTrace(WrappedScope.class, this, pContextFactory);
+    mContextFactory = pContextFactory;
+  }
+
   public void addPersistenceLayer(PersistenceLayer pLayer, Map<String, Object> pProps) {
-    LoggingUtils.entry(sLogger, this, pLayer, pProps);
-    try {
+    try (Context context = mContextFactory.newContext(WrappedScope.class, this, pLayer, pProps)) {
       ImmutableMap<String, Object> props = ImmutableMap.copyOf(pProps);
       mLayers.put(pLayer, props);
       processLayers(false);
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(WrappedScope.class, this, ex);
     }
   }
 
   public void removePersistenceLayer(PersistenceLayer pLayer) {
-    LoggingUtils.entry(sLogger, this, pLayer);
-    try {
+    try (Context context = mContextFactory.newContext(WrappedScope.class, this, pLayer)) {
       mLayers.remove(pLayer);
       processLayers(false);
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(WrappedScope.class, this, ex);
     }
   }
 
   public void addBuilder(IBuilder<PersistenceLayer> pLayer, Map<String, Object> pProps) {
-    LoggingUtils.entry(sLogger, this, pLayer, pProps);
-    try {
+    try (Context context = mContextFactory.newContext(WrappedScope.class, this, pLayer, pProps)) {
       ImmutableMap<String, Object> props = ImmutableMap.copyOf(pProps);
       mBuilderLayers.put(pLayer, props);
       processLayers(false);
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(WrappedScope.class, this, ex);
     }
   }
 
   public void removeBuilder(IBuilder<PersistenceLayer> pLayer) {
-    LoggingUtils.entry(sLogger, this, pLayer);
-    try {
+    try (Context context = mContextFactory.newContext(WrappedScope.class, this, pLayer)) {
       mBuilderLayers.remove(pLayer);
       processLayers(false);
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(WrappedScope.class, this, ex);
     }
   }
 
   public void onActivate(ComponentContext pContext, Map<String, Object> pProps) {
-    LoggingUtils.entry(sLogger, this, pContext, pProps);
-    try {
+    try (Context context = mContextFactory.newContext(WrappedScope.class, this, pContext, pProps)) {
       mName = PropertiesParsing.getNonNullString(pProps, "name", "default");
       mScope = mToolkit.getOrCreateScope(mName);
 
@@ -158,12 +149,9 @@ public class WrappedScope implements Scope {
 
       mInitialized = true;
       processLayers(true);
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(WrappedScope.class, this, ex);
     }
   }
 
@@ -187,11 +175,9 @@ public class WrappedScope implements Scope {
    * @param pProps
    */
   private void processLayers(boolean pIsFirstProcess) {
-    LoggingUtils.entry(sLogger, this, pIsFirstProcess);
-    try {
+    try (Context context = mContextFactory.newContext(WrappedScope.class, this, pIsFirstProcess)) {
 
       if (mInitialized == false) {
-        LoggingUtils.exit(sLogger, this);
         return;
       }
 
@@ -289,7 +275,7 @@ public class WrappedScope implements Scope {
             if (pIsFirstProcess == true) {
               if (mFilters[i] != null)
                 sLogger.info("Filter {} didn't resolve. Using a Memory PersistenceLayer for now", mFilters[i]);
-              layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer()));
+              layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer(mContextFactory)));
               mDefaultLayers[i] = true;
             }
             else {
@@ -300,7 +286,7 @@ public class WrappedScope implements Scope {
               else {
                 if (mFilters[i] != null)
                   sLogger.info("Filter {} didn't resolve. Using a Memory PersistenceLayer for now", mFilters[i]);
-                layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer()));
+                layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer(mContextFactory)));
                 mDefaultLayers[i] = true;
               }
             }
@@ -385,7 +371,7 @@ public class WrappedScope implements Scope {
         }
 
         CombinedPersistenceLayer combinedPersistenceLayer =
-          new CombinedPersistenceLayer(finalLayers[0], finalLayers[1], finalLayers[2], finalLayers[3]);
+          new CombinedPersistenceLayer(mContextFactory, finalLayers[0], finalLayers[1], finalLayers[2], finalLayers[3]);
         if (mToolkit instanceof GenericToolkit)
           ((GenericToolkit) mToolkit).setPersistenceLayer(mScope, combinedPersistenceLayer);
         else if (mToolkit instanceof WrappedToolkit) {
@@ -393,28 +379,19 @@ public class WrappedScope implements Scope {
           ((WrappedToolkit) mToolkit).clearModificationState();
         }
       }
-      LoggingUtils.exit(sLogger, this);
-    }
-    catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      throw ex;
     }
   }
 
   public void onDeactivate() {
-    LoggingUtils.entry(sLogger, this);
-    try {
+    try (Context context = mContextFactory.newContext(WrappedScope.class, this)) {
       String name = mName;
       if (name != null) {
         mName = null;
         mToolkit.removeScope(name);
       }
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      sLogger.error("", ex);
-      throw ex;
+      throw mContextFactory.reportThrowable(WrappedScope.class, this, ex);
     }
   }
 

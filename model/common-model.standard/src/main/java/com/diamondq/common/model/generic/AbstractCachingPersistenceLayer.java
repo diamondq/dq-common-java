@@ -6,6 +6,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Predicates;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -37,7 +38,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
 
   /**
    * The main constructor
-   *
+   * 
+   * @param pContextFactory the context factory
    * @param pCacheStructures true if the class should cache structures
    * @param pCacheStructuresSeconds the number of seconds to cache (-1 is forever)
    * @param pCacheStructureDefinitions true if the class should cache structure definitions
@@ -47,9 +49,11 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
    * @param pCacheResources true if the class should cache resources
    * @param pCacheResourcesSeconds the number of seconds to cache (-1 is forever)
    */
-  public AbstractCachingPersistenceLayer(boolean pCacheStructures, int pCacheStructuresSeconds,
-    boolean pCacheStructureDefinitions, int pCacheStructureDefinitionsSeconds, boolean pCacheEditorStructureDefinitions,
-    int pCacheEditorStructureDefinitionsSeconds, boolean pCacheResources, int pCacheResourcesSeconds) {
+  public AbstractCachingPersistenceLayer(ContextFactory pContextFactory, boolean pCacheStructures,
+    int pCacheStructuresSeconds, boolean pCacheStructureDefinitions, int pCacheStructureDefinitionsSeconds,
+    boolean pCacheEditorStructureDefinitions, int pCacheEditorStructureDefinitionsSeconds, boolean pCacheResources,
+    int pCacheResourcesSeconds) {
+    super(pContextFactory);
     if (pCacheStructures == true) {
       CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
       if (pCacheStructuresSeconds > 0)

@@ -11,6 +11,7 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
@@ -31,13 +32,23 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
    */
   public static class MemoryPersistenceLayerBuilder {
 
+    private @Nullable ContextFactory mContextFactory;
+
+    public MemoryPersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
+      mContextFactory = pContextFactory;
+      return this;
+    }
+
     /**
      * Builds the layer
      *
      * @return the layer
      */
     public NewMemoryPersistenceLayer build() {
-      return new NewMemoryPersistenceLayer();
+      ContextFactory contextFactory = mContextFactory;
+      if (contextFactory == null)
+        throw new IllegalArgumentException("The contextFactory is not set");
+      return new NewMemoryPersistenceLayer(contextFactory);
     }
   }
 
@@ -54,9 +65,11 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * Default constructor
+   * 
+   * @param pContextFactory the context factory
    */
-  public NewMemoryPersistenceLayer() {
-    super(true, true, -1, false, true, -1, false, false, -1, true, true, -1);
+  public NewMemoryPersistenceLayer(ContextFactory pContextFactory) {
+    super(pContextFactory, true, true, -1, false, true, -1, false, false, -1, true, true, -1);
     mDataCache = Maps.newConcurrentMap();
   }
 
