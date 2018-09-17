@@ -4,6 +4,8 @@ import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.injection.osgi.testmodel.TestClassWithObjConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestDep;
+import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
+import com.diamondq.common.utils.context.logging.LoggingContextHandler;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 
 import java.io.IOException;
@@ -17,7 +19,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -39,11 +40,12 @@ public class Test1 {
   @Test
   public void failNoFilters() {
     sLogger.debug("********** failNoFilters");
-    BundleContext bundleContext = MockOsgi.newBundleContext();
     TestConstructor service = new TestConstructor();
-    MockOsgi.injectServices(service, bundleContext);
+    context.registerInjectActivateService(new LoggingContextHandler());
+    context.registerInjectActivateService(new ContextFactoryImpl());
+    MockOsgi.injectServices(service, context.bundleContext());
     try {
-      MockOsgi.activate(service, bundleContext);
+      MockOsgi.activate(service, context.bundleContext());
     }
     catch (RuntimeException ex) {
       Throwable cause = ex.getCause();
@@ -67,6 +69,8 @@ public class Test1 {
     props.put(".dep_filter", "");
     config.update(props);
     TestConstructor service = new TestConstructor();
+    context.registerInjectActivateService(new LoggingContextHandler());
+    context.registerInjectActivateService(new ContextFactoryImpl());
     MockOsgi.injectServices(service, context.bundleContext());
     MockOsgi.activate(service, context.bundleContext());
 
@@ -102,6 +106,8 @@ public class Test1 {
     props.put(".dep_filter", "");
     config.update(props);
     TestConstructor service = new TestConstructor();
+    context.registerInjectActivateService(new LoggingContextHandler());
+    context.registerInjectActivateService(new ContextFactoryImpl());
     MockOsgi.injectServices(service, context.bundleContext());
     MockOsgi.activate(service, context.bundleContext());
 

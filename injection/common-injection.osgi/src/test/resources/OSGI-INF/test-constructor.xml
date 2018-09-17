@@ -10,4 +10,5 @@
     <provide
       interface="com.diamondq.common.injection.osgi.testmodel.TestConstructor" />
   </service>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
 </scr:component>

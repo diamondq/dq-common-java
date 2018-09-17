@@ -3,6 +3,8 @@ package com.diamondq.common.injection.osgi;
 import com.diamondq.common.injection.osgi.testmodel.TestClassWithObjConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestDep;
+import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
+import com.diamondq.common.utils.context.logging.LoggingContextHandler;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -48,6 +50,8 @@ public class TestProperties {
     /* Now register the service */
 
     TestConstructor service = new TestConstructor();
+    context.registerInjectActivateService(new LoggingContextHandler());
+    context.registerInjectActivateService(new ContextFactoryImpl());
     MockOsgi.injectServices(service, context.bundleContext());
     MockOsgi.activate(service, context.bundleContext());
 
