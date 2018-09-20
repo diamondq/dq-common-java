@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component
-  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  configuration-policy="optional" immediate="false"
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0"
+  configuration-policy="optional" immediate="false" 
   name="com.diamondq.common.jaxrs.osgi.clientfactory">
-  <implementation
+  <implementation 
     class="com.diamondq.common.jaxrs.osgi.ClientFactory" />
-  <service>
-     <provide interface="javax.ws.rs.client.Client"/>
+  <service scope="bundle">
+     <provide interface="javax.ws.rs.client.Client" />
   </service>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
 </scr:component>

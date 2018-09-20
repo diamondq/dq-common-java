@@ -4,7 +4,7 @@ import com.diamondq.common.injection.osgi.ServiceReferenceUtils;
 import com.diamondq.common.injection.osgi.SingletonServiceFactory;
 import com.diamondq.common.jaxrs.model.ApplicationInfo;
 import com.diamondq.common.jaxrs.model.ApplicationInfo.Builder;
-import com.diamondq.common.utils.context.logging.LoggingUtils;
+import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 
@@ -14,20 +14,15 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.osgi.framework.ServiceReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ApplicationInfoFactory extends SingletonServiceFactory<ApplicationInfo> {
-
-  private static final Logger sLogger = LoggerFactory.getLogger(ApplicationInfoFactory.class);
 
   /**
    * @see com.diamondq.common.injection.osgi.SingletonServiceFactory#createSingleton(org.osgi.framework.ServiceReference)
    */
   @Override
   protected ApplicationInfo createSingleton(ServiceReference<ApplicationInfo> pServiceReference) {
-    LoggingUtils.entry(sLogger, this);
-    try {
+    try (Context context = mContextFactory.newContext(ApplicationInfoFactory.class, this, pServiceReference)) {
       Map<String, Object> props = ServiceReferenceUtils.getProperties(pServiceReference);
 
       /* Get the FQDN property */
@@ -94,11 +89,7 @@ public class ApplicationInfoFactory extends SingletonServiceFactory<ApplicationI
 
       builder = builder.securedURI(Optional.ofNullable(securedURI));
       builder = builder.unsecuredURI(Optional.ofNullable(unsecuredURI));
-      return LoggingUtils.exit(sLogger, this, builder.build());
-    }
-    catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
-      throw ex;
+      return context.exit(builder.build());
     }
   }
 
@@ -107,6 +98,8 @@ public class ApplicationInfoFactory extends SingletonServiceFactory<ApplicationI
    */
   @Override
   protected void destroySingleton(ApplicationInfo pService) {
+    try (Context context = mContextFactory.newContext(ApplicationInfoFactory.class, this, pService)) {
+    }
   }
 
 }
