@@ -36,6 +36,8 @@ public enum PropertyType {
   Binary,
 
   /** This represents a timestamp */
-  Timestamp
+  Timestamp,
 
+  /** This represents a UUID */
+  UUID
 }
