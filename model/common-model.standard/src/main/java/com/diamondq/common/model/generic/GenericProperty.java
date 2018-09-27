@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -107,6 +108,7 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
         return defaultResult;
       }
       case Timestamp:
+      case UUID:
       case Binary:
       case Image:
       case EmbeddedStructureList:
@@ -198,6 +200,10 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
           pValue = (TYPE) (Integer) ((Long) pValue).intValue();
           break;
         }
+        if (pValue instanceof Short) {
+          pValue = (TYPE) (Integer) new Short((Short) pValue).intValue();
+          break;
+        }
         if (pValue instanceof String) {
           pValue = (TYPE) (Integer) Integer.parseInt((String) pValue);
           break;
@@ -265,6 +271,11 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
           break;
         }
         throw new IllegalArgumentException("A Timestamp Property must be passed a Long, Integer or String");
+      }
+      case UUID: {
+        if (pValue instanceof UUID)
+          break;
+        throw new IllegalArgumentException("A UUID Property must be passed a UUID");
       }
       }
     }
