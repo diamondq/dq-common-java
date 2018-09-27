@@ -13,6 +13,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public abstract class KVIndexDefinitionBuilder<@NonNull IDB extends KVIndexDefinitionBuilder<IDB>> {
 
   @Nullable
+  protected String                                         mTableName;
+
+  @Nullable
   protected String                                         mName;
 
   protected ImmutableList.Builder<@NonNull IKVIndexColumn> mColumns;
@@ -29,6 +32,18 @@ public abstract class KVIndexDefinitionBuilder<@NonNull IDB extends KVIndexDefin
    */
   public KVIndexDefinitionBuilder() {
     mColumns = ImmutableList.builder();
+  }
+
+  /**
+   * Sets the table name
+   * 
+   * @param pValue the table name
+   * @return the updated builder
+   */
+  @SuppressWarnings("unchecked")
+  public IDB tableName(String pValue) {
+    mTableName = pValue;
+    return (IDB) this;
   }
 
   /**
@@ -56,6 +71,9 @@ public abstract class KVIndexDefinitionBuilder<@NonNull IDB extends KVIndexDefin
   }
 
   protected void validate() {
+    if (mTableName == null)
+      throw new IllegalArgumentException(
+        "The mandatory field table name was not set on the " + this.getClass().getSimpleName());
     if (mName == null)
       throw new IllegalArgumentException(
         "The mandatory field name was not set on the " + this.getClass().getSimpleName());

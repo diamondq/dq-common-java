@@ -11,6 +11,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public class GenericKVIndexDefinition implements IKVIndexDefinition {
 
+  private final String                        mTableName;
+
   private final String                        mName;
 
   private final List<@NonNull IKVIndexColumn> mColumns;
@@ -18,13 +20,23 @@ public class GenericKVIndexDefinition implements IKVIndexDefinition {
   /**
    * Default constructor
    * 
+   * @param pTableName the table name
    * @param pName the name
    * @param pColumns the list of columns
    */
-  public GenericKVIndexDefinition(String pName, List<@NonNull IKVIndexColumn> pColumns) {
+  public GenericKVIndexDefinition(String pTableName, String pName, List<@NonNull IKVIndexColumn> pColumns) {
     super();
+    mTableName = pTableName;
     mName = pName;
     mColumns = ImmutableList.copyOf(pColumns);
+  }
+
+  /**
+   * @see com.diamondq.common.storage.kv.IKVIndexDefinition#getTableName()
+   */
+  @Override
+  public String getTableName() {
+    return mTableName;
   }
 
   /**

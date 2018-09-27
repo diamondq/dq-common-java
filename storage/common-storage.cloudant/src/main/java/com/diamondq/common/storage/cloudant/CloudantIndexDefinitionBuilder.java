@@ -14,7 +14,10 @@ public class CloudantIndexDefinitionBuilder extends KVIndexDefinitionBuilder<Clo
     validate();
     String name = mName;
     if (name == null)
-      throw new IllegalStateException();
-    return new GenericKVIndexDefinition(name, mColumns.build());
+      throw new IllegalArgumentException("The name was not set in the CloudantIndexDefinitionBuilder");
+    String tableName = mTableName;
+    if (tableName == null)
+      throw new IllegalArgumentException("The table name was not set in the CloudantIndexDefinitionBuilder");
+    return new GenericKVIndexDefinition(tableName, name, mColumns.build());
   }
 }

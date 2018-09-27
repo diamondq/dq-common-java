@@ -2,6 +2,7 @@ package com.diamondq.common.storage.jdbc;
 
 import com.diamondq.common.storage.kv.IKVAsyncTransaction;
 import com.diamondq.common.storage.kv.IKVColumnDefinition;
+import com.diamondq.common.storage.kv.IKVIndexColumn;
 import com.diamondq.common.storage.kv.IKVIndexDefinition;
 import com.diamondq.common.storage.kv.IKVIndexSupport;
 import com.diamondq.common.storage.kv.IKVStore;
@@ -21,6 +22,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.MapDifference.ValueDifference;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -172,10 +174,73 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
   @Override
   public void addRequiredIndexes(Collection<@NonNull IKVIndexDefinition> pIndexes) {
     Map<@NonNull String, @NonNull IKVIndexDefinition> indexByName = Maps.newHashMap();
-    for (IKVIndexDefinition index : pIndexes)
+    for (IKVIndexDefinition index : pIndexes) {
       indexByName.put(index.getName(), index);
+      String indexName = index.getName().toLowerCase();
+      String tableName = index.getTableName();
 
-    // throw new UnsupportedOperationException();
+      String mungedTableName = escapeTableName(tableName);
+
+      /* Query the database to see if the table exists */
+
+      String tableSchema = getTableSchema();
+
+      try {
+        try (Connection connection = mDatabase.getConnection()) {
+          connection.setAutoCommit(true);
+
+          /* Check the table itself */
+
+          boolean missingIndex = true;
+          try (ResultSet rs = connection.getMetaData().getIndexInfo(null, tableSchema, tableName, false, false)) {
+            while (rs.next() == true) {
+              String str = rs.getString(6);
+              if (str == null)
+                continue;
+              String testName = str.toLowerCase();
+              if (indexName.equals(testName) == true) {
+
+                /* TODO: Validate the fields */
+
+                missingIndex = false;
+                break;
+              }
+            }
+          }
+
+          if (missingIndex == true) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("CREATE INDEX ");
+            if (tableSchema != null)
+              sb.append(tableSchema).append('.');
+            sb.append(indexName);
+            sb.append(" on ");
+            if (tableSchema != null)
+              sb.append(tableSchema).append('.');
+            sb.append(mungedTableName);
+            sb.append(" (");
+            boolean firstCol = true;
+            for (IKVIndexColumn cd : index.getColumns()) {
+              if (firstCol == true)
+                firstCol = false;
+              else
+                sb.append(", ");
+              sb.append(escapeColumnName(cd.getName()));
+            }
+            sb.append(')');
+
+            sLogger.info("Constructing index via {}", sb.toString());
+
+            try (PreparedStatement ps = connection.prepareStatement(sb.toString())) {
+              ps.execute();
+            }
+          }
+        }
+      }
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
   }
 
   /**
@@ -336,9 +401,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
               sb.append(mungedTableName);
               sb.append(" (");
               sb.append(sPRIMARY_KEY_1);
-              sb.append(" varchar(1024),");
+              sb.append(" ").append(mDialect.getTextType(1024)).append(',');
               sb.append(sPRIMARY_KEY_2);
-              sb.append(" varchar(1024)");
+              sb.append(" ").append(mDialect.getTextType(1024));
               for (IKVColumnDefinition cd : pDefinition.getColumnDefinitions()) {
                 sb.append(", ");
                 sb.append(escapeColumnName(cd.getName()));
@@ -380,6 +445,18 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
                 }
                 case Timestamp: {
                   sb.append(mDialect.getTimestampType());
+                  break;
+                }
+                case UUID: {
+                  sb.append(mDialect.getUUIDType());
+                  break;
+                }
+                case Binary: {
+                  Integer maxLength = cd.getMaxLength();
+                  if (maxLength != null)
+                    sb.append(mDialect.getBinaryType(maxLength));
+                  else
+                    throw new UnsupportedOperationException();
                   break;
                 }
                 }

@@ -14,6 +14,9 @@ public class JDBCIndexDefinitionBuilder extends KVIndexDefinitionBuilder<JDBCInd
     String name = mName;
     if (name == null)
       throw new IllegalArgumentException("The name was not set in the JDBCIndexDefinitionBuilder");
-    return new GenericKVIndexDefinition(name, mColumns.build());
+    String tableName = mTableName;
+    if (tableName == null)
+      throw new IllegalArgumentException("The table name was not set in the JDBCIndexDefinitionBuilder");
+    return new GenericKVIndexDefinition(tableName, name, mColumns.build());
   }
 }
