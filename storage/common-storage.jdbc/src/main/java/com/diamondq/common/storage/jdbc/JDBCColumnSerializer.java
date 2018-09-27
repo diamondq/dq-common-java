@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -147,6 +148,30 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
         else
           throw new IllegalArgumentException("Only Long, BigDecimal or String supported, but found " + obj.getClass());
         mDialect.writeTimestamp(pPs, index, value);
+        break;
+      }
+      case UUID: {
+        Object obj = data.get(cd.getName());
+        UUID value;
+        if (obj == null)
+          value = null;
+        else if (obj instanceof UUID)
+          value = (UUID) obj;
+        else
+          throw new IllegalArgumentException("Only UUID supported, but found " + obj.getClass());
+        mDialect.writeUUID(pPs, index, value);
+        break;
+      }
+      case Binary: {
+        Object obj = data.get(cd.getName());
+        byte[] value;
+        if (obj == null)
+          value = null;
+        else if (obj instanceof byte[])
+          value = (byte[]) obj;
+        else
+          throw new IllegalArgumentException("Only byte[] supported, but found " + obj.getClass());
+        mDialect.writeBinary(pPs, index, value);
         break;
       }
       }

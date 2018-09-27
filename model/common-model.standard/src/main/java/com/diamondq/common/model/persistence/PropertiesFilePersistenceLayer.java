@@ -27,6 +27,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -329,6 +330,11 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
       R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
       return result;
     }
+    case UUID: {
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? null : UUID.fromString(value));
+      return result;
+    }
     }
     throw new IllegalArgumentException();
   }
@@ -438,6 +444,10 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
       throw new UnsupportedOperationException();
     }
     case Timestamp: {
+      pConfig.setProperty(pKey, pValue.toString());
+      break;
+    }
+    case UUID: {
       pConfig.setProperty(pKey, pValue.toString());
       break;
     }

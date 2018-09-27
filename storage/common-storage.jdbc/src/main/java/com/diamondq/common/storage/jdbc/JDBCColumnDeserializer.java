@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
 
 public class JDBCColumnDeserializer implements IResultSetDeserializer {
 
@@ -75,6 +76,18 @@ public class JDBCColumnDeserializer implements IResultSetDeserializer {
       }
       case Timestamp: {
         Long value = mDialect.readTimestamp(pRs, index);
+        if (value != null)
+          result.put(cd.getName(), value);
+        break;
+      }
+      case UUID: {
+        UUID value = mDialect.readUUID(pRs, index);
+        if (value != null)
+          result.put(cd.getName(), value);
+        break;
+      }
+      case Binary: {
+        byte[] value = mDialect.readBinary(pRs, index);
         if (value != null)
           result.put(cd.getName(), value);
         break;

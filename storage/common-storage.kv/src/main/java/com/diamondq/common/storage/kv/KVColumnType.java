@@ -27,6 +27,13 @@ public enum KVColumnType {
   /**
    * A full timestamp
    */
-  Timestamp
-
+  Timestamp,
+  /**
+   * A UUID
+   */
+  UUID,
+  /**
+   * Binary data
+   */
+  Binary
 }
