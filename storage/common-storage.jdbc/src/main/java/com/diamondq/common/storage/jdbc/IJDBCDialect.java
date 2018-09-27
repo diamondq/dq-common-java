@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+import java.util.UUID;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -68,6 +69,18 @@ public interface IJDBCDialect {
   public @Nullable Long readTimestamp(ResultSet pRs, int pIndex) throws SQLException;
 
   public void writeTimestamp(PreparedStatement pPs, int pIndex, @Nullable Long pValue) throws SQLException;
+
+  public String getUUIDType();
+
+  public @Nullable UUID readUUID(ResultSet pRs, int pIndex) throws SQLException;
+
+  public void writeUUID(PreparedStatement pPs, int pIndex, @Nullable UUID pValue) throws SQLException;
+
+  public String getBinaryType(int pMaxLength);
+
+  public byte @Nullable [] readBinary(ResultSet pRs, int pIndex) throws SQLException;
+
+  public void writeBinary(PreparedStatement pPs, int pIndex, byte @Nullable [] pValue) throws SQLException;
 
   public Set<@NonNull String> getReservedWords();
 }
