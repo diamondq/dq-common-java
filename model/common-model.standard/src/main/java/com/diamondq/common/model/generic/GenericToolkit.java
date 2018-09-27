@@ -8,6 +8,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
+import com.diamondq.common.model.interfaces.Query;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StandardMigrations;
@@ -269,14 +270,21 @@ public class GenericToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, com.diamondq.common.model.interfaces.QueryBuilder,
-   *      java.util.Map)
+   *      com.diamondq.common.model.interfaces.Query, java.util.Map)
    */
   @Override
-  public List<Structure> lookupStructuresByQuery(Scope pScope, StructureDefinition pStructureDefinition,
-    QueryBuilder pBuilder, @Nullable Map<String, Object> pParamValues) {
-    return getPersistenceLayer(pScope).lookupStructuresByQuery(this, pScope, pStructureDefinition, pBuilder,
-      pParamValues);
+  public List<Structure> lookupStructuresByQuery(Scope pScope, Query pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    return getPersistenceLayer(pScope).lookupStructuresByQuery(this, pScope, pQuery, pParamValues);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#writeQueryBuilder(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.QueryBuilder)
+   */
+  @Override
+  public Query writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder) {
+    return getPersistenceLayer(pScope).writeQueryBuilder(this, pScope, pQueryBuilder);
   }
 
   /**
@@ -503,11 +511,12 @@ public class GenericToolkit implements Toolkit {
   }
 
   /**
-   * @see com.diamondq.common.model.interfaces.Toolkit#createNewQueryBuilder(com.diamondq.common.model.interfaces.Scope)
+   * @see com.diamondq.common.model.interfaces.Toolkit#createNewQueryBuilder(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String)
    */
   @Override
-  public QueryBuilder createNewQueryBuilder(Scope pScope) {
-    return getPersistenceLayer(pScope).createNewQueryBuilder(this, pScope);
+  public QueryBuilder createNewQueryBuilder(Scope pScope, StructureDefinition pStructureDefinition, String pQueryName) {
+    return getPersistenceLayer(pScope).createNewQueryBuilder(this, pScope, pStructureDefinition, pQueryName);
   }
 
   /**

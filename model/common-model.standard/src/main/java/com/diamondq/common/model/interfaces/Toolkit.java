@@ -455,12 +455,31 @@ public interface Toolkit {
    * Creates a new empty QueryBuilder object.
    *
    * @param pScope the scope
+   * @param pStructureDefinition the structure definition
+   * @param pQueryName the query name
    * @return the QueryBuilder
    */
-  public QueryBuilder createNewQueryBuilder(Scope pScope);
+  public QueryBuilder createNewQueryBuilder(Scope pScope, StructureDefinition pStructureDefinition, String pQueryName);
 
-  public List<Structure> lookupStructuresByQuery(Scope pScope, StructureDefinition pStructureDefinition,
-    QueryBuilder pBuilder, @Nullable Map<String, Object> pParamValues);
+  /**
+   * Writes the query builder.
+   * 
+   * @param pScope the scope
+   * @param pQueryBuilder the query builder
+   * @return the query
+   */
+  public Query writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder);
+
+  /**
+   * Executes a previously written query
+   * 
+   * @param pScope the scope
+   * @param pQuery the query
+   * @param pParamValues the map of parameters
+   * @return the result
+   */
+  public List<Structure> lookupStructuresByQuery(Scope pScope, Query pQuery,
+    @Nullable Map<String, Object> pParamValues);
 
   /**
    * Creates a new standard migration

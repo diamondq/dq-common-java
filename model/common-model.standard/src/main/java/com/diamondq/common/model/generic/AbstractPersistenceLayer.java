@@ -1,6 +1,6 @@
 package com.diamondq.common.model.generic;
 
-import com.diamondq.common.model.generic.GenericQueryBuilder.GenericWhereInfo;
+import com.diamondq.common.model.generic.GenericQuery.GenericWhereInfo;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.EditorPropertyDefinition;
@@ -11,6 +11,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyPattern;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
+import com.diamondq.common.model.interfaces.Query;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Ref;
 import com.diamondq.common.model.interfaces.Scope;
@@ -22,6 +23,7 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
 import com.diamondq.common.model.interfaces.WhereOperator;
+import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
@@ -493,204 +495,221 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
   }
 
   /**
-   * This is a highly inefficient implementation that simply scans through all structures until it finds one that
-   * matches. A better implementation would use indexes to do a more directed search.
-   *
-   * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition,
-   *      com.diamondq.common.model.interfaces.QueryBuilder, java.util.Map)
+   * @see com.diamondq.common.model.generic.PersistenceLayer#writeQueryBuilder(com.diamondq.common.model.generic.GenericToolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
-  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope,
-    StructureDefinition pStructureDefinition, QueryBuilder pBuilder, @Nullable Map<String, Object> pParamValues) {
+  public Query writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
+    try (Context context =
+      mContextFactory.newContext(AbstractPersistenceLayer.class, this, pGenericToolkit, pScope, pQueryBuilder)) {
+      GenericQueryBuilder gqb = (GenericQueryBuilder) pQueryBuilder;
+      return new GenericQuery(gqb.getStructureDefinition(), gqb.getQueryName(), gqb.getWhereList(),
+        gqb.getParentParamKey(), gqb.getParentPropertyDefinition(), gqb.getSortList());
+    }
+  }
 
-    GenericQueryBuilder gqb = (GenericQueryBuilder) pBuilder;
+  /**
+   * This is a highly inefficient implementation that simply scans through all structures until it finds one that
+   * matches. A better implementation would use indexes to do a more directed search.
+   * 
+   * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Query, java.util.Map)
+   */
+  @Override
+  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, Query pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    try (Context context =
+      mContextFactory.newContext(AbstractPersistenceLayer.class, this, pToolkit, pScope, pQuery, pParamValues)) {
+      GenericQuery gq = (GenericQuery) pQuery;
 
-    /* Analyze the query to see if it only refers to primary keys */
+      /* Analyze the query to see if it only refers to primary keys */
 
-    List<String> primaryKeyNames = pStructureDefinition.lookupPrimaryKeyNames();
-    Set<String> primaryKeySet = Sets.newHashSet(primaryKeyNames);
+      StructureDefinition structureDefinition = gq.getStructureDefinition();
+      List<String> primaryKeyNames = structureDefinition.lookupPrimaryKeyNames();
+      Set<String> primaryKeySet = Sets.newHashSet(primaryKeyNames);
 
-    List<GenericWhereInfo> whereList = gqb.getWhereList();
-    boolean onlyPrimary = true;
-    for (GenericWhereInfo wi : whereList) {
-      if (primaryKeySet.contains(wi.key) == false) {
-        onlyPrimary = false;
-        break;
+      List<GenericWhereInfo> whereList = gq.getWhereList();
+      boolean onlyPrimary = true;
+      for (GenericWhereInfo wi : whereList) {
+        if (primaryKeySet.contains(wi.key) == false) {
+          onlyPrimary = false;
+          break;
+        }
       }
-    }
 
-    /*
-     * If we're only referring to the primary keys, then we can optimize the query since it's either a direct match or a
-     * range query
-     */
+      /*
+       * If we're only referring to the primary keys, then we can optimize the query since it's either a direct match or
+       * a range query
+       */
 
-    if (onlyPrimary == true) {
+      if (onlyPrimary == true) {
 
-    }
-
-    String parentParamKey = gqb.getParentParamKey();
-    PropertyDefinition parentPropertyDefinition = gqb.getParentPropertyDefinition();
-    String parentKey;
-    if (parentParamKey == null)
-      parentKey = null;
-    else {
-      if (pParamValues == null)
-        throw new IllegalArgumentException("Parent key provided but no parameters provided");
-      parentKey = (String) pParamValues.get(parentParamKey);
-    }
-    Collection<Structure> allStructures = getAllStructuresByDefinition(pToolkit, pScope,
-      pStructureDefinition.getWildcardReference(), parentKey, parentPropertyDefinition);
-    List<Structure> results = Lists.newArrayList();
-    for (Structure test : allStructures) {
-
-      boolean matches = true;
-      for (GenericWhereInfo w : whereList) {
-        Property<@Nullable Object> prop = test.lookupPropertyByName(w.key);
-        if (prop == null)
-          continue;
-        Object testValue = prop.getValue(test);
-        Object actValue;
-        if (w.paramKey != null) {
-          if (pParamValues == null)
-            throw new IllegalArgumentException("Parameter key provided by no parameters provided");
-          actValue = pParamValues.get(w.paramKey);
-        }
-        else
-          actValue = w.constant;
-
-        /* Now do the comparison based on the operator */
-
-        switch (w.operator) {
-        case eq: {
-          matches = Objects.equals(testValue, actValue) == true;
-          break;
-        }
-        case ne: {
-          matches = Objects.equals(testValue, actValue) == false;
-          break;
-        }
-        case gt:
-        case gte:
-        case lt:
-        case lte: {
-          Comparable<?> testDec;
-          Comparable<?> actDec;
-          if ((testValue instanceof Number) && (actValue instanceof Number)) {
-            if (testValue instanceof BigInteger)
-              testDec = new BigDecimal((BigInteger) testValue);
-            else if (testValue instanceof Byte)
-              testDec = new BigDecimal((Byte) testValue);
-            else if (testValue instanceof Double)
-              testDec = new BigDecimal((Double) testValue);
-            else if (testValue instanceof Float)
-              testDec = new BigDecimal((Float) testValue);
-            else if (testValue instanceof Integer)
-              testDec = new BigDecimal((Float) testValue);
-            else if (testValue instanceof Long)
-              testDec = new BigDecimal((Long) testValue);
-            else if (testValue instanceof Short)
-              testDec = new BigDecimal((Short) testValue);
-            else
-              throw new UnsupportedOperationException();
-            if (actValue instanceof BigInteger)
-              actDec = new BigDecimal((BigInteger) actValue);
-            else if (actValue instanceof Byte)
-              actDec = new BigDecimal((Byte) actValue);
-            else if (actValue instanceof Double)
-              actDec = new BigDecimal((Double) actValue);
-            else if (actValue instanceof Float)
-              actDec = new BigDecimal((Float) actValue);
-            else if (actValue instanceof Integer)
-              actDec = new BigDecimal((Float) actValue);
-            else if (actValue instanceof Long)
-              actDec = new BigDecimal((Long) actValue);
-            else if (actValue instanceof Short)
-              actDec = new BigDecimal((Short) actValue);
-            else
-              throw new UnsupportedOperationException();
-
-          }
-          else if ((testValue instanceof String) && (actValue instanceof String)) {
-            testDec = (String) testValue;
-            actDec = (String) actValue;
-          }
-          else {
-            testDec = null;
-            actDec = null;
-          }
-          if ((testDec == null) || (actDec == null))
-            matches = false;
-          else {
-            @SuppressWarnings("unchecked")
-            Comparable<Object> testDecObj = (Comparable<Object>) testDec;
-            @SuppressWarnings("unchecked")
-            Comparable<Object> actDecObj = (Comparable<Object>) actDec;
-            int compareResult = testDecObj.compareTo(actDecObj);
-            if (w.operator == WhereOperator.gt)
-              matches = compareResult > 0;
-            else if (w.operator == WhereOperator.gte)
-              matches = compareResult >= 0;
-            else if (w.operator == WhereOperator.lt)
-              matches = compareResult < 0;
-            else if (w.operator == WhereOperator.lte)
-              matches = compareResult <= 0;
-            else
-              throw new UnsupportedOperationException();
-          }
-        }
-        }
-
-        if (matches == false)
-          break;
       }
-      if (matches == false)
-        continue;
 
-      /* Everything matched, so add it */
+      String parentParamKey = gq.getParentParamKey();
+      PropertyDefinition parentPropertyDefinition = gq.getParentPropertyDefinition();
+      String parentKey;
+      if (parentParamKey == null)
+        parentKey = null;
+      else {
+        if (pParamValues == null)
+          throw new IllegalArgumentException("Parent key provided but no parameters provided");
+        parentKey = (String) pParamValues.get(parentParamKey);
+      }
+      Collection<Structure> allStructures = getAllStructuresByDefinition(pToolkit, pScope,
+        structureDefinition.getWildcardReference(), parentKey, parentPropertyDefinition);
+      List<Structure> results = Lists.newArrayList();
+      for (Structure test : allStructures) {
 
-      results.add(test);
-    }
-
-    /* Handle sorting if necessary */
-
-    List<Pair<String, Boolean>> sortList = gqb.getSortList();
-    if (sortList.isEmpty() == false) {
-      Collections.sort(results, (s1, s2) -> {
-        int sortResult = 0;
-        for (Pair<String, Boolean> sort : sortList) {
-          Object o1 = s1.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s1);
-          Object o2 = s2.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s2);
-          if (o1 instanceof Comparable) {
-            @SuppressWarnings("unchecked")
-            Comparable<Object> c1 = (Comparable<Object>) o1;
-            if (o2 == null)
-              sortResult = -1;
-            else
-              sortResult = c1.compareTo(o2);
+        boolean matches = true;
+        for (GenericWhereInfo w : whereList) {
+          Property<@Nullable Object> prop = test.lookupPropertyByName(w.key);
+          if (prop == null)
+            continue;
+          Object testValue = prop.getValue(test);
+          Object actValue;
+          if (w.paramKey != null) {
+            if (pParamValues == null)
+              throw new IllegalArgumentException("Parameter key provided by no parameters provided");
+            actValue = pParamValues.get(w.paramKey);
           }
           else
-            throw new IllegalArgumentException();
-          if (sort.getValue1() == false)
-            sortResult *= -1;
-          if (sortResult != 0)
+            actValue = w.constant;
+
+          /* Now do the comparison based on the operator */
+
+          switch (w.operator) {
+          case eq: {
+            matches = Objects.equals(testValue, actValue) == true;
+            break;
+          }
+          case ne: {
+            matches = Objects.equals(testValue, actValue) == false;
+            break;
+          }
+          case gt:
+          case gte:
+          case lt:
+          case lte: {
+            Comparable<?> testDec;
+            Comparable<?> actDec;
+            if ((testValue instanceof Number) && (actValue instanceof Number)) {
+              if (testValue instanceof BigInteger)
+                testDec = new BigDecimal((BigInteger) testValue);
+              else if (testValue instanceof Byte)
+                testDec = new BigDecimal((Byte) testValue);
+              else if (testValue instanceof Double)
+                testDec = new BigDecimal((Double) testValue);
+              else if (testValue instanceof Float)
+                testDec = new BigDecimal((Float) testValue);
+              else if (testValue instanceof Integer)
+                testDec = new BigDecimal((Float) testValue);
+              else if (testValue instanceof Long)
+                testDec = new BigDecimal((Long) testValue);
+              else if (testValue instanceof Short)
+                testDec = new BigDecimal((Short) testValue);
+              else
+                throw new UnsupportedOperationException();
+              if (actValue instanceof BigInteger)
+                actDec = new BigDecimal((BigInteger) actValue);
+              else if (actValue instanceof Byte)
+                actDec = new BigDecimal((Byte) actValue);
+              else if (actValue instanceof Double)
+                actDec = new BigDecimal((Double) actValue);
+              else if (actValue instanceof Float)
+                actDec = new BigDecimal((Float) actValue);
+              else if (actValue instanceof Integer)
+                actDec = new BigDecimal((Float) actValue);
+              else if (actValue instanceof Long)
+                actDec = new BigDecimal((Long) actValue);
+              else if (actValue instanceof Short)
+                actDec = new BigDecimal((Short) actValue);
+              else
+                throw new UnsupportedOperationException();
+
+            }
+            else if ((testValue instanceof String) && (actValue instanceof String)) {
+              testDec = (String) testValue;
+              actDec = (String) actValue;
+            }
+            else {
+              testDec = null;
+              actDec = null;
+            }
+            if ((testDec == null) || (actDec == null))
+              matches = false;
+            else {
+              @SuppressWarnings("unchecked")
+              Comparable<Object> testDecObj = (Comparable<Object>) testDec;
+              @SuppressWarnings("unchecked")
+              Comparable<Object> actDecObj = (Comparable<Object>) actDec;
+              int compareResult = testDecObj.compareTo(actDecObj);
+              if (w.operator == WhereOperator.gt)
+                matches = compareResult > 0;
+              else if (w.operator == WhereOperator.gte)
+                matches = compareResult >= 0;
+              else if (w.operator == WhereOperator.lt)
+                matches = compareResult < 0;
+              else if (w.operator == WhereOperator.lte)
+                matches = compareResult <= 0;
+              else
+                throw new UnsupportedOperationException();
+            }
+          }
+          }
+
+          if (matches == false)
             break;
         }
-        return sortResult;
-      });
+        if (matches == false)
+          continue;
+
+        /* Everything matched, so add it */
+
+        results.add(test);
+      }
+
+      /* Handle sorting if necessary */
+
+      List<Pair<String, Boolean>> sortList = gq.getSortList();
+      if (sortList.isEmpty() == false) {
+        Collections.sort(results, (s1, s2) -> {
+          int sortResult = 0;
+          for (Pair<String, Boolean> sort : sortList) {
+            Object o1 = s1.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s1);
+            Object o2 = s2.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s2);
+            if (o1 instanceof Comparable) {
+              @SuppressWarnings("unchecked")
+              Comparable<Object> c1 = (Comparable<Object>) o1;
+              if (o2 == null)
+                sortResult = -1;
+              else
+                sortResult = c1.compareTo(o2);
+            }
+            else
+              throw new IllegalArgumentException();
+            if (sort.getValue1() == false)
+              sortResult *= -1;
+            if (sortResult != 0)
+              break;
+          }
+          return sortResult;
+        });
+      }
+
+      return context.exit(ImmutableList.copyOf(results));
     }
-
-    return ImmutableList.copyOf(results);
-
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#createNewQueryBuilder(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition,
+   *      java.lang.String)
    */
   @Override
-  public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope) {
-    return new GenericQueryBuilder(null, null, null, null);
+  public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition,
+    String pQueryName) {
+    return new GenericQueryBuilder(pStructureDefinition, pQueryName, null, null, null, null);
   }
 
   /**

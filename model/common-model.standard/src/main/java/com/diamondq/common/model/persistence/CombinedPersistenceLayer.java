@@ -1,20 +1,26 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractPersistenceLayer;
+import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
+import com.diamondq.common.model.interfaces.Query;
+import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -176,6 +182,52 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
         return false;
     }
     return true;
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#writeQueryBuilder(com.diamondq.common.model.generic.GenericToolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
+   */
+  @Override
+  public Query writeQueryBuilder(GenericToolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
+    try (Context context =
+      mContextFactory.newContext(CombinedPersistenceLayer.class, this, pToolkit, pScope, pQueryBuilder)) {
+      Map<PersistenceLayer, Query> mappedQueries = new HashMap<>();
+      Query firstQuery = null;
+      for (PersistenceLayer l : mStructurePersistenceLayer) {
+        Query query = l.writeQueryBuilder(pToolkit, pScope, pQueryBuilder);
+        if (firstQuery == null)
+          firstQuery = query;
+        mappedQueries.put(l, query);
+      }
+      if (firstQuery == null)
+        throw new IllegalStateException();
+      return context.exit(new CombinedQuery(firstQuery, mappedQueries));
+    }
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Query, java.util.Map)
+   */
+  @Override
+  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, Query pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    try (Context context =
+      mContextFactory.newContext(CombinedPersistenceLayer.class, this, pToolkit, pScope, pQuery, pParamValues)) {
+      if (pQuery instanceof CombinedQuery == false)
+        throw new IllegalArgumentException();
+      CombinedQuery cq = (CombinedQuery) pQuery;
+      Map<PersistenceLayer, Query> mappedQueries = cq.getMappedQueries();
+      List<Structure> results = new ArrayList<>();
+      for (PersistenceLayer l : mStructurePersistenceLayer) {
+        Query query = mappedQueries.get(l);
+        if (query != null) {
+          results.addAll(l.lookupStructuresByQuery(pToolkit, pScope, query, pParamValues));
+        }
+      }
+      return context.exit(results);
+    }
   }
 
   /**

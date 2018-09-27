@@ -1,7 +1,9 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.model.generic.GenericQuery.GenericWhereInfo;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.QueryBuilder;
+import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.WhereOperator;
 import com.google.common.collect.ImmutableList;
 
@@ -12,26 +14,9 @@ import org.javatuples.Pair;
 
 public class GenericQueryBuilder implements QueryBuilder {
 
-  public static class GenericWhereInfo {
-    public final String        key;
+  private final StructureDefinition                  mStructureDefinition;
 
-    public final WhereOperator operator;
-
-    @Nullable
-    public final Object        constant;
-
-    @Nullable
-    public final String        paramKey;
-
-    public GenericWhereInfo(String pKey, WhereOperator pOperator, @Nullable Object pConstant,
-      @Nullable String pParamKey) {
-      super();
-      key = pKey;
-      operator = pOperator;
-      constant = pConstant;
-      paramKey = pParamKey;
-    }
-  }
+  private final String                               mQueryName;
 
   private final ImmutableList<GenericWhereInfo>      mWhereList;
 
@@ -41,12 +26,23 @@ public class GenericQueryBuilder implements QueryBuilder {
 
   private final ImmutableList<Pair<String, Boolean>> mSortList;
 
-  public GenericQueryBuilder(@Nullable List<GenericWhereInfo> pWhereList, @Nullable String pParentParamKey,
+  public GenericQueryBuilder(StructureDefinition pStructureDefinition, String pQueryName,
+    @Nullable List<GenericWhereInfo> pWhereList, @Nullable String pParentParamKey,
     @Nullable PropertyDefinition pParentPropertyDefinition, @Nullable List<Pair<String, Boolean>> pSortList) {
+    mStructureDefinition = pStructureDefinition;
+    mQueryName = pQueryName;
     mWhereList = (pWhereList == null ? ImmutableList.of() : ImmutableList.copyOf(pWhereList));
     mParentParamKey = pParentParamKey;
     mParentPropertyDefinition = pParentPropertyDefinition;
     mSortList = (pSortList == null ? ImmutableList.of() : ImmutableList.copyOf(pSortList));
+  }
+
+  public StructureDefinition getStructureDefinition() {
+    return mStructureDefinition;
+  }
+
+  public String getQueryName() {
+    return mQueryName;
   }
 
   /**
@@ -78,7 +74,7 @@ public class GenericQueryBuilder implements QueryBuilder {
    */
   @Override
   public GenericQueryBuilder andWhereConstant(String pKey, WhereOperator pOperator, Object pValue) {
-    return new GenericQueryBuilder(
+    return new GenericQueryBuilder(mStructureDefinition, mQueryName,
       ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
         .add(new GenericWhereInfo(pKey, pOperator, pValue, null)).build(),
       mParentParamKey, mParentPropertyDefinition, mSortList);
@@ -90,7 +86,7 @@ public class GenericQueryBuilder implements QueryBuilder {
    */
   @Override
   public GenericQueryBuilder andWhereParam(String pKey, WhereOperator pOperator, String pParamKey) {
-    return new GenericQueryBuilder(
+    return new GenericQueryBuilder(mStructureDefinition, mQueryName,
       ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
         .add(new GenericWhereInfo(pKey, pOperator, null, pParamKey)).build(),
       mParentParamKey, mParentPropertyDefinition, mSortList);
@@ -102,7 +98,8 @@ public class GenericQueryBuilder implements QueryBuilder {
    */
   @Override
   public QueryBuilder andWhereParentIs(String pParentParamKey, PropertyDefinition pParentPropertyDef) {
-    return new GenericQueryBuilder(mWhereList, pParentParamKey, pParentPropertyDef, mSortList);
+    return new GenericQueryBuilder(mStructureDefinition, mQueryName, mWhereList, pParentParamKey, pParentPropertyDef,
+      mSortList);
   }
 
   /**
@@ -110,7 +107,8 @@ public class GenericQueryBuilder implements QueryBuilder {
    */
   @Override
   public QueryBuilder orderBy(String pKey, boolean pIsAscending) {
-    return new GenericQueryBuilder(mWhereList, mParentParamKey, mParentPropertyDefinition,
+    return new GenericQueryBuilder(mStructureDefinition, mQueryName, mWhereList, mParentParamKey,
+      mParentPropertyDefinition,
       ImmutableList.<Pair<String, Boolean>> builder().addAll(mSortList).add(Pair.with(pKey, pIsAscending)).build());
   }
 }

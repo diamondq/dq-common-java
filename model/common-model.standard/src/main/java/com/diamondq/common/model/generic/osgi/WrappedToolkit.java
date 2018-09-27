@@ -10,6 +10,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
+import com.diamondq.common.model.interfaces.Query;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StandardMigrations;
@@ -546,22 +547,31 @@ public class WrappedToolkit implements Toolkit {
   }
 
   /**
-   * @see com.diamondq.common.model.interfaces.Toolkit#createNewQueryBuilder(com.diamondq.common.model.interfaces.Scope)
+   * @see com.diamondq.common.model.interfaces.Toolkit#createNewQueryBuilder(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String)
    */
   @Override
-  public QueryBuilder createNewQueryBuilder(Scope pScope) {
-    return mToolkit.createNewQueryBuilder(dewrapScope(pScope));
+  public QueryBuilder createNewQueryBuilder(Scope pScope, StructureDefinition pStructureDefinition, String pQueryName) {
+    return mToolkit.createNewQueryBuilder(dewrapScope(pScope), pStructureDefinition, pQueryName);
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, com.diamondq.common.model.interfaces.QueryBuilder,
-   *      java.util.Map)
+   *      com.diamondq.common.model.interfaces.Query, java.util.Map)
    */
   @Override
-  public List<Structure> lookupStructuresByQuery(Scope pScope, StructureDefinition pStructureDefinition,
-    QueryBuilder pBuilder, @Nullable Map<String, Object> pParamValues) {
-    return mToolkit.lookupStructuresByQuery(dewrapScope(pScope), pStructureDefinition, pBuilder, pParamValues);
+  public List<Structure> lookupStructuresByQuery(Scope pScope, Query pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    return mToolkit.lookupStructuresByQuery(dewrapScope(pScope), pQuery, pParamValues);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#writeQueryBuilder(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.QueryBuilder)
+   */
+  @Override
+  public Query writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder) {
+    return mToolkit.writeQueryBuilder(dewrapScope(pScope), pQueryBuilder);
   }
 
   /**
