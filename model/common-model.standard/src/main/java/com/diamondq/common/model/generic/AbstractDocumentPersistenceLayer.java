@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -103,328 +104,356 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
   @Override
   protected boolean internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Structure pStructure, boolean pMustMatchOldStructure, @Nullable Structure pOldStructure) {
-    if (mPersistStructures == false)
-      return true;
+    try (Context context = mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pToolkit, pScope,
+      pDefName, pKey, pStructure, pMustMatchOldStructure, pOldStructure)) {
+      if (mPersistStructures == false)
+        return context.exit(true);
 
-    STRUCTURECONFIGOBJ config;
-    boolean changed = false;
+      STRUCTURECONFIGOBJ config;
+      boolean changed = false;
 
-    @Nullable
-    STRUCTUREOPTIMISTICOBJ optimisticObj;
-    if (pMustMatchOldStructure == true) {
-      optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pOldStructure);
       @Nullable
-      STRUCTURECONFIGOBJ loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
-      if (pOldStructure == null) {
+      STRUCTUREOPTIMISTICOBJ optimisticObj;
+      if (pMustMatchOldStructure == true) {
+        optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pOldStructure);
+        @Nullable
+        STRUCTURECONFIGOBJ loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
+        if (pOldStructure == null) {
+          if (loadedConfig == null) {
+            loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
+            if (loadedConfig == null)
+              throw new IllegalStateException("The config should always exist since createIfMissing was set");
+            config = loadedConfig;
+          }
+          else
+            config = loadedConfig;
+        }
+        else {
+          if (loadedConfig == null)
+            return context.exit(false);
+          config = loadedConfig;
+        }
+      }
+      else {
+        @Nullable
+        STRUCTURECONFIGOBJ loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
         if (loadedConfig == null) {
           loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
           if (loadedConfig == null)
             throw new IllegalStateException("The config should always exist since createIfMissing was set");
-          config = loadedConfig;
+          changed = true;
         }
-        else
-          config = loadedConfig;
-      }
-      else {
-        if (loadedConfig == null)
-          return false;
         config = loadedConfig;
+        optimisticObj = null;
       }
-    }
-    else {
-      @Nullable
-      STRUCTURECONFIGOBJ loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, false);
-      if (loadedConfig == null) {
-        loadedConfig = loadStructureConfigObject(pToolkit, pScope, pDefName, pKey, true);
-        if (loadedConfig == null)
-          throw new IllegalStateException("The config should always exist since createIfMissing was set");
+
+      String oldStructureDefName =
+        getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
+      String newStructureDefName = pStructure.getDefinition().getReference().getSerializedString();
+      if (Objects.equals(oldStructureDefName, newStructureDefName) == false) {
+        setStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String,
+          newStructureDefName);
         changed = true;
       }
-      config = loadedConfig;
-      optimisticObj = null;
-    }
 
-    String oldStructureDefName =
-      getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
-    String newStructureDefName = pStructure.getDefinition().getReference().getSerializedString();
-    if (Objects.equals(oldStructureDefName, newStructureDefName) == false) {
-      setStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String,
-        newStructureDefName);
-      changed = true;
-    }
+      Map<String, Property<?>> properties = pStructure.getProperties();
 
-    Map<String, Property<?>> properties = pStructure.getProperties();
+      for (Property<?> p : properties.values()) {
+        PropertyDefinition propDef = p.getDefinition();
+        if (propDef.getKeywords().containsEntry(CommonKeywordKeys.PERSIST, CommonKeywordValues.FALSE) == true)
+          continue;
+        Collection<String> containerValue = propDef.getKeywords().get(CommonKeywordKeys.CONTAINER);
+        if (containerValue.isEmpty() == false) {
+          if (containerValue.contains(CommonKeywordValues.CONTAINER_PARENT)) {
 
-    for (Property<?> p : properties.values()) {
-      PropertyDefinition propDef = p.getDefinition();
-      if (propDef.getKeywords().containsEntry(CommonKeywordKeys.PERSIST, CommonKeywordValues.FALSE) == true)
-        continue;
-      Collection<String> containerValue = propDef.getKeywords().get(CommonKeywordKeys.CONTAINER);
-      if (containerValue.isEmpty() == false) {
-        if (containerValue.contains(CommonKeywordValues.CONTAINER_PARENT)) {
+            /*
+             * We are writing an object that is a pointer to a parent. See if the cached parent has this object, and if
+             * not, then invalidate the cache
+             */
 
-          /*
-           * We are writing an object that is a pointer to a parent. See if the cached parent has this object, and if
-           * not, then invalidate the cache
-           */
-
-          PropertyRef<?> parentPropRef = (PropertyRef<?>) p.getValue(pStructure);
-          if (parentPropRef != null) {
-            StructureAndProperty<?> structureAndProperty = parentPropRef.resolveToBoth();
-            if (structureAndProperty != null) {
-              Property<?> property = structureAndProperty.property;
-              if (property != null) {
-                @SuppressWarnings("unchecked")
-                List<StructureRef> structureRefList =
-                  (List<StructureRef>) property.getValue(structureAndProperty.structure);
-                boolean invalidate = true;
-                if (structureRefList != null) {
-                  StructureRef thisRef = pToolkit.createStructureRef(pScope, pStructure);
-                  for (StructureRef testRef : structureRefList) {
-                    if (testRef.equals(thisRef)) {
-                      invalidate = false;
-                      break;
+            PropertyRef<?> parentPropRef = (PropertyRef<?>) p.getValue(pStructure);
+            if (parentPropRef != null) {
+              StructureAndProperty<?> structureAndProperty = parentPropRef.resolveToBoth();
+              if (structureAndProperty != null) {
+                Property<?> property = structureAndProperty.property;
+                if (property != null) {
+                  @SuppressWarnings("unchecked")
+                  List<StructureRef> structureRefList =
+                    (List<StructureRef>) property.getValue(structureAndProperty.structure);
+                  boolean invalidate = true;
+                  if (structureRefList != null) {
+                    StructureRef thisRef = pToolkit.createStructureRef(pScope, pStructure);
+                    for (StructureRef testRef : structureRefList) {
+                      if (testRef.equals(thisRef)) {
+                        invalidate = false;
+                        break;
+                      }
                     }
                   }
+                  if (invalidate == true)
+                    invalidateStructure(pToolkit, pScope, structureAndProperty.structure);
                 }
-                if (invalidate == true)
-                  invalidateStructure(pToolkit, pScope, structureAndProperty.structure);
               }
             }
           }
+          if (persistContainerProp(pToolkit, pScope, pStructure, p) == false)
+            continue;
         }
-        if (persistContainerProp(pToolkit, pScope, pStructure, p) == false)
-          continue;
+
+        String propName = propDef.getName();
+        boolean hasProp = hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName);
+        switch (p.getDefinition().getType()) {
+        case String: {
+          if (p.isValueSet() == true) {
+            String value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String) : null;
+            String newValue = (String) p.getValue(pStructure);
+            if (newValue == null)
+              newValue = "";
+            if (Objects.equals(value, newValue) == false) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String, newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String) == true)
+              changed = true;
+          }
+          break;
+        }
+        case Boolean: {
+          if (p.isValueSet() == true) {
+            Boolean value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean) : null;
+            Boolean newValue = (Boolean) p.getValue(pStructure);
+            if (newValue == null)
+              newValue = false;
+            if ((value == null) || (value != newValue)) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean, newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+              PropertyType.Boolean) == true)
+              changed = true;
+          }
+          break;
+        }
+        case Decimal: {
+          if (p.isValueSet() == true) {
+            BigDecimal value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal) : null;
+            Number newValue = (Number) p.getValue(pStructure);
+            BigDecimal newDec;
+            if (newValue == null)
+              newDec = new BigDecimal(0.0);
+            else if (newValue instanceof BigDecimal)
+              newDec = (BigDecimal) newValue;
+            else if (newValue instanceof BigInteger)
+              newDec = new BigDecimal((BigInteger) newValue);
+            else if (newValue instanceof Byte)
+              newDec = new BigDecimal((Byte) newValue);
+            else if (newValue instanceof Double)
+              newDec = new BigDecimal((Double) newValue);
+            else if (newValue instanceof Float)
+              newDec = new BigDecimal((Float) newValue);
+            else if (newValue instanceof Integer)
+              newDec = new BigDecimal((Float) newValue);
+            else if (newValue instanceof Long)
+              newDec = new BigDecimal((Long) newValue);
+            else if (newValue instanceof Short)
+              newDec = new BigDecimal((Short) newValue);
+            else
+              throw new UnsupportedOperationException();
+            if ((value == null) || (newDec.equals(value) == false)) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal, newDec);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+              PropertyType.Decimal) == true)
+              changed = true;
+          }
+          break;
+        }
+        case Integer: {
+          if (p.isValueSet() == true) {
+            Integer value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer) : null;
+            Integer newValue = (Integer) p.getValue(pStructure);
+            if (newValue == null)
+              newValue = 0;
+            if ((value == null) || (value != newValue)) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer, newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+              PropertyType.Integer) == true)
+              changed = true;
+          }
+          break;
+        }
+        case Long: {
+          if (p.isValueSet() == true) {
+            Long value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long) : null;
+            Long newValue = (Long) p.getValue(pStructure);
+            if (newValue == null)
+              newValue = 0L;
+            if ((value == null) || (value != newValue)) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long, newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long) == true)
+              changed = true;
+          }
+          break;
+        }
+        case PropertyRef: {
+          if (p.isValueSet() == true) {
+            String value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.PropertyRef)
+              : null;
+            PropertyRef<?> newValueRef = (PropertyRef<?>) p.getValue(pStructure);
+            String newValue;
+            if (newValueRef == null)
+              newValue = "";
+            else
+              newValue = newValueRef.getSerializedString();
+            if (Objects.equals(value, newValue) == false) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.PropertyRef,
+                newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+              PropertyType.PropertyRef) == true)
+              changed = true;
+          }
+          break;
+        }
+        case StructureRef: {
+          if (p.isValueSet() == true) {
+            String value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRef)
+              : null;
+            StructureRef newValueRef = (StructureRef) p.getValue(pStructure);
+            String newValue;
+            if (newValueRef == null)
+              newValue = "";
+            else
+              newValue = newValueRef.getSerializedString();
+            if (Objects.equals(value, newValue) == false) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRef,
+                newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+              PropertyType.StructureRef) == true)
+              changed = true;
+          }
+          break;
+        }
+        case StructureRefList: {
+          if (p.isValueSet() == true) {
+            String[] value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRefList)
+              : null;
+            String[] newValues = (String[]) p.getValue(pStructure);
+            if (newValues == null)
+              newValues = new String[0];
+            if (Objects.equals(value, newValues) == false) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRefList,
+                newValues);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+              PropertyType.StructureRefList) == true)
+              changed = true;
+          }
+          break;
+        }
+        case EmbeddedStructureList: {
+          throw new UnsupportedOperationException();
+        }
+        case Image: {
+          throw new UnsupportedOperationException();
+        }
+        case Binary: {
+          if (p.isValueSet() == true) {
+            Object value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary) : null;
+            Object newValue = p.getValue(pStructure);
+            if (newValue == null)
+              newValue = new byte[0];
+            if (Objects.equals(value, newValue) == false) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary, newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary) == true)
+              changed = true;
+          }
+          break;
+        }
+        case Timestamp: {
+          if (p.isValueSet() == true) {
+            Long value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp) : null;
+            Long newValue = (Long) p.getValue(pStructure);
+            if (newValue == null)
+              newValue = 0L;
+            if ((value == null) || (value != newValue)) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp, newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
+              PropertyType.Timestamp) == true)
+              changed = true;
+          }
+          break;
+        }
+        case UUID: {
+          if (p.isValueSet() == true) {
+            UUID value = hasProp == true
+              ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.UUID) : null;
+            UUID newValue = (UUID) p.getValue(pStructure);
+            if (newValue == null)
+              newValue = UUID.fromString("00000000-0000-0000-0000-000000000000");
+            if (Objects.equals(value, newValue) == false) {
+              setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.UUID, newValue);
+              changed = true;
+            }
+          }
+          else {
+            if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.UUID) == true)
+              changed = true;
+          }
+          break;
+        }
+        }
+
       }
 
-      String propName = propDef.getName();
-      boolean hasProp = hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName);
-      switch (p.getDefinition().getType()) {
-      case String: {
-        if (p.isValueSet() == true) {
-          String value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String) : null;
-          String newValue = (String) p.getValue(pStructure);
-          if (newValue == null)
-            newValue = "";
-          if (Objects.equals(value, newValue) == false) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String, newValue);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.String) == true)
-            changed = true;
-        }
-        break;
-      }
-      case Boolean: {
-        if (p.isValueSet() == true) {
-          Boolean value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean) : null;
-          Boolean newValue = (Boolean) p.getValue(pStructure);
-          if (newValue == null)
-            newValue = false;
-          if ((value == null) || (value != newValue)) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean, newValue);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Boolean) == true)
-            changed = true;
-        }
-        break;
-      }
-      case Decimal: {
-        if (p.isValueSet() == true) {
-          BigDecimal value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal) : null;
-          Number newValue = (Number) p.getValue(pStructure);
-          BigDecimal newDec;
-          if (newValue == null)
-            newDec = new BigDecimal(0.0);
-          else if (newValue instanceof BigDecimal)
-            newDec = (BigDecimal) newValue;
-          else if (newValue instanceof BigInteger)
-            newDec = new BigDecimal((BigInteger) newValue);
-          else if (newValue instanceof Byte)
-            newDec = new BigDecimal((Byte) newValue);
-          else if (newValue instanceof Double)
-            newDec = new BigDecimal((Double) newValue);
-          else if (newValue instanceof Float)
-            newDec = new BigDecimal((Float) newValue);
-          else if (newValue instanceof Integer)
-            newDec = new BigDecimal((Float) newValue);
-          else if (newValue instanceof Long)
-            newDec = new BigDecimal((Long) newValue);
-          else if (newValue instanceof Short)
-            newDec = new BigDecimal((Short) newValue);
-          else
-            throw new UnsupportedOperationException();
-          if ((value == null) || (newDec.equals(value) == false)) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal, newDec);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Decimal) == true)
-            changed = true;
-        }
-        break;
-      }
-      case Integer: {
-        if (p.isValueSet() == true) {
-          Integer value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer) : null;
-          Integer newValue = (Integer) p.getValue(pStructure);
-          if (newValue == null)
-            newValue = 0;
-          if ((value == null) || (value != newValue)) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer, newValue);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Integer) == true)
-            changed = true;
-        }
-        break;
-      }
-      case Long: {
-        if (p.isValueSet() == true) {
-          Long value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long) : null;
-          Long newValue = (Long) p.getValue(pStructure);
-          if (newValue == null)
-            newValue = 0L;
-          if ((value == null) || (value != newValue)) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long, newValue);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Long) == true)
-            changed = true;
-        }
-        break;
-      }
-      case PropertyRef: {
-        if (p.isValueSet() == true) {
-          String value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.PropertyRef) : null;
-          PropertyRef<?> newValueRef = (PropertyRef<?>) p.getValue(pStructure);
-          String newValue;
-          if (newValueRef == null)
-            newValue = "";
-          else
-            newValue = newValueRef.getSerializedString();
-          if (Objects.equals(value, newValue) == false) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.PropertyRef, newValue);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
-            PropertyType.PropertyRef) == true)
-            changed = true;
-        }
-        break;
-      }
-      case StructureRef: {
-        if (p.isValueSet() == true) {
-          String value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRef) : null;
-          StructureRef newValueRef = (StructureRef) p.getValue(pStructure);
-          String newValue;
-          if (newValueRef == null)
-            newValue = "";
-          else
-            newValue = newValueRef.getSerializedString();
-          if (Objects.equals(value, newValue) == false) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRef,
-              newValue);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
-            PropertyType.StructureRef) == true)
-            changed = true;
-        }
-        break;
-      }
-      case StructureRefList: {
-        if (p.isValueSet() == true) {
-          String[] value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRefList)
-            : null;
-          String[] newValues = (String[]) p.getValue(pStructure);
-          if (newValues == null)
-            newValues = new String[0];
-          if (Objects.equals(value, newValues) == false) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.StructureRefList,
-              newValues);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
-            PropertyType.StructureRefList) == true)
-            changed = true;
-        }
-        break;
-      }
-      case EmbeddedStructureList: {
-        throw new UnsupportedOperationException();
-      }
-      case Image: {
-        throw new UnsupportedOperationException();
-      }
-      case Binary: {
-        if (p.isValueSet() == true) {
-          Object value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary) : null;
-          Object newValue = p.getValue(pStructure);
-          if (newValue == null)
-            newValue = new byte[0];
-          if (Objects.equals(value, newValue) == false) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary, newValue);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Binary) == true)
-            changed = true;
-        }
-        break;
-      }
-      case Timestamp: {
-        if (p.isValueSet() == true) {
-          Long value = hasProp == true
-            ? getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp) : null;
-          Long newValue = (Long) p.getValue(pStructure);
-          if (newValue == null)
-            newValue = 0L;
-          if ((value == null) || (value != newValue)) {
-            setStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.Timestamp, newValue);
-            changed = true;
-          }
-        }
-        else {
-          if (removeStructureConfigObjectProp(pToolkit, pScope, config, false, propName,
-            PropertyType.Timestamp) == true)
-            changed = true;
-        }
-        break;
-      }
-      }
-
+      if ((changed == true) || (isStructureConfigChanged(pToolkit, pScope, config) == true))
+        return context.exit(
+          saveStructureConfigObject(pToolkit, pScope, pDefName, pKey, config, pMustMatchOldStructure, optimisticObj));
+      return context.exit(true);
     }
-
-    if ((changed == true) || (isStructureConfigChanged(pToolkit, pScope, config) == true))
-      return saveStructureConfigObject(pToolkit, pScope, pDefName, pKey, config, pMustMatchOldStructure, optimisticObj);
-    return true;
   }
 
   /**
@@ -679,6 +708,17 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
             @SuppressWarnings("unchecked")
             Property<@Nullable Long> ap = (Property<@Nullable Long>) p;
             ap = ap.setValue(value);
+            structure = structure.updateProperty(ap);
+          }
+          break;
+        }
+        case UUID: {
+          if (hasStructureConfigObjectProp(pToolkit, pScope, config, false, propName) == true) {
+            @Nullable
+            UUID uuid = getStructureConfigObjectProp(pToolkit, pScope, config, false, propName, PropertyType.UUID);
+            @SuppressWarnings("unchecked")
+            Property<@Nullable UUID> ap = (Property<@Nullable UUID>) p;
+            ap = ap.setValue(uuid);
             structure = structure.updateProperty(ap);
           }
           break;

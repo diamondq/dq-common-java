@@ -6,6 +6,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Predicates;
 import com.google.common.cache.Cache;
@@ -101,23 +102,26 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
    */
   @Override
   public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
-    String key = pToolkit.createStructureRefStr(pScope, pStructure);
-    if (mStructureCache != null)
-      mStructureCache.put(key, pStructure);
+    try (Context context =
+      mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pToolkit, pScope, pStructure)) {
+      String key = pToolkit.createStructureRefStr(pScope, pStructure);
+      if (mStructureCache != null)
+        mStructureCache.put(key, pStructure);
 
-    /* Now write the data to disk */
+      /* Now write the data to disk */
 
-    int lastOffset = key.lastIndexOf('/');
-    if (lastOffset == -1)
-      throw new IllegalArgumentException("The Structure reference is not the right format: " + key);
-    int nextLastOffset = key.lastIndexOf('/', lastOffset - 1);
-    String typeName;
-    if (lastOffset == -1)
-      typeName = key.substring(0, lastOffset);
-    else
-      typeName = key.substring(nextLastOffset + 1, lastOffset);
+      int lastOffset = key.lastIndexOf('/');
+      if (lastOffset == -1)
+        throw new IllegalArgumentException("The Structure reference is not the right format: " + key);
+      int nextLastOffset = key.lastIndexOf('/', lastOffset - 1);
+      String typeName;
+      if (lastOffset == -1)
+        typeName = key.substring(0, lastOffset);
+      else
+        typeName = key.substring(nextLastOffset + 1, lastOffset);
 
-    internalWriteStructure(pToolkit, pScope, typeName, key, pStructure, false, null);
+      internalWriteStructure(pToolkit, pScope, typeName, key, pStructure, false, null);
+    }
   }
 
   /**
@@ -128,27 +132,30 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
   @Override
   public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
     @Nullable Structure pOldStructure) {
-    String key = pToolkit.createStructureRefStr(pScope, pStructure);
+    try (Context context = mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pToolkit, pScope,
+      pStructure, pOldStructure)) {
+      String key = pToolkit.createStructureRefStr(pScope, pStructure);
 
-    /* Now write the data to disk */
+      /* Now write the data to disk */
 
-    int lastOffset = key.lastIndexOf('/');
-    if (lastOffset == -1)
-      throw new IllegalArgumentException("The Structure reference is not the right format: " + key);
-    int nextLastOffset = key.lastIndexOf('/', lastOffset - 1);
-    String typeName;
-    if (lastOffset == -1)
-      typeName = key.substring(0, lastOffset);
-    else
-      typeName = key.substring(nextLastOffset + 1, lastOffset);
+      int lastOffset = key.lastIndexOf('/');
+      if (lastOffset == -1)
+        throw new IllegalArgumentException("The Structure reference is not the right format: " + key);
+      int nextLastOffset = key.lastIndexOf('/', lastOffset - 1);
+      String typeName;
+      if (lastOffset == -1)
+        typeName = key.substring(0, lastOffset);
+      else
+        typeName = key.substring(nextLastOffset + 1, lastOffset);
 
-    if (internalWriteStructure(pToolkit, pScope, typeName, key, pStructure, true, pOldStructure) == false)
-      return false;
+      if (internalWriteStructure(pToolkit, pScope, typeName, key, pStructure, true, pOldStructure) == false)
+        return context.exit(false);
 
-    if (mStructureCache != null)
-      mStructureCache.put(key, pStructure);
+      if (mStructureCache != null)
+        mStructureCache.put(key, pStructure);
 
-    return true;
+      return context.exit(true);
+    }
   }
 
   protected abstract boolean internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -160,29 +167,32 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
    */
   @Override
   public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
-    String key = pToolkit.createStructureRefStr(pScope, pStructure);
+    try (Context context =
+      mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pToolkit, pScope, pStructure)) {
+      String key = pToolkit.createStructureRefStr(pScope, pStructure);
 
-    /* Now write the data to disk */
+      /* Now write the data to disk */
 
-    int lastOffset = key.lastIndexOf('/');
-    if (lastOffset == -1)
-      throw new IllegalArgumentException("The Structure reference is not the right format: " + key);
-    int nextLastOffset = key.lastIndexOf('/', lastOffset - 1);
-    String typeName;
-    if (lastOffset == -1)
-      typeName = key.substring(0, lastOffset);
-    else
-      typeName = key.substring(nextLastOffset + 1, lastOffset);
+      int lastOffset = key.lastIndexOf('/');
+      if (lastOffset == -1)
+        throw new IllegalArgumentException("The Structure reference is not the right format: " + key);
+      int nextLastOffset = key.lastIndexOf('/', lastOffset - 1);
+      String typeName;
+      if (lastOffset == -1)
+        typeName = key.substring(0, lastOffset);
+      else
+        typeName = key.substring(nextLastOffset + 1, lastOffset);
 
-    /* Now write the data to disk */
+      /* Now write the data to disk */
 
-    if (internalDeleteStructure(pToolkit, pScope, typeName, key, pStructure) == false)
-      return false;
+      if (internalDeleteStructure(pToolkit, pScope, typeName, key, pStructure) == false)
+        return context.exit(false);
 
-    if (mStructureCache != null)
-      mStructureCache.invalidate(key);
+      if (mStructureCache != null)
+        mStructureCache.invalidate(key);
 
-    return true;
+      return context.exit(true);
+    }
   }
 
   protected abstract boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
