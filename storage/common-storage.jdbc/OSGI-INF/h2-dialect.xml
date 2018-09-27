@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" immediate="false"
+  name="com.diamondq.common.storage.jdbc.h2">
+  <implementation
+    class="com.diamondq.common.storage.jdbc.dialects.H2" />
+  <service>
+    <provide
+      interface="com.diamondq.common.storage.jdbc.IJDBCDialect" />
+  </service>
+  <property name="database" type="String" value="H2" />
+</scr:component>
