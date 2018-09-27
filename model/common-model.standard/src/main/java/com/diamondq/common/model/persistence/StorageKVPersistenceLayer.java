@@ -1,18 +1,24 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
+import com.diamondq.common.model.generic.GenericQuery.GenericWhereInfo;
+import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.CommonKeywordValues;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyType;
+import com.diamondq.common.model.interfaces.Query;
+import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.storage.kv.IKVIndexColumn;
+import com.diamondq.common.storage.kv.IKVIndexDefinition;
 import com.diamondq.common.storage.kv.IKVIndexSupport;
 import com.diamondq.common.storage.kv.IKVStore;
 import com.diamondq.common.storage.kv.IKVTableDefinitionSupport;
@@ -40,6 +46,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -149,17 +156,17 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
     mConfiguredTableDefinitions = Maps.newConcurrentMap();
     mTableDefinitionSupport = mStructureStore.getTableDefinitionSupport();
 
-    IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support =
-      mStructureStore.getIndexSupport();
-    if (support != null) {
-
-      /* Define an index for the lookups */
-
-      KVIndexDefinitionBuilder<?> indexDefinitionBuilder = support.createIndexDefinitionBuilder().name("lookups");
-      indexDefinitionBuilder = indexDefinitionBuilder
-        .addColumn(support.createIndexColumnBuilder().name("data.structureDef").type(KVColumnType.String).build());
-      support.addRequiredIndexes(Collections.singletonList(indexDefinitionBuilder.build()));
-    }
+    // IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support =
+    // mStructureStore.getIndexSupport();
+    // if (support != null) {
+    //
+    // /* Define an index for the lookups */
+    //
+    // KVIndexDefinitionBuilder<?> indexDefinitionBuilder = support.createIndexDefinitionBuilder().name("lookups");
+    // indexDefinitionBuilder = indexDefinitionBuilder
+    // .addColumn(support.createIndexColumnBuilder().name("data.structureDef").type(KVColumnType.String).build());
+    // support.addRequiredIndexes(Collections.singletonList(indexDefinitionBuilder.build()));
+    // }
   }
 
   public static StorageKVPersistenceLayerBuilder builder() {
@@ -253,8 +260,13 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
                     colBuilder = colBuilder.maxLength(maxLength);
                   break;
                 }
-                case Binary:
-                  throw new UnsupportedOperationException();
+                case Binary: {
+                  colBuilder = colBuilder.type(KVColumnType.Binary);
+                  Integer maxLength = pd.getMaxLength();
+                  if (maxLength != null)
+                    colBuilder = colBuilder.maxLength(maxLength);
+                  break;
+                }
                 case Boolean: {
                   colBuilder = colBuilder.type(KVColumnType.Boolean);
                   break;
@@ -295,6 +307,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
                 }
                 case Timestamp: {
                   colBuilder = colBuilder.type(KVColumnType.Timestamp);
+                  break;
+                }
+                case UUID: {
+                  colBuilder = colBuilder.type(KVColumnType.UUID);
+                  break;
                 }
                 }
 
@@ -434,7 +451,9 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       return result;
     }
     case Binary: {
-      throw new UnsupportedOperationException();
+      @SuppressWarnings("unchecked")
+      R result = (R) (value == null ? null : (byte[]) value);
+      return result;
     }
     case EmbeddedStructureList: {
       throw new UnsupportedOperationException();
@@ -445,6 +464,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
     case Timestamp: {
       @SuppressWarnings("unchecked")
       R result = (R) (value == null ? Long.valueOf(0) : (Long) value);
+      return result;
+    }
+    case UUID: {
+      @SuppressWarnings("unchecked")
+      R result =
+        (R) (value == null ? null : (value instanceof String ? UUID.fromString((String) value) : (UUID) value));
       return result;
     }
     }
@@ -545,7 +570,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       break;
     }
     case Binary: {
-      throw new UnsupportedOperationException();
+      pConfig.put(pKey, pValue);
+      break;
     }
     case EmbeddedStructureList: {
       throw new UnsupportedOperationException();
@@ -554,6 +580,10 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       throw new UnsupportedOperationException();
     }
     case Timestamp: {
+      pConfig.put(pKey, pValue);
+      break;
+    }
+    case UUID: {
       pConfig.put(pKey, pValue);
       break;
     }
@@ -806,5 +836,115 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           transaction.rollback();
       }
     }
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#writeQueryBuilder(com.diamondq.common.model.generic.GenericToolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
+   */
+  @Override
+  public Query writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
+    Query result = super.writeQueryBuilder(pGenericToolkit, pScope, pQueryBuilder);
+
+    IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support =
+      mStructureStore.getIndexSupport();
+
+    if (support != null) {
+      /*
+       * For each of the columns, make sure there is an index that matches. At this point, index optimization is pretty
+       * minimal
+       */
+
+      StructureDefinition sd = result.getStructureDefinition();
+
+      /*
+       * Primary keys are already included in the KV's primary key, so skip those. However, if there is multiple primary
+       * keys, then include them, so that they can be accessed independently of the primary key
+       */
+      int primaryKeyCount =
+        Iterables.size(Iterables.filter(sd.getAllProperties().values(), (pd) -> (pd != null) && pd.isPrimaryKey()));
+
+      List<GenericWhereInfo> whereList = result.getWhereList();
+      KVIndexDefinitionBuilder<?> idb = support.createIndexDefinitionBuilder();
+      idb = idb.name(result.getQueryName()).tableName(sd.getName());
+      int colCount = 0;
+      boolean onlyPrimary = true;
+      for (GenericWhereInfo gwi : whereList) {
+        PropertyDefinition pd = sd.lookupPropertyDefinitionByName(gwi.key);
+        if (pd == null)
+          throw new IllegalArgumentException();
+        String colName = gwi.key;
+        if (pd.isPrimaryKey() == true) {
+          if (primaryKeyCount == 1)
+            continue;
+        }
+        else
+          onlyPrimary = false;
+        KVColumnType colType;
+        switch (pd.getType()) {
+        case String: {
+          colType = KVColumnType.String;
+          break;
+        }
+        case Binary: {
+          colType = KVColumnType.Binary;
+          break;
+        }
+        case Boolean: {
+          colType = KVColumnType.Boolean;
+          break;
+        }
+        case Decimal: {
+          colType = KVColumnType.Decimal;
+          break;
+        }
+        case EmbeddedStructureList:
+          throw new UnsupportedOperationException();
+        case Image:
+          throw new UnsupportedOperationException();
+        case Integer: {
+          colType = KVColumnType.Integer;
+          break;
+        }
+        case Long: {
+          colType = KVColumnType.Long;
+          break;
+        }
+        case PropertyRef: {
+          colType = KVColumnType.String;
+          break;
+        }
+        case StructureRef: {
+          colType = KVColumnType.String;
+          break;
+        }
+        case StructureRefList: {
+          colType = KVColumnType.String;
+          break;
+        }
+        case Timestamp: {
+          colType = KVColumnType.Timestamp;
+          break;
+        }
+        case UUID: {
+          colType = KVColumnType.UUID;
+          break;
+        }
+        default:
+          throw new UnsupportedOperationException();
+        }
+
+        IKVIndexColumn ic = support.createIndexColumnBuilder().name(colName).type(colType).build();
+        idb = idb.addColumn(ic);
+        colCount++;
+      }
+      if ((colCount > 0) && (onlyPrimary == false)) {
+        IKVIndexDefinition id = idb.build();
+        String tableName = id.getTableName();
+        validateKVStoreTableSetup(pGenericToolkit, pScope, tableName);
+        support.addRequiredIndexes(Collections.singleton(id));
+      }
+    }
+    return result;
   }
 }
