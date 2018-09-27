@@ -56,7 +56,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 
   private transient final Memoizer                       mMemoizer         = new Memoizer();
 
-  private static final Pattern                           sValidNamePattern = Pattern.compile("^[0-9a-zA-Z.-]+$");
+  private static final Pattern                           sValidNamePattern = Pattern.compile("^[0-9a-zA-Z.-_]+$");
 
   public GenericStructureDefinition(Scope pScope, String pName, int pRevision, @Nullable TranslatableString pLabel,
     boolean pSingleInstance, @Nullable Map<String, PropertyDefinition> pProperties,

@@ -60,7 +60,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   private final ImmutableMultimap<String, String>    mKeywords;
 
-  private static final Pattern                       sValidNamePattern = Pattern.compile("^[0-9a-zA-Z.\\-]+$");
+  private static final Pattern                       sValidNamePattern = Pattern.compile("^[0-9a-zA-Z.\\-_]+$");
 
   public GenericPropertyDefinition(Scope pScope, String pName, @Nullable TranslatableString pLabel,
     boolean pIsPrimaryKey, int pPrimaryKeyOrder, PropertyType pType, @Nullable Script pValidationScript,
