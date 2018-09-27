@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -255,6 +256,68 @@ public class PostgreSQL extends AbstractDialect {
     else {
       Calendar c = sCALENDAR.get();
       pPs.setTimestamp(pIndex, new Timestamp(pValue), c);
+    }
+  }
+
+  /**
+   * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getUUIDType()
+   */
+  @Override
+  public String getUUIDType() {
+    return "uuid";
+  }
+
+  /**
+   * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readUUID(java.sql.ResultSet, int)
+   */
+  @Override
+  public @Nullable UUID readUUID(ResultSet pRs, int pIndex) throws SQLException {
+    UUID value = pRs.getObject(pIndex, UUID.class);
+    if ((pRs.wasNull() == true) || (value == null))
+      return null;
+    return value;
+  }
+
+  /**
+   * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeUUID(java.sql.PreparedStatement, int, java.util.UUID)
+   */
+  @Override
+  public void writeUUID(PreparedStatement pPs, int pIndex, @Nullable UUID pValue) throws SQLException {
+    if (pValue == null)
+      pPs.setNull(pIndex, Types.JAVA_OBJECT);
+    else {
+      pPs.setObject(pIndex, pValue);
+    }
+  }
+
+  /**
+   * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getBinaryType(int)
+   */
+  @Override
+  public String getBinaryType(int pMaxLength) {
+    return "bytea(" + String.valueOf(pMaxLength) + ")";
+  }
+
+  /**
+   * @see com.diamondq.common.storage.jdbc.IJDBCDialect#readBinary(java.sql.ResultSet, int)
+   */
+  @Override
+  public byte @Nullable [] readBinary(ResultSet pRs, int pIndex) throws SQLException {
+    byte[] value = pRs.getBytes(pIndex);
+    if (pRs.wasNull() == true)
+      return null;
+    return value;
+  }
+
+  /**
+   * @see com.diamondq.common.storage.jdbc.IJDBCDialect#writeBinary(java.sql.PreparedStatement, int, byte[])
+   */
+  @Override
+  public void writeBinary(PreparedStatement pPs, int pIndex, byte @Nullable [] pValue) throws SQLException {
+    if (pValue == null)
+      pPs.setNull(pIndex, Types.BINARY);
+    else {
+      pPs.setBytes(pIndex, pValue);
     }
   }
 
