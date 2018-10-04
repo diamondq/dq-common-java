@@ -5,12 +5,12 @@ import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.EditorPropertyDefinition;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
+import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
-import com.diamondq.common.model.interfaces.Query;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StandardMigrations;
@@ -557,10 +557,10 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Query, java.util.Map)
+   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
-  public List<Structure> lookupStructuresByQuery(Scope pScope, Query pQuery,
+  public List<Structure> lookupStructuresByQuery(Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues) {
     return mToolkit.lookupStructuresByQuery(dewrapScope(pScope), pQuery, pParamValues);
   }
@@ -570,7 +570,7 @@ public class WrappedToolkit implements Toolkit {
    *      com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
-  public Query writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder) {
+  public ModelQuery writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder) {
     return mToolkit.writeQueryBuilder(dewrapScope(pScope), pQueryBuilder);
   }
 

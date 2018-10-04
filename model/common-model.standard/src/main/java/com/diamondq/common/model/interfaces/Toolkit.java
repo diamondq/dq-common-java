@@ -468,7 +468,7 @@ public interface Toolkit {
    * @param pQueryBuilder the query builder
    * @return the query
    */
-  public Query writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder);
+  public ModelQuery writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder);
 
   /**
    * Executes a previously written query
@@ -478,7 +478,7 @@ public interface Toolkit {
    * @param pParamValues the map of parameters
    * @return the result
    */
-  public List<Structure> lookupStructuresByQuery(Scope pScope, Query pQuery,
+  public List<Structure> lookupStructuresByQuery(Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues);
 
   /**

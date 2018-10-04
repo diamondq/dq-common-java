@@ -3,12 +3,12 @@ package com.diamondq.common.model.generic;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.EditorPropertyDefinition;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
+import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
-import com.diamondq.common.model.interfaces.Query;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StandardMigrations;
@@ -150,12 +150,13 @@ public interface PersistenceLayer {
   public EditorStructureDefinition createDynamicEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
     StructureDefinition pStructureDefinition);
 
-  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, Query pQuery,
+  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues);
 
-  public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition, String pQueryName);
+  public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition,
+    String pQueryName);
 
-  public Query writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder);
+  public ModelQuery writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder);
 
   public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
     @Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys);

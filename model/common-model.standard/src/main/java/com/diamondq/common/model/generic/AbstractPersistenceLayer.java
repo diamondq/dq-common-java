@@ -1,17 +1,16 @@
 package com.diamondq.common.model.generic;
 
-import com.diamondq.common.model.generic.GenericQuery.GenericWhereInfo;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.EditorPropertyDefinition;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
+import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.PropertyPattern;
 import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
-import com.diamondq.common.model.interfaces.Query;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Ref;
 import com.diamondq.common.model.interfaces.Scope;
@@ -22,7 +21,8 @@ import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
-import com.diamondq.common.model.interfaces.WhereOperator;
+import com.diamondq.common.storage.kv.WhereInfo;
+import com.diamondq.common.storage.kv.WhereOperator;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Strings;
@@ -499,11 +499,11 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
-  public Query writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
+  public ModelQuery writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
     try (Context context =
       mContextFactory.newContext(AbstractPersistenceLayer.class, this, pGenericToolkit, pScope, pQueryBuilder)) {
       GenericQueryBuilder gqb = (GenericQueryBuilder) pQueryBuilder;
-      return new GenericQuery(gqb.getStructureDefinition(), gqb.getQueryName(), gqb.getWhereList(),
+      return new GenericModelQuery(gqb.getStructureDefinition(), gqb.getQueryName(), gqb.getWhereList(),
         gqb.getParentParamKey(), gqb.getParentPropertyDefinition(), gqb.getSortList());
     }
   }
@@ -513,14 +513,14 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
    * matches. A better implementation would use indexes to do a more directed search.
    * 
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Query, java.util.Map)
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
-  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, Query pQuery,
+  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues) {
     try (Context context =
       mContextFactory.newContext(AbstractPersistenceLayer.class, this, pToolkit, pScope, pQuery, pParamValues)) {
-      GenericQuery gq = (GenericQuery) pQuery;
+      GenericModelQuery gq = (GenericModelQuery) pQuery;
 
       /* Analyze the query to see if it only refers to primary keys */
 
@@ -528,9 +528,9 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
       List<String> primaryKeyNames = structureDefinition.lookupPrimaryKeyNames();
       Set<String> primaryKeySet = Sets.newHashSet(primaryKeyNames);
 
-      List<GenericWhereInfo> whereList = gq.getWhereList();
+      List<WhereInfo> whereList = gq.getWhereList();
       boolean onlyPrimary = true;
-      for (GenericWhereInfo wi : whereList) {
+      for (WhereInfo wi : whereList) {
         if (primaryKeySet.contains(wi.key) == false) {
           onlyPrimary = false;
           break;
@@ -562,7 +562,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
       for (Structure test : allStructures) {
 
         boolean matches = true;
-        for (GenericWhereInfo w : whereList) {
+        for (WhereInfo w : whereList) {
           Property<@Nullable Object> prop = test.lookupPropertyByName(w.key);
           if (prop == null)
             continue;

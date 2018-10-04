@@ -1,5 +1,7 @@
 package com.diamondq.common.model.interfaces;
 
+import com.diamondq.common.storage.kv.WhereOperator;
+
 public interface QueryBuilder {
 
   public QueryBuilder andWhereConstant(String pKey, WhereOperator pOperator, Object pValue);

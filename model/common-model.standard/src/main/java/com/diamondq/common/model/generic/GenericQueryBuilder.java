@@ -1,10 +1,10 @@
 package com.diamondq.common.model.generic;
 
-import com.diamondq.common.model.generic.GenericQuery.GenericWhereInfo;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.StructureDefinition;
-import com.diamondq.common.model.interfaces.WhereOperator;
+import com.diamondq.common.storage.kv.WhereInfo;
+import com.diamondq.common.storage.kv.WhereOperator;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class GenericQueryBuilder implements QueryBuilder {
 
   private final String                               mQueryName;
 
-  private final ImmutableList<GenericWhereInfo>      mWhereList;
+  private final ImmutableList<WhereInfo>             mWhereList;
 
   private final @Nullable String                     mParentParamKey;
 
@@ -27,7 +27,7 @@ public class GenericQueryBuilder implements QueryBuilder {
   private final ImmutableList<Pair<String, Boolean>> mSortList;
 
   public GenericQueryBuilder(StructureDefinition pStructureDefinition, String pQueryName,
-    @Nullable List<GenericWhereInfo> pWhereList, @Nullable String pParentParamKey,
+    @Nullable List<WhereInfo> pWhereList, @Nullable String pParentParamKey,
     @Nullable PropertyDefinition pParentPropertyDefinition, @Nullable List<Pair<String, Boolean>> pSortList) {
     mStructureDefinition = pStructureDefinition;
     mQueryName = pQueryName;
@@ -50,7 +50,7 @@ public class GenericQueryBuilder implements QueryBuilder {
    *
    * @return the list
    */
-  List<GenericWhereInfo> getWhereList() {
+  List<WhereInfo> getWhereList() {
     return mWhereList;
   }
 
@@ -70,25 +70,24 @@ public class GenericQueryBuilder implements QueryBuilder {
 
   /**
    * @see com.diamondq.common.model.interfaces.QueryBuilder#andWhereConstant(java.lang.String,
-   *      com.diamondq.common.model.interfaces.WhereOperator, java.lang.Object)
+   *      com.diamondq.common.storage.kv.WhereOperator, java.lang.Object)
    */
   @Override
   public GenericQueryBuilder andWhereConstant(String pKey, WhereOperator pOperator, Object pValue) {
     return new GenericQueryBuilder(mStructureDefinition, mQueryName,
-      ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
-        .add(new GenericWhereInfo(pKey, pOperator, pValue, null)).build(),
+      ImmutableList.<WhereInfo> builder().addAll(mWhereList).add(new WhereInfo(pKey, pOperator, pValue, null)).build(),
       mParentParamKey, mParentPropertyDefinition, mSortList);
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.QueryBuilder#andWhereParam(java.lang.String,
-   *      com.diamondq.common.model.interfaces.WhereOperator, java.lang.String)
+   *      com.diamondq.common.storage.kv.WhereOperator, java.lang.String)
    */
   @Override
   public GenericQueryBuilder andWhereParam(String pKey, WhereOperator pOperator, String pParamKey) {
-    return new GenericQueryBuilder(mStructureDefinition, mQueryName,
-      ImmutableList.<GenericWhereInfo> builder().addAll(mWhereList)
-        .add(new GenericWhereInfo(pKey, pOperator, null, pParamKey)).build(),
+    return new GenericQueryBuilder(
+      mStructureDefinition, mQueryName, ImmutableList.<WhereInfo> builder().addAll(mWhereList)
+        .add(new WhereInfo(pKey, pOperator, null, pParamKey)).build(),
       mParentParamKey, mParentPropertyDefinition, mSortList);
   }
 

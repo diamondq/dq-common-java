@@ -1,10 +1,10 @@
 package com.diamondq.common.model.persistence;
 
-import com.diamondq.common.model.generic.GenericQuery.GenericWhereInfo;
 import com.diamondq.common.model.generic.PersistenceLayer;
+import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
-import com.diamondq.common.model.interfaces.Query;
 import com.diamondq.common.model.interfaces.StructureDefinition;
+import com.diamondq.common.storage.kv.WhereInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -12,19 +12,29 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
 
-public class CombinedQuery implements Query {
+public class CombinedQuery implements ModelQuery {
 
-  private Query                        mFirstQuery;
+  private ModelQuery                        mFirstQuery;
 
-  private Map<PersistenceLayer, Query> mMappedQueries;
+  private Map<PersistenceLayer, ModelQuery> mMappedQueries;
 
-  public CombinedQuery(Query pFirstQuery, Map<PersistenceLayer, Query> pMappedQueries) {
+  public CombinedQuery(ModelQuery pFirstQuery, Map<PersistenceLayer, ModelQuery> pMappedQueries) {
     mFirstQuery = pFirstQuery;
     mMappedQueries = pMappedQueries;
   }
 
-  public Map<PersistenceLayer, Query> getMappedQueries() {
+  public Map<PersistenceLayer, ModelQuery> getMappedQueries() {
     return mMappedQueries;
+  }
+
+  @Override
+  public String getDefinitionName() {
+    return mFirstQuery.getDefinitionName();
+  }
+
+  @Override
+  public @Nullable String getParentName() {
+    return mFirstQuery.getParentName();
   }
 
   @Override
@@ -38,7 +48,7 @@ public class CombinedQuery implements Query {
   }
 
   @Override
-  public List<GenericWhereInfo> getWhereList() {
+  public List<WhereInfo> getWhereList() {
     return mFirstQuery.getWhereList();
   }
 
