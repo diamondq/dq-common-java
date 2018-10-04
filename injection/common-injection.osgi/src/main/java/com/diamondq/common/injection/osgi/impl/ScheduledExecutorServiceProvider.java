@@ -10,6 +10,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
+/**
+ * NOTE: Scheduled Executor Service's are not intended for long running tasks. The service will generally only run the
+ * core-pool-size # of threads at a time. Additional tasks will simply queue until one is available.
+ */
 public class ScheduledExecutorServiceProvider extends AbstractOSGiConstructor {
 
   public ScheduledExecutorServiceProvider() {
