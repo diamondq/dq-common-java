@@ -5,6 +5,7 @@ import com.cloudant.client.api.model.Response;
 import com.cloudant.client.org.lightcouch.NoDocumentException;
 import com.diamondq.common.storage.kv.IKVTransaction;
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
+import com.diamondq.common.storage.kv.Query;
 import com.diamondq.common.storage.kv.impl.PrimitiveWrappers;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -14,6 +15,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -168,4 +171,12 @@ public class CloudantKVTransaction implements IKVTransaction {
   public void rollback() {
   }
 
+  /**
+   * @see com.diamondq.common.storage.kv.IKVTransaction#executeQuery(com.diamondq.common.storage.kv.Query,
+   *      java.lang.Class, java.util.Map)
+   */
+  @Override
+  public <O> List<O> executeQuery(Query pQuery, Class<O> pClass, Map<String, Object> pParamValues) {
+    throw new UnsupportedOperationException();
+  }
 }
