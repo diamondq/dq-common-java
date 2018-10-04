@@ -513,6 +513,22 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
       if (config == null)
         return context.exit(null);
 
+      return context.exit(convertToStructure(pToolkit, pScope, pKey, config));
+    }
+  }
+
+  /**
+   * Helper function that converts a structure object into a structure
+   * 
+   * @param pToolkit the toolkit
+   * @param pScope the scope
+   * @param pKey the key of the object
+   * @param config the object
+   * @return the structure
+   */
+  protected Structure convertToStructure(Toolkit pToolkit, Scope pScope, String pKey, STRUCTURECONFIGOBJ config) {
+    try (Context context =
+      mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pToolkit, pScope, pKey, config)) {
       String fullStructureDefName =
         getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
       if (fullStructureDefName == null)
