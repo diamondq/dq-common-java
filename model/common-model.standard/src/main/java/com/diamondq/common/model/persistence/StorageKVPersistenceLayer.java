@@ -1,15 +1,15 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
-import com.diamondq.common.model.generic.GenericQuery.GenericWhereInfo;
+import com.diamondq.common.model.generic.GenericModelQuery;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.CommonKeywordValues;
+import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyType;
-import com.diamondq.common.model.interfaces.Query;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
@@ -28,9 +28,11 @@ import com.diamondq.common.storage.kv.KVColumnType;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
+import com.diamondq.common.storage.kv.WhereInfo;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.builders.IBuilder;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -252,6 +254,9 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
                 String colName = pd.getName();
                 colBuilder = colBuilder.name(colName);
 
+                if (pd.isPrimaryKey())
+                  colBuilder = colBuilder.primaryKey();
+
                 switch (pd.getType()) {
                 case String: {
                   colBuilder = colBuilder.type(KVColumnType.String);
@@ -317,6 +322,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
                 builder = builder.addColumn(colBuilder.build());
               }
+              if (singlePrimaryKey.isEmpty() == false)
+                builder = builder.singlePrimaryKeyName(singlePrimaryKey);
               tableDefinitionSupport.addTableDefinition(builder.build());
             }
             catch (RuntimeException ex) {
@@ -843,8 +850,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
-  public Query writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
-    Query result = super.writeQueryBuilder(pGenericToolkit, pScope, pQueryBuilder);
+  public ModelQuery writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
+    ModelQuery result = super.writeQueryBuilder(pGenericToolkit, pScope, pQueryBuilder);
 
     IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support =
       mStructureStore.getIndexSupport();
@@ -864,12 +871,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       int primaryKeyCount =
         Iterables.size(Iterables.filter(sd.getAllProperties().values(), (pd) -> (pd != null) && pd.isPrimaryKey()));
 
-      List<GenericWhereInfo> whereList = result.getWhereList();
+      List<WhereInfo> whereList = result.getWhereList();
       KVIndexDefinitionBuilder<?> idb = support.createIndexDefinitionBuilder();
       idb = idb.name(result.getQueryName()).tableName(sd.getName());
       int colCount = 0;
       boolean onlyPrimary = true;
-      for (GenericWhereInfo gwi : whereList) {
+      for (WhereInfo gwi : whereList) {
         PropertyDefinition pd = sd.lookupPropertyDefinitionByName(gwi.key);
         if (pd == null)
           throw new IllegalArgumentException();
@@ -946,5 +953,67 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       }
     }
     return result;
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   */
+  @Override
+  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    try (Context context =
+      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pQuery, pParamValues)) {
+      GenericModelQuery gq = (GenericModelQuery) pQuery;
+
+      String defName = gq.getDefinitionName();
+      Integer revision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, defName);
+      if (revision == null)
+        throw new IllegalArgumentException();
+      List<String> propNames = gq.getStructureDefinition().lookupPrimaryKeyNames();
+
+      IKVTransaction transaction = mStructureStore.startTransaction();
+      boolean success = false;
+      try {
+        validateKVStoreTableSetup(pToolkit, pScope, defName);
+
+        @SuppressWarnings({"unchecked", "cast", "rawtypes"})
+        List<Map<String, Object>> queryResults = (List<Map<String, Object>>) (List) transaction.executeQuery(gq,
+          Map.class, (pParamValues == null ? Collections.emptyMap() : pParamValues));
+        ImmutableList.Builder<Structure> builder = ImmutableList.builder();
+        for (Map<String, Object> queryResult : queryResults) {
+
+          // ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
+          // String primaryKey = mConfiguredTableDefinitions.get(defName);
+          // if ((primaryKey != null) && (primaryKey.isEmpty() == false))
+          // configMap.put(primaryKey, unescapeValue(containerAndPrimaryKey.primary));
+
+          StringBuilder primaryKeyBuilder = new StringBuilder();
+          primaryKeyBuilder.append(defName);
+          primaryKeyBuilder.append('/');
+
+          List<@Nullable Object> names = Lists.transform(propNames, (n) -> {
+            if (n == null)
+              throw new IllegalArgumentException("The name must not be null");
+            return queryResult.get(n);
+          });
+          primaryKeyBuilder.append(pToolkit.collapsePrimaryKeys(pScope, names));
+          String key = primaryKeyBuilder.toString();
+
+          queryResult.put("structureDef", new StringBuilder(defName).append(':').append(revision).toString());
+
+          builder.add(convertToStructure(pToolkit, pScope, key, queryResult));
+        }
+
+        success = true;
+        return context.exit(builder.build());
+      }
+      finally {
+        if (success == true)
+          transaction.commit();
+        else
+          transaction.rollback();
+      }
+    }
   }
 }
