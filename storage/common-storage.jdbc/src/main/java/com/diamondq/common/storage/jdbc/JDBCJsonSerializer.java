@@ -1,5 +1,6 @@
 package com.diamondq.common.storage.jdbc;
 
+import com.diamondq.common.storage.kv.IKVColumnDefinition;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,4 +34,13 @@ public class JDBCJsonSerializer implements IPreparedStatementSerializer {
     }
   }
 
+  /**
+   * @see com.diamondq.common.storage.jdbc.IPreparedStatementSerializer#serializeColumnToPreparedStatement(java.lang.Object,
+   *      com.diamondq.common.storage.kv.IKVColumnDefinition, java.sql.PreparedStatement, int)
+   */
+  @Override
+  public void serializeColumnToPreparedStatement(@Nullable Object pValue, IKVColumnDefinition pColDef,
+    PreparedStatement pPs, int pParamCount) {
+    throw new UnsupportedOperationException();
+  }
 }

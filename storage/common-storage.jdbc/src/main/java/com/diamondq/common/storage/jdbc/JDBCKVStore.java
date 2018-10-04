@@ -13,7 +13,9 @@ import com.diamondq.common.storage.kv.KVColumnDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
+import com.diamondq.common.storage.kv.Query;
 import com.diamondq.common.storage.kv.SyncWrapperAsyncKVTransaction;
+import com.diamondq.common.storage.kv.WhereInfo;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.builders.IBuilder;
@@ -21,8 +23,8 @@ import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.MapDifference.ValueDifference;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -30,12 +32,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -614,7 +618,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
         IPreparedStatementSerializer serializer = new JDBCColumnSerializer(mDialect, pDefinition);
 
         tableInfo = new JDBCTableInfo(getBySQL, supportsUpsert, putBySQL, putQueryBySQL, putInsertBySQL, putUpdateBySQL,
-          deserializer, serializer, removeBySQL, getCountSQL, clearSQL, keyIteratorSQL, keyIterator2SQL);
+          deserializer, serializer, removeBySQL, getCountSQL, clearSQL, keyIteratorSQL, keyIterator2SQL,
+          mungedTableName, tableSchema, pDefinition);
         mTableCache.put(pDefinition.getTableName(), tableInfo);
       }
     }
@@ -637,5 +642,113 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
       partial = partial + "_";
     }
     return partial;
+  }
+
+  /**
+   * Lookup or build the SQL query necessary to perform the query
+   * 
+   * @param pInfo the table info
+   * @param pQuery the query
+   * @return the SQL
+   */
+  public String getQuerySQL(JDBCTableInfo pInfo, Query pQuery) {
+    String querySQL = pInfo.querySQL.get(pQuery);
+    if (querySQL != null)
+      return querySQL;
+    try (Context context = mContextFactory.newContext(JDBCKVStore.class, this, pInfo, pQuery)) {
+
+      /* Build the query sql */
+
+      StringBuilder sb = new StringBuilder();
+
+      sb.append("SELECT ");
+
+      sb.append(String.join(",",
+        Iterables.concat(
+          Iterables.transform(pInfo.definition.getColumnDefinitions(),
+            (cd) -> cd == null ? null : escapeColumnName(cd.getName())),
+          Lists.newArrayList(sPRIMARY_KEY_1, sPRIMARY_KEY_2))));
+      sb.append(" FROM ");
+      if (pInfo.tableSchema != null)
+        sb.append(pInfo.tableSchema).append('.');
+      sb.append(pInfo.mungedTableName);
+
+      List<WhereInfo> whereList = pQuery.getWhereList();
+      if (whereList.isEmpty() == false) {
+        sb.append(" WHERE ");
+        boolean isFirstWhere = true;
+        for (WhereInfo where : whereList) {
+          if (isFirstWhere == true)
+            isFirstWhere = false;
+          else
+            sb.append(" AND ");
+          IKVColumnDefinition colDef = pInfo.definition.getColumnDefinitionsByName(where.key);
+          if (colDef == null) {
+            String singlePrimaryKeyName = pInfo.definition.getSinglePrimaryKeyName();
+            if ((singlePrimaryKeyName == null) || (where.key.equals(singlePrimaryKeyName) == false))
+              throw new IllegalArgumentException();
+            sb.append(sPRIMARY_KEY_1);
+            sb.append("=");
+            sb.append("'__ROOT__'");
+            sb.append(" AND ");
+            sb.append(sPRIMARY_KEY_2);
+          }
+          else
+            sb.append(escapeColumnName(colDef.getName()));
+          switch (where.operator) {
+          case eq:
+            sb.append("=");
+            break;
+          case gt:
+            sb.append(">");
+            break;
+          case gte:
+            sb.append(">=");
+            break;
+          case lt:
+            sb.append("<");
+            break;
+          case lte:
+            sb.append("<=");
+            break;
+          case ne:
+            sb.append("!=");
+            break;
+          }
+          sb.append("?");
+        }
+      }
+
+      List<Pair<String, Boolean>> sortList = pQuery.getSortList();
+      if (sortList.isEmpty() == false) {
+        sb.append(" ORDER BY ");
+        boolean firstSort = true;
+        for (Pair<String, Boolean> sort : sortList) {
+          if (firstSort == true)
+            firstSort = false;
+          else
+            sb.append(", ");
+          IKVColumnDefinition colDef = pInfo.definition.getColumnDefinitionsByName(sort.getValue0());
+          if (colDef == null) {
+            String singlePrimaryKeyName = pInfo.definition.getSinglePrimaryKeyName();
+            if ((singlePrimaryKeyName == null) || (sort.getValue0().equals(singlePrimaryKeyName) == false))
+              throw new IllegalArgumentException();
+            sb.append(sPRIMARY_KEY_2);
+          }
+          else
+            sb.append(escapeColumnName(colDef.getName()));
+          if (sort.getValue1() == true)
+            sb.append(" ASC");
+          else
+            sb.append(" DESC");
+        }
+      }
+
+      String newQuerySQL = sb.toString();
+      if ((querySQL = pInfo.querySQL.putIfAbsent(pQuery, newQuerySQL)) == null)
+        querySQL = newQuerySQL;
+    }
+
+    return querySQL;
   }
 }

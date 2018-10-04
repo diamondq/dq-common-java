@@ -9,9 +9,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class JDBCColumnDefinition extends GenericKVColumnDefinition {
 
-  public JDBCColumnDefinition(String pName, KVColumnType pType, @Nullable Integer pMaxLength,
+  public JDBCColumnDefinition(String pName, KVColumnType pType, boolean pIsPrimaryKey, @Nullable Integer pMaxLength,
     @Nullable BigDecimal pMinValue, @Nullable BigDecimal pMaxValue) {
-    super(pName, pType, pMaxLength, pMinValue, pMaxValue);
+    super(pName, pType, pIsPrimaryKey, pMaxLength, pMinValue, pMaxValue);
   }
 
 }

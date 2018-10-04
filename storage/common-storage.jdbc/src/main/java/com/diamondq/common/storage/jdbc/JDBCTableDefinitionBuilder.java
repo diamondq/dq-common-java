@@ -13,7 +13,7 @@ public class JDBCTableDefinitionBuilder extends KVTableDefinitionBuilder<JDBCTab
     String tableName = mTableName;
     if (tableName == null)
       throw new IllegalArgumentException("The table name was not set in the JDBCTableDefinitionBuilder");
-    return new JDBCTableDefinition(tableName, mColBuilder.build());
+    return new JDBCTableDefinition(tableName, mSinglePrimaryKeyName, mColBuilder.build());
   }
 
 }

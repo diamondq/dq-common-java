@@ -27,6 +27,8 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
   @Nullable
   protected KVColumnType mType;
 
+  protected boolean      mIsPrimaryKey = false;
+
   /**
    * Sets the name
    * 
@@ -36,6 +38,17 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
   @SuppressWarnings("unchecked")
   public CDB name(String pValue) {
     mName = pValue;
+    return (CDB) this;
+  }
+
+  /**
+   * Sets that this column is a primary key
+   * 
+   * @return the builder
+   */
+  @SuppressWarnings("unchecked")
+  public CDB primaryKey() {
+    mIsPrimaryKey = true;
     return (CDB) this;
   }
 

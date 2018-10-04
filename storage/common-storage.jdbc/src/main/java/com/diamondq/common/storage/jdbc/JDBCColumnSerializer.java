@@ -22,20 +22,16 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
     mDefinition = pDefinition;
   }
 
+  /**
+   * @see com.diamondq.common.storage.jdbc.IPreparedStatementSerializer#serializeColumnToPreparedStatement(java.lang.Object,
+   *      com.diamondq.common.storage.kv.IKVColumnDefinition, java.sql.PreparedStatement, int)
+   */
   @Override
-  public <@Nullable O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
-    throws SQLException {
-    if (pObj == null)
-      throw new UnsupportedOperationException();
-    if (Map.class.isAssignableFrom(pObj.getClass()) == false)
-      throw new UnsupportedOperationException();
-    @SuppressWarnings("unchecked")
-    Map<String, Object> data = (Map<String, Object>) pObj;
-    int index = pStartAtIndex;
-    for (IKVColumnDefinition cd : mDefinition.getColumnDefinitions()) {
-      switch (cd.getType()) {
+  public void serializeColumnToPreparedStatement(@Nullable Object obj, IKVColumnDefinition pColDef,
+    PreparedStatement pPs, int pParamCount) {
+    try {
+      switch (pColDef.getType()) {
       case Boolean: {
-        Object obj = data.get(cd.getName());
         Boolean value;
         if (obj == null)
           value = null;
@@ -45,13 +41,12 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           value = (Boolean) obj;
         else
           throw new IllegalArgumentException("Only Boolean or String supported, but found " + obj.getClass());
-        mDialect.writeBoolean(pPs, index, value);
+        mDialect.writeBoolean(pPs, pParamCount, value);
         break;
       }
       case Decimal: {
-        Object obj = data.get(cd.getName());
-        BigDecimal minValue = cd.getMinValue();
-        BigDecimal maxValue = cd.getMaxValue();
+        BigDecimal minValue = pColDef.getMinValue();
+        BigDecimal maxValue = pColDef.getMaxValue();
         if ((minValue != null) && (minValue.equals(JDBCKVStore.sLONG_MIN_VALUE)) && (maxValue != null)
           && (maxValue.equals(JDBCKVStore.sLONG_MAX_VALUE))) {
           Long value;
@@ -66,7 +61,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           else
             throw new IllegalArgumentException(
               "Only Long, BigDecimal or String supported, but found " + obj.getClass());
-          mDialect.writeLong(pPs, index, value);
+          mDialect.writeLong(pPs, pParamCount, value);
         }
         else {
           BigDecimal value;
@@ -78,12 +73,11 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
             value = (BigDecimal) obj;
           else
             throw new IllegalArgumentException("Only BigDecimal or String supported, but found " + obj.getClass());
-          mDialect.writeDecimal(pPs, index, value);
+          mDialect.writeDecimal(pPs, pParamCount, value);
         }
         break;
       }
       case Integer: {
-        Object obj = data.get(cd.getName());
         Integer value;
         if (obj == null)
           value = null;
@@ -96,11 +90,10 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
         else
           throw new IllegalArgumentException(
             "Only Integer, BigDecimal or String supported, but found " + obj.getClass());
-        mDialect.writeInteger(pPs, index, value);
+        mDialect.writeInteger(pPs, pParamCount, value);
         break;
       }
       case Long: {
-        Object obj = data.get(cd.getName());
         Long value;
         if (obj == null)
           value = null;
@@ -115,11 +108,10 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
         else
           throw new IllegalArgumentException(
             "Only Integer, Long, BigDecimal or String supported, but found " + obj.getClass());
-        mDialect.writeLong(pPs, index, value);
+        mDialect.writeLong(pPs, pParamCount, value);
         break;
       }
       case String: {
-        Object obj = data.get(cd.getName());
         String value;
         if (obj == null)
           value = null;
@@ -127,15 +119,14 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           value = (String) obj;
         else
           throw new IllegalArgumentException("Only String supported, but found " + obj.getClass());
-        Integer maxLength = cd.getMaxLength();
+        Integer maxLength = pColDef.getMaxLength();
         if (maxLength != null)
-          mDialect.writeText(pPs, index, value);
+          mDialect.writeText(pPs, pParamCount, value);
         else
-          mDialect.writeUnlimitedText(pPs, index, value);
+          mDialect.writeUnlimitedText(pPs, pParamCount, value);
         break;
       }
       case Timestamp: {
-        Object obj = data.get(cd.getName());
         Long value;
         if (obj == null)
           value = null;
@@ -147,11 +138,10 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           value = ((BigDecimal) obj).longValue();
         else
           throw new IllegalArgumentException("Only Long, BigDecimal or String supported, but found " + obj.getClass());
-        mDialect.writeTimestamp(pPs, index, value);
+        mDialect.writeTimestamp(pPs, pParamCount, value);
         break;
       }
       case UUID: {
-        Object obj = data.get(cd.getName());
         UUID value;
         if (obj == null)
           value = null;
@@ -159,11 +149,10 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           value = (UUID) obj;
         else
           throw new IllegalArgumentException("Only UUID supported, but found " + obj.getClass());
-        mDialect.writeUUID(pPs, index, value);
+        mDialect.writeUUID(pPs, pParamCount, value);
         break;
       }
       case Binary: {
-        Object obj = data.get(cd.getName());
         byte[] value;
         if (obj == null)
           value = null;
@@ -171,10 +160,29 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           value = (byte[]) obj;
         else
           throw new IllegalArgumentException("Only byte[] supported, but found " + obj.getClass());
-        mDialect.writeBinary(pPs, index, value);
+        mDialect.writeBinary(pPs, pParamCount, value);
         break;
       }
       }
+    }
+    catch (SQLException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  @Override
+  public <@Nullable O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
+    throws SQLException {
+    if (pObj == null)
+      throw new UnsupportedOperationException();
+    if (Map.class.isAssignableFrom(pObj.getClass()) == false)
+      throw new UnsupportedOperationException();
+    @SuppressWarnings("unchecked")
+    Map<String, Object> data = (Map<String, Object>) pObj;
+    int index = pStartAtIndex;
+    for (IKVColumnDefinition cd : mDefinition.getColumnDefinitions()) {
+      Object obj = data.get(cd.getName());
+      serializeColumnToPreparedStatement(obj, cd, pPs, index);
       index++;
     }
     return index;

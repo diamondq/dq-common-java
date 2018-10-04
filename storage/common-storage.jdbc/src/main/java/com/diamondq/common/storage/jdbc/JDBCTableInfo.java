@@ -1,5 +1,13 @@
 package com.diamondq.common.storage.jdbc;
 
+import com.diamondq.common.storage.kv.IKVTableDefinition;
+import com.diamondq.common.storage.kv.Query;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class JDBCTableInfo {
 
   /**
@@ -61,10 +69,31 @@ public class JDBCTableInfo {
    */
   public final String                       keyIterator2SQL;
 
+  /**
+   * A Map for caching the query SQL for a given Query object
+   */
+  public final ConcurrentMap<Query, String> querySQL;
+
+  /**
+   * The actual munged table name (without schema)
+   */
+  public final String                       mungedTableName;
+
+  /**
+   * The table schema
+   */
+  public final @Nullable String             tableSchema;
+
+  /**
+   * The table definition
+   */
+  public final IKVTableDefinition           definition;
+
   public JDBCTableInfo(String pGetBySQL, boolean pSupportsUpsert, String pPutBySQL, String pPutQueryBySQL,
     String pPutInsertBySQL, String pPutUpdateBySQL, IResultSetDeserializer pDeserializer,
     IPreparedStatementSerializer pSerializer, String pRemoveBySQL, String pGetCountSQL, String pClearSQL,
-    String pKeyIteratorSQL, String pKeyIterator2SQL) {
+    String pKeyIteratorSQL, String pKeyIterator2SQL, String pMungedTableName, @Nullable String pTableSchema,
+    IKVTableDefinition pDefinition) {
     super();
     getBySQL = pGetBySQL;
     supportsUpsert = pSupportsUpsert;
@@ -79,6 +108,10 @@ public class JDBCTableInfo {
     clearSQL = pClearSQL;
     keyIteratorSQL = pKeyIteratorSQL;
     keyIterator2SQL = pKeyIterator2SQL;
+    mungedTableName = pMungedTableName;
+    tableSchema = pTableSchema;
+    definition = pDefinition;
+    querySQL = new ConcurrentHashMap<>();
   }
 
 }

@@ -13,6 +13,8 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
 
   private final KVColumnType mType;
 
+  private final boolean      mIsPrimaryKey;
+
   @Nullable
   private final Integer      mMaxLength;
 
@@ -27,15 +29,17 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
    * 
    * @param pName the name
    * @param pType the type
+   * @param pIsPrimaryKey true if this is the primary key
    * @param pMaxLength the max length (can be null)
    * @param pMinValue the min value (can be null)
    * @param pMaxValue the max value (can be null)
    */
-  public GenericKVColumnDefinition(String pName, KVColumnType pType, @Nullable Integer pMaxLength,
-    @Nullable BigDecimal pMinValue, @Nullable BigDecimal pMaxValue) {
+  public GenericKVColumnDefinition(String pName, KVColumnType pType, boolean pIsPrimaryKey,
+    @Nullable Integer pMaxLength, @Nullable BigDecimal pMinValue, @Nullable BigDecimal pMaxValue) {
     super();
     mName = pName;
     mType = pType;
+    mIsPrimaryKey = pIsPrimaryKey;
     mMaxLength = pMaxLength;
     mMinValue = pMinValue;
     mMaxValue = pMaxValue;
@@ -47,6 +51,14 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
   @Override
   public String getName() {
     return mName;
+  }
+
+  /**
+   * @see com.diamondq.common.storage.kv.IKVColumnDefinition#isPrimaryKey()
+   */
+  @Override
+  public boolean isPrimaryKey() {
+    return mIsPrimaryKey;
   }
 
   /**

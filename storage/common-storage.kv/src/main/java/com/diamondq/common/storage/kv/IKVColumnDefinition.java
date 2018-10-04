@@ -24,6 +24,13 @@ public interface IKVColumnDefinition {
   public KVColumnType getType();
 
   /**
+   * Returns whether this column is part of the primary key
+   * 
+   * @return true or false
+   */
+  public boolean isPrimaryKey();
+
+  /**
    * Returns the maximum length of the column
    * 
    * @return the max length (or null if it doesn't apply)

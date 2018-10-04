@@ -1,6 +1,9 @@
 package com.diamondq.common.storage.jdbc;
 
+import com.diamondq.common.storage.kv.IKVColumnDefinition;
 import com.diamondq.common.storage.kv.IKVTransaction;
+import com.diamondq.common.storage.kv.Query;
+import com.diamondq.common.storage.kv.WhereInfo;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Predicates;
@@ -12,6 +15,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -380,6 +385,53 @@ public class JDBCKVTransaction implements IKVTransaction {
         }
         throw new RuntimeException(ex);
       }
+    }
+  }
+
+  /**
+   * @see com.diamondq.common.storage.kv.IKVTransaction#executeQuery(com.diamondq.common.storage.kv.Query,
+   *      java.lang.Class, java.util.Map)
+   */
+  @Override
+  public <O> List<O> executeQuery(Query pQuery, Class<O> pClass, Map<String, Object> pParamValues) {
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pQuery, pClass)) {
+      ImmutableList.Builder<O> builder = ImmutableList.builder();
+      try {
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        String table = pQuery.getDefinitionName();
+        JDBCTableInfo info = mStore.validateTable(c, table, pClass);
+        String querySQL = mStore.getQuerySQL(info, pQuery);
+        try (PreparedStatement ps = c.prepareStatement(querySQL)) {
+          sLogger.trace("{}", querySQL);
+          List<WhereInfo> whereList = pQuery.getWhereList();
+          int paramCount = 0;
+          for (WhereInfo where : whereList) {
+            paramCount++;
+            Object value;
+            if (where.constant != null)
+              value = where.constant;
+            else
+              value = pParamValues.get(where.paramKey);
+            IKVColumnDefinition colDef = info.definition.getColumnDefinitionsByName(where.key);
+            if (colDef == null)
+              throw new UnsupportedOperationException();
+            info.serializer.serializeColumnToPreparedStatement(value, colDef, ps, paramCount);
+            ps.setObject(paramCount, value);
+          }
+          try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next() == true)
+              builder.add(info.deserializer.deserializeFromResultSet(rs, pClass));
+          }
+        }
+      }
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
+
+      return builder.build();
     }
   }
 

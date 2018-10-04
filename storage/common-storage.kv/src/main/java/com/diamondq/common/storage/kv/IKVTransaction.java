@@ -3,6 +3,8 @@ package com.diamondq.common.storage.kv;
 import com.google.common.collect.Iterators;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -97,4 +99,14 @@ public interface IKVTransaction {
    * Rolls back the changes in this transaction
    */
   public void rollback();
+
+  /**
+   * Executes the given query
+   * 
+   * @param pQuery the query
+   * @param pClass the result class
+   * @param pParamValues the parameters
+   * @return the result list
+   */
+  public <O> List<O> executeQuery(Query pQuery, Class<O> pClass, Map<String, Object> pParamValues);
 }

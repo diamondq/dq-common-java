@@ -1,5 +1,7 @@
 package com.diamondq.common.storage.jdbc;
 
+import com.diamondq.common.storage.kv.IKVColumnDefinition;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -18,5 +20,16 @@ public interface IPreparedStatementSerializer {
    */
   public <@Nullable O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
     throws SQLException;
+
+  /**
+   * Serializes a single column definition to the prepared statement
+   * 
+   * @param pValue the value
+   * @param pColDef the column definition
+   * @param pPs the prepared statement
+   * @param pParamCount the parameter count
+   */
+  public void serializeColumnToPreparedStatement(@Nullable Object pValue, IKVColumnDefinition pColDef,
+    PreparedStatement pPs, int pParamCount);
 
 }

@@ -12,8 +12,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public abstract class KVTableDefinitionBuilder<@NonNull TDB extends KVTableDefinitionBuilder<@NonNull TDB>> {
 
-  @Nullable
-  protected String                                     mTableName;
+  protected @Nullable String                           mTableName;
+
+  protected @Nullable String                           mSinglePrimaryKeyName;
 
   protected ImmutableList.Builder<IKVColumnDefinition> mColBuilder = ImmutableList.builder();
 
@@ -33,6 +34,18 @@ public abstract class KVTableDefinitionBuilder<@NonNull TDB extends KVTableDefin
   @SuppressWarnings("unchecked")
   public TDB tableName(String pValue) {
     mTableName = pValue;
+    return (TDB) this;
+  }
+
+  /**
+   * Sets the single primary key column name
+   * 
+   * @param pValue the name
+   * @return the builder
+   */
+  @SuppressWarnings("unchecked")
+  public TDB singlePrimaryKeyName(String pValue) {
+    mSinglePrimaryKeyName = pValue;
     return (TDB) this;
   }
 
