@@ -1,6 +1,7 @@
 package com.diamondq.common.model.generic;
 
 import com.diamondq.common.lambda.Memoizer;
+import com.diamondq.common.model.Messages;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.Scope;
@@ -8,6 +9,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
@@ -56,7 +58,7 @@ public class GenericStructureDefinition implements StructureDefinition {
 
   private transient final Memoizer                       mMemoizer         = new Memoizer();
 
-  private static final Pattern                           sValidNamePattern = Pattern.compile("^[0-9a-zA-Z.-_]+$");
+  private static final Pattern                           sValidNamePattern = Pattern.compile("^[0-9a-zA-Z.\\-_]+$");
 
   public GenericStructureDefinition(Scope pScope, String pName, int pRevision, @Nullable TranslatableString pLabel,
     boolean pSingleInstance, @Nullable Map<String, PropertyDefinition> pProperties,
@@ -83,8 +85,7 @@ public class GenericStructureDefinition implements StructureDefinition {
   public void validate() {
 
     if (sValidNamePattern.matcher(mName).matches() == false)
-      throw new IllegalArgumentException(
-        "The StructureDefinition must have a valid name, which can only be the characters 0-9, a-z, A-Z, . and -.");
+      throw new ExtendedIllegalArgumentException(Messages.INVALIDSTRUCTURENAME, mName);
   }
 
   /**
