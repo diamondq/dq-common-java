@@ -2,9 +2,13 @@ package com.diamondq.common.storage.kv.inmemory.impl;
 
 import com.diamondq.common.storage.kv.AbstractKVTransaction;
 import com.diamondq.common.storage.kv.IKVTransaction;
+import com.diamondq.common.storage.kv.Query;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -127,4 +131,27 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
   public void rollback() {
   }
 
+  /**
+   * @see com.diamondq.common.storage.kv.IKVTransaction#executeQuery(com.diamondq.common.storage.kv.Query,
+   *      java.lang.Class, java.util.Map)
+   */
+  @Override
+  public <O> List<O> executeQuery(Query pQuery, Class<O> pClass, Map<String, Object> pParamValues) {
+    String tableName = pQuery.getDefinitionName();
+    ConcurrentMap<String, @Nullable String> table = getFromTable(tableName);
+    ImmutableList.Builder<O> builder = ImmutableList.builder();
+    for (@Nullable
+    String value : table.values()) {
+      if (value == null)
+        continue;
+      @SuppressWarnings("unused")
+      O obj = getObjFromString(tableName, pClass, value);
+
+      /* Not sure how to do the search at this point */
+
+      throw new UnsupportedOperationException();
+    }
+
+    return builder.build();
+  }
 }
