@@ -1,4 +1,4 @@
-package com.diamondq.common.model.interfaces;
+package com.diamondq.common.storage.kv;
 
 public enum WhereOperator {
 
