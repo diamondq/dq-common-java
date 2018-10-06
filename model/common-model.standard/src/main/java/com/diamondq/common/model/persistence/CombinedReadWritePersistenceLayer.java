@@ -213,6 +213,10 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
     PersistenceLayer pEditorStructureDefinitionWriteLayer, @Nullable PersistenceLayer pResourceReadLayer,
     PersistenceLayer pResourceWriteLayer) {
     super(pContextFactory);
+    ContextFactory.staticReportTrace(CombinedReadWritePersistenceLayer.class, this, pStructureReadLayer,
+      pStructureWriteLayer, pStructureDefinitionReadLayer, pStructureDefinitionWriteLayer,
+      pEditorStructureDefinitionReadLayer, pEditorStructureDefinitionWriteLayer, pResourceReadLayer,
+      pResourceWriteLayer);
     mStructureReadLayer = pStructureReadLayer;
     mStructureWriteLayer = pStructureWriteLayer;
     mStructureDefinitionReadLayer = pStructureDefinitionReadLayer;
@@ -230,6 +234,19 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
   @Override
   public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
     mStructureDefinitionWriteLayer.writeStructureDefinition(pToolkit, pScope, pValue);
+    enableStructureDefinition(pToolkit, pScope, pValue);
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#enableStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
+    PersistenceLayer readLayer = mStructureDefinitionReadLayer;
+    if (readLayer != null)
+      readLayer.enableStructureDefinition(pToolkit, pScope, pValue);
+    mStructureWriteLayer.enableStructureDefinition(pToolkit, pScope, pValue);
   }
 
   /**

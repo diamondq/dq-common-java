@@ -39,6 +39,16 @@ public interface PersistenceLayer {
 
   public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
+  /**
+   * Only called by the CombinedPeristenceLayer to enable the StructureDefinition on layers that don't persist the
+   * structure.
+   * 
+   * @param pToolkit
+   * @param pScope
+   * @param pValue
+   */
+  public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
+
   public void deleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
   public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope);

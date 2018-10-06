@@ -53,6 +53,8 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
     List<PersistenceLayer> pEditorStructureDefinitionPersistenceLayer,
     List<PersistenceLayer> pResourcePersistenceLayer) {
     super(pContextFactory);
+    ContextFactory.staticReportTrace(CombinedPersistenceLayer.class, this, pStructurePersistenceLayer,
+      pStructureDefinitionPersistenceLayer, pEditorStructureDefinitionPersistenceLayer, pResourcePersistenceLayer);
     mStructurePersistenceLayer = ImmutableList.copyOf(pStructurePersistenceLayer);
     mStructurePersistenceLayerIsSingleton = (mStructurePersistenceLayer.size() == 1);
     mStructureDefinitionPersistenceLayer = ImmutableList.copyOf(pStructureDefinitionPersistenceLayer);
@@ -80,6 +82,16 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
   @Override
   public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
     mStructureDefinitionPersistenceLayer.forEach((l) -> l.writeStructureDefinition(pToolkit, pScope, pValue));
+    enableStructureDefinition(pToolkit, pScope, pValue);
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#enableStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
+    mStructurePersistenceLayer.forEach((l) -> l.enableStructureDefinition(pToolkit, pScope, pValue));
   }
 
   /**

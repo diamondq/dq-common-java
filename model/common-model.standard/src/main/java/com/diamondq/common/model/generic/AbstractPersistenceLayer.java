@@ -915,4 +915,12 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
     return cachedResults;
   }
 
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#enableStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
+
+  }
 }
