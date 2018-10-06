@@ -410,4 +410,17 @@ public class WrappedScope implements Scope {
   public Toolkit getToolkit() {
     return mScope.getToolkit();
   }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @SuppressWarnings({"null", "unused"})
+  @Override
+  public String toString() {
+    Scope scope = mScope;
+    if (scope == null)
+      return super.toString();
+    else
+      return super.toString() + "[" + scope.getName() + "]";
+  }
 }
