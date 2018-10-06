@@ -2,6 +2,7 @@ package com.diamondq.common.utils.context;
 
 import java.util.function.Function;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -99,4 +100,22 @@ public interface Context extends AutoCloseable {
   @Override
   public void close();
 
+  /**
+   * Attach some data to the current context
+   * 
+   * @param pKey the key
+   * @param pValue the value
+   */
+  public <@NonNull T> void setData(String pKey, T pValue);
+
+  /**
+   * Retrieve data associated with the current context (or parent contexts)
+   * 
+   * @param pKey the key
+   * @param pSearchParents true if the parents should be searched or false if only the current context should be
+   *          searched
+   * @param pDataClass the return data class
+   * @return the return data or null if there is no match
+   */
+  public <T> @Nullable T getData(String pKey, boolean pSearchParents, Class<T> pDataClass);
 }

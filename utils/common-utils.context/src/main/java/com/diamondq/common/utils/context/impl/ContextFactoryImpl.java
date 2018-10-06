@@ -96,7 +96,7 @@ public class ContextFactoryImpl implements ContextFactory {
     if (pContext.equals(peek) == false)
       throw new IllegalStateException();
     mThreadLocalContexts.get().pop();
-    Object hasExited = pContext.getData(ContextHandler.sHAS_EXPLICIT_EXITED);
+    Object hasExited = pContext.getData(ContextHandler.sHAS_EXPLICIT_EXITED, false, Object.class);
 
     for (ContextHandler handler : mHandlers)
       handler.executeOnContextClose(pContext, hasExited != null);
@@ -111,6 +111,15 @@ public class ContextFactoryImpl implements ContextFactory {
     if (mThreadLocalContexts.get().isEmpty() == false)
       return mThreadLocalContexts.get().peek();
     return mNOOP_CONTEXT;
+  }
+
+  /**
+   * Method to get the full stack of contexts
+   * 
+   * @return the stack
+   */
+  public Stack<Context> getCurrentContextStack() {
+    return mThreadLocalContexts.get();
   }
 
   /**

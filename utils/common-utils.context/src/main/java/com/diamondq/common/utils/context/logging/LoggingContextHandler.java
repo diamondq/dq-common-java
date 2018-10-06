@@ -20,7 +20,7 @@ public class LoggingContextHandler implements ContextHandler {
    */
   @Override
   public void executeOnContextStart(ContextClass pContext) {
-    if (pContext.getData(ContextHandler.sSIMPLE_CONTEXT) != null)
+    if (pContext.getData(ContextHandler.sSIMPLE_CONTEXT, false, Boolean.class) != null)
       return;
     Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
@@ -41,7 +41,7 @@ public class LoggingContextHandler implements ContextHandler {
    */
   @Override
   public void executeOnContextClose(ContextClass pContext, boolean pHasExplictlyExited) {
-    if (pContext.getData(ContextHandler.sSIMPLE_CONTEXT) != null)
+    if (pContext.getData(ContextHandler.sSIMPLE_CONTEXT, false, Boolean.class) != null)
       return;
     if (pHasExplictlyExited == false) {
       Logger logger = mLoggerMap.get(pContext.startClass);

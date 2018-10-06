@@ -3,10 +3,12 @@ package com.diamondq.common.utils.context.spi;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
 
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -38,12 +40,10 @@ public class ContextClass implements Context {
   }
 
   /**
-   * Allows a ContextHandler to set some data within this Context
-   * 
-   * @param pKey the key
-   * @param pValue the value
+   * @see com.diamondq.common.utils.context.Context#setData(java.lang.String, java.lang.Object)
    */
-  public void setData(String pKey, Object pValue) {
+  @Override
+  public <@NonNull T> void setData(String pKey, T pValue) {
     ConcurrentMap<String, Object> dataMap = mDataMap;
     if (dataMap == null) {
       synchronized (this) {
@@ -58,16 +58,39 @@ public class ContextClass implements Context {
   }
 
   /**
-   * Allows a ContextHandler to retrieve some data within the context
-   * 
-   * @param pKey the key
-   * @return the value or null if there is no value
+   * @see com.diamondq.common.utils.context.Context#getData(java.lang.String, boolean, java.lang.Class)
    */
-  public @Nullable Object getData(String pKey) {
+  @Override
+  public <T> @Nullable T getData(String pKey, boolean pSearchParents, Class<T> pDataClass) {
     ConcurrentMap<String, Object> dataMap = mDataMap;
-    if (dataMap == null)
-      return null;
-    return dataMap.get(pKey);
+    if (pSearchParents == false) {
+      if (dataMap == null)
+        return null;
+      Object result = dataMap.get(pKey);
+      if ((result != null) && (pDataClass.isInstance(result) == false))
+        throw new IllegalArgumentException();
+      @SuppressWarnings("unchecked")
+      T objResult = (T) result;
+      return objResult;
+    }
+
+    Stack<Context> stack = mFactory.getCurrentContextStack();
+    boolean isFirst = true;
+    for (Context context : stack) {
+      if (isFirst == true) {
+        isFirst = false;
+        continue;
+      }
+      Object result = context.getData(pKey, false, pDataClass);
+      if (result != null) {
+        if (pDataClass.isInstance(result) == false)
+          throw new IllegalArgumentException();
+        @SuppressWarnings("unchecked")
+        T objResult = (T) result;
+        return objResult;
+      }
+    }
+    return null;
   }
 
   /**
