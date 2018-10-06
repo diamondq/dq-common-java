@@ -2,6 +2,7 @@ package com.diamondq.common.storage.jdbc;
 
 import com.diamondq.common.storage.kv.IKVColumnDefinition;
 import com.diamondq.common.storage.kv.IKVTransaction;
+import com.diamondq.common.storage.kv.KVColumnType;
 import com.diamondq.common.storage.kv.Query;
 import com.diamondq.common.storage.kv.WhereInfo;
 import com.diamondq.common.utils.context.Context;
@@ -19,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -31,16 +35,23 @@ import org.slf4j.LoggerFactory;
  */
 public class JDBCKVTransaction implements IKVTransaction {
 
-  private static final Logger  sLogger = LoggerFactory.getLogger(JDBCKVTransaction.class);
+  private static final Logger              sLogger = LoggerFactory.getLogger(JDBCKVTransaction.class);
 
-  private final ContextFactory mContextFactory;
+  private static final IKVColumnDefinition sPRIMARY_KEY_2_DEF;
 
-  private final JDBCKVStore    mStore;
+  private final ContextFactory             mContextFactory;
 
-  private final DataSource     mDataSource;
+  private final JDBCKVStore                mStore;
+
+  private final DataSource                 mDataSource;
 
   @Nullable
-  private Connection           mConnection;
+  private Connection                       mConnection;
+
+  static {
+    sPRIMARY_KEY_2_DEF = new JDBCColumnDefinitionBuilder().maxLength(1024).name(JDBCKVStore.sPRIMARY_KEY_2).primaryKey()
+      .type(KVColumnType.String).build();
+  }
 
   public JDBCKVTransaction(ContextFactory pContextFactory, JDBCKVStore pStore, DataSource pDataSource) {
     mContextFactory = pContextFactory;
@@ -50,8 +61,10 @@ public class JDBCKVTransaction implements IKVTransaction {
 
   private void validateConnection() throws SQLException {
     if (mConnection == null) {
-      mConnection = mDataSource.getConnection();
-      mConnection.setAutoCommit(false);
+      Connection connection = mDataSource.getConnection();
+      if (connection.getAutoCommit() == true)
+        connection.setAutoCommit(false);
+      mConnection = connection;
     }
   }
 
@@ -338,11 +351,37 @@ public class JDBCKVTransaction implements IKVTransaction {
   @Override
   public void commit() {
     try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this)) {
+
+      /* First see if there is a UserTransaction in the context */
+
+      boolean skip = false;
+
+      UserTransaction userTransaction = context.getData(UserTransaction.class.getName(), true, UserTransaction.class);
+      if (userTransaction != null) {
+        try {
+          int status = userTransaction.getStatus();
+          if (status != Status.STATUS_NO_TRANSACTION) {
+
+            /*
+             * We're in the middle of a transaction. The expectation is that a parent will perform the real commit, so
+             * we'll do nothing here
+             */
+
+            context.trace("UserTransaction active. commit being skipped due to status {}", status);
+            skip = true;
+          }
+
+        }
+        catch (SystemException ex) {
+          throw new RuntimeException(ex);
+        }
+      }
       try {
         Connection c = mConnection;
         if (c != null) {
           mConnection = null;
-          c.commit();
+          if (skip == false)
+            c.commit();
           c.close();
         }
       }
@@ -366,11 +405,31 @@ public class JDBCKVTransaction implements IKVTransaction {
   @Override
   public void rollback() {
     try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this)) {
+      boolean skip = false;
+      UserTransaction userTransaction = context.getData(UserTransaction.class.getName(), true, UserTransaction.class);
+      if (userTransaction != null) {
+        try {
+          int status = userTransaction.getStatus();
+          if (status != Status.STATUS_NO_TRANSACTION) {
+            if (status != Status.STATUS_MARKED_ROLLBACK) {
+              context.debug("Marking the transaction as rollbackOnly");
+              userTransaction.setRollbackOnly();
+            }
+            context.trace("UserTransaction active. rollback being skipped due to status {}", status);
+            skip = true;
+            return;
+          }
+        }
+        catch (SystemException ex) {
+          throw new RuntimeException(ex);
+        }
+      }
       try {
         Connection c = mConnection;
         if (c != null) {
           mConnection = null;
-          c.rollback();
+          if (skip == false)
+            c.rollback();
           c.close();
         }
       }
@@ -416,10 +475,13 @@ public class JDBCKVTransaction implements IKVTransaction {
             else
               value = pParamValues.get(where.paramKey);
             IKVColumnDefinition colDef = info.definition.getColumnDefinitionsByName(where.key);
-            if (colDef == null)
-              throw new UnsupportedOperationException();
+            if (colDef == null) {
+              String singlePrimaryKeyName = info.definition.getSinglePrimaryKeyName();
+              if ((singlePrimaryKeyName == null) || (where.key.equals(singlePrimaryKeyName) == false))
+                throw new UnsupportedOperationException();
+              colDef = sPRIMARY_KEY_2_DEF;
+            }
             info.serializer.serializeColumnToPreparedStatement(value, colDef, ps, paramCount);
-            ps.setObject(paramCount, value);
           }
           try (ResultSet rs = ps.executeQuery()) {
             while (rs.next() == true)

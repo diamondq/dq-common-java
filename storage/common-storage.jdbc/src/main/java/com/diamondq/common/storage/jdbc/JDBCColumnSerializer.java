@@ -117,8 +117,10 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           value = null;
         else if (obj instanceof String)
           value = (String) obj;
+        else if (obj instanceof UUID)
+          value = ((UUID) obj).toString();
         else
-          throw new IllegalArgumentException("Only String supported, but found " + obj.getClass());
+          throw new IllegalArgumentException("Only String and UUID are supported, but found " + obj.getClass());
         Integer maxLength = pColDef.getMaxLength();
         if (maxLength != null)
           mDialect.writeText(pPs, pParamCount, value);

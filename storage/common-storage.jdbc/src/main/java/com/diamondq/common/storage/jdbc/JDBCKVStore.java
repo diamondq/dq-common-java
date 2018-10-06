@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -48,9 +51,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
   private static final Logger sLogger         = LoggerFactory.getLogger(JDBCKVStore.class);
 
-  private static final String sPRIMARY_KEY_2  = "PRIMARY_KEY_2";
+  public static final String  sPRIMARY_KEY_2  = "PRIMARY_KEY_2";
 
-  private static final String sPRIMARY_KEY_1  = "PRIMARY_KEY_1";
+  public static final String  sPRIMARY_KEY_1  = "PRIMARY_KEY_1";
 
   static final BigDecimal     sLONG_MIN_VALUE = BigDecimal.valueOf(Long.MIN_VALUE);
 
@@ -177,72 +180,77 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
    */
   @Override
   public void addRequiredIndexes(Collection<@NonNull IKVIndexDefinition> pIndexes) {
-    Map<@NonNull String, @NonNull IKVIndexDefinition> indexByName = Maps.newHashMap();
-    for (IKVIndexDefinition index : pIndexes) {
-      indexByName.put(index.getName(), index);
-      String indexName = index.getName().toLowerCase();
-      String tableName = index.getTableName();
+    try (Context context = mContextFactory.newContext(JDBCKVStore.class, this, pIndexes)) {
+      Map<@NonNull String, @NonNull IKVIndexDefinition> indexByName = Maps.newHashMap();
+      for (IKVIndexDefinition index : pIndexes) {
+        indexByName.put(index.getName(), index);
+        String indexName = index.getName().toLowerCase();
+        String tableName = index.getTableName();
 
-      String mungedTableName = escapeTableName(tableName);
+        String mungedTableName = escapeTableName(tableName);
 
-      /* Query the database to see if the table exists */
+        /* Query the database to see if the table exists */
 
-      String tableSchema = getTableSchema();
+        String tableSchema = getTableSchema();
 
-      try {
-        try (Connection connection = mDatabase.getConnection()) {
-          connection.setAutoCommit(true);
+        UserTransaction userTransaction = context.getData(UserTransaction.class.getName(), true, UserTransaction.class);
 
-          /* Check the table itself */
+        try {
+          try (Connection connection = mDatabase.getConnection()) {
+            if ((userTransaction == null) || (userTransaction.getStatus() == Status.STATUS_NO_TRANSACTION))
+              connection.setAutoCommit(true);
 
-          boolean missingIndex = true;
-          try (ResultSet rs = connection.getMetaData().getIndexInfo(null, tableSchema, tableName, false, false)) {
-            while (rs.next() == true) {
-              String str = rs.getString(6);
-              if (str == null)
-                continue;
-              String testName = str.toLowerCase();
-              if (indexName.equals(testName) == true) {
+            /* Check the table itself */
 
-                /* TODO: Validate the fields */
+            boolean missingIndex = true;
+            try (ResultSet rs = connection.getMetaData().getIndexInfo(null, tableSchema, tableName, false, false)) {
+              while (rs.next() == true) {
+                String str = rs.getString(6);
+                if (str == null)
+                  continue;
+                String testName = str.toLowerCase();
+                if (indexName.equals(testName) == true) {
 
-                missingIndex = false;
-                break;
+                  /* TODO: Validate the fields */
+
+                  missingIndex = false;
+                  break;
+                }
+              }
+            }
+
+            if (missingIndex == true) {
+              StringBuilder sb = new StringBuilder();
+              sb.append("CREATE INDEX ");
+              if (tableSchema != null)
+                sb.append(tableSchema).append('.');
+              sb.append(indexName);
+              sb.append(" on ");
+              if (tableSchema != null)
+                sb.append(tableSchema).append('.');
+              sb.append(mungedTableName);
+              sb.append(" (");
+              boolean firstCol = true;
+              for (IKVIndexColumn cd : index.getColumns()) {
+                if (firstCol == true)
+                  firstCol = false;
+                else
+                  sb.append(", ");
+                sb.append(escapeColumnName(cd.getName()));
+              }
+              sb.append(')');
+
+              sLogger.info("Constructing index via {}", sb.toString());
+
+              try (PreparedStatement ps = connection.prepareStatement(sb.toString())) {
+                ps.execute();
               }
             }
           }
-
-          if (missingIndex == true) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("CREATE INDEX ");
-            if (tableSchema != null)
-              sb.append(tableSchema).append('.');
-            sb.append(indexName);
-            sb.append(" on ");
-            if (tableSchema != null)
-              sb.append(tableSchema).append('.');
-            sb.append(mungedTableName);
-            sb.append(" (");
-            boolean firstCol = true;
-            for (IKVIndexColumn cd : index.getColumns()) {
-              if (firstCol == true)
-                firstCol = false;
-              else
-                sb.append(", ");
-              sb.append(escapeColumnName(cd.getName()));
-            }
-            sb.append(')');
-
-            sLogger.info("Constructing index via {}", sb.toString());
-
-            try (PreparedStatement ps = connection.prepareStatement(sb.toString())) {
-              ps.execute();
-            }
-          }
         }
-      }
-      catch (SQLException ex) {
-        throw new RuntimeException(ex);
+        catch (SQLException | SystemException ex) {
+          throw new RuntimeException(ex);
+        }
       }
     }
   }
@@ -336,9 +344,12 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
         String tableSchema = getTableSchema();
 
+        UserTransaction userTransaction = context.getData(UserTransaction.class.getName(), true, UserTransaction.class);
+
         try {
           try (Connection connection = mDatabase.getConnection()) {
-            connection.setAutoCommit(true);
+            if ((userTransaction == null) || (userTransaction.getStatus() == Status.STATUS_NO_TRANSACTION))
+              connection.setAutoCommit(true);
 
             String matchingSchema = null;
             if (tableSchema != null) {
@@ -480,7 +491,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
             }
           }
         }
-        catch (SQLException ex) {
+        catch (SQLException | SystemException ex) {
           throw new RuntimeException(ex);
         }
 
