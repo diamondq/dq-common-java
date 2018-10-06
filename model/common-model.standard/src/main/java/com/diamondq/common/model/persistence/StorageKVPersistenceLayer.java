@@ -153,6 +153,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
    */
   public StorageKVPersistenceLayer(ContextFactory pContextFactory, IKVStore pStructureStore) {
     super(pContextFactory, true, false, -1, false, false, -1, false, false, -1, false, false, -1);
+    ContextFactory.staticReportTrace(StorageKVPersistenceLayer.class, this, pStructureStore);
     mStructureStore = pStructureStore;
 
     mConfiguredTableDefinitions = Maps.newConcurrentMap();
@@ -194,12 +195,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   }
 
   protected void validateKVStoreTableSetup(Toolkit pToolkit, Scope pScope, String pTableName) {
-    try (Context context =
-      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pTableName)) {
-      IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
-      if (tableDefinitionSupport != null) {
-        synchronized (this) {
-          if (mConfiguredTableDefinitions.containsKey(pTableName) == false) {
+    IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
+    if (tableDefinitionSupport != null) {
+      synchronized (this) {
+        if (mConfiguredTableDefinitions.containsKey(pTableName) == false) {
+          try (Context context =
+            mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pTableName)) {
             String singlePrimaryKey = "";
             try {
               KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
@@ -338,11 +339,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   }
 
   /**
-   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalWriteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
+   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#enableStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  protected void internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
+  public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
     try (
       Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pValue)) {
 
@@ -356,7 +357,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
       /* Let the super handle it normally */
 
-      super.internalWriteStructureDefinition(pToolkit, pScope, pValue);
+      super.enableStructureDefinition(pToolkit, pScope, pValue);
     }
   }
 
@@ -885,8 +886,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           if (primaryKeyCount == 1)
             continue;
         }
-        else
-          onlyPrimary = false;
+        onlyPrimary = false;
         KVColumnType colType;
         switch (pd.getType()) {
         case String: {
