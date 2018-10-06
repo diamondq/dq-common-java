@@ -146,8 +146,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     int pCacheStructuresSeconds, @Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
     super(pContextFactory, pStructureBaseDir != null, true, pCacheStructuresSeconds, pStructureDefBaseDir != null, true,
       -1, pEditorStructureDefBaseDir != null, true, -1, false, true, -1);
-    sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}) from {}", pStructureBaseDir, pCacheStructuresSeconds,
-      pStructureDefBaseDir, pEditorStructureDefBaseDir, this);
+    ContextFactory.staticReportTrace(PropertiesFilePersistenceLayer.class, this, pStructureBaseDir,
+      pCacheStructuresSeconds, pStructureDefBaseDir, pEditorStructureDefBaseDir);
     mStructureBaseDir = pStructureBaseDir;
     mStructureDefBaseDir = pStructureDefBaseDir;
     mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;

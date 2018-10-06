@@ -62,6 +62,7 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
    */
   public MemoryPersistenceLayer(ContextFactory pContextFactory) {
     super(pContextFactory, true, -1, true, -1, true, -1, true, -1);
+    ContextFactory.staticReportTrace(MemoryPersistenceLayer.class, this);
   }
 
   /**

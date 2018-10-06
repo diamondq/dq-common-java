@@ -59,6 +59,7 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
   public DynamicPropertiesFilePersistenceLayer(ContextFactory pContextFactory, String pAccessKey) {
     super(pContextFactory, new File("placeholder"), false, -1, new File("placeholder"), false, -1,
       new File("placeholder"), false, -1, new File("placeholder"), false, -1);
+    ContextFactory.staticReportTrace(DynamicPropertiesFilePersistenceLayer.class, this, pAccessKey);
     mAccessKey = pAccessKey;
   }
 

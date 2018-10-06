@@ -20,11 +20,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLayer {
-  private static final Logger sLogger = LoggerFactory.getLogger(ResourceBundlePersistenceLayer.class);
 
   /**
    * The builder (generally used for the Config system)
@@ -81,7 +78,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
   public ResourceBundlePersistenceLayer(ContextFactory pContextFactory, String pResourceBaseName,
     @Nullable ClassLoader pClassLoader) {
     super(pContextFactory, false, -1, false, -1, false, -1, true, -1);
-    sLogger.trace("ResourceBundlePersistenceLayer({}) from {}", pResourceBaseName, this);
+    ContextFactory.staticReportTrace(ResourceBundlePersistenceLayer.class, this, pResourceBaseName, pClassLoader);
     mBaseName = pResourceBaseName;
     mClassLoader = pClassLoader;
   }

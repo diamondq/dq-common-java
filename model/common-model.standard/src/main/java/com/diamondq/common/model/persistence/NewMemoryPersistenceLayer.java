@@ -70,6 +70,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
    */
   public NewMemoryPersistenceLayer(ContextFactory pContextFactory) {
     super(pContextFactory, true, true, -1, false, true, -1, false, false, -1, true, true, -1);
+    ContextFactory.staticReportTrace(NewMemoryPersistenceLayer.class, this);
     mDataCache = Maps.newConcurrentMap();
   }
 
