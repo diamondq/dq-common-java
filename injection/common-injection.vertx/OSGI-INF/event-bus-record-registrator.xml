@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" configuration-policy="optional" immediate="true" name="com.diamondq.common.vertx.eventbusrecordregistrator">
+  <implementation
+    class="com.diamondq.common.vertx.EventBusRecordRegistrator" />
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setVertx" cardinality="1..1" interface="io.vertx.core.Vertx" name="Vertx" policy="static"/>
+  <service>
+     <provide interface="com.diamondq.common.vertx.EventBusRecordRegistrator"/>
+  </service>
+  <reference bind="setServiceDiscovery" cardinality="1..1" interface="io.vertx.servicediscovery.ServiceDiscovery" name="ServiceDiscovery" policy="static"/>
+</scr:component>
