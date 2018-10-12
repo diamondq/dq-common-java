@@ -123,7 +123,7 @@ public class LoggingContextHandler implements ContextHandler {
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null)
         logger = newLogger;
     }
-    if (logger.isTraceEnabled(LoggingUtils.sEXIT_MARKER)) {
+    if (logger.isErrorEnabled()) {
       String methodName = pContext.getLatestStackMethod();
       LoggingUtils.exitInternal(logger, pContext.startThis, methodName, false, pThrowable, false, null, null);
     }

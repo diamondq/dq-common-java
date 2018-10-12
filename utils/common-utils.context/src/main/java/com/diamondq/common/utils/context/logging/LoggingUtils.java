@@ -268,7 +268,7 @@ public class LoggingUtils {
     }
 
     if (pThrowable != null)
-      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_ERROR, methodName, pThis, pThrowable);
+      pLogger.error(sEXIT_MARKER, sEXIT_MESSAGE_ERROR, methodName, pThis, pThrowable);
 
     else if (pWithResult == true) {
       if (pMeta != null) {
