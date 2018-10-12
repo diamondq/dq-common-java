@@ -653,14 +653,16 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
     @Nullable Function<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPRE> pEndPreFunction,
     @Nullable Function<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletionStage<ENDRESULT>> pEndFunction,
     @Nullable Function<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
-    Executor pExecutor) {
+    @Nullable Executor pExecutor) {
 
     ExtendedCompletableFuture<ENDPOST> finalResult = new ExtendedCompletableFuture<>();
 
     /* Setup the LoopState object */
 
     ExtendedCompletionStage<@Nullable LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> applyResult =
-      thenApplyAsync(input -> new LoopState<>(input), pExecutor);
+      (pExecutor == null ? thenApply(input -> new LoopState<>(input))
+        : thenApplyAsync(input -> new LoopState<>(input), pExecutor));
+    
     @SuppressWarnings("null")
     ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
       (ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
@@ -756,6 +758,79 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
       .<@Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V> thenDoWhileAsync(
         pStartPreFunction, null, pStartPostFunction, null, pActionFunction, null, null, null, pTestPostFunction, null,
         null, pEndPostFunction, pExecutor);
+  }
+
+  public default <U, V> ExtendedCompletionStage<List<V>> forLoop(
+    Function<T, @Nullable Iterable<U>> pGetIterableFunction, Function<U, CompletionStage<V>> pPerformActionFunction,
+    @Nullable Function<V, Boolean> pBreakFunction, @Nullable Executor pExecutor) {
+
+    /* Get the iterable */
+
+    Function<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, @Nullable Iterator<U>> pStartPreFunction =
+      (loopState) -> {
+        loopState.startPost = true;
+        loopState.testPost = true;
+        loopState.endPost = new ArrayList<V>();
+        Iterable<U> iterable = pGetIterableFunction.apply(loopState.input);
+        if (iterable == null)
+          return null;
+        return iterable.iterator();
+      };
+
+    /* Is there an initial element */
+
+    Function<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, Boolean> pStartPostFunction =
+      (loopState) -> {
+        Iterator<U> startPre = loopState.startPre;
+        return (startPre == null ? false : startPre.hasNext());
+      };
+
+    /* Process the element */
+
+    @SuppressWarnings("null")
+    Function<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, ExtendedCompletionStage<V>> pActionFunction =
+      (loopState) -> {
+        Iterator<U> startPre = loopState.startPre;
+        Boolean startPost = loopState.startPost;
+        Boolean testPost = loopState.testPost;
+        if ((startPre == null) || (startPost == false) || (testPost == false))
+          return ExtendedCompletableFuture.completedFuture(null);
+        U nextElement = startPre.next();
+        CompletionStage<V> completionStage = pPerformActionFunction.apply(nextElement);
+        if (completionStage instanceof ExtendedCompletionStage)
+          return (ExtendedCompletionStage<V>) completionStage;
+        return ExtendedCompletionStage.of(completionStage);
+      };
+
+    Function<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, @Nullable Void> pActionPostFunction =
+      (loopState) -> {
+        loopState.endPost.add(loopState.actionResult);
+        return null;
+      };
+
+    /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
+
+    Function<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, Boolean> pTestPostFunction =
+      (loopState) -> {
+        Iterator<U> startPre = loopState.startPre;
+        V actionResult = loopState.actionResult;
+        if (startPre == null)
+          return false;
+        if (actionResult != null) {
+          if (pBreakFunction == null)
+            return false;
+          if (pBreakFunction.apply(actionResult) == true)
+            return false;
+        }
+        return startPre.hasNext();
+      };
+
+    Function<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, List<V>> pEndPostFunction =
+      (loopState) -> loopState.endPost;
+    return this
+      .<@Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>> thenDoWhileAsync(
+        pStartPreFunction, null, pStartPostFunction, null, pActionFunction, pActionPostFunction, null, null,
+        pTestPostFunction, null, null, pEndPostFunction, pExecutor);
   }
 
   /**
