@@ -148,6 +148,18 @@ public class ContextFactoryImpl implements ContextFactory {
     }
   }
 
+  @Override
+  public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable... pArgs) {
+    try (ContextClass context = new ContextClass(this, pClass, pThis, false, null)) {
+      mThreadLocalContexts.get().push(context);
+      context.setData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
+      for (ContextHandler handler : mHandlers)
+        handler.executeOnContextStart(context);
+      context.trace(pMessage, pArgs);
+    }
+  }
+
   /* ************************************************************ */
   /* ContextFactoryImpl methods */
   /* ************************************************************ */

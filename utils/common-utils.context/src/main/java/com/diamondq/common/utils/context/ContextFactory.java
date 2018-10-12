@@ -18,6 +18,11 @@ public interface ContextFactory {
     getInstance().reportTrace(pClass, pThis, pArgs);
   }
 
+  public static void staticReportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable... pArgs) {
+    getInstance().reportTrace(pClass, pThis, pMessage, pArgs);
+  }
+
   public static RuntimeException staticReportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
     return getInstance().reportThrowable(pClass, pThis, pThrowable);
   }
@@ -53,5 +58,17 @@ public interface ContextFactory {
    * @param pArgs the arguments
    */
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs);
+
+  /**
+   * Report an exception outside of a context. It will automatically create a context, report the exception and then end
+   * the context.
+   * 
+   * @param pClass the class
+   * @param pThis the this object
+   * @param pMessage the message
+   * @param pArgs the arguments
+   */
+  public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable... pArgs);
 
 }
