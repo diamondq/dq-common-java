@@ -73,6 +73,8 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
   protected final transient Cache<String, List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>>>                          mMigrationCache;
 
+  protected volatile transient @Nullable AsyncPersistenceLayer                                                                             mAsyncPersistenceLayer;
+
   static {
     BitSet b = new BitSet();
     b.set('0', '9' + 1);
@@ -95,6 +97,21 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
     mMigrationFunctions = Maps.newConcurrentMap();
     CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
     mMigrationCache = builder.build();
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#getAsyncPersistenceLayer()
+   */
+  @Override
+  public AsyncPersistenceLayer getAsyncPersistenceLayer() {
+    synchronized (this) {
+      AsyncPersistenceLayer apl = mAsyncPersistenceLayer;
+      if (apl == null) {
+        apl = new SyncAsyncPersistenceLayer(this);
+        mAsyncPersistenceLayer = apl;
+      }
+      return apl;
+    }
   }
 
   /**
@@ -328,11 +345,12 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
   }
 
   /**
-   * @see com.diamondq.common.model.generic.PersistenceLayer#createStructureDefinitionRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   * @see com.diamondq.common.model.generic.PersistenceLayer#createStructureDefinitionRefFromSerialized(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
-  public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized) {
+  public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Toolkit pToolkit, Scope pScope,
+    String pSerialized) {
     int revisionOffset = pSerialized.indexOf(':');
     Integer revision;
     if (revisionOffset == -1)
@@ -487,21 +505,26 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
     return null;
   }
 
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureByPrimaryKeys(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition,
+   *      java.lang.Object[])
+   */
   @Override
-  public @Nullable Structure lookupStructureByPrimaryKeys(GenericToolkit pGenericToolkit, Scope pScope,
+  public @Nullable Structure lookupStructureByPrimaryKeys(Toolkit pToolkit, Scope pScope,
     StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys) {
-    return pGenericToolkit.createStructureRefFromParts(pScope, null, null, pStructureDef, Arrays.asList(pPrimaryKeys))
+    return pToolkit.createStructureRefFromParts(pScope, null, null, pStructureDef, Arrays.asList(pPrimaryKeys))
       .resolve();
   }
 
   /**
-   * @see com.diamondq.common.model.generic.PersistenceLayer#writeQueryBuilder(com.diamondq.common.model.generic.GenericToolkit,
+   * @see com.diamondq.common.model.generic.PersistenceLayer#writeQueryBuilder(com.diamondq.common.model.interfaces.Toolkit,
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
-  public ModelQuery writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
+  public ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
     try (Context context =
-      mContextFactory.newContext(AbstractPersistenceLayer.class, this, pGenericToolkit, pScope, pQueryBuilder)) {
+      mContextFactory.newContext(AbstractPersistenceLayer.class, this, pToolkit, pScope, pQueryBuilder)) {
       GenericQueryBuilder gqb = (GenericQueryBuilder) pQueryBuilder;
       return new GenericModelQuery(gqb.getStructureDefinition(), gqb.getQueryName(), gqb.getWhereList(),
         gqb.getParentParamKey(), gqb.getParentPropertyDefinition(), gqb.getSortList());

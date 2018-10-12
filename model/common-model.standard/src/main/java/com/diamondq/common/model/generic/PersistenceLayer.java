@@ -91,10 +91,9 @@ public interface PersistenceLayer {
   public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
     @Nullable Structure pOldStructure);
 
-  public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope,
-    String pSerializedRef);
+  public @Nullable Structure lookupStructureBySerializedRef(Toolkit pToolkit, Scope pScope, String pSerializedRef);
 
-  public @Nullable Structure lookupStructureByPrimaryKeys(GenericToolkit pGenericToolkit, Scope pScope,
+  public @Nullable Structure lookupStructureByPrimaryKeys(Toolkit pToolkit, Scope pScope,
     StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys);
 
   public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue);
@@ -131,8 +130,7 @@ public interface PersistenceLayer {
 
   public StructureRef createStructureRefFromSerialized(Toolkit pToolkit, Scope pScope, String pValue);
 
-  public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pGenericToolkit, Scope pScope,
-    String pValue);
+  public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pToolkit, Scope pScope, String pValue);
 
   public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope, StructureDefinitionRef pRef,
     @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef);
@@ -166,12 +164,13 @@ public interface PersistenceLayer {
   public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition,
     String pQueryName);
 
-  public ModelQuery writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder);
+  public ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder);
 
   public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
     @Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys);
 
-  public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized);
+  public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Toolkit pToolkit, Scope pScope,
+    String pSerialized);
 
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Toolkit pToolkit, Scope pScope,
     StandardMigrations pMigrationType, @NonNull Object @Nullable [] pParams);
@@ -183,5 +182,7 @@ public interface PersistenceLayer {
     Toolkit pToolkit, Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
 
   public @Nullable Integer lookupLatestStructureDefinitionRevision(Toolkit pToolkit, Scope pScope, String pDefName);
+
+  public AsyncPersistenceLayer getAsyncPersistenceLayer();
 
 }

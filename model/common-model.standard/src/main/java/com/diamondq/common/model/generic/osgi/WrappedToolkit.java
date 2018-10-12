@@ -2,6 +2,7 @@ package com.diamondq.common.model.generic.osgi;
 
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
+import com.diamondq.common.model.interfaces.AsyncToolkit;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.EditorPropertyDefinition;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
@@ -37,25 +38,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WrappedToolkit implements Toolkit {
-  private static final Logger sLogger                          = LoggerFactory.getLogger(WrappedToolkit.class);
+  private static final Logger     sLogger                          = LoggerFactory.getLogger(WrappedToolkit.class);
 
-  protected Toolkit           mToolkit;
+  protected Toolkit               mToolkit;
 
-  protected volatile boolean  mWriteStructure                  = false;
+  protected volatile boolean      mWriteStructure                  = false;
 
-  protected volatile boolean  mWriteStructureDefinition        = false;
+  protected volatile boolean      mWriteStructureDefinition        = false;
 
-  protected volatile boolean  mWriteEditorStructureDefinition  = false;
+  protected volatile boolean      mWriteEditorStructureDefinition  = false;
 
-  protected volatile boolean  mWriteResource                   = false;
+  protected volatile boolean      mWriteResource                   = false;
 
-  protected volatile boolean  mDeleteStructure                 = false;
+  protected volatile boolean      mDeleteStructure                 = false;
 
-  protected volatile boolean  mDeleteStructureDefinition       = false;
+  protected volatile boolean      mDeleteStructureDefinition       = false;
 
-  protected volatile boolean  mDeleteEditorStructureDefinition = false;
+  protected volatile boolean      mDeleteEditorStructureDefinition = false;
 
-  protected volatile boolean  mDeleteResource                  = false;
+  protected volatile boolean      mDeleteResource                  = false;
+
+  protected volatile AsyncToolkit mAsyncToolkit;
+
+  protected volatile AsyncToolkit mWrappedAsyncToolkit;
 
   @SuppressWarnings("null")
   public WrappedToolkit() {
@@ -125,6 +130,21 @@ public class WrappedToolkit implements Toolkit {
     catch (RuntimeException ex) {
       LoggingUtils.exitWithException(sLogger, this, ex);
       throw ex;
+    }
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#getAsyncToolkit()
+   */
+  @Override
+  public AsyncToolkit getAsyncToolkit() {
+    AsyncToolkit asyncToolkit = mToolkit.getAsyncToolkit();
+    synchronized (this) {
+      if (mAsyncToolkit == asyncToolkit)
+        return mWrappedAsyncToolkit;
+      mAsyncToolkit = asyncToolkit;
+      mWrappedAsyncToolkit = new WrappedAsyncToolkit(mAsyncToolkit);
+      return mWrappedAsyncToolkit;
     }
   }
 

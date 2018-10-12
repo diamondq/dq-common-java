@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.model.interfaces.AsyncToolkit;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.EditorPropertyDefinition;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
@@ -40,7 +41,18 @@ public class GenericToolkit implements Toolkit {
 
   private final ConcurrentMap<String, Scope>           mScopes      = Maps.newConcurrentMap();
 
+  private final AsyncToolkit                           mAsyncToolkit;
+
   public GenericToolkit() {
+    mAsyncToolkit = new GenericAsyncToolkit(mPersistence, mScopes, this);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#getAsyncToolkit()
+   */
+  @Override
+  public AsyncToolkit getAsyncToolkit() {
+    return mAsyncToolkit;
   }
 
   /**
@@ -158,7 +170,7 @@ public class GenericToolkit implements Toolkit {
    */
   @Override
   public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized) {
-    return getPersistenceLayer(pScope).createStructureDefinitionRefFromSerialized(pScope, pSerialized);
+    return getPersistenceLayer(pScope).createStructureDefinitionRefFromSerialized(this, pScope, pSerialized);
   }
 
   /**
