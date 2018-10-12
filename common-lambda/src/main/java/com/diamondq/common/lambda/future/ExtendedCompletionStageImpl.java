@@ -812,7 +812,6 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#resolve()
    */
-  @SuppressWarnings("null")
   @Override
   public T resolve() {
     try {

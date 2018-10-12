@@ -193,7 +193,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
   }
 
   @Override
-  public @Nullable T get() throws InterruptedException, ExecutionException {
+  public T get() throws InterruptedException, ExecutionException {
     return mDelegate.get();
   }
 
@@ -1174,7 +1174,6 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#resolve()
    */
-  @SuppressWarnings("null")
   @Override
   public T resolve() {
     try {
