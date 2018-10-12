@@ -24,12 +24,14 @@
     <module>../injection/common-injection.cdi</module>
     <module>../injection/common-injection.cdi.weld</module>
     <module>../injection/common-injection.osgi</module>
+    <module>../injection/common-injection.vertx</module>
     <module>../metrics/common-metrics.micrometer</module>
     <module>../security/common-security.jwt</module>
     <module>../security/common-security.acme</module>
     <module>../security/common-security.acl</module>
     <module>../security/common-security.acl.noop</module>
     <module>../security/common-security.openaz</module>
+    <module>../servers/common-servers.paxweb.jersey</module>
     <module>../servers/common-servers.undertow</module>
     <module>../servers/common-servers.undertow.resteasy.weld</module>
     <module>../storage/common-storage.cloudant</module>
