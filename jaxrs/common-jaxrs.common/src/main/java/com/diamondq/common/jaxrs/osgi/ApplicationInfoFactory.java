@@ -1,57 +1,59 @@
 package com.diamondq.common.jaxrs.osgi;
 
-import com.diamondq.common.injection.osgi.ServiceReferenceUtils;
-import com.diamondq.common.injection.osgi.SingletonServiceFactory;
+import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
+import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.jaxrs.model.ApplicationInfo;
 import com.diamondq.common.jaxrs.model.ApplicationInfo.Builder;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
-import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
+import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
 import java.util.Optional;
 
-import org.osgi.framework.ServiceReference;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ApplicationInfoFactory extends SingletonServiceFactory<ApplicationInfo> {
+public class ApplicationInfoFactory extends AbstractOSGiConstructor {
 
-  /**
-   * @see com.diamondq.common.injection.osgi.SingletonServiceFactory#createSingleton(org.osgi.framework.ServiceReference)
-   */
-  @Override
-  protected ApplicationInfo createSingleton(ServiceReference<ApplicationInfo> pServiceReference) {
-    try (Context context = mContextFactory.newContext(ApplicationInfoFactory.class, this, pServiceReference)) {
-      Map<String, Object> props = ServiceReferenceUtils.getProperties(pServiceReference);
+  public ApplicationInfoFactory() {
+    super(ConstructorInfoBuilder.builder().register(ApplicationInfo.class) //
+      .constructorClass(ApplicationInfoFactory.class).factoryMethod("onCreate") //
+      .cArg().prop(".fqdn").type(String.class).required().build() //
+      .cArg().prop(".http-enabled").type(Boolean.class).optional().build() //
+      .cArg().prop(".http-port").type(Integer.class).value(80).optional().build() //
+      .cArg().prop(".http-host").type(String.class).optional().build() //
+      .cArg().prop(".https-enabled").type(Boolean.class).optional().build() //
+      .cArg().prop(".https-port").type(Integer.class).value(443).optional().build() //
+      .cArg().prop(".https-host").type(String.class).optional().build() //
+    );
+  }
+
+  public ApplicationInfo onCreate(String pFQDN, @Nullable Boolean pHttpEnabled, Integer pHttpPort, @Nullable String pHttpHost,
+    @Nullable Boolean pHttpsEnabled, Integer pHttpsPort, @Nullable String pHttpsHost) {
+    try (Context context = mContextFactory.newContext(ApplicationInfoFactory.class, this)) {
 
       /* Get the FQDN property */
 
-      String fqdn = PropertiesParsing.getNullableString(props, ".fqdn");
-      if (fqdn == null)
-        throw new ExtendedIllegalArgumentException(Messages.APPLICATIONINFO_FQDN_REQUIRED);
-      Builder builder = ApplicationInfo.builder().fQDN(fqdn);
+      Verify.notNullArg(pFQDN, Messages.APPLICATIONINFO_FQDN_REQUIRED);
+      Builder builder = ApplicationInfo.builder().fQDN(pFQDN);
 
       URI unsecuredURI;
       URI securedURI;
 
       /* Get whether http is enabled */
 
-      Boolean httpEnabled = PropertiesParsing.getNullableBoolean(props, ".http-enabled");
-      if ((httpEnabled != null) && (httpEnabled == true)) {
+      if ((pHttpEnabled != null) && (pHttpEnabled == true)) {
 
         /* Get the host and port */
 
-        int httpPort = PropertiesParsing.getNonNullInt(props, ".http-port", 80);
-        String httpHost = PropertiesParsing.getNullableString(props, ".http-host");
-
-        if (httpHost == null)
+        if (pHttpHost == null)
           throw new ExtendedIllegalArgumentException(Messages.APPLICATIONINFO_HTTP_HOST_REQUIRED);
 
         /* Build the URI */
 
         try {
-          unsecuredURI = new URI("http://" + httpHost + (httpPort == 80 ? "" : ":" + httpPort));
+          unsecuredURI = new URI("http://" + pHttpHost + (pHttpPort == 80 ? "" : ":" + pHttpPort));
         }
         catch (URISyntaxException ex) {
           throw new RuntimeException(ex);
@@ -62,21 +64,17 @@ public class ApplicationInfoFactory extends SingletonServiceFactory<ApplicationI
 
       /* Get if HTTPS is enabled */
 
-      Boolean httpsEnabled = PropertiesParsing.getNullableBoolean(props, ".https-enabled");
-      if ((httpsEnabled != null) && (httpsEnabled == true)) {
+      if ((pHttpsEnabled != null) && (pHttpsEnabled == true)) {
 
         /* Get the host and port */
 
-        int httpsPort = PropertiesParsing.getNonNullInt(props, ".https-port", 443);
-        String httpsHost = PropertiesParsing.getNullableString(props, ".https-host");
-
-        if (httpsHost == null)
+        if (pHttpsHost == null)
           throw new ExtendedIllegalArgumentException(Messages.APPLICATIONINFO_HTTPS_HOST_REQUIRED);
 
         /* Build the URI */
 
         try {
-          securedURI = new URI("https://" + httpsHost + (httpsPort == 443 ? "" : ":" + httpsPort));
+          securedURI = new URI("https://" + pHttpsHost + (pHttpsPort == 443 ? "" : ":" + pHttpsPort));
         }
         catch (URISyntaxException ex) {
           throw new RuntimeException(ex);
@@ -90,15 +88,6 @@ public class ApplicationInfoFactory extends SingletonServiceFactory<ApplicationI
       builder = builder.securedURI(Optional.ofNullable(securedURI));
       builder = builder.unsecuredURI(Optional.ofNullable(unsecuredURI));
       return context.exit(builder.build());
-    }
-  }
-
-  /**
-   * @see com.diamondq.common.injection.osgi.SingletonServiceFactory#destroySingleton(java.lang.Object)
-   */
-  @Override
-  protected void destroySingleton(ApplicationInfo pService) {
-    try (Context context = mContextFactory.newContext(ApplicationInfoFactory.class, this, pService)) {
     }
   }
 
