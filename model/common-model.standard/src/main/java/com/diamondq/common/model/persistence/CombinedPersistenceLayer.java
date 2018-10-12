@@ -1,7 +1,6 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractPersistenceLayer;
-import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
 import com.diamondq.common.model.interfaces.ModelQuery;
@@ -197,11 +196,11 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
   }
 
   /**
-   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#writeQueryBuilder(com.diamondq.common.model.generic.GenericToolkit,
+   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#writeQueryBuilder(com.diamondq.common.model.interfaces.Toolkit,
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
-  public ModelQuery writeQueryBuilder(GenericToolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
+  public ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
     try (Context context =
       mContextFactory.newContext(CombinedPersistenceLayer.class, this, pToolkit, pScope, pQueryBuilder)) {
       Map<PersistenceLayer, ModelQuery> mappedQueries = new HashMap<>();

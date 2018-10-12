@@ -2,7 +2,6 @@ package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
 import com.diamondq.common.model.generic.GenericModelQuery;
-import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.CommonKeywordValues;
@@ -847,12 +846,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   }
 
   /**
-   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#writeQueryBuilder(com.diamondq.common.model.generic.GenericToolkit,
+   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#writeQueryBuilder(com.diamondq.common.model.interfaces.Toolkit,
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
-  public ModelQuery writeQueryBuilder(GenericToolkit pGenericToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
-    ModelQuery result = super.writeQueryBuilder(pGenericToolkit, pScope, pQueryBuilder);
+  public ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
+    ModelQuery result = super.writeQueryBuilder(pToolkit, pScope, pQueryBuilder);
 
     IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support =
       mStructureStore.getIndexSupport();
@@ -948,7 +947,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       if ((colCount > 0) && (onlyPrimary == false)) {
         IKVIndexDefinition id = idb.build();
         String tableName = id.getTableName();
-        validateKVStoreTableSetup(pGenericToolkit, pScope, tableName);
+        validateKVStoreTableSetup(pToolkit, pScope, tableName);
         support.addRequiredIndexes(Collections.singleton(id));
       }
     }
