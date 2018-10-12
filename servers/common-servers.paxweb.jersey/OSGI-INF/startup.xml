@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" immediate="true" name="com.diamondq.common.servers.paxweb.jersey.startup">
+  <implementation
+    class="com.diamondq.common.servers.paxweb.jersey.Startup" />
+  <service>
+     <provide interface="com.diamondq.common.servers.paxweb.jersey.Startup"/>
+  </service>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setHttpService" cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="static"/>
+  <reference bind="addApplication" cardinality="1..n" interface="javax.ws.rs.core.Application" name="Application" policy="static"/>
+</scr:component>
