@@ -6,7 +6,7 @@
     <groupId>com.diamondq.common</groupId>
     <artifactId>common-masterparent</artifactId>
     <version>0.2.0-SNAPSHOT</version>
-    <relativePath>../xmpp-masterparent</relativePath>
+    <relativePath>../common-masterparent</relativePath>
   </parent>
   <artifactId>common-root</artifactId>
   <packaging>pom</packaging>
