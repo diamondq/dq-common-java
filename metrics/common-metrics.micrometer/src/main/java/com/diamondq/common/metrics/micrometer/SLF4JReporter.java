@@ -9,6 +9,8 @@ import com.google.common.collect.Iterables;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -103,7 +105,11 @@ public class SLF4JReporter {
 
   private void onReport() {
     try (Context context = mContextFactory.newContext(SLF4JReporter.class, this)) {
+      SortedMap<String, Meter> sortedMeters = new TreeMap<>();
       for (Meter meter : mMeterRegistry.getMeters()) {
+        sortedMeters.put(meter.getId().getName(), meter);
+      }
+      for (Meter meter : sortedMeters.values()) {
         Id id = meter.getId();
         String name = id.getName();
         List<Tag> tags = id.getTags();
