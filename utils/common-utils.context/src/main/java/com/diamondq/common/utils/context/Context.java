@@ -19,11 +19,6 @@ public interface Context extends AutoCloseable {
   public <T> T exit(T pResult);
 
   /**
-   * Reports an explicit exit with no value for the context
-   */
-  public void exit();
-
-  /**
    * Reports an explicit exit value with a conversion function for the context
    * 
    * @param pResult the exit value
@@ -41,6 +36,8 @@ public interface Context extends AutoCloseable {
    */
   public void trace(@Nullable Object @Nullable... pArgs);
 
+  public void traceWithMeta(String pMessage, @Nullable Object @Nullable... pArgs);
+
   /**
    * Returns whether trace is enabled
    * 
@@ -49,6 +46,8 @@ public interface Context extends AutoCloseable {
   public boolean isTraceEnabled();
 
   public void debug(String pMessage, @Nullable Object @Nullable... pArgs);
+
+  public void debugWithMeta(String pMessage, @Nullable Object @Nullable... pArgs);
 
   /**
    * Returns whether debug is enabled
@@ -118,4 +117,26 @@ public interface Context extends AutoCloseable {
    * @return the return data or null if there is no match
    */
   public <T> @Nullable T getData(String pKey, boolean pSearchParents, Class<T> pDataClass);
+
+  /**
+   * Allows a context to be used in an alternate thread. This call increases the 'open' count, so that an additional
+   * close is necessary to actually close the context.
+   */
+  public void prepareForAlternateThreads();
+
+  /**
+   * Allows the context to become active on the current thread. NOTE: The context is returned so it can be wrapped in a
+   * try()/close mechanism
+   * 
+   * @param pMessage the required message
+   * @param pArgs some arguments used to issue a trace when this context is activated
+   * @return the context
+   */
+  public Context activateOnThread(String pMessage, @Nullable Object @Nullable... pArgs);
+
+  /**
+   * Closes the context regardless of how many 'open' counts there are. This is mainly used in error scenarios.
+   */
+  public void forceClose();
+
 }

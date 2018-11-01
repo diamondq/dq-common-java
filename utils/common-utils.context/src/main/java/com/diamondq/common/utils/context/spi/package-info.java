@@ -1,5 +1,5 @@
 /**
- * Information about the common.utils.misc.context.spi package
+ * Information about the common.utils.context.spi package
  */
 @org.checkerframework.framework.qual.DefaultQualifier(value = org.checkerframework.checker.nullness.qual.NonNull.class)
 @org.eclipse.jdt.annotation.NonNullByDefault

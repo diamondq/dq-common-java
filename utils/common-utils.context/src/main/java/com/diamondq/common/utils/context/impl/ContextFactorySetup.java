@@ -1,7 +1,7 @@
 package com.diamondq.common.utils.context.impl;
 
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.context.logging.LoggingContextHandler;
+import com.diamondq.common.utils.context.impl.logging.LoggingContextHandler;
 
 /**
  * This class is used for non-OSGi environments to get a ContextFactory

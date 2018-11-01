@@ -6,9 +6,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ContextHandler {
 
-  public static final String sHAS_EXPLICIT_EXITED = "CH_HAS_EXPLICIT_EXITED";
+  static final String sEXIT_VALUE     = ContextClass.sHANDLER_DATA_PREFIX + "CH_EXIT_VALUE";
 
-  public static final String sSIMPLE_CONTEXT      = "CH_SIMPLE_CONTEXT";
+  static final String sEXIT_FUNC      = ContextClass.sHANDLER_DATA_PREFIX + "CH_EXIT_FUNC";
+
+  static final String sSIMPLE_CONTEXT = ContextClass.sHANDLER_DATA_PREFIX + "CH_SIMPLE_CONTEXT";
 
   /**
    * Called whenever a Context is created
@@ -21,33 +23,12 @@ public interface ContextHandler {
    * Called whenever the Context is closed
    * 
    * @param pContext the context
-   * @param pHasExplicitlyExited true if it was explicitly exited before the close
+   * @param pWithExitValue true if the exit value is provided or false if it's not (this is needed since null in
+   *          pExitValue is not enough to tell if the exit was provided or not)
+   * @param pExitValue the exit value if provided
+   * @param pFunc the exit function
    */
-  public void executeOnContextClose(ContextClass pContext, boolean pHasExplicitlyExited);
-
-  /**
-   * Called whenever the Context is passed an explicit exit
-   * 
-   * @param pContext the context
-   */
-  public void executeOnContextExplicitExit(ContextClass pContext);
-
-  /**
-   * Called whenever the Context is passed an explicit exit
-   * 
-   * @param pContext the context
-   * @param pArg the exit value
-   */
-  public void executeOnContextExplicitExit(ContextClass pContext, @Nullable Object pArg);
-
-  /**
-   * Called whenever the Context is passed an explicit exit
-   * 
-   * @param pContext the context
-   * @param pArg the exit value
-   * @param pFunc the conversion function
-   */
-  public void executeOnContextExplicitExitWithMeta(ContextClass pContext, @Nullable Object pArg,
+  public void executeOnContextClose(ContextClass pContext, boolean pWithExitValue, @Nullable Object pExitValue,
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
 
   /**
@@ -58,10 +39,10 @@ public interface ContextHandler {
    */
   public void executeOnContextExplicitThrowable(ContextClass pContext, Throwable pThrowable);
 
-  public void executeOnContextReportTrace(ContextClass pContext, @Nullable String pMessage,
+  public void executeOnContextReportTrace(ContextClass pContext, @Nullable String pMessage, boolean pWithMeta,
     @Nullable Object @Nullable... pArgs);
 
-  public void executeOnContextReportDebug(ContextClass pContext, @Nullable String pMessage,
+  public void executeOnContextReportDebug(ContextClass pContext, @Nullable String pMessage, boolean pWithMeta,
     @Nullable Object @Nullable... pArgs);
 
   public void executeOnContextReportInfo(ContextClass pContext, @Nullable String pMessage,
@@ -75,4 +56,7 @@ public interface ContextHandler {
   public void executeOnContextReportError(ContextClass pContext, @Nullable String pMessage,
     @Nullable Object @Nullable... pArgs);
 
+  public void executeOnDetachContextToThread(ContextClass pContext);
+
+  public void executeOnAttachContextToThread(ContextClass pContext);
 }

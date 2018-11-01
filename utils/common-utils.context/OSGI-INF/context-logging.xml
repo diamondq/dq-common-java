@@ -2,11 +2,11 @@
 <scr:component
   xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0"
   configuration-policy="optional" immediate="false"
-  name="com.diamondq.common.utils.context.logging.loggingcontexthandler">
+  name="com.diamondq.common.utils.context.impl.logging.loggingcontexthandler">
   <implementation
-    class="com.diamondq.common.utils.context.logging.LoggingContextHandler" />
+    class="com.diamondq.common.utils.context.impl.logging.LoggingContextHandler" />
   <service>
      <provide interface="com.diamondq.common.utils.context.spi.ContextHandler"/>
-     <provide interface="com.diamondq.common.utils.context.logging.LoggingContextHandler"/>
+     <provide interface="com.diamondq.common.utils.context.impl.logging.LoggingContextHandler"/>
   </service>
 </scr:component>
