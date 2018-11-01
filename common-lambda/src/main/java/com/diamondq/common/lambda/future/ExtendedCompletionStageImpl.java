@@ -36,6 +36,35 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     return pStage;
   }
 
+  /**
+   * Generates a new ExtendedCompletableFuture from an existing CompletableFuture but in the same context as the given
+   * future. Nothing from the given future is used other than the context. This is usually used to preserve the Vertx
+   * Context or Logging Context.
+   *
+   * @param pFuture the existing CompletableFuture
+   * @return the new ExtendedCompletableFuture
+   */
+  @Override
+  public <U> ExtendedCompletionStage<U> relatedOf(CompletionStage<U> pFuture) {
+    return new ExtendedCompletableFuture<U>(decomposeToCompletionStage(pFuture).toCompletableFuture());
+  }
+
+  /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedNewFuture()
+   */
+  @Override
+  public <U> ExtendedCompletableFuture<U> relatedNewFuture() {
+    return new ExtendedCompletableFuture<U>();
+  }
+
+  /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedCompletedFuture(java.lang.Object)
+   */
+  @Override
+  public <U> ExtendedCompletableFuture<U> relatedCompletedFuture(U value) {
+    return new ExtendedCompletableFuture<U>(CompletableFuture.completedFuture(value));
+  }
+
   @Override
   public int hashCode() {
     return mDelegate.hashCode();
@@ -165,8 +194,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     BiFunction<? super T, ? super U, ? extends V> pFn) {
     CancelableBiFunction<? super T, ? super U, ? extends V> ab = ExtendedCompletableFuture.wrapBiFunction(pFn);
     try {
-      ExtendedCompletionStage<V> result =
-        ExtendedCompletionStage.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
+      ExtendedCompletionStage<V> result = relatedOf(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
       final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -188,8 +216,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     BiFunction<? super T, ? super U, ? extends V> pFn) {
     CancelableBiFunction<? super T, ? super U, ? extends V> ab = ExtendedCompletableFuture.wrapBiFunction(pFn);
     try {
-      ExtendedCompletionStage<V> result =
-        ExtendedCompletionStage.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
+      ExtendedCompletionStage<V> result = relatedOf(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
       final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -212,7 +239,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableBiFunction<? super T, ? super U, ? extends V> ab = ExtendedCompletableFuture.wrapBiFunction(pFn);
     try {
       ExtendedCompletionStage<V> result =
-        ExtendedCompletionStage.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
+        relatedOf(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
       final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -256,6 +283,41 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     }, pExecutor);
   }
 
+  /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedRunAsync(java.lang.Runnable)
+   */
+  @Override
+  public ExtendedCompletionStage<@Nullable Void> relatedRunAsync(Runnable pRunnable) {
+    CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(pRunnable);
+    try {
+      ExtendedCompletionStage<@Nullable Void> result = relatedOf(CompletableFuture.runAsync(ab));
+      ab = null;
+      return result;
+    }
+    finally {
+      if (ab != null)
+        ab.cancel();
+    }
+  }
+
+  /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedRunAsync(java.lang.Runnable,
+   *      java.util.concurrent.Executor)
+   */
+  @Override
+  public ExtendedCompletionStage<@Nullable Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor) {
+    CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(pRunnable);
+    try {
+      ExtendedCompletionStage<@Nullable Void> result = relatedOf(CompletableFuture.runAsync(ab, pExecutor));
+      ab = null;
+      return result;
+    }
+    finally {
+      if (ab != null)
+        ab.cancel();
+    }
+  }
+
   @Override
   public ExtendedCompletionStage<@Nullable Void> runAfterBoth(CompletionStage<?> pOther, Runnable pAction) {
     return thenCombine(pOther, (a, b) -> {
@@ -285,8 +347,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
   public <U> ExtendedCompletionStage<U> applyToEither(CompletionStage<? extends T> pOther, Function<? super T, U> pFn) {
     CancelableFunction<? super T, U> ab = ExtendedCompletableFuture.wrapFunction(pFn);
     try {
-      ExtendedCompletionStage<U> result =
-        ExtendedCompletionStage.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
+      ExtendedCompletionStage<U> result = relatedOf(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
       final CancelableFunction<? super T, U> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -309,7 +370,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableFunction<? super T, U> ab = ExtendedCompletableFuture.wrapFunction(pFn);
     try {
       ExtendedCompletionStage<U> result =
-        ExtendedCompletionStage.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
+        relatedOf(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
       final CancelableFunction<? super T, U> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -332,7 +393,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableFunction<? super T, U> ab = ExtendedCompletableFuture.wrapFunction(pFn);
     try {
       ExtendedCompletionStage<U> result =
-        ExtendedCompletionStage.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
+        relatedOf(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
       final CancelableFunction<? super T, U> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -381,7 +442,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(pAction);
     try {
       ExtendedCompletionStage<@Nullable Void> result =
-        ExtendedCompletionStage.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
+        relatedOf(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
       final CancelableRunnable cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -403,7 +464,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(pAction);
     try {
       ExtendedCompletionStage<@Nullable Void> result =
-        ExtendedCompletionStage.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
+        relatedOf(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
       final CancelableRunnable cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -426,7 +487,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(pAction);
     try {
       ExtendedCompletionStage<@Nullable Void> result =
-        ExtendedCompletionStage.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
+        relatedOf(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
       final CancelableRunnable cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -449,7 +510,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab =
       ExtendedCompletableFuture.wrapFunction(pFn);
     try {
-      ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.thenCompose(ab));
+      ExtendedCompletionStage<U> result = relatedOf(mDelegate.thenCompose(ab));
       final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -472,7 +533,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab =
       ExtendedCompletableFuture.wrapFunction(pFn);
     try {
-      ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.thenComposeAsync(ab));
+      ExtendedCompletionStage<U> result = relatedOf(mDelegate.thenComposeAsync(ab));
       final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -495,7 +556,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab =
       ExtendedCompletableFuture.wrapFunction(pFn);
     try {
-      ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.thenComposeAsync(ab, pExecutor));
+      ExtendedCompletionStage<U> result = relatedOf(mDelegate.thenComposeAsync(ab, pExecutor));
       final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -543,7 +604,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab =
       ExtendedCompletableFuture.wrapBiFunction(pFn);
     try {
-      ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.handle(ab));
+      ExtendedCompletionStage<U> result = relatedOf(mDelegate.handle(ab));
       ab = null;
       return result;
     }
@@ -558,7 +619,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab =
       ExtendedCompletableFuture.wrapBiFunction(pFn);
     try {
-      ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.handleAsync(ab));
+      ExtendedCompletionStage<U> result = relatedOf(mDelegate.handleAsync(ab));
       ab = null;
       return result;
     }
@@ -574,7 +635,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab =
       ExtendedCompletableFuture.wrapBiFunction(pFn);
     try {
-      ExtendedCompletionStage<U> result = ExtendedCompletionStage.of(mDelegate.handleAsync(ab, pExecutor));
+      ExtendedCompletionStage<U> result = relatedOf(mDelegate.handleAsync(ab, pExecutor));
       ab = null;
       return result;
     }
@@ -618,7 +679,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
       if (x instanceof ExceptionMarker)
         return pFn.apply(((ExceptionMarker) x).throwable);
       else
-        return ExtendedCompletableFuture.completedFuture(x);
+        return relatedCompletedFuture(x);
     });
   }
 
@@ -635,7 +696,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
       if (x instanceof ExceptionMarker)
         return pFn.apply(((ExceptionMarker) x).throwable);
       else
-        return ExtendedCompletableFuture.completedFuture(x);
+        return relatedCompletedFuture(x);
     }, pExecutor);
   }
 
@@ -681,7 +742,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
   public ExtendedCompletionStage<T> continueComposeIfNull(Supplier<CompletionStage<T>> pFunc) {
     return thenCompose((result) -> {
       if (result != null)
-        return ExtendedCompletableFuture.completedFuture(result);
+        return relatedCompletedFuture(result);
       return pFunc.get();
     });
   }
@@ -699,18 +760,6 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
         return result;
       return pFunc.get();
     });
-  }
-
-  /**
-   * Marks a completed failure
-   *
-   * @param pEx the exception
-   * @return the future
-   */
-  public static <U> ExtendedCompletionStage<U> completedFailure(Throwable pEx) {
-    CompletableFuture<U> result = new CompletableFuture<>();
-    result.completeExceptionally(pEx);
-    return ExtendedCompletionStage.of(result);
   }
 
   /**
@@ -744,7 +793,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
     Function<@NonNull T, @NonNull ? extends @NonNull CompletionStage<U>> pFunc) {
     return thenCompose((result) -> {
       if (result == null)
-        return ExtendedCompletableFuture.completedFuture(null);
+        return relatedCompletedFuture(null);
       return pFunc.apply(result);
     });
   }
@@ -828,7 +877,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
    */
   @Override
   public ExtendedCompletionStage<T> orTimeoutAsync(long pTimeout, TimeUnit pUnit, ScheduledExecutorService pService) {
-    CompletableFuture<T> result = new CompletableFuture<>();
+    CompletableFuture<T> result = relatedNewFuture();
     pService.schedule(() -> result.completeExceptionally(new TimeoutException()), pTimeout, pUnit);
     return applyToEitherAsync(result, (v) -> v, pService);
   }
@@ -841,7 +890,7 @@ public class ExtendedCompletionStageImpl<T> implements ExtendedCompletionStage<T
   @Override
   public ExtendedCompletionStage<T> completeOnTimeout​Async(T pValue, long pTimeout, TimeUnit pUnit,
     ScheduledExecutorService pService) {
-    CompletableFuture<T> result = new CompletableFuture<>();
+    CompletableFuture<T> result = relatedNewFuture();
     pService.schedule(() -> result.complete(pValue), pTimeout, pUnit);
     return applyToEitherAsync(result, (v) -> v, pService);
   }

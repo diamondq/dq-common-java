@@ -341,8 +341,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     BiFunction<? super T, ? super U, ? extends V> pFn) {
     CancelableBiFunction<? super T, ? super U, ? extends V> ab = wrapBiFunction(pFn);
     try {
-      ExtendedCompletableFuture<V> result =
-        ExtendedCompletableFuture.of(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
+      ExtendedCompletableFuture<V> result = relatedOf(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
       final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -365,7 +364,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     CancelableBiFunction<? super T, ? super U, ? extends V> ab = wrapBiFunction(pFn);
     try {
       ExtendedCompletableFuture<V> result =
-        ExtendedCompletableFuture.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
+        relatedOf(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
       final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -388,7 +387,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     CancelableBiFunction<? super T, ? super U, ? extends V> ab = wrapBiFunction(pFn);
     try {
       ExtendedCompletableFuture<V> result =
-        ExtendedCompletableFuture.of(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
+        relatedOf(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
       final CancelableBiFunction<? super T, ? super U, ? extends V> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -462,8 +461,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     Function<? super T, U> pFn) {
     CancelableFunction<? super T, U> ab = wrapFunction(pFn);
     try {
-      ExtendedCompletableFuture<U> result =
-        ExtendedCompletableFuture.of(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
       final CancelableFunction<? super T, U> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -486,7 +484,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     CancelableFunction<? super T, U> ab = wrapFunction(pFn);
     try {
       ExtendedCompletableFuture<U> result =
-        ExtendedCompletableFuture.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
+        relatedOf(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
       final CancelableFunction<? super T, U> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -509,7 +507,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     CancelableFunction<? super T, U> ab = wrapFunction(pFn);
     try {
       ExtendedCompletableFuture<U> result =
-        ExtendedCompletableFuture.of(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
+        relatedOf(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
       final CancelableFunction<? super T, U> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -558,7 +556,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     CancelableRunnable ab = wrapRunnable(pAction);
     try {
       ExtendedCompletableFuture<@Nullable Void> result =
-        ExtendedCompletableFuture.of(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
+        relatedOf(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
       final CancelableRunnable cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -580,7 +578,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     CancelableRunnable ab = wrapRunnable(pAction);
     try {
       ExtendedCompletableFuture<@Nullable Void> result =
-        ExtendedCompletableFuture.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
+        relatedOf(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
       final CancelableRunnable cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -603,7 +601,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     CancelableRunnable ab = wrapRunnable(pAction);
     try {
       ExtendedCompletableFuture<@Nullable Void> result =
-        ExtendedCompletableFuture.of(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
+        relatedOf(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
       final CancelableRunnable cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -625,7 +623,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
     CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = wrapFunction(pFn);
     try {
-      ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.thenCompose(ab));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenCompose(ab));
       final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -647,7 +645,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn) {
     CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = wrapFunction(pFn);
     try {
-      ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(ab));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenComposeAsync(ab));
       final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -669,7 +667,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     Function<? super T, @NonNull ? extends @NonNull CompletionStage<U>> pFn, Executor pExecutor) {
     CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> ab = wrapFunction(pFn);
     try {
-      ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.thenComposeAsync(ab, pExecutor));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenComposeAsync(ab, pExecutor));
       final CancelableFunction<? super T, @NonNull ? extends @NonNull CompletionStage<U>> cleanup = ab;
       result = result.exceptionally((ex) -> {
         cleanup.cancel();
@@ -717,7 +715,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
   public <U> ExtendedCompletableFuture<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
     CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab = wrapBiFunction(pFn);
     try {
-      ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handle(ab));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.handle(ab));
       ab = null;
       return result;
     }
@@ -731,7 +729,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
   public <U> ExtendedCompletableFuture<U> handleAsync(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
     CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab = wrapBiFunction(pFn);
     try {
-      ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handleAsync(ab));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.handleAsync(ab));
       ab = null;
       return result;
     }
@@ -746,7 +744,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     Executor pExecutor) {
     CancelableBiFunction<? super T, @Nullable Throwable, ? extends U> ab = wrapBiFunction(pFn);
     try {
-      ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(mDelegate.handleAsync(ab, pExecutor));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.handleAsync(ab, pExecutor));
       ab = null;
       return result;
     }
@@ -790,7 +788,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
       if (x instanceof ExceptionMarker)
         return pFn.apply(((ExceptionMarker) x).throwable);
       else
-        return ExtendedCompletableFuture.completedFuture(x);
+        return relatedCompletedFuture(x);
     });
   }
 
@@ -807,7 +805,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
       if (x instanceof ExceptionMarker)
         return pFn.apply(((ExceptionMarker) x).throwable);
       else
-        return ExtendedCompletableFuture.completedFuture(x);
+        return relatedCompletedFuture(x);
     }, pExecutor);
   }
 
@@ -853,8 +851,12 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     mDelegate = new CompletableFuture<>();
   }
 
-  private ExtendedCompletableFuture(CompletableFuture<T> pFuture) {
+  protected ExtendedCompletableFuture(CompletableFuture<T> pFuture) {
     mDelegate = pFuture;
+  }
+
+  public static <T> ExtendedCompletableFuture<T> newCompletableFuture() {
+    return new ExtendedCompletableFuture<>();
   }
 
   /**
@@ -921,6 +923,23 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
   }
 
   /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedRunAsync(java.lang.Runnable)
+   */
+  @Override
+  public ExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Runnable pRunnable) {
+    CancelableRunnable ab = wrapRunnable(pRunnable);
+    try {
+      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(CompletableFuture.runAsync(ab));
+      ab = null;
+      return result;
+    }
+    finally {
+      if (ab != null)
+        ab.cancel();
+    }
+  }
+
+  /**
    * Returns a new CompletableFuture that is asynchronously completed by a task running in the given executor after it
    * runs the given action.
    *
@@ -933,6 +952,24 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     try {
       ExtendedCompletableFuture<@Nullable Void> result =
         ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab, executor));
+      ab = null;
+      return result;
+    }
+    finally {
+      if (ab != null)
+        ab.cancel();
+    }
+  }
+
+  /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedRunAsync(java.lang.Runnable,
+   *      java.util.concurrent.Executor)
+   */
+  @Override
+  public ExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor) {
+    CancelableRunnable ab = wrapRunnable(pRunnable);
+    try {
+      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(CompletableFuture.runAsync(ab, pExecutor));
       ab = null;
       return result;
     }
@@ -978,6 +1015,16 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     return ExtendedCompletableFuture.of(CompletableFuture.completedFuture(value));
   }
 
+  @Override
+  public <U> ExtendedCompletableFuture<U> relatedCompletedFuture(U value) {
+    return relatedOf(CompletableFuture.completedFuture(value));
+  }
+
+  @Override
+  public <U> ExtendedCompletableFuture<U> relatedNewFuture() {
+    return new ExtendedCompletableFuture<>();
+  }
+
   /**
    * Generates a new ExtendedCompletableFuture from an existing CompletableFuture
    *
@@ -985,6 +1032,23 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
    * @return the new ExtendedCompletableFuture
    */
   public static <U> ExtendedCompletableFuture<U> of(CompletableFuture<U> pFuture) {
+    return new ExtendedCompletableFuture<>(decomposeToCompletableFuture(pFuture));
+  }
+
+  /**
+   * Generates a new ExtendedCompletableFuture from an existing CompletableFuture but in the same context as the given
+   * future. Nothing from the given future is used other than the context. This is usually used to preserve the Vertx
+   * Context or Logging Context.
+   *
+   * @param pFuture the existing CompletableFuture
+   * @return the new ExtendedCompletableFuture
+   */
+  @Override
+  public <U> ExtendedCompletionStage<U> relatedOf(CompletionStage<U> pFuture) {
+    return new ExtendedCompletableFuture<>(decomposeToCompletionStage(pFuture).toCompletableFuture());
+  }
+
+  public <U> ExtendedCompletableFuture<U> relatedOf(CompletableFuture<U> pFuture) {
     return new ExtendedCompletableFuture<>(decomposeToCompletableFuture(pFuture));
   }
 
@@ -1014,7 +1078,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
   public ExtendedCompletableFuture<T> continueComposeIfNull(Supplier<CompletionStage<T>> pFunc) {
     return thenCompose((result) -> {
       if (result != null)
-        return ExtendedCompletableFuture.completedFuture(result);
+        return relatedCompletedFuture(result);
       return pFunc.get();
     });
   }
@@ -1044,6 +1108,19 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     CompletableFuture<U> result = new CompletableFuture<>();
     result.completeExceptionally(pEx);
     return ExtendedCompletableFuture.of(result);
+  }
+
+  /**
+   * Marks a completed failure but in the same context as the given future. Nothing from the given future is used other
+   * than the context. This is usually used to preserve the Vertx Context or Logging Context.
+   *
+   * @param pEx the exception
+   * @return the future
+   */
+  public <U> ExtendedCompletableFuture<U> relatedCompletedFailure(Throwable pEx) {
+    CompletableFuture<U> result = new CompletableFuture<>();
+    result.completeExceptionally(pEx);
+    return relatedOf(result);
   }
 
   /**
@@ -1101,7 +1178,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
     Function<@NonNull T, @NonNull ? extends @NonNull CompletionStage<U>> pFunc) {
     return thenCompose((result) -> {
       if (result == null)
-        return ExtendedCompletableFuture.completedFuture(null);
+        return relatedCompletedFuture(null);
       return pFunc.apply(result);
     });
   }
@@ -1153,7 +1230,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
    */
   @Override
   public ExtendedCompletionStage<T> orTimeoutAsync(long pTimeout, TimeUnit pUnit, ScheduledExecutorService pService) {
-    CompletableFuture<T> result = new CompletableFuture<>();
+    CompletableFuture<T> result = relatedNewFuture();
     pService.schedule(() -> result.completeExceptionally(new TimeoutException()), pTimeout, pUnit);
     return applyToEitherAsync(result, (v) -> v, pService);
   }
@@ -1166,7 +1243,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
   @Override
   public ExtendedCompletionStage<T> completeOnTimeout​Async(T pValue, long pTimeout, TimeUnit pUnit,
     ScheduledExecutorService pService) {
-    CompletableFuture<T> result = new CompletableFuture<>();
+    CompletableFuture<T> result = relatedNewFuture();
     pService.schedule(() -> result.complete(pValue), pTimeout, pUnit);
     return applyToEitherAsync(result, (v) -> v, pService);
   }
@@ -1324,6 +1401,8 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
         return state;
       });
 
+    final ExtendedCompletionStage<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> finalCurrent =
+      current;
     current = current.whenComplete((state, ex) -> {
       if (ex != null) {
         pFinalResult.completeExceptionally(ex);
@@ -1338,7 +1417,7 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
           /* We're finished running */
 
           ExtendedCompletableFuture<@NonNull LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> start =
-            ExtendedCompletableFuture.completedFuture(state);
+            finalCurrent.relatedCompletedFuture(state);
 
           endLoop(start, pEndPreFunction, pEndFunction, pEndPostFunction, pFinalResult, pExecutor);
 
@@ -1347,9 +1426,9 @@ public class ExtendedCompletableFuture<T> extends CompletableFuture<T> implement
 
           /* We're not finished, so schedule another run */
 
-          CompletableFuture.runAsync(() -> {
+          finalCurrent.relatedRunAsync(() -> {
             ExtendedCompletableFuture<LoopState<INPUT, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> start =
-              ExtendedCompletableFuture.completedFuture(state);
+              finalCurrent.relatedCompletedFuture(state);
             performDoWhile(start, pActionPreFunction, pActionFunction, pActionPostFunction, pTestPreFunction,
               pTestFunction, pTestPostFunction, pEndPreFunction, pEndFunction, pEndPostFunction, pFinalResult,
               pExecutor);

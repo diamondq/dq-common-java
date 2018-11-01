@@ -364,6 +364,15 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
   }
 
   /**
+   * Returns a new CompletableFuture that is asynchronously completed by a task running in the
+   * {@link ForkJoinPool#commonPool()} after it runs the given action.
+   *
+   * @param runnable the action to run before completing the returned CompletableFuture
+   * @return the new CompletableFuture
+   */
+  public ExtendedCompletionStage<@Nullable Void> relatedRunAsync(Runnable runnable);
+
+  /**
    * Returns a new CompletableFuture that is asynchronously completed by a task running in the given executor after it
    * runs the given action.
    *
@@ -386,6 +395,16 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
   }
 
   /**
+   * Returns a new CompletableFuture that is asynchronously completed by a task running in the given executor after it
+   * runs the given action.
+   *
+   * @param runnable the action to run before completing the returned CompletableFuture
+   * @param executor the executor to use for asynchronous execution
+   * @return the new CompletableFuture
+   */
+  public ExtendedCompletionStage<@Nullable Void> relatedRunAsync(Runnable runnable, Executor executor);
+
+  /**
    * Generates a new ExtendedCompletableFuture from an existing CompletableFuture
    *
    * @param pFuture the existing CompletableFuture
@@ -394,6 +413,16 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
   public static <U> ExtendedCompletionStage<U> of(CompletionStage<U> pFuture) {
     return new ExtendedCompletionStageImpl<>(ExtendedCompletionStageImpl.decomposeToCompletionStage(pFuture));
   }
+
+  /**
+   * Generates a new ExtendedCompletableFuture from an existing CompletableFuture but in the same context as the given
+   * future. Nothing from the given future is used other than the context. This is usually used to preserve the Vertx
+   * Context or Logging Context.
+   *
+   * @param pFuture the existing CompletableFuture
+   * @return the new ExtendedCompletableFuture
+   */
+  public <U> ExtendedCompletionStage<U> relatedOf(CompletionStage<U> pFuture);
 
   /**
    * Continues if the result is null
@@ -603,7 +632,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
     @Nullable Function<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ExtendedCompletionStage<ENDRESULT>> pEndFunction,
     @Nullable Function<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction) {
 
-    ExtendedCompletableFuture<ENDPOST> finalResult = new ExtendedCompletableFuture<>();
+    ExtendedCompletableFuture<ENDPOST> finalResult = relatedNewFuture();
 
     /* Setup the LoopState object */
 
@@ -655,14 +684,14 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
     @Nullable Function<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>, ENDPOST> pEndPostFunction,
     @Nullable Executor pExecutor) {
 
-    ExtendedCompletableFuture<ENDPOST> finalResult = new ExtendedCompletableFuture<>();
+    ExtendedCompletableFuture<ENDPOST> finalResult = relatedNewFuture();
 
     /* Setup the LoopState object */
 
     ExtendedCompletionStage<@Nullable LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> applyResult =
       (pExecutor == null ? thenApply(input -> new LoopState<>(input))
         : thenApplyAsync(input -> new LoopState<>(input), pExecutor));
-    
+
     @SuppressWarnings("null")
     ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>> current =
       (ExtendedCompletionStage<@NonNull LoopState<T, STARTPRE, STARTRESULT, STARTPOST, ACTIONPRE, ACTIONRESULT, ACTIONPOST, TESTPRE, TESTRESULT, TESTPOST, ENDPRE, ENDRESULT, ENDPOST>>) applyResult;
@@ -727,7 +756,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
         Boolean startPost = loopState.startPost;
         Boolean testPost = loopState.testPost;
         if ((startPre == null) || (startPost == false) || (testPost == false))
-          return ExtendedCompletableFuture.completedFuture(null);
+          return relatedCompletedFuture(null);
         U nextElement = startPre.next();
         CompletionStage<V> completionStage = pPerformActionFunction.apply(nextElement);
         if (completionStage instanceof ExtendedCompletionStage)
@@ -794,7 +823,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
         Boolean startPost = loopState.startPost;
         Boolean testPost = loopState.testPost;
         if ((startPre == null) || (startPost == false) || (testPost == false))
-          return ExtendedCompletableFuture.completedFuture(null);
+          return relatedCompletedFuture(null);
         U nextElement = startPre.next();
         CompletionStage<V> completionStage = pPerformActionFunction.apply(nextElement);
         if (completionStage instanceof ExtendedCompletionStage)
@@ -955,6 +984,14 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
     return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
   }
 
+  public default ExtendedCompletionStage<@Nullable Void> relatedAllOf(@NonNull CompletionStage<?>... cfs) {
+    @NonNull
+    CompletableFuture<?>[] args = new @NonNull CompletableFuture<?>[cfs.length];
+    for (int i = 0; i < cfs.length; i++)
+      args[i] = cfs[i].toCompletableFuture();
+    return relatedOf(CompletableFuture.allOf(args));
+  }
+
   /**
    * Generates an allOf future
    *
@@ -972,11 +1009,29 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
     return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
   }
 
+  public default ExtendedCompletionStage<@Nullable Void> relatedAllOf(
+    Collection<@NonNull ? extends @NonNull CompletionStage<?>> cfs) {
+    CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
+    int count = 0;
+    for (Iterator<@NonNull ? extends @NonNull CompletionStage<?>> i = cfs.iterator(); i.hasNext();) {
+      CompletionStage<?> next = i.next();
+      args[count++] = next.toCompletableFuture();
+    }
+    return relatedOf(CompletableFuture.allOf(args));
+  }
+
   public static ExtendedCompletionStage<@Nullable Object> anyOf(@NonNull CompletionStage<?>... cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
     for (int i = 0; i < cfs.length; i++)
       args[i] = cfs[i].toCompletableFuture();
     return ExtendedCompletableFuture.of(CompletableFuture.anyOf(args));
+  }
+
+  public default ExtendedCompletionStage<@Nullable Object> relatedAnyOf(@NonNull CompletionStage<?>... cfs) {
+    CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
+    for (int i = 0; i < cfs.length; i++)
+      args[i] = cfs[i].toCompletableFuture();
+    return relatedOf(CompletableFuture.anyOf(args));
   }
 
   public static <U> ExtendedCompletionStage<List<U>> listOf(Collection<ExtendedCompletionStage<U>> cfs) {
@@ -988,4 +1043,19 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
       return results;
     });
   }
+
+  public default <U> ExtendedCompletionStage<List<U>> relatedListOf(Collection<ExtendedCompletionStage<U>> cfs) {
+    return relatedAllOf(cfs).thenApply((v) -> {
+      List<U> results = new ArrayList<>();
+      for (CompletionStage<U> stage : cfs) {
+        results.add(stage.toCompletableFuture().join());
+      }
+      return results;
+    });
+  }
+
+  public <U> ExtendedCompletableFuture<U> relatedCompletedFuture(U value);
+
+  public <U> ExtendedCompletableFuture<U> relatedNewFuture();
+
 }
