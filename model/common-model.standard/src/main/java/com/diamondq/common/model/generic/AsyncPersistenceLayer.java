@@ -1,6 +1,5 @@
 package com.diamondq.common.model.generic;
 
-import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.model.interfaces.AsyncToolkit;
 import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
@@ -15,6 +14,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
+import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,8 +34,8 @@ public interface AsyncPersistenceLayer {
 
   public StructureDefinition createNewTombstoneStructureDefinition(AsyncToolkit pToolkit, Scope pScope, String pName);
 
-  public ExtendedCompletionStage<StructureDefinition> writeStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
-    StructureDefinition pValue);
+  public ContextExtendedCompletionStage<StructureDefinition> writeStructureDefinition(AsyncToolkit pToolkit,
+    Scope pScope, StructureDefinition pValue);
 
   /**
    * Only called by the CombinedPeristenceLayer to enable the StructureDefinition on layers that don't persist the
@@ -47,16 +47,16 @@ public interface AsyncPersistenceLayer {
    */
   public void enableStructureDefinition(AsyncToolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
-  public ExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
     StructureDefinition pValue);
 
-  public ExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(
+  public ContextExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(
     AsyncToolkit pToolkit, Scope pScope);
 
-  public ExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(AsyncToolkit pToolkit,
-    Scope pScope, String pName);
+  public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(
+    AsyncToolkit pToolkit, Scope pScope, String pName);
 
-  public ExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(
+  public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(
     AsyncToolkit pToolkit, Scope pScope, String pName, @Nullable Integer pRevision);
 
   /* Reference */
@@ -87,19 +87,19 @@ public interface AsyncPersistenceLayer {
 
   public Structure createNewTombstoneStructure(AsyncToolkit pToolkit, Scope pScope, Structure pOldStructure);
 
-  public ExtendedCompletionStage<@Nullable Void> writeStructure(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<@Nullable Void> writeStructure(AsyncToolkit pToolkit, Scope pScope,
     Structure pStructure);
 
-  public ExtendedCompletionStage<Boolean> writeStructure(AsyncToolkit pToolkit, Scope pScope, Structure pStructure,
-    @Nullable Structure pOldStructure);
+  public ContextExtendedCompletionStage<Boolean> writeStructure(AsyncToolkit pToolkit, Scope pScope,
+    Structure pStructure, @Nullable Structure pOldStructure);
 
-  public ExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(AsyncToolkit pToolkit,
+  public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(AsyncToolkit pToolkit,
     Scope pScope, String pSerializedRef);
 
-  public ExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(AsyncToolkit pToolkit, Scope pScope,
-    StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys);
+  public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(AsyncToolkit pToolkit,
+    Scope pScope, StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys);
 
-  public ExtendedCompletionStage<Boolean> deleteStructure(AsyncToolkit pToolkit, Scope pScope, Structure pValue);
+  public ContextExtendedCompletionStage<Boolean> deleteStructure(AsyncToolkit pToolkit, Scope pScope, Structure pValue);
 
   /* Property */
 
@@ -111,17 +111,17 @@ public interface AsyncPersistenceLayer {
   public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(AsyncToolkit pToolkit, Scope pScope,
     String pValue);
 
-  public ExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(AsyncToolkit pToolkit,
+  public ContextExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(AsyncToolkit pToolkit,
     Scope pScope, StructureDefinitionRef pRef, @Nullable String pParentKey,
     @Nullable PropertyDefinition pParentPropertyDef);
 
-  public ExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(AsyncToolkit pToolkit, Scope pScope,
     ModelQuery pQuery, @Nullable Map<String, Object> pParamValues);
 
   public QueryBuilder createNewQueryBuilder(AsyncToolkit pToolkit, Scope pScope,
     StructureDefinition pStructureDefinition, String pQueryName);
 
-  public ExtendedCompletionStage<ModelQuery> writeQueryBuilder(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<ModelQuery> writeQueryBuilder(AsyncToolkit pToolkit, Scope pScope,
     QueryBuilder pQueryBuilder);
 
   public StructureRef createStructureRefFromParts(AsyncToolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
@@ -139,7 +139,7 @@ public interface AsyncPersistenceLayer {
   public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
     AsyncToolkit pToolkit, Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
 
-  public ExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(AsyncToolkit pToolkit,
-    Scope pScope, String pDefName);
+  public ContextExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(
+    AsyncToolkit pToolkit, Scope pScope, String pDefName);
 
 }

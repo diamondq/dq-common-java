@@ -1,6 +1,5 @@
 package com.diamondq.common.model.generic.osgi;
 
-import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.model.interfaces.AsyncToolkit;
 import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
@@ -16,6 +15,7 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +41,8 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(Scope pScope) {
+  public ContextExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(
+    Scope pScope) {
     return mAsyncToolkit.getAllStructureDefinitionRefs(dewrapScope(pScope));
   }
 
@@ -51,13 +52,14 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ExtendedCompletionStage<StructureDefinition> writeStructureDefinition(Scope pScope,
+  public ContextExtendedCompletionStage<StructureDefinition> writeStructureDefinition(Scope pScope,
     StructureDefinition pValue) {
     return mAsyncToolkit.writeStructureDefinition(dewrapScope(pScope), pValue);
   }
 
   @Override
-  public ExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(Scope pScope, StructureDefinition pValue) {
+  public ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(Scope pScope,
+    StructureDefinition pValue) {
     return mAsyncToolkit.deleteStructureDefinition(dewrapScope(pScope), pValue);
   }
 
@@ -95,14 +97,14 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(Scope pScope,
+  public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(Scope pScope,
     String pName) {
     return mAsyncToolkit.lookupStructureDefinitionByName(dewrapScope(pScope), pName);
   }
 
   @Override
-  public ExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(Scope pScope,
-    String pName, @Nullable Integer pRevision) {
+  public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(
+    Scope pScope, String pName, @Nullable Integer pRevision) {
     return mAsyncToolkit.lookupStructureDefinitionByNameAndRevision(dewrapScope(pScope), pName, pRevision);
   }
 
@@ -117,13 +119,13 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(Scope pScope,
+  public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(Scope pScope,
     String pSerializedRef) {
     return mAsyncToolkit.lookupStructureBySerializedRef(dewrapScope(pScope), pSerializedRef);
   }
 
   @Override
-  public ExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(Scope pScope,
+  public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(Scope pScope,
     StructureDefinition pStructureDef, @Nullable Object @NonNull... pPrimaryKeys) {
     return mAsyncToolkit.lookupStructureByPrimaryKeys(dewrapScope(pScope), pStructureDef, pPrimaryKeys);
   }
@@ -134,18 +136,18 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ExtendedCompletionStage<@Nullable Void> writeStructure(Scope pScope, Structure pStructure) {
+  public ContextExtendedCompletionStage<@Nullable Void> writeStructure(Scope pScope, Structure pStructure) {
     return mAsyncToolkit.writeStructure(dewrapScope(pScope), pStructure);
   }
 
   @Override
-  public ExtendedCompletionStage<Boolean> writeStructure(Scope pScope, Structure pStructure,
+  public ContextExtendedCompletionStage<Boolean> writeStructure(Scope pScope, Structure pStructure,
     @Nullable Structure pOldStructure) {
     return mAsyncToolkit.writeStructure(dewrapScope(pScope), pStructure, pOldStructure);
   }
 
   @Override
-  public ExtendedCompletionStage<Boolean> deleteStructure(Scope pScope, Structure pOldStructure) {
+  public ContextExtendedCompletionStage<Boolean> deleteStructure(Scope pScope, Structure pOldStructure) {
     return mAsyncToolkit.deleteStructure(dewrapScope(pScope), pOldStructure);
   }
 
@@ -172,7 +174,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(Scope pScope,
+  public ContextExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(Scope pScope,
     StructureDefinitionRef pRef, @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef) {
     return mAsyncToolkit.getAllStructuresByDefinition(dewrapScope(pScope), pRef, pParentKey, pParentPropertyDef);
   }
@@ -183,12 +185,12 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ExtendedCompletionStage<ModelQuery> writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder) {
+  public ContextExtendedCompletionStage<ModelQuery> writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder) {
     return mAsyncToolkit.writeQueryBuilder(dewrapScope(pScope), pQueryBuilder);
   }
 
   @Override
-  public ExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(Scope pScope, ModelQuery pQuery,
+  public ContextExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues) {
     return mAsyncToolkit.lookupStructuresByQuery(dewrapScope(pScope), pQuery, pParamValues);
   }
@@ -213,7 +215,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(Scope pScope,
+  public ContextExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(Scope pScope,
     String pDefName) {
     return mAsyncToolkit.lookupLatestStructureDefinitionRevision(dewrapScope(pScope), pDefName);
   }

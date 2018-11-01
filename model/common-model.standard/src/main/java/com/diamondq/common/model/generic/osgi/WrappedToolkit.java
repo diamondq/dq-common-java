@@ -22,7 +22,6 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
 import com.diamondq.common.model.interfaces.TranslatableString;
-import com.diamondq.common.utils.context.logging.LoggingUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -68,13 +67,10 @@ public class WrappedToolkit implements Toolkit {
   }
 
   public void onActivate() {
-    LoggingUtils.entry(sLogger, this);
     try {
       mToolkit = ToolkitFactory.newInstance().newToolkit();
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
       sLogger.error("", ex);
       throw ex;
     }
@@ -107,7 +103,6 @@ public class WrappedToolkit implements Toolkit {
   }
 
   public void clearModificationState() {
-    LoggingUtils.simpleEntry(sLogger, this);
     mWriteStructure = false;
     mWriteStructureDefinition = false;
     mWriteEditorStructureDefinition = false;
@@ -119,16 +114,13 @@ public class WrappedToolkit implements Toolkit {
   }
 
   public void setPersistenceLayer(Scope pScope, PersistenceLayer pLayer) {
-    LoggingUtils.entry(sLogger, this, pScope, pLayer);
     try {
       if (mToolkit instanceof GenericToolkit)
         ((GenericToolkit) mToolkit).setPersistenceLayer(pScope, pLayer);
       else
         throw new UnsupportedOperationException();
-      LoggingUtils.exit(sLogger, this);
     }
     catch (RuntimeException ex) {
-      LoggingUtils.exitWithException(sLogger, this, ex);
       throw ex;
     }
   }

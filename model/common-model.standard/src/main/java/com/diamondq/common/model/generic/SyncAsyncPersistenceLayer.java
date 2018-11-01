@@ -1,7 +1,6 @@
 package com.diamondq.common.model.generic;
 
-import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
-import com.diamondq.common.lambda.future.ExtendedCompletionStage;
+import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.model.interfaces.AsyncToolkit;
 import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
@@ -16,6 +15,8 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
+import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
+import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 
 import java.util.Collection;
 import java.util.List;
@@ -58,14 +59,14 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public ExtendedCompletionStage<StructureDefinition> writeStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
-    StructureDefinition pValue) {
+  public ContextExtendedCompletionStage<StructureDefinition> writeStructureDefinition(AsyncToolkit pToolkit,
+    Scope pScope, StructureDefinition pValue) {
     mPersistenceLayer.writeStructureDefinition(pToolkit.getSyncToolkit(), pScope, pValue);
     StructureDefinition result =
       mPersistenceLayer.lookupStructureDefinitionByName(pToolkit.getSyncToolkit(), pScope, pValue.getName());
     if (result == null)
       throw new IllegalArgumentException();
-    return ExtendedCompletableFuture.completedFuture(result);
+    return FutureUtils.completedFuture(result);
   }
 
   /**
@@ -82,10 +83,10 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public ExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
     StructureDefinition pValue) {
     mPersistenceLayer.deleteStructureDefinition(pToolkit.getSyncToolkit(), pScope, pValue);
-    return ExtendedCompletableFuture.completedFuture(null);
+    return FutureUtils.completedFuture(null);
   }
 
   /**
@@ -93,9 +94,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope)
    */
   @Override
-  public ExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(
+  public ContextExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(
     AsyncToolkit pToolkit, Scope pScope) {
-    return ExtendedCompletableFuture
+    return ContextExtendedCompletableFuture
       .completedFuture(mPersistenceLayer.getAllStructureDefinitionRefs(pToolkit.getSyncToolkit(), pScope));
   }
 
@@ -104,9 +105,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
-  public ExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(AsyncToolkit pToolkit,
-    Scope pScope, String pName) {
-    return ExtendedCompletableFuture
+  public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(
+    AsyncToolkit pToolkit, Scope pScope, String pName) {
+    return ContextExtendedCompletableFuture
       .completedFuture(mPersistenceLayer.lookupStructureDefinitionByName(pToolkit.getSyncToolkit(), pScope, pName));
   }
 
@@ -115,9 +116,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
    */
   @Override
-  public ExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(
+  public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(
     AsyncToolkit pToolkit, Scope pScope, String pName, @Nullable Integer pRevision) {
-    return ExtendedCompletableFuture.completedFuture(mPersistenceLayer
+    return FutureUtils.completedFuture(mPersistenceLayer
       .lookupStructureDefinitionByNameAndRevision(pToolkit.getSyncToolkit(), pScope, pName, pRevision));
   }
 
@@ -214,10 +215,10 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
-  public ExtendedCompletionStage<@Nullable Void> writeStructure(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<@Nullable Void> writeStructure(AsyncToolkit pToolkit, Scope pScope,
     Structure pStructure) {
     mPersistenceLayer.writeStructure(pToolkit.getSyncToolkit(), pScope, pStructure);
-    return ExtendedCompletableFuture.completedFuture(null);
+    return FutureUtils.completedFuture(null);
   }
 
   /**
@@ -226,9 +227,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Structure)
    */
   @Override
-  public ExtendedCompletionStage<Boolean> writeStructure(AsyncToolkit pToolkit, Scope pScope, Structure pStructure,
-    @Nullable Structure pOldStructure) {
-    return ExtendedCompletableFuture
+  public ContextExtendedCompletionStage<Boolean> writeStructure(AsyncToolkit pToolkit, Scope pScope,
+    Structure pStructure, @Nullable Structure pOldStructure) {
+    return ContextExtendedCompletableFuture
       .completedFuture(mPersistenceLayer.writeStructure(pToolkit.getSyncToolkit(), pScope, pStructure, pOldStructure));
   }
 
@@ -237,9 +238,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
-  public ExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(AsyncToolkit pToolkit,
+  public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(AsyncToolkit pToolkit,
     Scope pScope, String pSerializedRef) {
-    return ExtendedCompletableFuture.completedFuture(
+    return FutureUtils.completedFuture(
       mPersistenceLayer.lookupStructureBySerializedRef(pToolkit.getSyncToolkit(), pScope, pSerializedRef));
   }
 
@@ -249,9 +250,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      java.lang.Object[])
    */
   @Override
-  public ExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(AsyncToolkit pToolkit, Scope pScope,
-    StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys) {
-    return ExtendedCompletableFuture.completedFuture(
+  public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(AsyncToolkit pToolkit,
+    Scope pScope, StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys) {
+    return FutureUtils.completedFuture(
       mPersistenceLayer.lookupStructureByPrimaryKeys(pToolkit.getSyncToolkit(), pScope, pStructureDef, pPrimaryKeys));
   }
 
@@ -260,8 +261,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
-  public ExtendedCompletionStage<Boolean> deleteStructure(AsyncToolkit pToolkit, Scope pScope, Structure pValue) {
-    return ExtendedCompletableFuture
+  public ContextExtendedCompletionStage<Boolean> deleteStructure(AsyncToolkit pToolkit, Scope pScope,
+    Structure pValue) {
+    return ContextExtendedCompletableFuture
       .completedFuture(mPersistenceLayer.deleteStructure(pToolkit.getSyncToolkit(), pScope, pValue));
   }
 
@@ -302,11 +304,11 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
    */
   @Override
-  public ExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(AsyncToolkit pToolkit,
+  public ContextExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(AsyncToolkit pToolkit,
     Scope pScope, StructureDefinitionRef pRef, @Nullable String pParentKey,
     @Nullable PropertyDefinition pParentPropertyDef) {
-    return ExtendedCompletableFuture.completedFuture(mPersistenceLayer
-      .getAllStructuresByDefinition(pToolkit.getSyncToolkit(), pScope, pRef, pParentKey, pParentPropertyDef));
+    return FutureUtils.completedFuture(mPersistenceLayer.getAllStructuresByDefinition(pToolkit.getSyncToolkit(), pScope,
+      pRef, pParentKey, pParentPropertyDef));
   }
 
   /**
@@ -314,9 +316,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
-  public ExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(AsyncToolkit pToolkit, Scope pScope,
     ModelQuery pQuery, @Nullable Map<String, Object> pParamValues) {
-    return ExtendedCompletableFuture.completedFuture(
+    return FutureUtils.completedFuture(
       mPersistenceLayer.lookupStructuresByQuery(pToolkit.getSyncToolkit(), pScope, pQuery, pParamValues));
   }
 
@@ -336,9 +338,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
-  public ExtendedCompletionStage<ModelQuery> writeQueryBuilder(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<ModelQuery> writeQueryBuilder(AsyncToolkit pToolkit, Scope pScope,
     QueryBuilder pQueryBuilder) {
-    return ExtendedCompletableFuture
+    return ContextExtendedCompletableFuture
       .completedFuture(mPersistenceLayer.writeQueryBuilder(pToolkit.getSyncToolkit(), pScope, pQueryBuilder));
   }
 
@@ -402,9 +404,9 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
-  public ExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(AsyncToolkit pToolkit,
-    Scope pScope, String pDefName) {
-    return ExtendedCompletableFuture.completedFuture(
+  public ContextExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(
+    AsyncToolkit pToolkit, Scope pScope, String pDefName) {
+    return FutureUtils.completedFuture(
       mPersistenceLayer.lookupLatestStructureDefinitionRevision(pToolkit.getSyncToolkit(), pScope, pDefName));
   }
 
