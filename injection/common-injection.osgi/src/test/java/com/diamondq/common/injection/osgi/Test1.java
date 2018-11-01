@@ -5,7 +5,7 @@ import com.diamondq.common.injection.osgi.testmodel.TestClassWithObjConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestDep;
 import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
-import com.diamondq.common.utils.context.logging.LoggingContextHandler;
+import com.diamondq.common.utils.context.impl.logging.LoggingContextHandler;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 
 import java.io.IOException;
