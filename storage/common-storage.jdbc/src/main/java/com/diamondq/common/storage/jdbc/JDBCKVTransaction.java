@@ -26,16 +26,12 @@ import javax.transaction.UserTransaction;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The Cloudant database is effectively flat. Thus, mapping the concept of a 'table' is done by concatenating the
  * 'table' to the front of any keys.
  */
 public class JDBCKVTransaction implements IKVTransaction {
-
-  private static final Logger              sLogger = LoggerFactory.getLogger(JDBCKVTransaction.class);
 
   private static final IKVColumnDefinition sPRIMARY_KEY_2_DEF;
 
@@ -84,7 +80,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         try (PreparedStatement ps = c.prepareStatement(info.getBySQL)) {
           ps.setString(1, pKey1);
           ps.setString(2, pKey2);
-          sLogger.trace("{} -> {}, {}", info.getBySQL, pKey1, pKey2);
+          context.trace("{} -> {}, {}", info.getBySQL, pKey1, pKey2);
           try (ResultSet rs = ps.executeQuery()) {
             if (rs.next() == false)
               return context.exit(null);
@@ -116,7 +112,7 @@ public class JDBCKVTransaction implements IKVTransaction {
             ps.setString(1, pKey1);
             ps.setString(2, pKey2);
             info.serializer.serializeToPreparedStatement(pObj, ps, 2);
-            sLogger.trace("{} -> {}, {}", info.putBySQL, pKey1, pKey2);
+            context.trace("{} -> {}, {}", info.putBySQL, pKey1, pKey2);
             ps.execute();
           }
         }
@@ -125,7 +121,7 @@ public class JDBCKVTransaction implements IKVTransaction {
           try (PreparedStatement qps = c.prepareStatement(info.putQueryBySQL)) {
             qps.setString(1, pKey1);
             qps.setString(2, pKey2);
-            sLogger.trace("{} -> {}, {}", info.putQueryBySQL, pKey1, pKey2);
+            context.trace("{} -> {}, {}", info.putQueryBySQL, pKey1, pKey2);
             try (ResultSet rs = qps.executeQuery()) {
               exists = rs.next();
             }
@@ -135,7 +131,7 @@ public class JDBCKVTransaction implements IKVTransaction {
               ps.setString(1, pKey1);
               ps.setString(2, pKey2);
               info.serializer.serializeToPreparedStatement(pObj, ps, 3);
-              sLogger.trace("{} -> {}, {}", info.putInsertBySQL, pKey1, pKey2);
+              context.trace("{} -> {}, {}", info.putInsertBySQL, pKey1, pKey2);
               ps.execute();
             }
           }
@@ -144,7 +140,7 @@ public class JDBCKVTransaction implements IKVTransaction {
               int offset = info.serializer.serializeToPreparedStatement(pObj, ps, 1);
               ps.setString(offset, pKey1);
               ps.setString(offset + 1, pKey2);
-              sLogger.trace("{} -> {}, {}", info.putUpdateBySQL, pKey1, pKey2);
+              context.trace("{} -> {}, {}", info.putUpdateBySQL, pKey1, pKey2);
               ps.execute();
             }
           }
@@ -172,7 +168,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         try (PreparedStatement ps = c.prepareStatement(info.removeBySQL)) {
           ps.setString(1, pKey1);
           ps.setString(2, pKey2);
-          sLogger.trace("{} -> {}, {}", info.removeBySQL, pKey1, pKey2);
+          context.trace("{} -> {}, {}", info.removeBySQL, pKey1, pKey2);
           if (ps.executeUpdate() > 0)
             return context.exit(true);
           return context.exit(false);
@@ -198,7 +194,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         JDBCTableInfo info = mStore.validateTable(c, pTable, null);
         PreparedStatement ps = c.prepareStatement(info.keyIteratorSQL);
         try {
-          sLogger.trace("{}", info.keyIteratorSQL);
+          context.trace("{}", info.keyIteratorSQL);
           ResultSet rs = ps.executeQuery();
           try {
             JDBCResultSetIterator result = new JDBCResultSetIterator(ps, rs);
@@ -240,7 +236,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         PreparedStatement ps = c.prepareStatement(info.keyIterator2SQL);
         try {
           ps.setString(1, pKey1);
-          sLogger.trace("{} -> {}", info.keyIterator2SQL, pKey1);
+          context.trace("{} -> {}", info.keyIterator2SQL, pKey1);
           ResultSet rs = ps.executeQuery();
           try {
             JDBCResultSetIterator result = new JDBCResultSetIterator(ps, rs);
@@ -280,7 +276,7 @@ public class JDBCKVTransaction implements IKVTransaction {
           throw new IllegalStateException();
         JDBCTableInfo info = mStore.validateTable(c, pTable, null);
         try (PreparedStatement ps = c.prepareStatement(info.clearSQL)) {
-          sLogger.trace("{}", info.clearSQL);
+          context.trace("{}", info.clearSQL);
           ps.executeUpdate();
         }
       }
@@ -303,7 +299,7 @@ public class JDBCKVTransaction implements IKVTransaction {
           throw new IllegalStateException();
         JDBCTableInfo info = mStore.validateTable(c, pTable, null);
         try (PreparedStatement ps = c.prepareStatement(info.getCountSQL)) {
-          sLogger.trace("{}", info.getCountSQL);
+          context.trace("{}", info.getCountSQL);
           try (ResultSet rs = ps.executeQuery()) {
             if (rs.next() == false)
               return context.exit(0L);
@@ -464,7 +460,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         JDBCTableInfo info = mStore.validateTable(c, table, pClass);
         String querySQL = mStore.getQuerySQL(info, pQuery);
         try (PreparedStatement ps = c.prepareStatement(querySQL)) {
-          sLogger.trace("{}", querySQL);
+          context.trace("{}", querySQL);
           List<WhereInfo> whereList = pQuery.getWhereList();
           int paramCount = 0;
           for (WhereInfo where : whereList) {
