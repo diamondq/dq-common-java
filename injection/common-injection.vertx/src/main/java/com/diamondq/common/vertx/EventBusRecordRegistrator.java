@@ -155,19 +155,20 @@ public class EventBusRecordRegistrator implements ServiceExporter {
    */
   @Override
   public void init(Vertx pVertx, ServicePublisher pPublisher, JsonObject pConfiguration, Future<Void> pFuture) {
+    try (Context ctx =
+      mContextFactory.newContext(EventBusRecordRegistrator.class, this, pVertx, pPublisher, pConfiguration, pFuture)) {
+      /* Get all the existing records and process them before marking us as active */
 
-    /* Get all the existing records and process them before marking us as active */
+      VertxUtils.<Function<Record, Boolean>, List<Record>> call(mServiceDiscovery::getRecords, (r) -> true)
+        .thenAccept((records) -> {
 
-    VertxUtils.<Function<Record, Boolean>, List<Record>> call(mServiceDiscovery::getRecords, (r) -> true)
-      .thenAccept((records) -> {
+          for (Record record : records)
+            processRecord(record);
 
-        for (Record record : records)
-          processRecord(record);
+          pFuture.complete();
 
-        pFuture.complete();
-
-      });
-
+        });
+    }
   }
 
   /**

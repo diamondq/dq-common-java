@@ -16,6 +16,10 @@
       <artifactId>common-injection.osgi</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-metrics.micrometer</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
     </dependency>
@@ -61,8 +65,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-utils.logback</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.janino</groupId>
+      <artifactId>janino</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

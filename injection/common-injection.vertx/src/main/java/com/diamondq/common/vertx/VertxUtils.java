@@ -1,17 +1,22 @@
 package com.diamondq.common.vertx;
 
-import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
+import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.lambda.interfaces.Consumer2;
 import com.diamondq.common.lambda.interfaces.Consumer3;
+import com.diamondq.common.lambda.interfaces.Consumer4;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
+import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
+import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -23,6 +28,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.streams.ReadStream;
 
 public class VertxUtils {
 
@@ -49,40 +56,66 @@ public class VertxUtils {
 
   }
 
+  private static @Nullable Vertx mDefaultVertx;
+
+  public static @Nullable Vertx getDefaultVertx() {
+    return mDefaultVertx;
+  }
+
+  public static void setDefaultVertx(@Nullable Vertx pDefaultVertx) {
+    mDefaultVertx = pDefaultVertx;
+  }
+
   public static <V extends Verticle> Closeable deployMultiInstance(Vertx pVertx, V pVerticle,
-    @Nullable Consumer<V> pOnStarted) {
+    @Nullable Consumer2<V, Context> pOnStarted) {
     int deployCount = Runtime.getRuntime().availableProcessors() * 2;
     return deployMultiInstance(pVertx, pVerticle, pOnStarted, deployCount);
   }
 
   public static <V extends Verticle> Closeable deployMultiInstance(Vertx pVertx, V pVerticle,
-    @Nullable Consumer<V> pOnStarted, int pDeployCount) {
+    @Nullable Consumer2<V, Context> pOnStarted, int pDeployCount) {
 
-    @Nullable
-    String[] deploymentIds = new @Nullable String[pDeployCount];
-    List<ExtendedCompletionStage<@Nullable Void>> futures = new ArrayList<>();
-    for (int i = 0; i < pDeployCount; i++) {
-      final int offset = i;
+    Context currentContext = ContextFactory.currentContext();
+    currentContext.prepareForAlternateThreads();
+    try (Context ctx =
+      ContextFactory.getInstance().newContext(VertxUtils.class, null, pVertx, pVerticle, pOnStarted, pDeployCount)) {
 
-      futures.add(
+      @Nullable
+      String[] deploymentIds = new @Nullable String[pDeployCount];
+      List<ContextExtendedCompletionStage<@Nullable Void>> futures = new ArrayList<>();
+      for (int i = 0; i < pDeployCount; i++) {
+        final int offset = i;
 
-        /* Deploy the verticle */
+        futures.add(
 
-        VertxUtils.<Verticle, String> call(pVertx::deployVerticle, pVerticle)
+          /* Deploy the verticle */
 
-          /* And record the deployment id for future undeployment */
+          VertxUtils.<Verticle, String> call(pVertx::deployVerticle, pVerticle)
 
-          .thenAccept((did) -> deploymentIds[offset] = did));
+            /* And record the deployment id for future undeployment */
 
+            .thenAccept((did) -> deploymentIds[offset] = did));
+
+      }
+      ContextExtendedCompletableFuture<Object> holderFuture = FutureUtils.newCompletableFuture();
+      ContextExtendedCompletionStage<@Nullable Void> deploymentFuture = holderFuture.relatedAllOf(futures);
+
+      deploymentFuture.thenAccept((v) -> {
+        if (pOnStarted != null) {
+          currentContext.prepareForAlternateThreads();
+          try (Context deployContext = currentContext.activateOnThread("")) {
+            pOnStarted.accept(pVerticle, deployContext);
+          }
+        }
+      }).handle((t, ex) -> {
+        if (ex != null)
+          ContextFactory.staticReportThrowable(VertxUtils.class, VertxUtils.class, ex);
+        try (Context handleContext = currentContext.activateOnThread("")) {
+        }
+        return t;
+      });
+      return new Undeployer(pVertx, deploymentIds);
     }
-    ExtendedCompletionStage.allOf(futures).thenAccept((v) -> {
-      if (pOnStarted != null)
-        pOnStarted.accept(pVerticle);
-    }).exceptionally((ex) -> {
-      ContextFactory.staticReportThrowable(VertxUtils.class, VertxUtils.class, ex);
-      return null;
-    });
-    return new Undeployer(pVertx, deploymentIds);
   }
 
   public static void undeploy(@Nullable Closeable pDeployment) {
@@ -103,9 +136,9 @@ public class VertxUtils {
    * @param pFunction the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
-  public static <T, R> Pair<ExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
+  public static <T, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
     Function<@NonNull T, ExtendedCompletionStage<R>> pFunction) {
-    ExtendedCompletableFuture<R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -141,9 +174,9 @@ public class VertxUtils {
    * @param pArg1 the additional argument to pass to the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
-  public static <T, A1, R> Pair<ExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
+  public static <T, A1, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
     Function2<@NonNull T, A1, ExtendedCompletionStage<R>> pFunction, A1 pArg1) {
-    ExtendedCompletableFuture<R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -180,9 +213,9 @@ public class VertxUtils {
    * @param pArg2 the additional argument to pass to the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
-  public static <T, A1, A2, R> Pair<ExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
+  public static <T, A1, A2, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
     Function3<@NonNull T, A1, A2, ExtendedCompletionStage<R>> pFunction, A1 pArg1, A2 pArg2) {
-    ExtendedCompletableFuture<R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -219,9 +252,9 @@ public class VertxUtils {
    * @param pFunction the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
-  public static <T, R> Pair<ExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
+  public static <T, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
     Function<@NonNull T, R> pFunction) {
-    ExtendedCompletableFuture<R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -253,9 +286,9 @@ public class VertxUtils {
    * @param pArg1 the additional argument to pass to the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
-  public static <T, A1, R> Pair<ExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
+  public static <T, A1, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
     Function2<@NonNull T, A1, R> pFunction, A1 pArg1) {
-    ExtendedCompletableFuture<R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -288,9 +321,9 @@ public class VertxUtils {
    * @param pArg2 the additional argument to pass to the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
-  public static <T, A1, A2, R> Pair<ExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
+  public static <T, A1, A2, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
     Function3<@NonNull T, A1, A2, R> pFunction, A1 pArg1, A2 pArg2) {
-    ExtendedCompletableFuture<R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -317,9 +350,29 @@ public class VertxUtils {
 
   /* **************************************** VERTX CALL ************************************************** */
 
-  public static <A1, R> ExtendedCompletionStage<R> call(Consumer2<A1, Handler<AsyncResult<@Nullable R>>> pCallee,
+  public static <R> ContextExtendedCompletionStage<R> call(Consumer<Handler<AsyncResult<@Nullable R>>> pCallee) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.accept((ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
+        if (result == null)
+          throw new IllegalArgumentException();
+        future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <A1, R> ContextExtendedCompletionStage<R> call(Consumer2<A1, Handler<AsyncResult<@Nullable R>>> pCallee,
     A1 pArg1) {
-    ExtendedCompletableFuture<R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -338,9 +391,9 @@ public class VertxUtils {
     return future;
   }
 
-  public static <A1, A2, R> ExtendedCompletionStage<R> call(
+  public static <A1, A2, R> ContextExtendedCompletionStage<R> call(
     Consumer3<A1, A2, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2) {
-    ExtendedCompletableFuture<R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -359,9 +412,30 @@ public class VertxUtils {
     return future;
   }
 
-  public static <A1, R> ExtendedCompletionStage<@Nullable R> callWithNull(
+  public static <A1, A2, A3, R> ContextExtendedCompletionStage<R> call(
+    Consumer4<A1, A2, A3, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
+        if (result == null)
+          throw new IllegalArgumentException();
+        future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <A1, R> ContextExtendedCompletionStage<@Nullable R> callWithNull(
     Consumer2<A1, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1) {
-    ExtendedCompletableFuture<@Nullable R> future = new ExtendedCompletableFuture<>();
+    ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -378,4 +452,44 @@ public class VertxUtils {
     return future;
   }
 
+  /* **************************************** VERTX DATASTREAM ************************************************** */
+
+  public static ContextExtendedCompletionStage<@Nullable Void> readStream(ReadStream<Buffer> pStream,
+    Consumer2<Buffer, Context> pHandler) {
+    Context currentContext = ContextFactory.currentContext();
+    currentContext.prepareForAlternateThreads();
+    AtomicBoolean closed = new AtomicBoolean(false);
+    ContextExtendedCompletableFuture<@Nullable Void> finished = FutureUtils.newCompletableFuture();
+
+    /* Handle the end of stream */
+
+    pStream.endHandler((v) -> {
+      if (closed.compareAndSet(false, true) == true) {
+        try (Context ctx = currentContext.activateOnThread("")) {
+        }
+      }
+      finished.complete(null);
+    });
+
+    /* Handle an error */
+
+    pStream.exceptionHandler((ex) -> {
+      if (closed.compareAndSet(false, true) == true) {
+        try (Context ctx = currentContext.activateOnThread("")) {
+        }
+      }
+      finished.completeExceptionally(ex);
+    });
+
+    /* Handle each block of data */
+
+    pStream.handler((buffer) -> {
+      currentContext.prepareForAlternateThreads();
+      try (Context ctx = currentContext.activateOnThread("")) {
+        pHandler.accept(buffer, ctx);
+      }
+    });
+
+    return finished;
+  }
 }

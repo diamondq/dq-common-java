@@ -2,7 +2,13 @@ package com.diamondq.common.vertx;
 
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
+import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+import com.diamondq.common.lambda.future.FutureUtils;
+import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -27,6 +33,26 @@ public class VertxProvider extends AbstractOSGiConstructor {
 
   public Vertx create(@Nullable String pBlockedThreadCheckInterval, @Nullable String pBlockedThreadCheckIntervalUnit) {
     System.setProperty(LoggerFactory.LOGGER_DELEGATE_FACTORY_CLASS_NAME, SLF4JLogDelegateFactory.class.getName());
+
+    /* Assign the Vertx future as the primary future */
+
+    try {
+      Method newCompletableFuture =
+        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
+      Method completedFuture =
+        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFuture", Object.class);
+      Method completedFailure =
+        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFailure", Throwable.class);
+      Set<Class<?>> replacements = new HashSet<>();
+      replacements.add(ContextExtendedCompletableFuture.class);
+      replacements.add(ExtendedCompletableFuture.class);
+
+      FutureUtils.setMethods(newCompletableFuture, completedFuture, completedFailure,
+        VertxContextExtendedCompletableFuture.class, replacements);
+    }
+    catch (NoSuchMethodException | SecurityException ex) {
+      throw new RuntimeException(ex);
+    }
     VertxOptions options = new VertxOptions();
     // options.setAddressResolverOptions(addressResolverOptions);
     if (pBlockedThreadCheckInterval != null) {
@@ -104,7 +130,9 @@ public class VertxProvider extends AbstractOSGiConstructor {
     // options.setWarningExceptionTime(warningExceptionTime);
     // options.setWorkerPoolSize(workerPoolSize);
 
-    return Vertx.vertx(options);
+    Vertx result = Vertx.vertx(options);
+    VertxUtils.setDefaultVertx(result);
+    return result;
   }
 
   public void onDelete(Vertx pValue) {

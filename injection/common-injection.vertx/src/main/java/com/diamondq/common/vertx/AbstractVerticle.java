@@ -9,14 +9,14 @@ import io.vertx.core.Future;
 
 public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
 
-  protected boolean                                       mRunning       = false;
+  protected boolean                                       mVerticleRunning = false;
 
-  private final ExtendedCompletableFuture<@Nullable Void> mRunningFuture = new ExtendedCompletableFuture<>();
+  private final ExtendedCompletableFuture<@Nullable Void> mRunningFuture   = new ExtendedCompletableFuture<>();
 
   protected void setRunning(boolean pValue) {
     synchronized (this) {
-      mRunning = pValue;
-      if (mRunning == true)
+      mVerticleRunning = pValue;
+      if (mVerticleRunning == true)
         mRunningFuture.complete(null);
     }
   }
