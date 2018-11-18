@@ -845,9 +845,7 @@ public interface ExtendedCompletionStage<T> extends CompletionStage<T> {
         V actionResult = loopState.actionResult;
         if (startPre == null)
           return false;
-        if (actionResult != null) {
-          if (pBreakFunction == null)
-            return false;
+        if ((actionResult != null) && (pBreakFunction != null)) {
           if (pBreakFunction.apply(actionResult) == true)
             return false;
         }
