@@ -162,8 +162,9 @@ public class JerseyServlet implements Servlet {
     final List<Registration> collected, final Class<? extends Application> a) {
     for (final Registration sr : registrations.values()) {
       final Map<String, String> ips = sr.getInitParameters();
-      if (ips.containsKey(ServletProperties.JAXRS_APPLICATION_CLASS)) {
-        if (ips.get(ServletProperties.JAXRS_APPLICATION_CLASS).equals(a.getName())) {
+      String appClass = ips.get(ServletProperties.JAXRS_APPLICATION_CLASS);
+      if (appClass != null) {
+        if (appClass.equals(a.getName())) {
           collected.add(sr);
         }
       }
