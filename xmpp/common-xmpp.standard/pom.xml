@@ -66,6 +66,7 @@
                   filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
                 <Provide-Capability>osgi.serviceloader;
                   osgi.serviceloader=rocks.xmpp.core.session.Module</Provide-Capability>
+                <Require-Bundle>rocks.xmpp.addr,rocks.xmpp.core.client,rocks.xmpp.core.common,rocks.xmpp.extensions.client,rocks.xmpp.extensions.common,rocks.xmpp.precis</Require-Bundle>
               </instructions>
             </configuration>
           </execution>

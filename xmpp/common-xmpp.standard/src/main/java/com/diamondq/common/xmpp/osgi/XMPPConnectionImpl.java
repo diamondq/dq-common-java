@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +26,7 @@ import rocks.xmpp.core.net.ConnectionConfiguration;
 import rocks.xmpp.core.net.client.ClientConnectionConfiguration;
 import rocks.xmpp.core.net.client.SocketConnectionConfiguration;
 import rocks.xmpp.core.net.client.SocketConnectionConfiguration.Builder;
+import rocks.xmpp.core.session.Module;
 import rocks.xmpp.core.session.ReconnectionStrategy;
 import rocks.xmpp.core.session.XmppClient;
 import rocks.xmpp.core.session.XmppSessionConfiguration;
@@ -33,7 +38,9 @@ import rocks.xmpp.core.stanza.PresenceEvent;
  */
 public class XMPPConnectionImpl extends AbstractOSGiConstructor {
 
-  private static final Logger sLogger = LoggerFactory.getLogger(XMPPConnectionImpl.class);
+  private static final Logger      sLogger = LoggerFactory.getLogger(XMPPConnectionImpl.class);
+
+  private ScheduledExecutorService mScheduledExecutorService;
 
   public XMPPConnectionImpl() {
     super(ConstructorInfoBuilder.builder().constructorClass(XMPPConnectionImpl.class).factoryMethod("create")
@@ -63,6 +70,10 @@ public class XMPPConnectionImpl extends AbstractOSGiConstructor {
     );
   }
 
+  public void setScheduledExecutorService(ScheduledExecutorService pScheduledExecutorService) {
+    mScheduledExecutorService = pScheduledExecutorService;
+  }
+
   public void onDelete(XmppClient pClient) {
     sLogger.trace("onDelete({}) from {}", pClient, this);
     try {
@@ -73,7 +84,7 @@ public class XMPPConnectionImpl extends AbstractOSGiConstructor {
     }
   }
 
-  public XmppClient create(String pDomain, String pHostname, int pPort, @Nullable Integer pConnectTimeout,
+  public @Nullable XmppClient create(String pDomain, String pHostname, int pPort, @Nullable Integer pConnectTimeout,
     @Nullable Integer pKeepAliveInterval, @Nullable Boolean pSecure, @Nullable String pProxyHost,
     @Nullable Integer pProxyPort, @Nullable String pProxyType, @Nullable String pDebuggerName,
     @Nullable Integer pDefaultResponseTimeout, @Nullable String pLocaleStr, @Nullable String pReconnectType,
@@ -81,6 +92,40 @@ public class XMPPConnectionImpl extends AbstractOSGiConstructor {
     @Nullable Integer pMinTime, @Nullable Integer pMaxTime, @Nullable String pUserName, @Nullable String pPassword,
     @Nullable String pResource, @Nullable Collection<Consumer<PresenceEvent>> pInboundPresenceListeners) {
     sLogger.trace("create({}, {}, ...) from {}", pDomain, pHostname, this);
+
+    /* Check to see if all the modules are available */
+
+    try {
+      int count = 0;
+      String[] requiredModules = new String[] {"com.diamondq.common.xmpp.Module", "rocks.xmpp.core.session.CoreModule",
+          "rocks.xmpp.core.session.context.extensions.ExtensionModule"};
+      for (ServiceReference<Module> sr : mComponentContext.getBundleContext().getServiceReferences(Module.class,
+        null)) {
+        Module module = mComponentContext.getBundleContext().getService(sr);
+        if (module == null)
+          throw new UnsupportedOperationException();
+        String name = module.getClass().getName();
+        for (String test : requiredModules) {
+          if (test.equals(name))
+            count++;
+        }
+      }
+      if (count < requiredModules.length) {
+        mScheduledExecutorService.schedule(() -> {
+          XmppClient client =
+            create(pDomain, pHostname, pPort, pConnectTimeout, pKeepAliveInterval, pSecure, pProxyHost, pProxyPort,
+              pProxyType, pDebuggerName, pDefaultResponseTimeout, pLocaleStr, pReconnectType, pSlotTime, pCeilingTime,
+              pAfterTime, pMinTime, pMaxTime, pUserName, pPassword, pResource, pInboundPresenceListeners);
+          if (client != null) {
+            registerService(client);
+          }
+        }, 5, TimeUnit.SECONDS);
+        return null;
+      }
+    }
+    catch (InvalidSyntaxException ex) {
+      throw new RuntimeException(ex);
+    }
 
     List<ConnectionConfiguration> configurationList = new ArrayList<>();
 
@@ -105,9 +150,10 @@ public class XMPPConnectionImpl extends AbstractOSGiConstructor {
       if (pProxyPort == null)
         throw new IllegalArgumentException("The proxyPort is required if proxyHost is provided.");
 
-      if (pProxyType == null)
-        pProxyType = Proxy.Type.SOCKS.toString();
-      Proxy.Type proxyType = Proxy.Type.valueOf(pProxyType);
+      String proxyTypeStr = pProxyType;
+      if (proxyTypeStr == null)
+        proxyTypeStr = Proxy.Type.SOCKS.toString();
+      Proxy.Type proxyType = Proxy.Type.valueOf(proxyTypeStr);
 
       InetSocketAddress address = new InetSocketAddress(pProxyHost, pProxyPort);
       Proxy proxy = new Proxy(proxyType, address);
