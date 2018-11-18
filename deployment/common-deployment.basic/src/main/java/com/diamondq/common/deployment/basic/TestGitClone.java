@@ -42,8 +42,11 @@ public class TestGitClone extends CloneGitRepo {
     if (directory.isPresent())
       command.append(' ').append(directory.get());
     command.append("{lf}");
-    command.append("{cd} ").append(directory
-      .or(Iterables.getLast(Splitter.on('/').split(gitRepoAndRef.getRepository().getPath())).replace(".git", "")));
+    String repoPath = gitRepoAndRef.getRepository().getPath();
+    if (repoPath == null)
+      throw new IllegalStateException();
+    command.append("{cd} ")
+      .append(directory.or(Iterables.getLast(Splitter.on('/').split(repoPath)).replace(".git", "")));
     if (gitRepoAndRef.getTag().isPresent()) {
       command.append("{lf}").append("git checkout ").append(gitRepoAndRef.getTag().get());
     }
