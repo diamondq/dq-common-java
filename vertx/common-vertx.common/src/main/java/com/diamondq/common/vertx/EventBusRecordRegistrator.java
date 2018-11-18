@@ -64,10 +64,11 @@ public class EventBusRecordRegistrator implements ServiceExporter {
   }
 
   public void onActivate(BundleContext pContext) {
-    Verify.notNullArg(mContextFactory, Messages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY, "contextFactory");
+    Verify.notNullArg(mContextFactory, VertxMessages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY, "contextFactory");
     try (Context context = mContextFactory.newContext(EventBusRecordRegistrator.class, this)) {
-      Verify.notNullArg(mVertx, Messages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY, "vertx");
-      Verify.notNullArg(mServiceDiscovery, Messages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY, "serviceDiscovery");
+      Verify.notNullArg(mVertx, VertxMessages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY, "vertx");
+      Verify.notNullArg(mServiceDiscovery, VertxMessages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY,
+        "serviceDiscovery");
       mBundleContext = pContext;
       mServiceDiscovery.registerServiceExporter(this, new JsonObject());
     }

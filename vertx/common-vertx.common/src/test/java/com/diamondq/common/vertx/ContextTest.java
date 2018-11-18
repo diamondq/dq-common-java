@@ -1,5 +1,7 @@
 package com.diamondq.common.vertx;
 
+import static org.junit.Assert.assertNotNull;
+
 import com.diamondq.common.injection.osgi.impl.ExecutorServiceProvider;
 import com.diamondq.common.injection.osgi.impl.ScheduledExecutorServiceProvider;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
@@ -51,6 +53,7 @@ public class ContextTest {
   @Test
   public void test() throws InterruptedException, ExecutionException {
     ContextFactory contextFactory = mContext.getService(ContextFactory.class);
+    assertNotNull(contextFactory);
     ExtendedCompletableFuture<@Nullable Void> f;
     try (Context ctx = contextFactory.newContext(ContextTest.class, this)) {
       // ContextClass ctxClass = (ContextClass) ctx;
@@ -66,6 +69,7 @@ public class ContextTest {
       });
 
       ExecutorService executorService = mContext.getService(ExecutorService.class);
+      assertNotNull(executorService);
       executorService.submit(() -> {
         try {
           Thread.sleep(1000L);

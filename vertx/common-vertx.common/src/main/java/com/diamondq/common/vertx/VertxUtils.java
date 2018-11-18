@@ -128,6 +128,11 @@ public class VertxUtils {
     }
   }
 
+  public static @Nullable Void reportThrowable(Throwable pThrowable, Context pContext) {
+    pContext.reportThrowable(pThrowable);
+    return null;
+  }
+
   /* **************************************** WRAP ASYNC ************************************************** */
 
   /**
@@ -350,7 +355,7 @@ public class VertxUtils {
 
   /* **************************************** VERTX CALL ************************************************** */
 
-  public static <R> ContextExtendedCompletionStage<R> call(Consumer<Handler<AsyncResult<@Nullable R>>> pCallee) {
+  public static <R> ContextExtendedCompletionStage<R> call(Consumer<Handler<AsyncResult<R>>> pCallee) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept((ar) -> {
       if (ar.succeeded() == false) {
@@ -363,14 +368,15 @@ public class VertxUtils {
         @Nullable
         R result = ar.result();
         if (result == null)
-          throw new IllegalArgumentException();
-        future.complete(result);
+          future.completeExceptionally(new IllegalArgumentException());
+        else
+          future.complete(result);
       }
     });
     return future;
   }
 
-  public static <A1, R> ContextExtendedCompletionStage<R> call(Consumer2<A1, Handler<AsyncResult<@Nullable R>>> pCallee,
+  public static <A1, R> ContextExtendedCompletionStage<R> call(Consumer2<A1, Handler<AsyncResult<R>>> pCallee,
     A1 pArg1) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, (ar) -> {
@@ -384,15 +390,16 @@ public class VertxUtils {
         @Nullable
         R result = ar.result();
         if (result == null)
-          throw new IllegalArgumentException();
-        future.complete(result);
+          future.completeExceptionally(new IllegalArgumentException());
+        else
+          future.complete(result);
       }
     });
     return future;
   }
 
-  public static <A1, A2, R> ContextExtendedCompletionStage<R> call(
-    Consumer3<A1, A2, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2) {
+  public static <A1, A2, R> ContextExtendedCompletionStage<R> call(Consumer3<A1, A2, Handler<AsyncResult<R>>> pCallee,
+    A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, (ar) -> {
       if (ar.succeeded() == false) {
@@ -405,15 +412,16 @@ public class VertxUtils {
         @Nullable
         R result = ar.result();
         if (result == null)
-          throw new IllegalArgumentException();
-        future.complete(result);
+          future.completeExceptionally(new IllegalArgumentException());
+        else
+          future.complete(result);
       }
     });
     return future;
   }
 
   public static <A1, A2, A3, R> ContextExtendedCompletionStage<R> call(
-    Consumer4<A1, A2, A3, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
+    Consumer4<A1, A2, A3, Handler<AsyncResult<R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
       if (ar.succeeded() == false) {
@@ -426,17 +434,75 @@ public class VertxUtils {
         @Nullable
         R result = ar.result();
         if (result == null)
-          throw new IllegalArgumentException();
+          future.completeExceptionally(new IllegalArgumentException());
+        else
+          future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <@Nullable R> ContextExtendedCompletionStage<R> callReturnsNullable(
+    Consumer<Handler<AsyncResult<R>>> pCallee) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.accept((ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
         future.complete(result);
       }
     });
     return future;
   }
 
-  public static <A1, R> ContextExtendedCompletionStage<@Nullable R> callWithNull(
-    Consumer2<A1, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1) {
-    ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
+  public static <A1, @Nullable R> ContextExtendedCompletionStage<R> callReturnsNullable(
+    Consumer2<A1, Handler<AsyncResult<R>>> pCallee, A1 pArg1) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, (ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
+        future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <A1, A2, @Nullable R> ContextExtendedCompletionStage<R> callReturnsNullable(
+    Consumer3<A1, A2, Handler<AsyncResult<R>>> pCallee, A1 pArg1, A2 pArg2) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.accept(pArg1, pArg2, (ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
+        future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <A1, A2, A3, @Nullable R> ContextExtendedCompletionStage<R> callReturnsNullable(
+    Consumer4<A1, A2, A3, Handler<AsyncResult<R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
         if (cause == null)

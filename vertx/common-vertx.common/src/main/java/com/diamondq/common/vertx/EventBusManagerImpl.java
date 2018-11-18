@@ -136,11 +136,11 @@ public class EventBusManagerImpl implements EventBusManager {
   }
 
   public void onActivate() {
-    Verify.notNullArg(mContextFactory, Messages.EVENTBUSMANAGER_MISSING_DEPENDENCY, "contextFactory");
+    Verify.notNullArg(mContextFactory, VertxMessages.EVENTBUSMANAGER_MISSING_DEPENDENCY, "contextFactory");
     try (Context ctx = mContextFactory.newContext(EventBusManagerImpl.class, this)) {
-      Verify.notNullArg(mVertx, Messages.EVENTBUSMANAGER_MISSING_DEPENDENCY, "vertx");
-      Verify.notNullArg(mMeterRegistry, Messages.EVENTBUSMANAGER_MISSING_DEPENDENCY, "meterRegistry");
-      Verify.notNullArg(mServiceDiscovery, Messages.EVENTBUSMANAGER_MISSING_DEPENDENCY, "serviceDiscovery");
+      Verify.notNullArg(mVertx, VertxMessages.EVENTBUSMANAGER_MISSING_DEPENDENCY, "vertx");
+      Verify.notNullArg(mMeterRegistry, VertxMessages.EVENTBUSMANAGER_MISSING_DEPENDENCY, "meterRegistry");
+      Verify.notNullArg(mServiceDiscovery, VertxMessages.EVENTBUSMANAGER_MISSING_DEPENDENCY, "serviceDiscovery");
     }
     catch (RuntimeException ex) {
       throw mContextFactory.reportThrowable(EventBusManagerImpl.class, this, ex);
@@ -258,7 +258,7 @@ public class EventBusManagerImpl implements EventBusManager {
 
         /* See if the record has already been published */
 
-        return VertxUtils.<JsonObject, @Nullable Record> callWithNull(mServiceDiscovery::getRecord, filter)
+        return VertxUtils.<JsonObject, @Nullable Record> callReturnsNullable(mServiceDiscovery::getRecord, filter)
           .thenCompose((r) -> {
 
             /* If the record hasn't been published, then publish it */
