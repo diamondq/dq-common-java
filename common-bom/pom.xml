@@ -40,11 +40,6 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
-        <artifactId>common-injection.vertx</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
         <artifactId>common-jaxrs.common</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -192,6 +187,21 @@
       <dependency>
         <groupId>com.diamondq.common</groupId>
         <artifactId>common-utils.sync</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-vertx.common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-vertx.processor</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-vertx.processor.tests</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
