@@ -11,18 +11,4 @@
   <artifactId>common-utils.misc</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils: Misc</name>
-  <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.javatuples</groupId>
-      <artifactId>javatuples</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
-      <artifactId>common-lambda</artifactId>
-    </dependency>
-  </dependencies>
 </project>
