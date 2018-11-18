@@ -246,6 +246,10 @@ public class ContextFactoryImpl implements SPIContextFactory {
     }
   }
 
+  /**
+   * @see com.diamondq.common.utils.context.ContextFactory#reportTrace(java.lang.Class, java.lang.Object,
+   *      java.lang.String, java.lang.Object[])
+   */
   @Override
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable... pArgs) {
@@ -261,6 +265,28 @@ public class ContextFactoryImpl implements SPIContextFactory {
       for (ContextHandler handler : mHandlers)
         handler.executeOnContextStart(context);
       context.trace(pMessage, pArgs);
+    }
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.ContextFactory#reportDebug(java.lang.Class, java.lang.Object,
+   *      java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable... pArgs) {
+    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    ContextClass parentContext;
+    if (contextStack.isEmpty() == true)
+      parentContext = null;
+    else
+      parentContext = contextStack.peek();
+    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
+      contextStack.add(context);
+      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
+      for (ContextHandler handler : mHandlers)
+        handler.executeOnContextStart(context);
+      context.debug(pMessage, pArgs);
     }
   }
 

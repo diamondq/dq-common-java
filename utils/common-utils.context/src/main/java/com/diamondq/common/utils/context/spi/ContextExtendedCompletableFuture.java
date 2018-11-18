@@ -581,12 +581,19 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     Function<Throwable, ? extends CompletionStage<T>> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<T> result =
-      (ContextExtendedCompletableFuture<T>) super.exceptionallyCompose((t) -> {
-        try (Context ctx = currentContext.activateOnThread("")) {
-          return pFn.apply(t);
-        }
-      });
+    /*
+     * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
+     * context count regardless, thus the use of handle
+     */
+    ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handle((t, ex) -> {
+      try (Context ctx = currentContext.activateOnThread("")) {
+        if (ex == null)
+          return relatedCompletedFuture(t);
+        return pFn.apply(ex);
+      }
+    }).thenCompose((x) -> {
+      return x;
+    });
     return result;
   }
 
@@ -598,10 +605,19 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     Function2<Throwable, Context, ? extends CompletionStage<T>> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.exceptionallyCompose((t) -> {
+    /*
+     * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
+     * context count regardless, thus the use of handle
+     */
+    @SuppressWarnings("unchecked")
+    ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t, ctx);
+        if (ex == null)
+          return relatedCompletedFuture(t);
+        return pFn.apply(ex, currentContext);
       }
+    }).thenCompose((x) -> {
+      return x;
     });
     return result;
   }
@@ -615,12 +631,19 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<T> result =
-      (ContextExtendedCompletableFuture<T>) super.exceptionallyCompose((t) -> {
-        try (Context ctx = currentContext.activateOnThread("")) {
-          return pFn.apply(t);
-        }
-      }, pExecutor);
+    /*
+     * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
+     * context count regardless, thus the use of handle
+     */
+    ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handleAsync((t, ex) -> {
+      try (Context ctx = currentContext.activateOnThread("")) {
+        if (ex == null)
+          return relatedCompletedFuture(t);
+        return pFn.apply(ex);
+      }
+    }, pExecutor).thenComposeAsync((x) -> {
+      return x;
+    }, pExecutor);
     return result;
   }
 
@@ -633,10 +656,18 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     Function2<Throwable, Context, ? extends CompletionStage<T>> pFn, Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.exceptionallyCompose((t) -> {
+    /*
+     * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
+     * context count regardless, thus the use of handle
+     */
+    ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handleAsync((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t, ctx);
+        if (ex == null)
+          return relatedCompletedFuture(t);
+        return pFn.apply(ex, currentContext);
       }
+    }, pExecutor).thenComposeAsync((x) -> {
+      return x;
     }, pExecutor);
     return result;
   }
