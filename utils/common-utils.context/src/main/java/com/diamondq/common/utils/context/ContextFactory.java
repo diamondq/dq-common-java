@@ -92,4 +92,16 @@ public interface ContextFactory {
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable... pArgs);
 
+  /**
+   * Report an debug outside of a context. It will automatically create a context, report the debug and then end the
+   * context.
+   * 
+   * @param pClass the class
+   * @param pThis the this object
+   * @param pMessage the message
+   * @param pArgs the arguments
+   */
+  public void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable... pArgs);
+
 }
