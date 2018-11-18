@@ -324,6 +324,7 @@ public class AbstractOSGiConstructor {
         }
 
         if (available == true) {
+          @Nullable
           Object service;
           try {
             Constructor<?> c = mInfo.constructor;
@@ -345,23 +346,8 @@ public class AbstractOSGiConstructor {
             | InvocationTargetException ex) {
             throw new RuntimeException(ex);
           }
-          Dictionary<String, Object> properties = new Hashtable<>();
-
-          /* Add all the properties that do not start with a .period */
-
-          for (Map.Entry<String, Object> pair : mCurrentProps.entrySet()) {
-            String key = pair.getKey();
-            if (key.startsWith("."))
-              continue;
-            if (sSKIP_PROPS.contains(key) == true)
-              continue;
-            properties.put(key, pair.getValue());
-          }
-
-          sLogger.trace("Registering constructed service...");
-          mServiceObject = service;
-          mRegistration =
-            mComponentContext.getBundleContext().registerService(mInfo.registrationClasses, service, properties);
+          if (service != null)
+            registerService(service);
         }
         else {
           ServiceRegistration<?> registration = mRegistration;
@@ -383,4 +369,23 @@ public class AbstractOSGiConstructor {
     }
   }
 
+  protected void registerService(Object pService) {
+    Dictionary<String, Object> properties = new Hashtable<>();
+
+    /* Add all the properties that do not start with a .period */
+
+    for (Map.Entry<String, Object> pair : mCurrentProps.entrySet()) {
+      String key = pair.getKey();
+      if (key.startsWith("."))
+        continue;
+      if (sSKIP_PROPS.contains(key) == true)
+        continue;
+      properties.put(key, pair.getValue());
+    }
+
+    sLogger.trace("Registering constructed service...");
+    mServiceObject = pService;
+    mRegistration =
+      mComponentContext.getBundleContext().registerService(mInfo.registrationClasses, pService, properties);
+  }
 }
