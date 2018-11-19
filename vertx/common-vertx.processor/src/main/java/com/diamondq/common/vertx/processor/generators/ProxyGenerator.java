@@ -164,7 +164,7 @@ public class ProxyGenerator implements Generator {
     else {
       announceMethod = announceMethod
         // Engine instance = new EngineProxy(mContextFactory, mVertx, address);
-        .addStatement("$T instance = new $T(mContextFactory, mVertx, address)", pProxyClass.getBaseQualifiedTypeName(),
+        .addStatement("$T instance = new $T(mContextFactory, mVertx, address, mDeliveryTimeout)", pProxyClass.getBaseQualifiedTypeName(),
           pProxyClass.getProxyQualifiedTypeName());
     }
     announceMethod = announceMethod
