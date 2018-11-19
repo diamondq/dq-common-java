@@ -89,7 +89,7 @@ public abstract class AbstractVerticleOsgi {
   protected abstract Supplier<Verticle> getSupplier();
 
   public void onActivate(ComponentContext pContext) {
-    String pid = pContext.getBundleContext().getProperty(Constants.SERVICE_PID);
+    String pid = (String) pContext.getProperties().get(Constants.SERVICE_PID);
     Verify.notNullArg(mContextFactory, MiscMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
     try (Context ctx = mContextFactory.newContext(AbstractVerticleOsgi.class, this)) {
       Verify.notNullArg(mConverterManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", pid);
