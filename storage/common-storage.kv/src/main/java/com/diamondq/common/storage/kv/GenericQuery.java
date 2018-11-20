@@ -1,5 +1,7 @@
 package com.diamondq.common.storage.kv;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -79,4 +81,20 @@ public class GenericQuery implements Query {
   public @Nullable String getParentName() {
     return mParentName;
   }
+
+  protected ToStringHelper toStringHelper(ToStringHelper pHelper) {
+    return pHelper //
+      .add("definitionName", mDefinitionName) //
+      .add("queryName", mQueryName) //
+      .add("parentParamKey", mParentParamKey) //
+      .add("parentName", mParentName) //
+      .add("whereList", mWhereList) //
+      .add("sortList", mSortList);
+  }
+
+  @Override
+  public String toString() {
+    return toStringHelper(MoreObjects.toStringHelper(this)).toString();
+  }
+
 }

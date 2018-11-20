@@ -5,6 +5,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.storage.kv.GenericQuery;
 import com.diamondq.common.storage.kv.WhereInfo;
+import com.google.common.base.MoreObjects.ToStringHelper;
 
 import java.util.List;
 
@@ -40,6 +41,12 @@ public class GenericModelQuery extends GenericQuery implements ModelQuery {
   @Override
   public @Nullable PropertyDefinition getParentPropertyDefinition() {
     return mParentPropertyDefinition;
+  }
+
+  @Override
+  protected ToStringHelper toStringHelper(ToStringHelper pHelper) {
+    return super.toStringHelper(pHelper).add("structureDefinition", mStructureDefinition.getName())
+      .add("parentPropertyDefinition", mParentPropertyDefinition);
   }
 
 }

@@ -201,8 +201,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
    */
   @Override
   public ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
-    try (Context context =
-      mContextFactory.newContext(CombinedPersistenceLayer.class, this, pToolkit, pScope, pQueryBuilder)) {
+    try (Context context = mContextFactory.newContext(CombinedPersistenceLayer.class, this, pQueryBuilder)) {
       Map<PersistenceLayer, ModelQuery> mappedQueries = new HashMap<>();
       ModelQuery firstQuery = null;
       for (PersistenceLayer l : mStructurePersistenceLayer) {
@@ -224,8 +223,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
   @Override
   public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues) {
-    try (Context context =
-      mContextFactory.newContext(CombinedPersistenceLayer.class, this, pToolkit, pScope, pQuery, pParamValues)) {
+    try (Context context = mContextFactory.newContext(CombinedPersistenceLayer.class, this, pQuery, pParamValues)) {
       if (pQuery instanceof CombinedQuery == false)
         throw new IllegalArgumentException();
       CombinedQuery cq = (CombinedQuery) pQuery;

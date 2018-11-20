@@ -1,5 +1,8 @@
 package com.diamondq.common.storage.kv;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class WhereInfo {
@@ -22,4 +25,13 @@ public class WhereInfo {
     paramKey = pParamKey;
   }
 
+  @Override
+  public String toString() {
+    ToStringHelper helper = MoreObjects.toStringHelper(this).add("key", key).add("operator", operator);
+    if (constant == null)
+      helper = helper.add("paramKey", paramKey);
+    else
+      helper = helper.add("constant", constant);
+    return helper.toString();
+  }
 }
