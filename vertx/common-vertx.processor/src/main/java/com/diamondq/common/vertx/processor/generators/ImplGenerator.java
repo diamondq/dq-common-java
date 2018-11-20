@@ -342,25 +342,20 @@ public class ImplGenerator implements Generator {
               param.getName(), param.getName(), UUID.class, param.getName());
         }
 
-        /* Handle codec available objects */
+        /* Handle Buffer */
 
-        else if (type.isConverterAvailable() == true) {
-          if (type.isNullable() == false) {
-            methodBuilder =
-              methodBuilder.addStatement("$T $N_json = $T.notNullArg(body.getJsonObject($S), $T.VERIFY_PARAM_NULL, $S)",
-                JsonObject.class, param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
-            // MyObject obj = mConverterManager.convert(obj_json, MyObject.class);
-            methodBuilder = methodBuilder.addStatement("$T $N = mConverterManager.convert($N_json, $T.class)", typeName,
-              param.getName(), param.getName(), typeName);
-          }
-          else {
-            methodBuilder = methodBuilder.addStatement("@T $T $N_json = body.getJsonObject($S)", Nullable.class,
-              JsonObject.class, param.getName(), param.getName());
-            // MyObject obj = mConverter.convert(obj_json, MyObject.class);
-            methodBuilder =
-              methodBuilder.addStatement("@T $T $N = $N_json == null ? null : mConverter.convert($N_json, $T.class)",
-                Nullable.class, typeName, param.getName(), param.getName(), param.getName(), typeName);
-          }
+        else if (ClassName.get(Buffer.class).equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("$T $N = $T.buffer($T.notNullArg(body.getBinary($S), $T.VERIFY_PARAM_NULL, $S))",
+              Buffer.class, param.getName(), Buffer.class, Verify.class, param.getName(), MiscMessages.class,
+              param.getName());
+        }
+        else if (ClassName.get(Buffer.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+          .equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("byte @$T[] $N_bytes = body.getBinary($S)", Nullable.class, param.getName(), param.getName())
+            .addStatement("@$T $T $N = ($N_bytes == null ? null : $T.buffer($N_bytes))", Nullable.class, Buffer.class,
+              param.getName(), param.getName(), Buffer.class, param.getName());
         }
 
         /* Handle list, set, collection */
@@ -450,6 +445,32 @@ public class ImplGenerator implements Generator {
                 .addStatement("$N.add($N_string == null ? null : $T.fromString($N_string))", param.getName(),
                   param.getName(), UUID.class, param.getName());
             }
+            else if (itemType.isConverterAvailable() == true) {
+              if (itemType.isNullable() == true) {
+                methodBuilder = methodBuilder //
+                  .addStatement("@$T $T $N_jsonobject = $N_jsonarray.getJsonObject(i)", Nullable.class,
+                    JsonObject.class, param.getName(), param.getName())
+                  .addStatement(
+                    "@$T $T $N_obj = ($N_jsonobject == null ? null : mConverter.convert($N_json, $T.class))",
+                    Nullable.class, itemTypeName, param.getName(), param.getName(), param.getName(), itemTypeName)
+                  .addStatement("$N.add($N_obj)", param.getName(), param.getName())
+                //
+                ;
+              }
+              else {
+                methodBuilder = methodBuilder // .
+                  .addStatement(
+                    "$T $N_jsonobject = $T.notNullArg($N_jsonarray.getJsonObject(i), $T.VERIFY_PARAM_NULL, $S)",
+                    JsonObject.class, param.getName(), Verify.class, param.getName(), MiscMessages.class,
+                    param.getName())
+                  // MyObject obj = mConverterManager.convert(obj_json, MyObject.class);
+                  .addStatement("$T $N_obj = mConverterManager.convert($N_jsonobject, $T.class)", itemTypeName,
+                    param.getName(), param.getName(), itemTypeName)
+                  .addStatement("$N.add($N_obj)", param.getName(), param.getName())
+                //
+                ;
+              }
+            }
             else
               throw new UnsupportedOperationException(
                 "Method: " + proxyMethod.toString() + " Param: " + param.toString());
@@ -460,6 +481,32 @@ public class ImplGenerator implements Generator {
             throw new UnsupportedOperationException(
               "Method: " + proxyMethod.toString() + " Param: " + param.toString());
         }
+
+        /* Handle converter available objects */
+        /*
+         * IMPORTANT: The converter check must be last because things like a List, which, by itself may not need a
+         * converter, the generic type within it might.
+         */
+
+        else if (type.isConverterAvailable() == true) {
+          if (type.isNullable() == false) {
+            methodBuilder =
+              methodBuilder.addStatement("$T $N_json = $T.notNullArg(body.getJsonObject($S), $T.VERIFY_PARAM_NULL, $S)",
+                JsonObject.class, param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+            // MyObject obj = mConverterManager.convert(obj_json, MyObject.class);
+            methodBuilder = methodBuilder.addStatement("$T $N = mConverterManager.convert($N_json, $T.class)", typeName,
+              param.getName(), param.getName(), typeName);
+          }
+          else {
+            methodBuilder = methodBuilder.addStatement("@T $T $N_json = body.getJsonObject($S)", Nullable.class,
+              JsonObject.class, param.getName(), param.getName());
+            // MyObject obj = mConverter.convert(obj_json, MyObject.class);
+            methodBuilder =
+              methodBuilder.addStatement("@T $T $N = $N_json == null ? null : mConverter.convert($N_json, $T.class)",
+                Nullable.class, typeName, param.getName(), param.getName(), param.getName(), typeName);
+          }
+        }
+
         else
           throw new UnsupportedOperationException("Method: " + proxyMethod.toString() + " Param: " + param.toString());
       }
@@ -635,24 +682,6 @@ public class ImplGenerator implements Generator {
         .addStatement("pMessage.reply(r == null ? null : r.toString())");
     }
 
-    else if (pReturnType.isConverterAvailable() == true) {
-      if (pReturnType.isNullable() == true) {
-        pBuilder = pBuilder
-          // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
-          .addStatement("@$T $T r_obj = (r == null ? null : mConverterManager.convert(r, $T.class))", Nullable.class,
-            JsonObject.class, JsonObject.class)
-          //
-          .addStatement("pMessage.reply(r_obj)");
-      }
-      else {
-        pBuilder = pBuilder
-          // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
-          .addStatement("$T r_obj = mConverterManager.convert(r, $T.class)", JsonObject.class, JsonObject.class)
-          //
-          .addStatement("pMessage.reply(r_obj)");
-      }
-    }
-
     /* Handle list, set, collection */
 
     else if (typeName instanceof ParameterizedTypeName) {
@@ -729,6 +758,25 @@ public class ImplGenerator implements Generator {
         throw new UnsupportedOperationException(
           "Method: " + pProxyMethod.toString() + " Return: " + pReturnType.toString());
     }
+
+    else if (pReturnType.isConverterAvailable() == true) {
+      if (pReturnType.isNullable() == true) {
+        pBuilder = pBuilder
+          // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
+          .addStatement("@$T $T r_obj = (r == null ? null : mConverterManager.convert(r, $T.class))", Nullable.class,
+            JsonObject.class, JsonObject.class)
+          //
+          .addStatement("pMessage.reply(r_obj)");
+      }
+      else {
+        pBuilder = pBuilder
+          // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
+          .addStatement("$T r_obj = mConverterManager.convert(r, $T.class)", JsonObject.class, JsonObject.class)
+          //
+          .addStatement("pMessage.reply(r_obj)");
+      }
+    }
+
     else
       throw new UnsupportedOperationException(
         "Method: " + pProxyMethod.toString() + " Return: " + pReturnType.toString());

@@ -1,10 +1,14 @@
 <configuration>
+<!-- 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
     </encoder>
   </appender>
-<!-- 
+  <root level="TRACE">
+    <appender-ref ref="STDOUT" />
+  </root>
+ -->  
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>vertx_processor.log</file>
     <append>true</append>
@@ -12,8 +16,7 @@
       <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
     </encoder>
   </appender>
- -->  
   <root level="TRACE">
-    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
   </root>
 </configuration>

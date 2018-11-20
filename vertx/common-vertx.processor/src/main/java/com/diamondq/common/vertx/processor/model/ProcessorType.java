@@ -84,17 +84,21 @@ public class ProcessorType<R extends ProcessorType<R>> {
         TypeElement te = (TypeElement) dt.asElement();
         mNonGenericNonAnnotatedTypeName = te.getQualifiedName().toString();
         ConverterAvailable codecAvailable = te.getAnnotation(ConverterAvailable.class);
+        boolean converterAvailable;
         if (codecAvailable != null)
-          mIsConverterAvailable = true;
+          converterAvailable = true;
         else
-          mIsConverterAvailable = false;
+          converterAvailable = false;
         List<TypeName> typeNameList = new ArrayList<>();
         for (TypeMirror type : dt.getTypeArguments()) {
           R proxyType = pTypeConstructor.newInstance(type, pTypeConstructor, pProcessingEnv);
+          if (proxyType.isConverterAvailable() == true)
+            converterAvailable = true;
           typeList.add(proxyType);
           typeNameList.add(proxyType.getTypeName());
         }
 
+        mIsConverterAvailable = converterAvailable;
         ClassName className = ClassName.get((TypeElement) dt.asElement());
         if (typeList.isEmpty() == true)
           typeName = className;

@@ -538,15 +538,13 @@ public class ProxyGenerator implements Generator {
           .addStatement("message.put($S, $N_str)", param.getName(), param.getName());
       }
 
-      /* Handle codec available objects */
+      /* Handle Buffer */
 
-      else if (type.isConverterAvailable() == true) {
-        // JsonObject obj = mConverterManager.convert(pObj, JsonObject.class)
-        pBuilder = pBuilder.addStatement(
-          "@$T($S) @$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
-          SuppressWarnings.class, "null", Nullable.class, JsonObject.class, param.getName(), param.getName(),
-          param.getName(), JsonObject.class);
-        pBuilder = pBuilder.addStatement("message.put($S, $N_jsonobject)", param.getName(), param.getName());
+      else if (ClassName.get(Buffer.class).equals(typeName.withoutAnnotations())) {
+        pBuilder = pBuilder //
+          .addStatement("byte @$T[] $N_bytes = ($N == null ? null : $N.getBytes())", Nullable.class, param.getName(),
+            param.getName(), param.getName())
+          .addStatement("message.put($S, $N_bytes)", param.getName(), param.getName());
       }
 
       /* Handle list, set, collection */
@@ -610,6 +608,14 @@ public class ProxyGenerator implements Generator {
             .equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item == null ? null : item.toString())", param.getName());
           }
+          else if (itemType.isConverterAvailable() == true) {
+            pBuilder = pBuilder //
+              .addStatement(
+                "@$T($S) @$T $T $N_jsonobject = item == null ? null : mConverterManager.convert(item, $T.class)",
+                SuppressWarnings.class, "null", Nullable.class, JsonObject.class, param.getName(), JsonObject.class)
+              .addStatement("$N_array.add($N_jsonobject)", param.getName(), param.getName()) //
+            ;
+          }
           else
             throw new UnsupportedOperationException(
               "Method: " + pProxyMethod.toString() + " Param: " + param.toString());
@@ -619,6 +625,17 @@ public class ProxyGenerator implements Generator {
         }
         else
           throw new UnsupportedOperationException("Method: " + pProxyMethod.toString() + " Param: " + param.toString());
+      }
+
+      /* Handle converter available objects */
+
+      else if (type.isConverterAvailable() == true) {
+        // JsonObject obj = mConverterManager.convert(pObj, JsonObject.class)
+        pBuilder = pBuilder.addStatement(
+          "@$T($S) @$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
+          SuppressWarnings.class, "null", Nullable.class, JsonObject.class, param.getName(), param.getName(),
+          param.getName(), JsonObject.class);
+        pBuilder = pBuilder.addStatement("message.put($S, $N_jsonobject)", param.getName(), param.getName());
       }
 
       else
@@ -713,10 +730,6 @@ public class ProxyGenerator implements Generator {
         replyReturnType = TypeName.get(String.class).annotated(AnnotationSpec.builder(Nullable.class).build());
       }
 
-      else if (actualReturnType.isConverterAvailable() == true) {
-        replyReturnType = TypeName.get(JsonObject.class);
-      }
-
       /* Handle list, set, collection */
 
       else if (returnTypeName instanceof ParameterizedTypeName) {
@@ -729,6 +742,11 @@ public class ProxyGenerator implements Generator {
           throw new UnsupportedOperationException(
             "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
       }
+
+      else if (actualReturnType.isConverterAvailable() == true) {
+        replyReturnType = TypeName.get(JsonObject.class);
+      }
+
       else
         throw new UnsupportedOperationException(
           "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());

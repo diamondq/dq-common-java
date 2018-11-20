@@ -48,7 +48,7 @@ public class ProcessorMethod<R extends ProcessorType<R>, P extends ProcessorPara
       /* Get the parameters */
 
       List<P> params = new ArrayList<>();
-      boolean needsConverter = false;
+      boolean needsConverter = mReturnType.isConverterAvailable();
       for (VariableElement ve : pElement.getParameters()) {
         @NonNull
         P param = pParamConstructor.newInstance(ve, pTypeConstructor, pProcessingEnv);
