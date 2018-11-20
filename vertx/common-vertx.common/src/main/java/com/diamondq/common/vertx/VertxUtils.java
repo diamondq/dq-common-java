@@ -82,7 +82,7 @@ public class VertxUtils {
 
       @Nullable
       String[] deploymentIds = new @Nullable String[pDeployCount];
-      List<ContextExtendedCompletionStage<@Nullable Void>> futures = new ArrayList<>();
+      List<ContextExtendedCompletionStage<?>> futures = new ArrayList<>();
       for (int i = 0; i < pDeployCount; i++) {
         final int offset = i;
 

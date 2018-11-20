@@ -267,7 +267,7 @@ public class SyncEngine {
       Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = sextext.getValue4();
       Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = sextext.getValue5();
 
-      Collection<ExtendedCompletableFuture<@Nullable Void>> futures = new ArrayList<>();
+      Collection<ExtendedCompletableFuture<?>> futures = new ArrayList<>();
 
       /* Now start processing the changes */
 

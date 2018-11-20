@@ -45,7 +45,7 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
    * @see io.vertx.core.streams.ReadStream#exceptionHandler(io.vertx.core.Handler)
    */
   @Override
-  public ReadStream<Buffer> exceptionHandler(Handler<Throwable> pHandler) {
+  public ReadStream<Buffer> exceptionHandler(@Nullable Handler<Throwable> pHandler) {
     mExceptionContext = mVertx.getOrCreateContext();
     mExceptionHandler = pHandler;
     return this;

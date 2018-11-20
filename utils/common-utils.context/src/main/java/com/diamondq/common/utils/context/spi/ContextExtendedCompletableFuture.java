@@ -2,8 +2,10 @@ package com.diamondq.common.utils.context.spi;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
+import com.diamondq.common.lambda.interfaces.Consumer1;
 import com.diamondq.common.lambda.interfaces.Consumer2;
 import com.diamondq.common.lambda.interfaces.Consumer3;
+import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.utils.context.Context;
@@ -15,10 +17,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -74,21 +72,23 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
 
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(
-    Collection<@NonNull ? extends CompletionStage<?>> pCfs) {
+    Collection<? extends ExtendedCompletionStage<?>> pCfs) {
     ContextExtendedCompletionStage<@Nullable Void> result =
       (ContextExtendedCompletionStage<@Nullable Void>) super.relatedAllOf(pCfs);
     return result;
   }
 
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(@NonNull CompletionStage<?> @NonNull... pCfs) {
+  public ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(
+    @NonNull ExtendedCompletionStage<?> @NonNull... pCfs) {
     ContextExtendedCompletionStage<@Nullable Void> result =
       (ContextExtendedCompletionStage<@Nullable Void>) super.relatedAllOf(pCfs);
     return result;
   }
 
   @Override
-  public ContextExtendedCompletionStage<@Nullable Object> relatedAnyOf(@NonNull CompletionStage<?> @NonNull... pCfs) {
+  public ContextExtendedCompletionStage<@Nullable Object> relatedAnyOf(
+    @NonNull ExtendedCompletionStage<?> @NonNull... pCfs) {
     ContextExtendedCompletionStage<@Nullable Object> result =
       (ContextExtendedCompletionStage<@Nullable Object>) super.relatedAnyOf(pCfs);
     return result;
@@ -104,13 +104,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** APPLY ********** */
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenApply(java.util.function.Function)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenApply(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenApply(Function<? super T, ? extends U> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> thenApply(Function1<T, U> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.thenApply((t) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t);
@@ -123,7 +122,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenApply(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenApply(Function2<? super T, Context, ? extends U> pFn) {
+  public <U> ContextExtendedCompletionStage<U> thenApply(Function2<T, Context, U> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -136,13 +135,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenApplyAsync(java.util.function.Function)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t);
@@ -155,7 +153,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<? super T, Context, ? extends U> pFn) {
+  public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<T, Context, U> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -168,15 +166,13 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenApplyAsync(java.util.function.Function,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function1,
    *      java.util.concurrent.Executor)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> pFn,
-    Executor pExecutor) {
+  public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn, Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t);
@@ -190,8 +186,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    *      java.util.concurrent.Executor)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<? super T, Context, ? extends U> pFn,
-    Executor pExecutor) {
+  public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<T, Context, U> pFn, Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -206,10 +201,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** ACCEPT ********** */
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAccept(java.util.function.Consumer)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer<? super T> pAction) {
+  public ContextExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer1<T> pAction) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<@Nullable Void> result =
@@ -225,7 +220,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenAccept(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<? super T, Context> pAction) {
+  public ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<T, Context> pAction) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -239,10 +234,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptAsync(java.util.function.Consumer)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction) {
+  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<@Nullable Void> result =
@@ -258,7 +253,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<? super T, Context> pAction) {
+  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -272,12 +267,11 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptAsync(java.util.function.Consumer,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer1,
    *      java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction,
-    Executor pExecutor) {
+  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<@Nullable Void> result =
@@ -294,7 +288,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    *      java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<? super T, Context> pAction,
+  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction,
     Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
@@ -311,15 +305,14 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** COMBINE ********** */
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenCombine(java.util.concurrent.CompletionStage,
-   *      java.util.function.BiFunction)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U, V> ContextExtendedCompletableFuture<V> thenCombine(CompletionStage<? extends U> pOther,
-    BiFunction<? super T, ? super U, ? extends V> pFn) {
+  public <U, V> ContextExtendedCompletableFuture<V> thenCombine(ExtendedCompletionStage<U> pOther,
+    Function2<T, U, V> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<V> result =
       (ContextExtendedCompletableFuture<V>) super.thenCombine(pOther, (t, u) -> {
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -330,12 +323,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenCombine(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
-  public <U, V> ContextExtendedCompletionStage<V> thenCombine(CompletionStage<? extends U> pOther,
-    Function3<? super T, ? super U, Context, ? extends V> pFn) {
+  public <U, V> ContextExtendedCompletionStage<V> thenCombine(ExtendedCompletionStage<U> pOther,
+    Function3<T, U, Context, V> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -348,15 +341,14 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenCombineAsync(java.util.concurrent.CompletionStage,
-   *      java.util.function.BiFunction)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-    BiFunction<? super T, ? super U, ? extends V> pFn) {
+  public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
+    Function2<T, U, V> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<V> result =
       (ContextExtendedCompletableFuture<V>) super.thenCombineAsync(pOther, (t, u) -> {
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -367,12 +359,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenCombineAsync(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
-  public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-    Function3<? super T, ? super U, Context, ? extends V> pFn) {
+  public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
+    Function3<T, U, Context, V> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -386,15 +378,14 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenCombineAsync(java.util.concurrent.CompletionStage,
-   *      java.util.function.BiFunction, java.util.concurrent.Executor)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Function2, java.util.concurrent.Executor)
    */
   @Override
-  public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-    BiFunction<? super T, ? super U, ? extends V> pFn, Executor pExecutor) {
+  public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
+    Function2<T, U, V> pFn, Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<V> result =
       (ContextExtendedCompletableFuture<V>) super.thenCombineAsync(pOther, (t, u) -> {
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -405,12 +396,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenCombineAsync(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function3, java.util.concurrent.Executor)
    */
   @Override
-  public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-    Function3<? super T, ? super U, Context, ? extends V> pFn, Executor pExecutor) {
+  public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
+    Function3<T, U, Context, V> pFn, Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -426,11 +417,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** COMPOSE ********** */
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenCompose(java.util.function.Function)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenCompose(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenCompose(
-    Function<? super T, @NonNull ? extends CompletionStage<U>> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> thenCompose(Function1<T, ExtendedCompletionStage<U>> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.thenCompose((t) -> {
@@ -445,8 +435,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenCompose(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenCompose(
-    Function2<? super T, Context, ? extends CompletionStage<U>> pFn) {
+  public <U> ContextExtendedCompletionStage<U> thenCompose(Function2<T, Context, ExtendedCompletionStage<U>> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -459,11 +448,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenComposeAsync(java.util.function.Function)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(
-    Function<? super T, @NonNull ? extends CompletionStage<U>> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
@@ -478,8 +466,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenComposeAsync(
-    Function2<? super T, Context, ? extends CompletionStage<U>> pFn) {
+  public <U> ContextExtendedCompletionStage<U> thenComposeAsync(Function2<T, Context, ExtendedCompletionStage<U>> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -492,12 +479,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenComposeAsync(java.util.function.Function,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function1,
    *      java.util.concurrent.Executor)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(
-    Function<? super T, @NonNull ? extends CompletionStage<U>> pFn, Executor pExecutor) {
+  public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn,
+    Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
@@ -513,8 +500,8 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    *      java.util.concurrent.Executor)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenComposeAsync(
-    Function2<? super T, Context, ? extends CompletionStage<U>> pFn, Executor pExecutor) {
+  public <U> ContextExtendedCompletionStage<U> thenComposeAsync(Function2<T, Context, ExtendedCompletionStage<U>> pFn,
+    Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -529,10 +516,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** EXCEPTIONALLY ********** */
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#exceptionally(java.util.function.Function)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#exceptionally(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public ContextExtendedCompletableFuture<T> exceptionally(Function<Throwable, ? extends T> pFn) {
+  public ContextExtendedCompletableFuture<T> exceptionally(Function1<Throwable, T> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
@@ -553,7 +540,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#exceptionally(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public ContextExtendedCompletionStage<T> exceptionally(Function2<Throwable, Context, ? extends T> pFn) {
+  public ContextExtendedCompletionStage<T> exceptionally(Function2<Throwable, Context, T> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
@@ -574,11 +561,11 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** EXCEPTIONALLYCOMPOSE ********** */
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#exceptionallyCompose(java.util.function.Function)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#exceptionallyCompose(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
   public ContextExtendedCompletableFuture<T> exceptionallyCompose(
-    Function<Throwable, ? extends CompletionStage<T>> pFn) {
+    Function1<Throwable, ExtendedCompletionStage<T>> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
@@ -587,8 +574,11 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
      */
     ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
-        if (ex == null)
-          return relatedCompletedFuture(t);
+        if (ex == null) {
+          @SuppressWarnings("null")
+          T unconstraintedT = t;
+          return relatedCompletedFuture(unconstraintedT);
+        }
         return pFn.apply(ex);
       }
     }).thenCompose((x) -> {
@@ -602,7 +592,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletionStage<T> exceptionallyCompose(
-    Function2<Throwable, Context, ? extends CompletionStage<T>> pFn) {
+    Function2<Throwable, Context, ExtendedCompletionStage<T>> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
@@ -612,8 +602,11 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     @SuppressWarnings("unchecked")
     ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
-        if (ex == null)
-          return relatedCompletedFuture(t);
+        if (ex == null) {
+          @SuppressWarnings("null")
+          T unconstraintedT = t;
+          return relatedCompletedFuture(unconstraintedT);
+        }
         return pFn.apply(ex, currentContext);
       }
     }).thenCompose((x) -> {
@@ -623,11 +616,11 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#exceptionallyCompose(java.util.function.Function,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#exceptionallyCompose(com.diamondq.common.lambda.interfaces.Function1,
    *      java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletableFuture<T> exceptionallyCompose(Function<Throwable, ? extends CompletionStage<T>> pFn,
+  public ContextExtendedCompletableFuture<T> exceptionallyCompose(Function1<Throwable, ExtendedCompletionStage<T>> pFn,
     Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
@@ -637,8 +630,11 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
      */
     ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handleAsync((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
-        if (ex == null)
-          return relatedCompletedFuture(t);
+        if (ex == null) {
+          @SuppressWarnings("null")
+          T unconstraintedT = t;
+          return relatedCompletedFuture(unconstraintedT);
+        }
         return pFn.apply(ex);
       }
     }, pExecutor).thenComposeAsync((x) -> {
@@ -653,7 +649,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletionStage<T> exceptionallyCompose(
-    Function2<Throwable, Context, ? extends CompletionStage<T>> pFn, Executor pExecutor) {
+    Function2<Throwable, Context, ExtendedCompletionStage<T>> pFn, Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
@@ -662,8 +658,11 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
      */
     ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handleAsync((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
-        if (ex == null)
-          return relatedCompletedFuture(t);
+        if (ex == null) {
+          @SuppressWarnings("null")
+          T unconstraintedT = t;
+          return relatedCompletedFuture(unconstraintedT);
+        }
         return pFn.apply(ex, currentContext);
       }
     }, pExecutor).thenComposeAsync((x) -> {
@@ -675,11 +674,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** WHENCOMPLETE ********** */
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#whenComplete(java.util.function.BiConsumer)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#whenComplete(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletableFuture<T> whenComplete(
-    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction) {
+  public ContextExtendedCompletableFuture<T> whenComplete(Consumer2<T, @Nullable Throwable> pAction) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.whenComplete((t, ex) -> {
@@ -694,8 +692,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#whenComplete(com.diamondq.common.lambda.interfaces.Consumer3)
    */
   @Override
-  public ContextExtendedCompletionStage<T> whenComplete(
-    Consumer3<? super T, @Nullable ? super @Nullable Throwable, Context> pAction) {
+  public ContextExtendedCompletionStage<T> whenComplete(Consumer3<T, @Nullable Throwable, Context> pAction) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -708,11 +705,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#whenCompleteAsync(java.util.function.BiConsumer)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#whenCompleteAsync(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletableFuture<T> whenCompleteAsync(
-    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction) {
+  public ContextExtendedCompletableFuture<T> whenCompleteAsync(Consumer2<T, @Nullable Throwable> pAction) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<T> result =
@@ -728,8 +724,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#whenCompleteAsync(com.diamondq.common.lambda.interfaces.Consumer3)
    */
   @Override
-  public ContextExtendedCompletionStage<T> whenCompleteAsync(
-    Consumer3<? super T, @Nullable ? super @Nullable Throwable, Context> pAction) {
+  public ContextExtendedCompletionStage<T> whenCompleteAsync(Consumer3<T, @Nullable Throwable, Context> pAction) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -742,12 +737,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#whenCompleteAsync(java.util.function.BiConsumer,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#whenCompleteAsync(com.diamondq.common.lambda.interfaces.Consumer2,
    *      java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletableFuture<T> whenCompleteAsync(
-    BiConsumer<? super T, @Nullable ? super @Nullable Throwable> pAction, Executor pExecutor) {
+  public ContextExtendedCompletableFuture<T> whenCompleteAsync(Consumer2<T, @Nullable Throwable> pAction,
+    Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<T> result =
@@ -764,8 +759,8 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    *      java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletionStage<T> whenCompleteAsync(
-    Consumer3<? super T, @Nullable ? super @Nullable Throwable, Context> pAction, Executor pExecutor) {
+  public ContextExtendedCompletionStage<T> whenCompleteAsync(Consumer3<T, @Nullable Throwable, Context> pAction,
+    Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -780,13 +775,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** HANDLE ********** */
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#handle(java.util.function.BiFunction)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#handle(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> handle(BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> handle(Function2<@Nullable T, @Nullable Throwable, U> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ex);
@@ -799,8 +793,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#handle(com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> handle(
-    Function3<? super T, @Nullable Throwable, Context, ? extends U> pFn) {
+  public <U> ContextExtendedCompletionStage<U> handle(Function3<@Nullable T, @Nullable Throwable, Context, U> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -813,14 +806,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#handleAsync(java.util.function.BiFunction)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#handleAsync(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> handleAsync(
-    BiFunction<? super T, @Nullable Throwable, ? extends U> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> handleAsync(Function2<@Nullable T, @Nullable Throwable, U> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.handleAsync((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ex);
@@ -834,7 +825,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> handleAsync(
-    Function3<? super T, @Nullable Throwable, Context, ? extends U> pFn) {
+    Function3<@Nullable T, @Nullable Throwable, Context, U> pFn) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -847,15 +838,14 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#handleAsync(java.util.function.BiFunction,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#handleAsync(com.diamondq.common.lambda.interfaces.Function2,
    *      java.util.concurrent.Executor)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> handleAsync(
-    BiFunction<? super T, @Nullable Throwable, ? extends U> pFn, Executor pExecutor) {
+  public <U> ContextExtendedCompletableFuture<U> handleAsync(Function2<@Nullable T, @Nullable Throwable, U> pFn,
+    Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    @SuppressWarnings("unchecked")
     ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.handleAsync((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ex);
@@ -869,8 +859,8 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    *      java.util.concurrent.Executor)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> handleAsync(
-    Function3<? super T, @Nullable Throwable, Context, ? extends U> pFn, Executor pExecutor) {
+  public <U> ContextExtendedCompletionStage<U> handleAsync(Function3<@Nullable T, @Nullable Throwable, Context, U> pFn,
+    Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
@@ -885,14 +875,23 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   /* ********** FORLOOP ********** */
 
   /**
-   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#forLoop(com.diamondq.common.lambda.interfaces.Function2,
-   *      com.diamondq.common.lambda.interfaces.Function2, com.diamondq.common.lambda.interfaces.Function2,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#forLoop(com.diamondq.common.lambda.interfaces.Function1,
+   *      com.diamondq.common.lambda.interfaces.Function1, com.diamondq.common.lambda.interfaces.Function1,
    *      java.util.concurrent.Executor)
    */
   @Override
   public <U, V> ContextExtendedCompletionStage<List<V>> forLoop(
+    Function1<T, @Nullable Iterable<U>> pGetIterableFunction,
+    Function1<U, ExtendedCompletionStage<V>> pPerformActionFunction, @Nullable Function1<V, Boolean> pBreakFunction,
+    @Nullable Executor pExecutor) {
+    return (ContextExtendedCompletionStage<List<V>>) super.forLoop(pGetIterableFunction, pPerformActionFunction,
+      pBreakFunction, pExecutor);
+  }
+
+  @Override
+  public <U, V> ContextExtendedCompletionStage<List<V>> forLoop(
     Function2<T, Context, @Nullable Iterable<U>> pGetIterableFunction,
-    Function2<U, Context, CompletionStage<V>> pPerformActionFunction,
+    Function2<U, Context, ExtendedCompletionStage<V>> pPerformActionFunction,
     @Nullable Function2<V, Context, Boolean> pBreakFunction, @Nullable Executor pExecutor) {
 
     ContextFactory contextFactory = ContextFactory.getInstance();
@@ -965,10 +964,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#relatedRunAsync(java.util.function.Consumer)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#relatedRunAsync(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Consumer<Context> pRunnable) {
+  public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Consumer1<Context> pRunnable) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     ContextExtendedCompletableFuture<@Nullable Void> result =
@@ -998,11 +997,11 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   /**
-   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#relatedRunAsync(java.util.function.Consumer,
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#relatedRunAsync(com.diamondq.common.lambda.interfaces.Consumer1,
    *      java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Consumer<Context> pRunnable,
+  public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Consumer1<Context> pRunnable,
     Executor pExecutor) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();

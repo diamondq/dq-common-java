@@ -1,6 +1,6 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
-import java.util.function.Consumer;
+import com.diamondq.common.lambda.interfaces.Consumer1;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,17 +10,17 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerConsumer<T> extends AbstractTracerWrapper implements Consumer<T>, AbortableContinuation {
+public class TracerConsumer<T> extends AbstractTracerWrapper implements Consumer1<T>, AbortableContinuation {
 
   private static final Logger sLogger = LoggerFactory.getLogger(TracerConsumer.class);
 
-  private final Consumer<T>   mDelegate;
+  private final Consumer1<T>  mDelegate;
 
-  public TracerConsumer(Consumer<T> pDelegate) {
+  public TracerConsumer(Consumer1<T> pDelegate) {
     this(GlobalTracer.get(), pDelegate);
   }
 
-  public TracerConsumer(Tracer pTracer, Consumer<T> pDelegate) {
+  public TracerConsumer(Tracer pTracer, Consumer1<T> pDelegate) {
     super(pTracer);
     mDelegate = pDelegate;
   }

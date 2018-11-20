@@ -47,8 +47,7 @@ public class ExtendedCompletionStageTest {
     try (Scope scope = mockTracker.buildSpan("testThenApply").startActive(true)) {
       sLogger.info("Before future");
       f = new ExtendedCompletableFuture<>();
-      ExtendedCompletionStage<Boolean> r = ExtendedCompletionStage.of(f);
-      r.thenApply((b) -> {
+      f.thenApply((b) -> {
         TracingAssertions.assertActiveSpan("Should have active span");
         sLogger.info("Inside apply");
         return true;
@@ -74,7 +73,7 @@ public class ExtendedCompletionStageTest {
       f1 = new ExtendedCompletableFuture<>();
       f2 = new ExtendedCompletableFuture<>();
       f3 = new ExtendedCompletableFuture<Boolean>()
-        .applyToEither(ExtendedCompletionStage.of(f1).thenCombine(ExtendedCompletionStage.of(f2), (b1, b2) -> {
+        .applyToEither(f1.thenCombine(f2, (b1, b2) -> {
           sLogger.info("   +++ Inside combine");
           Assert.assertEquals(true, b1);
           Assert.assertEquals(true, b2);

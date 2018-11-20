@@ -1,6 +1,6 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
-import java.util.function.BiConsumer;
+import com.diamondq.common.lambda.interfaces.Consumer2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,17 +10,17 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerBiConsumer<A, B> extends AbstractTracerWrapper implements BiConsumer<A, B>, AbortableContinuation {
+public class TracerConsumer2<A, B> extends AbstractTracerWrapper implements Consumer2<A, B>, AbortableContinuation {
 
-  private static final Logger    sLogger = LoggerFactory.getLogger(TracerBiConsumer.class);
+  private static final Logger   sLogger = LoggerFactory.getLogger(TracerConsumer2.class);
 
-  private final BiConsumer<A, B> mDelegate;
+  private final Consumer2<A, B> mDelegate;
 
-  public TracerBiConsumer(BiConsumer<A, B> pDelegate) {
+  public TracerConsumer2(Consumer2<A, B> pDelegate) {
     this(GlobalTracer.get(), pDelegate);
   }
 
-  public TracerBiConsumer(Tracer pTracer, BiConsumer<A, B> pDelegate) {
+  public TracerConsumer2(Tracer pTracer, Consumer2<A, B> pDelegate) {
     super(pTracer);
     mDelegate = pDelegate;
   }

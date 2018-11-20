@@ -42,6 +42,7 @@ public class XMPPConnectionImpl extends AbstractOSGiConstructor {
 
   private ScheduledExecutorService mScheduledExecutorService;
 
+  @SuppressWarnings("null")
   public XMPPConnectionImpl() {
     super(ConstructorInfoBuilder.builder().constructorClass(XMPPConnectionImpl.class).factoryMethod("create")
       .factoryDelete("onDelete").register(XmppClient.class) //

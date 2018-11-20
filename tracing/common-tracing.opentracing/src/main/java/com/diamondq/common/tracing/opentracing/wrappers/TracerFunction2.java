@@ -1,8 +1,7 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
-import com.diamondq.common.lambda.interfaces.CancelableBiFunction;
-
-import java.util.function.BiFunction;
+import com.diamondq.common.lambda.interfaces.CancelableFunction2;
+import com.diamondq.common.lambda.interfaces.Function2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,18 +11,18 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerBiFunction<A, B, C> extends AbstractTracerWrapper
-  implements BiFunction<A, B, C>, CancelableBiFunction<A, B, C> {
+public class TracerFunction2<A, B, C> extends AbstractTracerWrapper
+  implements Function2<A, B, C>, CancelableFunction2<A, B, C> {
 
-  private static final Logger       sLogger = LoggerFactory.getLogger(TracerBiFunction.class);
+  private static final Logger      sLogger = LoggerFactory.getLogger(TracerFunction2.class);
 
-  private final BiFunction<A, B, C> mDelegate;
+  private final Function2<A, B, C> mDelegate;
 
-  public TracerBiFunction(BiFunction<A, B, C> pDelegate) {
+  public TracerFunction2(Function2<A, B, C> pDelegate) {
     this(GlobalTracer.get(), pDelegate);
   }
 
-  public TracerBiFunction(Tracer pTracer, BiFunction<A, B, C> pDelegate) {
+  public TracerFunction2(Tracer pTracer, Function2<A, B, C> pDelegate) {
     super(pTracer);
     mDelegate = pDelegate;
   }
@@ -55,7 +54,7 @@ public class TracerBiFunction<A, B, C> extends AbstractTracerWrapper
   }
 
   /**
-   * @see com.diamondq.common.lambda.interfaces.CancelableBiFunction#cancel()
+   * @see com.diamondq.common.lambda.interfaces.CancelableFunction2#cancel()
    */
   @Override
   public void cancel() {

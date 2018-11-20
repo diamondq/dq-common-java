@@ -9,6 +9,7 @@ import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
+import com.diamondq.common.utils.misc.errors.Verify;
 import com.diamondq.common.vertx.streams.impl.ReadStreamBackPressure;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -149,7 +150,7 @@ public class StreamUtils {
           throw (RuntimeException) ex;
         throw new RuntimeException(ex);
       }
-      return r;
+      return Verify.notNull(r);
     });
   }
 }

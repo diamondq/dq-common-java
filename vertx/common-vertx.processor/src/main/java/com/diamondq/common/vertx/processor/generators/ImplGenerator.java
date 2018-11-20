@@ -1,7 +1,6 @@
 package com.diamondq.common.vertx.processor.generators;
 
 import com.diamondq.common.lambda.future.FutureUtils;
-import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;

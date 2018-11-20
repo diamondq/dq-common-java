@@ -1,7 +1,10 @@
 package com.diamondq.common.vertx;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+import com.diamondq.common.lambda.future.ExtendedCompletionStage;
+import com.diamondq.common.lambda.interfaces.Consumer1;
 import com.diamondq.common.lambda.interfaces.Consumer2;
+import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.utils.context.Context;
@@ -11,12 +14,7 @@ import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import io.vertx.core.Vertx;
@@ -89,11 +87,8 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
     return new VertxContextExtendedCompletableFuture<>(mVertxContext, mExecutor, pFuture);
   }
 
-  /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenApply(java.util.function.Function)
-   */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenApply(Function<? super T, ? extends U> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> thenApply(Function1<T, U> pFn) {
     return super.thenApplyAsync(pFn, mExecutor);
   }
 
@@ -101,15 +96,15 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenApply(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenApply(Function2<? super T, Context, ? extends U> pFn) {
+  public <U> ContextExtendedCompletionStage<U> thenApply(Function2<T, Context, U> pFn) {
     return super.thenApplyAsync(pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenApplyAsync(java.util.function.Function)
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function<? super T, ? extends U> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn) {
     return super.thenApplyAsync(pFn, mExecutor);
   }
 
@@ -117,15 +112,15 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<? super T, Context, ? extends U> pFn) {
+  public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<T, Context, U> pFn) {
     return super.thenApplyAsync(pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAccept(java.util.function.Consumer)
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer<? super T> pAction) {
+  public ContextExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer1<T> pAction) {
     return super.thenAcceptAsync(pAction, mExecutor);
   }
 
@@ -133,15 +128,15 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<? super T, Context> pAction) {
+  public ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<T, Context> pAction) {
     return super.thenAcceptAsync(pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAcceptAsync(java.util.function.Consumer)
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer<? super T> pAction) {
+  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction) {
     return super.thenAcceptAsync(pAction, mExecutor);
   }
 
@@ -149,47 +144,47 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<? super T, Context> pAction) {
+  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction) {
     return super.thenAcceptAsync(pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombine(java.util.concurrent.CompletionStage,
-   *      java.util.function.BiFunction)
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U, V> ContextExtendedCompletableFuture<V> thenCombine(CompletionStage<? extends U> pOther,
-    BiFunction<? super T, ? super U, ? extends V> pFn) {
+  public <U, V> ContextExtendedCompletableFuture<V> thenCombine(ExtendedCompletionStage<U> pOther,
+    Function2<T, U, V> pFn) {
     return super.thenCombineAsync(pOther, pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombine(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
-  public <U, V> ContextExtendedCompletionStage<V> thenCombine(CompletionStage<? extends U> pOther,
-    Function3<? super T, ? super U, Context, ? extends V> pFn) {
+  public <U, V> ContextExtendedCompletionStage<V> thenCombine(ExtendedCompletionStage<U> pOther,
+    Function3<T, U, Context, V> pFn) {
     return super.thenCombineAsync(pOther, pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombineAsync(java.util.concurrent.CompletionStage,
-   *      java.util.function.BiFunction)
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-    BiFunction<? super T, ? super U, ? extends V> pFn) {
+  public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
+    Function2<T, U, V> pFn) {
     return super.thenCombineAsync(pOther, pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombineAsync(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
-  public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(CompletionStage<? extends U> pOther,
-    Function3<? super T, ? super U, Context, ? extends V> pFn) {
+  public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
+    Function3<T, U, Context, V> pFn) {
     return super.thenCombineAsync(pOther, pFn, mExecutor);
   }
 
@@ -197,26 +192,23 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCompose(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenCompose(
-    Function2<? super T, Context, ? extends CompletionStage<U>> pFn) {
+  public <U> ContextExtendedCompletionStage<U> thenCompose(Function2<T, Context, ExtendedCompletionStage<U>> pFn) {
     return super.thenComposeAsync(pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCompose(java.util.function.Function)
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCompose(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenCompose(
-    Function<? super T, @NonNull ? extends CompletionStage<U>> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> thenCompose(Function1<T, ExtendedCompletionStage<U>> pFn) {
     return super.thenComposeAsync(pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenComposeAsync(java.util.function.Function)
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(
-    Function<? super T, @NonNull ? extends CompletionStage<U>> pFn) {
+  public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn) {
     return super.thenComposeAsync(pFn, mExecutor);
   }
 
@@ -224,8 +216,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ContextExtendedCompletionStage<U> thenComposeAsync(
-    Function2<? super T, Context, ? extends CompletionStage<U>> pFn) {
+  public <U> ContextExtendedCompletionStage<U> thenComposeAsync(Function2<T, Context, ExtendedCompletionStage<U>> pFn) {
     return super.thenComposeAsync(pFn, mExecutor);
   }
 
@@ -234,112 +225,112 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    */
   @Override
   public ContextExtendedCompletionStage<T> exceptionallyCompose(
-    Function2<Throwable, Context, ? extends CompletionStage<T>> pFn) {
+    Function2<Throwable, Context, ExtendedCompletionStage<T>> pFn) {
     return super.exceptionallyCompose(pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#exceptionallyCompose(java.util.function.Function)
+   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#exceptionallyCompose(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
   public ContextExtendedCompletableFuture<T> exceptionallyCompose(
-    Function<Throwable, ? extends CompletionStage<T>> pFn) {
+    Function1<Throwable, ExtendedCompletionStage<T>> pFn) {
     return super.exceptionallyCompose(pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#acceptEither(java.util.concurrent.CompletionStage,
-   *      java.util.function.Consumer)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#acceptEither(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> acceptEither(CompletionStage<? extends T> pOther,
-    Consumer<? super T> pAction) {
+  public ExtendedCompletableFuture<@Nullable Void> acceptEither(ExtendedCompletionStage<T> pOther,
+    Consumer1<T> pAction) {
     return super.acceptEitherAsync(pOther, pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#acceptEitherAsync(java.util.concurrent.CompletionStage,
-   *      java.util.function.Consumer)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#acceptEitherAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(CompletionStage<? extends T> pOther,
-    Consumer<? super T> pAction) {
+  public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther,
+    Consumer1<T> pAction) {
     return super.acceptEitherAsync(pOther, pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#applyToEither(java.util.concurrent.CompletionStage,
-   *      java.util.function.Function)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#applyToEither(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> applyToEither(CompletionStage<? extends T> pOther,
-    Function<? super T, U> pFn) {
+  public <U> ExtendedCompletableFuture<U> applyToEither(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn) {
     return super.applyToEitherAsync(pOther, pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#applyToEitherAsync(java.util.concurrent.CompletionStage,
-   *      java.util.function.Function)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#applyToEitherAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> applyToEitherAsync(CompletionStage<? extends T> pOther,
-    Function<? super T, U> pFn) {
+  public <U> ExtendedCompletableFuture<U> applyToEitherAsync(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn) {
     return super.applyToEitherAsync(pOther, pFn, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterBoth(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterBoth(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(CompletionStage<?> pOther, Runnable pAction) {
+  public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return super.runAfterBothAsync(pOther, pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterBothAsync(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterBothAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(CompletionStage<?> pOther, Runnable pAction) {
+  public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther,
+    Runnable pAction) {
     return super.runAfterBothAsync(pOther, pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterEither(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterEither(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterEither(CompletionStage<?> pOther, Runnable pAction) {
+  public ExtendedCompletableFuture<@Nullable Void> runAfterEither(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return super.runAfterEitherAsync(pOther, pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterEitherAsync(java.util.concurrent.CompletionStage,
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterEitherAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(CompletionStage<?> pOther, Runnable pAction) {
+  public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther,
+    Runnable pAction) {
     return super.runAfterEitherAsync(pOther, pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptBoth(java.util.concurrent.CompletionStage,
-   *      java.util.function.BiConsumer)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptBoth(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(CompletionStage<? extends U> pOther,
-    BiConsumer<? super T, ? super U> pAction) {
+  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(ExtendedCompletionStage<U> pOther,
+    Consumer2<T, U> pAction) {
     return super.thenAcceptBothAsync(pOther, pAction, mExecutor);
   }
 
   /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptBothAsync(java.util.concurrent.CompletionStage,
-   *      java.util.function.BiConsumer)
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptBothAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   *      com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(CompletionStage<? extends U> pOther,
-    BiConsumer<? super T, ? super U> pAction) {
+  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(ExtendedCompletionStage<U> pOther,
+    Consumer2<T, U> pAction) {
     return super.thenAcceptBothAsync(pOther, pAction, mExecutor);
   }
 

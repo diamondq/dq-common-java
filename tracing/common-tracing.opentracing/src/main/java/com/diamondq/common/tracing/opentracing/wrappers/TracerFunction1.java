@@ -1,8 +1,7 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
-import com.diamondq.common.lambda.interfaces.CancelableFunction;
-
-import java.util.function.Function;
+import com.diamondq.common.lambda.interfaces.CancelableFunction1;
+import com.diamondq.common.lambda.interfaces.Function1;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,18 +11,18 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerFunction<A, B> extends AbstractTracerWrapper
-  implements Function<A, B>, AbortableContinuation, CancelableFunction<A, B> {
+public class TracerFunction1<A, B> extends AbstractTracerWrapper
+  implements Function1<A, B>, AbortableContinuation, CancelableFunction1<A, B> {
 
-  private static final Logger  sLogger = LoggerFactory.getLogger(TracerFunction.class);
+  private static final Logger   sLogger = LoggerFactory.getLogger(TracerFunction1.class);
 
-  private final Function<A, B> mDelegate;
+  private final Function1<A, B> mDelegate;
 
-  public TracerFunction(Function<A, B> pDelegate) {
+  public TracerFunction1(Function1<A, B> pDelegate) {
     this(GlobalTracer.get(), pDelegate);
   }
 
-  public TracerFunction(Tracer pTracer, Function<A, B> pDelegate) {
+  public TracerFunction1(Tracer pTracer, Function1<A, B> pDelegate) {
     super(pTracer);
     mDelegate = pDelegate;
   }
@@ -55,7 +54,7 @@ public class TracerFunction<A, B> extends AbstractTracerWrapper
   }
 
   /**
-   * @see com.diamondq.common.lambda.interfaces.CancelableFunction#cancel()
+   * @see com.diamondq.common.lambda.interfaces.CancelableFunction1#cancel()
    */
   @Override
   public void cancel() {
