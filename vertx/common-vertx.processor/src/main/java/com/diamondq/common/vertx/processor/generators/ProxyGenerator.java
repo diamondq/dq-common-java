@@ -770,6 +770,8 @@ public class ProxyGenerator implements Generator {
           ParameterizedTypeName.get(ClassName.get(Message.class), replyReturnType)), "ar") //
         // try (Context ctx2 = ctx.activateOnThread("")) {
         .beginControlFlow("try (Context ctx2 = ctx.activateOnThread($S))", "")
+        // try {
+        .beginControlFlow("try")
         // if (ar.succeeded() == true) {
         .beginControlFlow("if (ar.succeeded() == true)")
         // Message<String> replyMessage = ar.result();
@@ -987,6 +989,14 @@ public class ProxyGenerator implements Generator {
         .addStatement("result.completeExceptionally(cause)")
         // }
         .endControlFlow()
+        // }
+        .endControlFlow()
+        // } catch (RuntimeException ex) {
+        .nextControlFlow("catch (RuntimeException ex)")
+        // if (result.completeExceptionally(ex) == false)
+        .beginControlFlow("if (result.completeExceptionally(ex) == false)")
+        // ctx2.reportThrowable(ex);
+        .addStatement("ctx2.reportThrowable(ex)").endControlFlow() //
         // }
         .endControlFlow()
         // });
