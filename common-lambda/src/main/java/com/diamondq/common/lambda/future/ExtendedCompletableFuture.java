@@ -1,5 +1,8 @@
 package com.diamondq.common.lambda.future;
 
+import com.diamondq.common.lambda.interfaces.Cancelable;
+import com.diamondq.common.lambda.interfaces.CancelableConsumer1;
+import com.diamondq.common.lambda.interfaces.CancelableConsumer1.NoopCancelableConsumer1;
 import com.diamondq.common.lambda.interfaces.CancelableFunction1;
 import com.diamondq.common.lambda.interfaces.CancelableFunction1.NoopCancelableFunction1;
 import com.diamondq.common.lambda.interfaces.CancelableFunction2;
@@ -41,6 +44,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
 
   private static final Constructor<CancelableFunction1<?, ?>>    sFunction1Constructor;
 
+  private static final Constructor<CancelableConsumer1<?>>       sConsumer1Constructor;
+
   private static final Constructor<CancelableSupplier<?>>        sSupplierConstructor;
 
   private static final Constructor<CancelableRunnable>           sRunnableConstructor;
@@ -53,9 +58,11 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     @NonNull
     Constructor<CancelableSupplier<?>> supplierConstructor;
     @NonNull
+    Constructor<CancelableConsumer1<?>> consumer1Constructor;
+    @NonNull
     Constructor<CancelableRunnable> runnableConstructor;
     try {
-      Class<?> c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerBiFunction");
+      Class<?> c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerFunction2");
 
       /* BiFunction */
 
@@ -66,11 +73,18 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
 
       /* Function */
 
-      c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerFunction");
+      c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerFunction1");
       @SuppressWarnings({"unchecked"})
       Constructor<CancelableFunction1<?, ?>> cf =
         (Constructor<CancelableFunction1<?, ?>>) c.getConstructor(Function1.class);
       function1Constructor = cf;
+
+      /* Consumer1 */
+
+      c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerConsumer1");
+      @SuppressWarnings({"unchecked"})
+      Constructor<CancelableConsumer1<?>> cc = (Constructor<CancelableConsumer1<?>>) c.getConstructor(Consumer1.class);
+      consumer1Constructor = cc;
 
       /* Supplier */
 
@@ -105,6 +119,11 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
         supplierConstructor = cs;
 
         @SuppressWarnings({"rawtypes", "unchecked"})
+        Constructor<CancelableConsumer1<?>> cc =
+          (Constructor) NoopCancelableConsumer1.class.getConstructor(Consumer1.class);
+        consumer1Constructor = cc;
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
         Constructor<CancelableRunnable> cr = (Constructor) NoopCancelableRunnable.class.getConstructor(Runnable.class);
         runnableConstructor = cr;
 
@@ -119,6 +138,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
 
     sFunction2Constructor = function2Constructor;
     sFunction1Constructor = function1Constructor;
+    sConsumer1Constructor = consumer1Constructor;
     sSupplierConstructor = supplierConstructor;
     sRunnableConstructor = runnableConstructor;
   }
@@ -137,6 +157,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   static <T, R> CancelableFunction1<T, R> wrapFunction1(Function1<T, R> pFn) {
     try {
       return (CancelableFunction1<T, R>) sFunction1Constructor.newInstance(pFn);
+    }
+    catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+      throw new IllegalStateException(ex);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T, R> CancelableConsumer1<T> wrapConsumer1(Consumer1<T> pFn) {
+    try {
+      return (CancelableConsumer1<T>) sConsumer1Constructor.newInstance(pFn);
     }
     catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
       throw new IllegalStateException(ex);
@@ -229,16 +259,18 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    */
   @Override
   public <U> ExtendedCompletableFuture<U> thenApply(Function1<T, U> pFn) {
-    return handle((t, ex) -> {
-      if (ex != null) {
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      }
-      @SuppressWarnings("null")
-      T unconstrainedT = t;
-      return pFn.apply(unconstrainedT);
-    });
+    CancelableFunction1<T, U> ab = wrapFunction1(pFn);
+    boolean cleanupFlag = true;
+    try {
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenApply(ab));
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
+      return result;
+    }
+    finally {
+      if (cleanupFlag == true)
+        ab.cancel();
+    }
   }
 
   /**
@@ -246,16 +278,18 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    */
   @Override
   public <U> ExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn) {
-    return handleAsync((t, ex) -> {
-      if (ex != null) {
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      }
-      @SuppressWarnings("null")
-      T unconstrainedT = t;
-      return pFn.apply(unconstrainedT);
-    });
+    CancelableFunction1<T, U> ab = wrapFunction1(pFn);
+    boolean cleanupFlag = true;
+    try {
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenApplyAsync(ab));
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
+      return result;
+    }
+    finally {
+      if (cleanupFlag == true)
+        ab.cancel();
+    }
   }
 
   /**
@@ -264,16 +298,18 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    */
   @Override
   public <U> ExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn, Executor pExecutor) {
-    return handleAsync((t, ex) -> {
-      if (ex != null) {
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      }
-      @SuppressWarnings("null")
-      T unconstrainedT = t;
-      return pFn.apply(unconstrainedT);
-    }, pExecutor);
+    CancelableFunction1<T, U> ab = wrapFunction1(pFn);
+    boolean cleanupFlag = true;
+    try {
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenApplyAsync(ab, pExecutor));
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
+      return result;
+    }
+    finally {
+      if (cleanupFlag == true)
+        ab.cancel();
+    }
   }
 
   /**
@@ -281,17 +317,19 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer1<T> pAction) {
-    return handle((t, ex) -> {
-      if (ex != null) {
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      }
-      @SuppressWarnings("null")
-      T unconstrainedT = t;
-      pAction.accept(unconstrainedT);
-      return null;
-    });
+    CancelableConsumer1<T> ab = wrapConsumer1(pAction);
+    boolean cleanupFlag = true;
+    try {
+      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.thenAccept(ab));
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
+      return result;
+    }
+    finally {
+      if (cleanupFlag == true)
+        ab.cancel();
+    }
+
   }
 
   /**
@@ -299,17 +337,18 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction) {
-    return handleAsync((t, ex) -> {
-      if (ex != null) {
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      }
-      @SuppressWarnings("null")
-      T unconstrainedT = t;
-      pAction.accept(unconstrainedT);
-      return null;
-    });
+    CancelableConsumer1<T> ab = wrapConsumer1(pAction);
+    boolean cleanupFlag = true;
+    try {
+      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.thenAcceptAsync(ab));
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
+      return result;
+    }
+    finally {
+      if (cleanupFlag == true)
+        ab.cancel();
+    }
   }
 
   /**
@@ -318,17 +357,18 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor) {
-    return handleAsync((t, ex) -> {
-      if (ex != null) {
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      }
-      @SuppressWarnings("null")
-      T unconstrainedT = t;
-      pAction.accept(unconstrainedT);
-      return null;
-    }, pExecutor);
+    CancelableConsumer1<T> ab = wrapConsumer1(pAction);
+    boolean cleanupFlag = true;
+    try {
+      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.thenAcceptAsync(ab, pExecutor));
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
+      return result;
+    }
+    finally {
+      if (cleanupFlag == true)
+        ab.cancel();
+    }
   }
 
   /**
@@ -387,20 +427,15 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public <U, V> ExtendedCompletableFuture<V> thenCombine(ExtendedCompletionStage<U> pOther, Function2<T, U, V> pFn) {
     CancelableFunction2<T, U, V> ab = wrapFunction2(pFn);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<V> result = relatedOf(mDelegate.thenCombine(decomposeToCompletionStage(pOther), ab));
-      final CancelableFunction2<T, U, V> cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -413,21 +448,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
     Function2<T, U, V> pFn) {
     CancelableFunction2<T, U, V> ab = wrapFunction2(pFn);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<V> result =
         relatedOf(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab));
-      final CancelableFunction2<T, U, V> cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -440,21 +470,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther, Function2<T, U, V> pFn,
     Executor pExecutor) {
     CancelableFunction2<T, U, V> ab = wrapFunction2(pFn);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<V> result =
         relatedOf(mDelegate.thenCombineAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
-      final CancelableFunction2<T, U, V> cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -543,20 +568,15 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public <U> ExtendedCompletableFuture<U> applyToEither(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<U> result = relatedOf(mDelegate.applyToEither(decomposeToCompletionStage(pOther), ab));
-      final CancelableFunction1<T, U> cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -568,21 +588,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public <U> ExtendedCompletableFuture<U> applyToEitherAsync(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<U> result =
         relatedOf(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab));
-      final CancelableFunction1<T, U> cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -595,21 +610,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public <U> ExtendedCompletableFuture<U> applyToEitherAsync(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn,
     Executor pExecutor) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<U> result =
         relatedOf(mDelegate.applyToEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
-      final CancelableFunction1<T, U> cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -660,21 +670,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public ExtendedCompletableFuture<@Nullable Void> runAfterEither(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     CancelableRunnable ab = wrapRunnable(pAction);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<@Nullable Void> result =
         relatedOf(mDelegate.runAfterEither(decomposeToCompletionStage(pOther), ab));
-      final CancelableRunnable cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -687,21 +692,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther,
     Runnable pAction) {
     CancelableRunnable ab = wrapRunnable(pAction);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<@Nullable Void> result =
         relatedOf(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab));
-      final CancelableRunnable cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -714,21 +714,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther,
     Runnable pAction, Executor pExecutor) {
     CancelableRunnable ab = wrapRunnable(pAction);
+    boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<@Nullable Void> result =
         relatedOf(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther), ab, pExecutor));
-      final CancelableRunnable cleanup = ab;
-      ab = null;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      cleanupFlag = false;
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (ab != null)
+      if (cleanupFlag == true)
         ab.cancel();
     }
   }
@@ -738,20 +733,14 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    */
   @Override
   public <U> ExtendedCompletableFuture<U> thenCompose(Function1<T, @NonNull ExtendedCompletionStage<U>> pFn) {
-    final CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
+    CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenCompose((t) -> {
         return decomposeToCompletionStage(ab.apply(t));
       }));
-      final CancelableFunction1<T, ExtendedCompletionStage<U>> cleanup = ab;
       cleanupFlag = false;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
@@ -765,20 +754,14 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    */
   @Override
   public <U> ExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn) {
-    final CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
+    CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenComposeAsync((t) -> {
         return decomposeToCompletionStage(ab.apply(t));
       }));
-      final CancelableFunction1<T, ExtendedCompletionStage<U>> cleanup = ab;
       cleanupFlag = false;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
@@ -794,26 +777,29 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public <U> ExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn,
     Executor pExecutor) {
-    final CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
+    CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenComposeAsync((t) -> {
         return decomposeToCompletionStage(ab.apply(t));
       }, pExecutor));
-      final CancelableFunction1<T, ExtendedCompletionStage<U>> cleanup = ab;
       cleanupFlag = false;
-      result = result.exceptionally((ex) -> {
-        cleanup.cancel();
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      });
+      result = result.internalExceptionally(ab);
       return result;
     }
     finally {
       if (cleanupFlag == true)
         ab.cancel();
     }
+  }
+
+  private ExtendedCompletableFuture<T> internalExceptionally(Cancelable ab) {
+    return relatedOf(mDelegate.exceptionally((ex) -> {
+      ab.cancel();
+      if (ex instanceof RuntimeException)
+        throw (RuntimeException) ex;
+      throw new RuntimeException(ex);
+    }));
   }
 
   /**
@@ -909,21 +895,21 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     }
   }
 
-  // @Override
-  // public CompletableFuture<T> toCompletableFuture() {
-  // return mDelegate.toCompletableFuture();
-  // }
-  //
-
+  /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#exceptionally(com.diamondq.common.lambda.interfaces.Function1)
+   */
   @Override
   public ExtendedCompletableFuture<T> exceptionally(Function1<Throwable, T> pFn) {
-    return handle((t, ex) -> {
-      if (ex != null)
-        return pFn.apply(ex);
-      @SuppressWarnings("null")
-      T unconstraintedT = t;
-      return unconstraintedT;
-    });
+    CancelableFunction1<Throwable, T> ab = wrapFunction1(pFn);
+    try {
+      ExtendedCompletableFuture<T> result = relatedOf(mDelegate.exceptionally(ab));
+      ab = null;
+      return result;
+    }
+    finally {
+      if (ab != null)
+        ab.cancel();
+    }
   }
 
   private static class ExceptionMarker {
@@ -1457,6 +1443,5 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return results;
     }));
   }
-
 
 }

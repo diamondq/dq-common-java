@@ -10,17 +10,17 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
-public class TracerConsumer<T> extends AbstractTracerWrapper implements Consumer1<T>, AbortableContinuation {
+public class TracerConsumer1<T> extends AbstractTracerWrapper implements Consumer1<T>, AbortableContinuation {
 
-  private static final Logger sLogger = LoggerFactory.getLogger(TracerConsumer.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(TracerConsumer1.class);
 
   private final Consumer1<T>  mDelegate;
 
-  public TracerConsumer(Consumer1<T> pDelegate) {
+  public TracerConsumer1(Consumer1<T> pDelegate) {
     this(GlobalTracer.get(), pDelegate);
   }
 
-  public TracerConsumer(Tracer pTracer, Consumer1<T> pDelegate) {
+  public TracerConsumer1(Tracer pTracer, Consumer1<T> pDelegate) {
     super(pTracer);
     mDelegate = pDelegate;
   }

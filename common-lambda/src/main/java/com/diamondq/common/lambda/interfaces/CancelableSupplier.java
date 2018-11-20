@@ -1,6 +1,6 @@
 package com.diamondq.common.lambda.interfaces;
 
-public interface CancelableSupplier<R> extends Supplier<R>, java.util.function.Supplier<R> {
+public interface CancelableSupplier<R> extends Supplier<R>, java.util.function.Supplier<R>, Cancelable {
 
   public static final class NoopCancelableSupplier<R> implements CancelableSupplier<R> {
 
@@ -20,5 +20,6 @@ public interface CancelableSupplier<R> extends Supplier<R>, java.util.function.S
     }
   }
 
+  @Override
   public void cancel();
 }

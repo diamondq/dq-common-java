@@ -1,6 +1,6 @@
 package com.diamondq.common.lambda.interfaces;
 
-public interface CancelableRunnable extends Runnable {
+public interface CancelableRunnable extends Runnable, Cancelable {
 
   public static final class NoopCancelableRunnable implements CancelableRunnable {
 
@@ -20,5 +20,6 @@ public interface CancelableRunnable extends Runnable {
     }
   }
 
+  @Override
   public void cancel();
 }

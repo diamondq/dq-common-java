@@ -140,20 +140,20 @@ public interface ContextExtendedCompletionStage<T> extends ExtendedCompletionSta
   /* ********** HANDLE ********** */
 
   @Override
-  public <U> ContextExtendedCompletionStage<U> handle(Function2<T, @Nullable Throwable, U> pFn);
+  public <U> ContextExtendedCompletionStage<U> handle(Function2<@Nullable T, @Nullable Throwable, U> pFn);
 
-  public <U> ContextExtendedCompletionStage<U> handle(Function3<T, @Nullable Throwable, Context, U> pFn);
-
-  @Override
-  public <U> ContextExtendedCompletionStage<U> handleAsync(Function2<T, @Nullable Throwable, U> pFn);
-
-  public <U> ContextExtendedCompletionStage<U> handleAsync(Function3<T, @Nullable Throwable, Context, U> pFn);
+  public <U> ContextExtendedCompletionStage<U> handle(Function3<@Nullable T, @Nullable Throwable, Context, U> pFn);
 
   @Override
-  public <U> ContextExtendedCompletionStage<U> handleAsync(Function2<T, @Nullable Throwable, U> pFn,
+  public <U> ContextExtendedCompletionStage<U> handleAsync(Function2<@Nullable T, @Nullable Throwable, U> pFn);
+
+  public <U> ContextExtendedCompletionStage<U> handleAsync(Function3<@Nullable T, @Nullable Throwable, Context, U> pFn);
+
+  @Override
+  public <U> ContextExtendedCompletionStage<U> handleAsync(Function2<@Nullable T, @Nullable Throwable, U> pFn,
     Executor pExecutor);
 
-  public <U> ContextExtendedCompletionStage<U> handleAsync(Function3<T, @Nullable Throwable, Context, U> pFn,
+  public <U> ContextExtendedCompletionStage<U> handleAsync(Function3<@Nullable T, @Nullable Throwable, Context, U> pFn,
     Executor pExecutor);
 
   /* ********** FORLOOP ********** */
