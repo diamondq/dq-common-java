@@ -164,8 +164,8 @@ public class ProxyGenerator implements Generator {
     else {
       announceMethod = announceMethod
         // Engine instance = new EngineProxy(mContextFactory, mVertx, address);
-        .addStatement("$T instance = new $T(mContextFactory, mVertx, address, mDeliveryTimeout)", pProxyClass.getBaseQualifiedTypeName(),
-          pProxyClass.getProxyQualifiedTypeName());
+        .addStatement("$T instance = new $T(mContextFactory, mVertx, address, mDeliveryTimeout)",
+          pProxyClass.getBaseQualifiedTypeName(), pProxyClass.getProxyQualifiedTypeName());
     }
     announceMethod = announceMethod
       // Dictionary<String, ?> properties = new Hashtable<>();
@@ -360,9 +360,11 @@ public class ProxyGenerator implements Generator {
       // /* Parse configuration properties */
       //
       .addCode("\n/* Parse configuration properties */\n\n")
-      // long deliveryTime = PropertiesParsing.getNonNullLong(contextProperties, ".delivery-timeout", 30L);
-      .addStatement("long deliveryTime = $T.getNonNullLong(contextProperties, $S, 30L)", PropertiesParsing.class,
-        ".delivery-timeout")
+      // long deliveryTime = PropertiesParsing.getNonNullLong(contextProperties, ".delivery-timeout",
+      // Long.parseLong(System.getProperty("vertx-delivery-timeout", "30")));
+      .addStatement(
+        "long deliveryTime = $T.getNonNullLong(contextProperties, $S, Long.parseLong(System.getProperty($S, $S)))",
+        PropertiesParsing.class, ".delivery-timeout", "vertx-delivery-timeout", "30")
       // TimeUnit deliveryUnit = TimeUnit.valueOf(PropertiesParsing.getNonNullString(contextProperties,
       // ".delivery-timeout-unit", "SECONDS").toUpperCase(Locale.ENGLISH));
       .addStatement(
@@ -996,8 +998,8 @@ public class ProxyGenerator implements Generator {
 
       // DeliveryOptions options = new DeliveryOptions().addHeader("action", "getName");
       builder = builder.addCode("\n/* Add the options including the method to call */\n\n")
-        .addStatement("$T options = new $T().addHeader($S, $S).setSendTimeout(mDeliveryTimeout)", DeliveryOptions.class, DeliveryOptions.class, "action",
-          pProxyMethod.getMethodName()) //
+        .addStatement("$T options = new $T().addHeader($S, $S).setSendTimeout(mDeliveryTimeout)", DeliveryOptions.class,
+          DeliveryOptions.class, "action", pProxyMethod.getMethodName()) //
 
         .addCode("\n/* Define the return future */\n\n")
 

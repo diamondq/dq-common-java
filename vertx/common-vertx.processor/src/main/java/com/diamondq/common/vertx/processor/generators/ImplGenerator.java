@@ -880,6 +880,12 @@ public class ImplGenerator implements Generator {
       // MessageConsumer<JsonObject> consumer = vertx.eventBus().<JsonObject> consumer(address);
       .addStatement("$T<$T> consumer = vertx.eventBus().<$T>consumer(address)", MessageConsumer.class, JsonObject.class,
         JsonObject.class)
+      // mSelfProxy = new LocalFileEngineProxy(mContextFactory, vertx, address,
+      // Long.parseLong(System.getProperty("vertx-delivery-timeout", "30")) * 1000L);
+      .addStatement(pImplClass.isNeedsConverter()
+        ? "mSelfProxy = new $NProxy(mContextFactory, mConverterManager, vertx, address, Long.parseLong(System.getProperty($S, $S)) * 1000L)"
+        : "mSelfProxy = new $NProxy(mContextFactory, vertx, address, Long.parseLong(System.getProperty($S, $S)) * 1000L)",
+        pImplClass.getBaseSimpleName(), "vertx-delivery-timeout", "30")
       //
       // /* Register a handler to callback when the consumer is fully registered */
       //
