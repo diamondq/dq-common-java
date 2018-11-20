@@ -104,8 +104,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
   @Override
   protected boolean internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Structure pStructure, boolean pMustMatchOldStructure, @Nullable Structure pOldStructure) {
-    try (Context context = mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pToolkit, pScope,
-      pDefName, pKey, pStructure, pMustMatchOldStructure, pOldStructure)) {
+    try (Context context = mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pDefName, pKey,
+      pStructure, pMustMatchOldStructure, pOldStructure)) {
       if (mPersistStructures == false)
         return context.exit(true);
 
@@ -502,8 +502,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
   @Override
   protected @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName,
     String pKey) {
-    try (Context context =
-      mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pToolkit, pScope, pDefName, pKey)) {
+    try (Context context = mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pDefName, pKey)) {
 
       if (mPersistStructures == false)
         return context.exit(null);
@@ -527,8 +526,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
    * @return the structure
    */
   protected Structure convertToStructure(Toolkit pToolkit, Scope pScope, String pKey, STRUCTURECONFIGOBJ config) {
-    try (Context context =
-      mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pToolkit, pScope, pKey, config)) {
+    try (Context context = mContextFactory.newContext(AbstractDocumentPersistenceLayer.class, this, pKey, config)) {
       String fullStructureDefName =
         getStructureConfigObjectProp(pToolkit, pScope, config, true, "structureDef", PropertyType.String);
       if (fullStructureDefName == null)

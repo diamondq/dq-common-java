@@ -102,8 +102,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
    */
   @Override
   public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
-    try (Context context =
-      mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pToolkit, pScope, pStructure)) {
+    try (Context context = mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pStructure)) {
       String key = pToolkit.createStructureRefStr(pScope, pStructure);
       if (mStructureCache != null)
         mStructureCache.put(key, pStructure);
@@ -132,8 +131,8 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
   @Override
   public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
     @Nullable Structure pOldStructure) {
-    try (Context context = mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pToolkit, pScope,
-      pStructure, pOldStructure)) {
+    try (Context context =
+      mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pStructure, pOldStructure)) {
       String key = pToolkit.createStructureRefStr(pScope, pStructure);
 
       /* Now write the data to disk */
@@ -167,8 +166,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
    */
   @Override
   public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
-    try (Context context =
-      mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pToolkit, pScope, pStructure)) {
+    try (Context context = mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pStructure)) {
       String key = pToolkit.createStructureRefStr(pScope, pStructure);
 
       /* Now write the data to disk */
@@ -211,27 +209,29 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
   @Nullable
   @Override
   public Structure lookupStructureBySerializedRef(Toolkit pToolkit, Scope pScope, String pSerializedRef) {
-    Cache<String, Structure> structureCache = mStructureCache;
-    Structure result = (structureCache == null ? null : structureCache.getIfPresent(pSerializedRef));
-    if (result != null)
+    try (Context ctx = mContextFactory.newContext(AbstractCachingPersistenceLayer.class, this, pSerializedRef)) {
+      Cache<String, Structure> structureCache = mStructureCache;
+      Structure result = (structureCache == null ? null : structureCache.getIfPresent(pSerializedRef));
+      if (result != null)
+        return result;
+
+      int lastOffset = pSerializedRef.lastIndexOf('/');
+      if (lastOffset == -1)
+        throw new IllegalArgumentException("The Structure reference is not the right format: " + pSerializedRef);
+      int nextLastOffset = pSerializedRef.lastIndexOf('/', lastOffset - 1);
+      String typeName;
+      if (lastOffset == -1)
+        typeName = pSerializedRef.substring(0, lastOffset);
+      else
+        typeName = pSerializedRef.substring(nextLastOffset + 1, lastOffset);
+
+      result = internalLookupStructureByName(pToolkit, pScope, typeName, pSerializedRef);
+
+      if ((result != null) && (mStructureCache != null))
+        mStructureCache.put(pSerializedRef, result);
+
       return result;
-
-    int lastOffset = pSerializedRef.lastIndexOf('/');
-    if (lastOffset == -1)
-      throw new IllegalArgumentException("The Structure reference is not the right format: " + pSerializedRef);
-    int nextLastOffset = pSerializedRef.lastIndexOf('/', lastOffset - 1);
-    String typeName;
-    if (lastOffset == -1)
-      typeName = pSerializedRef.substring(0, lastOffset);
-    else
-      typeName = pSerializedRef.substring(nextLastOffset + 1, lastOffset);
-
-    result = internalLookupStructureByName(pToolkit, pScope, typeName, pSerializedRef);
-
-    if ((result != null) && (mStructureCache != null))
-      mStructureCache.put(pSerializedRef, result);
-
-    return result;
+    }
   }
 
   protected abstract @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName,

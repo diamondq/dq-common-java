@@ -176,8 +176,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   }
 
   protected void validateKVStoreManyToManySetup(Toolkit pToolkit, Scope pScope, String pTableName) {
-    try (Context context =
-      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pTableName)) {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pTableName)) {
       IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
       if (tableDefinitionSupport != null) {
         synchronized (this) {
@@ -198,8 +197,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
     if (tableDefinitionSupport != null) {
       synchronized (this) {
         if (mConfiguredTableDefinitions.containsKey(pTableName) == false) {
-          try (Context context =
-            mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pTableName)) {
+          try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pTableName)) {
             String singlePrimaryKey = "";
             try {
               KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
@@ -343,8 +341,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
    */
   @Override
   public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
-    try (
-      Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pValue)) {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pValue)) {
 
       /*
        * Handle the table validation. NOTE: This makes the assumption that this persistence layer is part of a
@@ -369,8 +366,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected @Nullable Map<String, Object> loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
     String pKey, boolean pCreateIfMissing) {
-    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pDefName,
-      pKey, pCreateIfMissing)) {
+    try (Context context =
+      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pDefName, pKey, pCreateIfMissing)) {
       IKVTransaction transaction = mStructureStore.startTransaction();
       boolean success = false;
       try {
@@ -618,8 +615,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Map<String, Object> pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
-    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pDefName,
-      pKey, pConfig, pMustMatchOptimisticObj, pOptimisticObj)) {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pDefName, pKey, pConfig,
+      pMustMatchOptimisticObj, pOptimisticObj)) {
       IKVTransaction transaction = mStructureStore.startTransaction();
       boolean success = false;
       try {
@@ -701,8 +698,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Structure pStructure) {
-    try (Context context =
-      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pDefName, pKey, pStructure)) {
+    try (
+      Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pDefName, pKey, pStructure)) {
 
       IKVTransaction transaction = mStructureStore.startTransaction();
       boolean success = false;
@@ -764,7 +761,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope,
     @Nullable Map<String, Object> pConfig, StructureDefinition pStructureDefinition, String pStructureDefName,
     @Nullable String pKey, @Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
-    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pConfig,
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pConfig,
       pStructureDefinition, pStructureDefName, pKey, pPropDef, pStructureRefListBuilder)) {
       IKVTransaction transaction = mStructureStore.startTransaction();
       boolean success = false;
@@ -961,8 +958,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues) {
-    try (Context context =
-      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pToolkit, pScope, pQuery, pParamValues)) {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pQuery, pParamValues)) {
       GenericModelQuery gq = (GenericModelQuery) pQuery;
 
       String defName = gq.getDefinitionName();

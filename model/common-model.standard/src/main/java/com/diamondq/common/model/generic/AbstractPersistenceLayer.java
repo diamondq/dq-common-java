@@ -513,8 +513,10 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
   @Override
   public @Nullable Structure lookupStructureByPrimaryKeys(Toolkit pToolkit, Scope pScope,
     StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys) {
-    return pToolkit.createStructureRefFromParts(pScope, null, null, pStructureDef, Arrays.asList(pPrimaryKeys))
-      .resolve();
+    try (Context ctx = mContextFactory.newContext(AbstractPersistenceLayer.class, this, pStructureDef, pPrimaryKeys)) {
+      return pToolkit.createStructureRefFromParts(pScope, null, null, pStructureDef, Arrays.asList(pPrimaryKeys))
+        .resolve();
+    }
   }
 
   /**
