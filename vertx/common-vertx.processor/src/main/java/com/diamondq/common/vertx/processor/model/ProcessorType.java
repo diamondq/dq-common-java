@@ -1,6 +1,7 @@
 package com.diamondq.common.vertx.processor.model;
 
 import com.diamondq.common.vertx.annotations.ConverterAvailable;
+import com.diamondq.common.vertx.annotations.ProxyGen;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.squareup.javapoet.AnnotationSpec;
@@ -24,6 +25,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Describes a type (Parameter Type or Return Type)
@@ -32,23 +34,26 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public class ProcessorType<R extends ProcessorType<R>> {
 
-  protected final boolean  mPrimitive;
+  protected final boolean               mPrimitive;
 
-  protected final TypeKind mTypeKind;
+  protected final TypeKind              mTypeKind;
 
-  protected TypeName       mTypeName;
+  protected TypeName                    mTypeName;
 
-  protected final String   mNonGenericNonAnnotatedTypeName;
+  protected final String                mNonGenericNonAnnotatedTypeName;
 
-  protected final List<R>  mParameterizedTypeList;
+  protected final List<R>               mParameterizedTypeList;
 
-  protected final boolean  mIsNullable;
+  protected final boolean               mIsNullable;
 
-  protected final boolean  mIsConverterAvailable;
+  protected final boolean               mIsConverterAvailable;
+
+  protected final boolean               mProxyType;
+
+  protected final @Nullable TypeElement mDeclaredTypeElement;
 
   public ProcessorType(TypeMirror pType, Constructor<R> pTypeConstructor, ProcessingEnvironment pProcessingEnv) {
     try {
-
       mTypeKind = pType.getKind();
       TypeName typeName;
       List<R> typeList = new ArrayList<>();
@@ -58,6 +63,8 @@ public class ProcessorType<R extends ProcessorType<R>> {
         ArrayType at = (ArrayType) pType;
         typeName = ArrayTypeName.get(at);
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         break;
       case BOOLEAN:
@@ -65,30 +72,46 @@ public class ProcessorType<R extends ProcessorType<R>> {
         typeName = TypeName.BOOLEAN;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case BYTE:
         mPrimitive = true;
         typeName = TypeName.BYTE;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case CHAR:
         mPrimitive = true;
         typeName = TypeName.CHAR;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case DECLARED: {
         mPrimitive = false;
         DeclaredType dt = (DeclaredType) pType;
         TypeElement te = (TypeElement) dt.asElement();
+        mDeclaredTypeElement = te;
         mNonGenericNonAnnotatedTypeName = te.getQualifiedName().toString();
-        ConverterAvailable codecAvailable = te.getAnnotation(ConverterAvailable.class);
+        ConverterAvailable converterAvailableAnno = te.getAnnotation(ConverterAvailable.class);
         boolean converterAvailable;
-        if (codecAvailable != null)
+        if (converterAvailableAnno != null)
           converterAvailable = true;
         else
           converterAvailable = false;
+        ProxyGen proxyGenAnno = te.getAnnotation(ProxyGen.class);
+        boolean proxyTypeFlag = false;
+        if (proxyGenAnno != null) {
+          proxyTypeFlag = true;
+
+          ProxyClass proxyClass = new ProxyClass(te, pProcessingEnv);
+          if (proxyClass.isNeedsConverter() == true)
+            converterAvailable = true;
+        }
         List<TypeName> typeNameList = new ArrayList<>();
         for (TypeMirror type : dt.getTypeArguments()) {
           R proxyType = pTypeConstructor.newInstance(type, pTypeConstructor, pProcessingEnv);
@@ -99,6 +122,7 @@ public class ProcessorType<R extends ProcessorType<R>> {
         }
 
         mIsConverterAvailable = converterAvailable;
+        mProxyType = proxyTypeFlag;
         ClassName className = ClassName.get((TypeElement) dt.asElement());
         if (typeList.isEmpty() == true)
           typeName = className;
@@ -115,6 +139,8 @@ public class ProcessorType<R extends ProcessorType<R>> {
         typeName = TypeName.DOUBLE;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case ERROR:
         throw new UnsupportedOperationException();
@@ -125,12 +151,16 @@ public class ProcessorType<R extends ProcessorType<R>> {
         typeName = TypeName.FLOAT;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case INT:
         mPrimitive = true;
         typeName = TypeName.INT;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case INTERSECTION:
         throw new UnsupportedOperationException();
@@ -139,6 +169,8 @@ public class ProcessorType<R extends ProcessorType<R>> {
         typeName = TypeName.LONG;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case NONE:
         throw new UnsupportedOperationException();
@@ -153,6 +185,8 @@ public class ProcessorType<R extends ProcessorType<R>> {
         typeName = TypeName.SHORT;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case TYPEVAR:
         throw new UnsupportedOperationException();
@@ -163,6 +197,8 @@ public class ProcessorType<R extends ProcessorType<R>> {
         typeName = TypeName.VOID;
         mNonGenericNonAnnotatedTypeName = typeName.toString();
         mIsConverterAvailable = false;
+        mProxyType = false;
+        mDeclaredTypeElement = null;
         break;
       case WILDCARD:
         throw new UnsupportedOperationException();
@@ -196,6 +232,10 @@ public class ProcessorType<R extends ProcessorType<R>> {
     return mIsConverterAvailable;
   }
 
+  public boolean isProxyType() {
+    return mProxyType;
+  }
+
   public boolean isPrimitive() {
     return mPrimitive;
   }
@@ -214,6 +254,10 @@ public class ProcessorType<R extends ProcessorType<R>> {
 
   public boolean isNullable() {
     return mIsNullable;
+  }
+
+  public @Nullable TypeElement getDeclaredTypeElement() {
+    return mDeclaredTypeElement;
   }
 
   protected ToStringHelper toStringHelper() {

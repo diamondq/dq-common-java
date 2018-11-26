@@ -18,22 +18,25 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class ProcessorClass<R extends ProcessorType<R>, P extends ProcessorParam<R>, M extends ProcessorMethod<R, P>> {
 
-  protected final TypeElement mBaseElement;
+  protected final ProcessingEnvironment mProcessingEnv;
 
-  protected final String      mBaseQualifiedPackage;
+  protected final TypeElement           mBaseElement;
 
-  protected final String      mBaseSimpleName;
+  protected final String                mBaseQualifiedPackage;
 
-  protected final String      mBaseQualifiedName;
+  protected final String                mBaseSimpleName;
 
-  protected final TypeName    mBaseQualifiedTypeName;
+  protected final String                mBaseQualifiedName;
 
-  protected final List<M>     mMethods;
+  protected final TypeName              mBaseQualifiedTypeName;
 
-  protected final boolean     mNeedsConverter;
+  protected final List<M>               mMethods;
+
+  protected final boolean               mNeedsConverter;
 
   public ProcessorClass(TypeElement pClassElement, Constructor<M> pMethodConstructor, Constructor<P> pParamConstructor,
     Constructor<R> pTypeConstructor, ProcessingEnvironment pProcessingEnv) throws IllegalArgumentException {
+    mProcessingEnv = pProcessingEnv;
     mBaseElement = pClassElement;
     String annotatedQualifiedName = pClassElement.getQualifiedName().toString();
 
@@ -112,5 +115,9 @@ public class ProcessorClass<R extends ProcessorType<R>, P extends ProcessorParam
 
   public boolean isNeedsConverter() {
     return mNeedsConverter;
+  }
+
+  public ProcessingEnvironment getProcessingEnv() {
+    return mProcessingEnv;
   }
 }

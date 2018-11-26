@@ -19,6 +19,7 @@ import com.diamondq.common.vertx.processor.model.BaseParam;
 import com.diamondq.common.vertx.processor.model.BaseType;
 import com.diamondq.common.vertx.processor.model.ElementIllegalArgumentException;
 import com.diamondq.common.vertx.processor.model.ImplClass;
+import com.diamondq.common.vertx.processor.model.ProxyClass;
 import com.diamondq.common.vertx.processor.model.ProxyMethod;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ArrayTypeName;
@@ -155,6 +156,8 @@ public class ImplGenerator implements Generator {
     builder = builder
       .addField(FieldSpec.builder(pImplClass.getBaseQualifiedTypeName(), "mSelfProxy", Modifier.PROTECTED).build());
 
+    builder = builder.addField(FieldSpec.builder(ClassName.get(String.class), "mAddress", Modifier.PRIVATE).build());
+
     // /* **** Vertx */
     //
     // ClassName vertxName = ClassName.get("io.vertx.core", "Vertx");
@@ -169,6 +172,8 @@ public class ImplGenerator implements Generator {
     builder = generateStop(pImplClass, builder);
 
     builder = generateOnMessage(pImplClass, builder);
+
+    builder = generateGetAddress(pImplClass, builder);
 
     /* Add a constructor */
 
@@ -482,6 +487,24 @@ public class ImplGenerator implements Generator {
               "Method: " + proxyMethod.toString() + " Param: " + param.toString());
         }
 
+        else if (type.isProxyType() == true) {
+          TypeElement declaredTypeElement = type.getDeclaredTypeElement();
+          if (declaredTypeElement == null)
+            throw new IllegalStateException();
+          ProxyClass proxyClass = new ProxyClass(declaredTypeElement, pImplClass.getProcessingEnv());
+          methodBuilder = methodBuilder //
+            .addStatement("$T $N_json = $T.notNullArg(body.getJsonObject($S), $T.VERIFY_PARAM_NULL, $S)",
+              JsonObject.class, param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName()) //
+            .addStatement("String $N_address = $T.notNull($N_json.getString($S))", param.getName(), Verify.class,
+              param.getName(), "address") //
+            .addStatement(proxyClass.isNeedsConverter() == true
+              ? "$T $N = new $TProxy(mContextFactory, mConverterManager, vertx, $N_address, Long.parseLong(System.getProperty($S, $S)) * 1000L)"
+              : "$T $N = new $TProxy(mContextFactory, vertx, $N_address, Long.parseLong(System.getProperty($S, $S)) * 1000L)",
+              typeName, param.getName(), typeName, param.getName(), "vertx-delivery-timeout", "30")
+          //
+          ;
+        }
+
         /* Handle converter available objects */
         /*
          * IMPORTANT: The converter check must be last because things like a List, which, by itself may not need a
@@ -513,10 +536,12 @@ public class ImplGenerator implements Generator {
 
       BaseType returnType = proxyMethod.getActualReturn();
       TypeName returnTypeName = returnType.getTypeName();
+      TypeName nullableReturnTypeName =
+        returnTypeName.withoutAnnotations().annotated(AnnotationSpec.builder(Nullable.class).build());
 
       // (r, ex, ctx2) -> {
       MethodSpec.Builder completionMethod = MethodSpec.methodBuilder("apply").addModifiers(Modifier.PUBLIC)
-        .addAnnotation(Override.class).addParameter(returnTypeName, "r") //
+        .addAnnotation(Override.class).addParameter(nullableReturnTypeName, "r") //
         .addParameter(ClassName.get(Throwable.class).annotated(AnnotationSpec.builder(Nullable.class).build()), "ex") //
         .addParameter(ClassName.get(Context.class), "ctx2") //
         .returns(ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())) //
@@ -559,7 +584,8 @@ public class ImplGenerator implements Generator {
 
       TypeSpec methodResultHandler = TypeSpec.anonymousClassBuilder("")
         .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Function3.class), //
-          returnTypeName, ClassName.get(Throwable.class).annotated(AnnotationSpec.builder(Nullable.class).build()),
+          nullableReturnTypeName,
+          ClassName.get(Throwable.class).annotated(AnnotationSpec.builder(Nullable.class).build()),
           ClassName.get(Context.class),
           ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())))
         .addMethod(completionMethod.build()) //
@@ -619,35 +645,35 @@ public class ImplGenerator implements Generator {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
-    else if (TypeName.INT.equals(typeName)) {
+    else if (TypeName.INT.box().equals(typeName.withoutAnnotations())) {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
-    else if (TypeName.LONG.equals(typeName)) {
+    else if (TypeName.LONG.box().equals(typeName.withoutAnnotations())) {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
-    else if (TypeName.FLOAT.equals(typeName)) {
+    else if (TypeName.FLOAT.box().equals(typeName.withoutAnnotations())) {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
-    else if (TypeName.DOUBLE.equals(typeName)) {
+    else if (TypeName.DOUBLE.box().equals(typeName.withoutAnnotations())) {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
-    else if (TypeName.BOOLEAN.equals(typeName)) {
+    else if (TypeName.BOOLEAN.box().equals(typeName.withoutAnnotations())) {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
-    else if (TypeName.SHORT.equals(typeName)) {
+    else if (TypeName.SHORT.box().equals(typeName.withoutAnnotations())) {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
-    else if (TypeName.CHAR.equals(typeName)) {
+    else if (TypeName.CHAR.box().equals(typeName.withoutAnnotations())) {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
-    else if (TypeName.BYTE.equals(typeName)) {
+    else if (TypeName.BYTE.box().equals(typeName.withoutAnnotations())) {
       pBuilder = pBuilder //
         .addStatement("pMessage.reply(r)");
     }
@@ -675,7 +701,7 @@ public class ImplGenerator implements Generator {
 
     else if (ClassName.get(UUID.class).equals(typeName)) {
       pBuilder = pBuilder //
-        .addStatement("pMessage.reply(r.toString())");
+        .addStatement("pMessage.reply($T.notNull(r).toString())", Verify.class);
     }
     else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
       pBuilder = pBuilder //
@@ -695,36 +721,40 @@ public class ImplGenerator implements Generator {
             JsonArray.class, JsonArray.class);
         else
           pBuilder = pBuilder.addStatement("$T r_array = new $T()", JsonArray.class, JsonArray.class);
-        if (pReturnType.isNullable())
+        if (pReturnType.isNullable()) {
           pBuilder = pBuilder.beginControlFlow("if (r != null)");
-        pBuilder = pBuilder.beginControlFlow("for ($T item : r)", itemType.getTypeName());
-        if (TypeName.BOOLEAN.equals(itemTypeName)) {
+          pBuilder = pBuilder.beginControlFlow("for ($T item : r)", itemType.getTypeName());
+        }
+        else
+          pBuilder = pBuilder.beginControlFlow("for ($T item : $T.notNull(r))", itemType.getTypeName(), Verify.class);
+
+        if (TypeName.BOOLEAN.box().equals(itemTypeName.withoutAnnotations())) {
           pBuilder = pBuilder.addStatement("r_array.add(item)");
         }
-        else if (TypeName.BYTE.equals(itemTypeName)) {
+        else if (TypeName.BYTE.box().equals(itemTypeName.withoutAnnotations())) {
           pBuilder = pBuilder //
             .addStatement("byte[] r_byte_array = new byte[1]") //
             .addStatement("r_byte_array[0] = item") //
             .addStatement("r_array.add(r_byte_array)");
         }
-        else if (TypeName.CHAR.equals(itemTypeName)) {
+        else if (TypeName.CHAR.box().equals(itemTypeName.withoutAnnotations())) {
           pBuilder = pBuilder //
             .addStatement("String r_string = Character.toString(item)") //
             .addStatement("r_array.add(r_string)");
         }
-        else if (TypeName.DOUBLE.equals(itemTypeName)) {
+        else if (TypeName.DOUBLE.box().equals(itemTypeName.withoutAnnotations())) {
           pBuilder = pBuilder.addStatement("r_array.add(item)");
         }
-        else if (TypeName.FLOAT.equals(itemTypeName)) {
+        else if (TypeName.FLOAT.box().equals(itemTypeName.withoutAnnotations())) {
           pBuilder = pBuilder.addStatement("r_array.add(item)");
         }
-        else if (TypeName.INT.equals(itemTypeName)) {
+        else if (TypeName.INT.box().equals(itemTypeName.withoutAnnotations())) {
           pBuilder = pBuilder.addStatement("r_array.add(item)");
         }
-        else if (TypeName.LONG.equals(itemTypeName)) {
+        else if (TypeName.LONG.box().equals(itemTypeName.withoutAnnotations())) {
           pBuilder = pBuilder.addStatement("r_array.add(item)");
         }
-        else if (TypeName.SHORT.equals(itemTypeName)) {
+        else if (TypeName.SHORT.box().equals(itemTypeName.withoutAnnotations())) {
           pBuilder = pBuilder //
             .addStatement("int r_int = item") //
             .addStatement("r_array.add(r_int)");
@@ -759,6 +789,35 @@ public class ImplGenerator implements Generator {
           "Method: " + pProxyMethod.toString() + " Return: " + pReturnType.toString());
     }
 
+    else if (pReturnType.isProxyType() == true) {
+      if (pReturnType.isNullable() == true) {
+        pBuilder = pBuilder //
+          .addStatement("$T r_obj", JsonObject.class) //
+          .beginControlFlow("if (r != null)") //
+          .addStatement("r_obj = new $T()", JsonObject.class) //
+          .beginControlFlow("if (r instanceof $TProxy)", typeName.withoutAnnotations()) //
+          .addStatement("r_obj.put($S, (($TProxy)r).getAddress())", "address", typeName.withoutAnnotations()) //
+          .nextControlFlow("else") //
+          .addStatement("throw new $T()", IllegalStateException.class) //
+          .endControlFlow() //
+          .nextControlFlow("else") //
+          .addStatement("r_obj = null") //
+          .endControlFlow() //
+          .addStatement("pMessage.reply(r_obj)");
+      }
+      else {
+        pBuilder = pBuilder //
+          .addStatement("$T r_obj = new $T()", JsonObject.class, JsonObject.class) //
+          .addStatement("$T.notNull(r))", Verify.class) //
+          .beginControlFlow("if (r instanceof $TProxy)", typeName.withoutAnnotations()) //
+          .addStatement("r_obj.put($S, (($TProxy)r).getAddress())", "address", typeName) //
+          .nextControlFlow("else") //
+          .addStatement("throw new $T()", IllegalStateException.class) //
+          .endControlFlow() //
+          .addStatement("pMessage.reply(r_obj)");
+      }
+    }
+
     else if (pReturnType.isConverterAvailable() == true) {
       if (pReturnType.isNullable() == true) {
         pBuilder = pBuilder
@@ -771,7 +830,8 @@ public class ImplGenerator implements Generator {
       else {
         pBuilder = pBuilder
           // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
-          .addStatement("$T r_obj = mConverterManager.convert(r, $T.class)", JsonObject.class, JsonObject.class)
+          .addStatement("$T r_obj = mConverterManager.convert($T.notNull(r), $T.class)", JsonObject.class, Verify.class,
+            JsonObject.class)
           //
           .addStatement("pMessage.reply(r_obj)");
       }
@@ -782,6 +842,17 @@ public class ImplGenerator implements Generator {
         "Method: " + pProxyMethod.toString() + " Return: " + pReturnType.toString());
 
     return pBuilder;
+  }
+
+  private TypeSpec.Builder generateGetAddress(ImplClass pImplClass, TypeSpec.Builder pClassBuilder) {
+
+    MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("getAddress") //
+      .addModifiers(Modifier.PUBLIC) //
+      .returns(ClassName.get(String.class)) //
+      .addStatement("return mAddress") //
+    ;
+    return pClassBuilder.addMethod(methodBuilder.build());
+
   }
 
   private TypeSpec.Builder generateStop(ImplClass pImplClass, TypeSpec.Builder pClassBuilder) {
@@ -923,16 +994,16 @@ public class ImplGenerator implements Generator {
       // start();
       .addStatement("start()")
       // String address = Verify.notNull(context.config().getString("address"));
-      .addStatement("String address = $T.notNull($T.notNull(context.config()).getString($S))", Verify.class,
-        Verify.class, "address")
+      .addStatement("mAddress = $T.notNull($T.notNull(context.config()).getString($S))", Verify.class, Verify.class,
+        "address")
       // MessageConsumer<JsonObject> consumer = vertx.eventBus().<JsonObject> consumer(address);
-      .addStatement("$T<$T> consumer = vertx.eventBus().<$T>consumer(address)", MessageConsumer.class, JsonObject.class,
-        JsonObject.class)
+      .addStatement("$T<$T> consumer = vertx.eventBus().<$T>consumer(mAddress)", MessageConsumer.class,
+        JsonObject.class, JsonObject.class)
       // mSelfProxy = new LocalFileEngineProxy(mContextFactory, vertx, address,
       // Long.parseLong(System.getProperty("vertx-delivery-timeout", "30")) * 1000L);
       .addStatement(pImplClass.isNeedsConverter()
-        ? "mSelfProxy = new $NProxy(mContextFactory, mConverterManager, vertx, address, Long.parseLong(System.getProperty($S, $S)) * 1000L)"
-        : "mSelfProxy = new $NProxy(mContextFactory, vertx, address, Long.parseLong(System.getProperty($S, $S)) * 1000L)",
+        ? "mSelfProxy = new $NProxy(mContextFactory, mConverterManager, vertx, mAddress, Long.parseLong(System.getProperty($S, $S)) * 1000L)"
+        : "mSelfProxy = new $NProxy(mContextFactory, vertx, mAddress, Long.parseLong(System.getProperty($S, $S)) * 1000L)",
         pImplClass.getBaseSimpleName(), "vertx-delivery-timeout", "30")
       //
       // /* Register a handler to callback when the consumer is fully registered */
