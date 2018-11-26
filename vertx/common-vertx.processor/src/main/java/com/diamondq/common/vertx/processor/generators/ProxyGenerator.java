@@ -48,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -497,41 +498,69 @@ public class ProxyGenerator implements Generator {
     for (BaseParam param : pProxyMethod.getParameters()) {
       BaseType type = param.getType();
       TypeName typeName = type.getTypeName();
-      if (TypeName.BOOLEAN.equals(typeName)) {
+      if ((TypeName.BOOLEAN.equals(typeName)) || (TypeName.BOOLEAN.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
       }
-      else if (TypeName.BYTE.equals(typeName)) {
+      else if ((TypeName.BYTE.equals(typeName)) || (TypeName.BYTE.box().equals(typeName))) {
         pBuilder = pBuilder //
           .addStatement("byte[] $N_array = new byte[1]", param.getName()) //
-          .addStatement("$N_array[0] = $N)", param.getName(), param.getName()) //
+          .addStatement("$N_array[0] = $N", param.getName(), param.getName()) //
           .addStatement("message.put($S, $N_array)", param.getName(), param.getName());
       }
-      else if (TypeName.CHAR.equals(typeName)) {
+      else if (TypeName.BYTE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+        pBuilder = pBuilder //
+          .beginControlFlow("if ($N != null)", param.getName()) //
+          .addStatement("byte[] $N_array = new byte[1]", param.getName()) //
+          .addStatement("$N_array[0] = $N", param.getName(), param.getName()) //
+          .addStatement("message.put($S, $N_array)", param.getName(), param.getName()) //
+          .nextControlFlow("else") //
+          .addStatement("message.put($S, (byte[])null)", param.getName()) //
+          .endControlFlow();
+      }
+      else if ((TypeName.CHAR.equals(typeName)) || (TypeName.CHAR.box().equals(typeName))) {
         pBuilder = pBuilder //
           .addStatement("String $N_string = Character.toString($N)", param.getName(), param.getName()) //
           .addStatement("message.put($S, $N_string)", param.getName(), param.getName());
       }
-      else if (TypeName.DOUBLE.equals(typeName)) {
+      else if (TypeName.CHAR.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+        pBuilder = pBuilder //
+          .beginControlFlow("if ($N != null)", param.getName()) //
+          .addStatement("String $N_string = Character.toString($N)", param.getName(), param.getName()) //
+          .addStatement("message.put($S, $N_string)", param.getName(), param.getName()) //
+          .nextControlFlow("else") //
+          .addStatement("message.put($S, (String) null)", param.getName()) //
+          .endControlFlow();
+      }
+      else if ((TypeName.DOUBLE.equals(typeName)) || (TypeName.DOUBLE.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
       }
-      else if (TypeName.FLOAT.equals(typeName)) {
+      else if ((TypeName.FLOAT.equals(typeName)) || (TypeName.FLOAT.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
       }
-      else if (TypeName.INT.equals(typeName)) {
+      else if ((TypeName.INT.equals(typeName)) || (TypeName.INT.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
       }
-      else if (TypeName.LONG.equals(typeName)) {
+      else if ((TypeName.LONG.equals(typeName)) || (TypeName.LONG.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
       }
-      else if (TypeName.SHORT.equals(typeName)) {
+      else if ((TypeName.SHORT.equals(typeName)) || (TypeName.DOUBLE.box().equals(typeName))) {
         pBuilder = pBuilder //
           .addStatement("int $N_int = $N", param.getName(), param.getName()) //
           .addStatement("message.put($S, $N_int)", param.getName(), param.getName());
       }
+      else if (TypeName.SHORT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+        pBuilder = pBuilder //
+          .beginControlFlow("if ($N != null)", param.getName()) //
+          .addStatement("int $N_int = $N", param.getName(), param.getName()) //
+          .addStatement("message.put($S, $N_int)", param.getName(), param.getName()) //
+          .nextControlFlow("else") //
+          .addStatement("message.put($S, (Integer) null)", param.getName()) //
+          .endControlFlow();
+      }
 
       /* Handle byte array */
 
-      else if (ArrayTypeName.of(TypeName.BYTE).equals(typeName)) {
+      else if (ArrayTypeName.of(TypeName.BYTE).equals(typeName.withoutAnnotations())) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
       }
 
@@ -671,7 +700,8 @@ public class ProxyGenerator implements Generator {
       }
 
       else
-        throw new UnsupportedOperationException("Method: " + pProxyMethod.toString() + " Param: " + param.toString());
+        throw new UnsupportedOperationException("TypeName: " + typeName.toString() + " Param: |" + param.toString()
+          + "| Method: |" + pProxyMethod.toString() + "|");
     }
     return pBuilder;
   }
@@ -1194,7 +1224,14 @@ public class ProxyGenerator implements Generator {
     methodBuilder.returns(pMethod.getReturnType().getTypeName());
     List<ParameterSpec> parameterSpecs = new ArrayList<>();
     for (VariableElement parameter : method.getParameters()) {
-      parameterSpecs.add(ParameterSpec.get(parameter));
+      TypeMirror paramType = parameter.asType();
+      TypeName type = TypeName.get(paramType);
+      for (AnnotationMirror mirror : paramType.getAnnotationMirrors()) {
+        type = type.annotated(AnnotationSpec.get(mirror));
+      }
+      String name = parameter.getSimpleName().toString();
+      ParameterSpec.Builder paramBuilder = ParameterSpec.builder(type, name).addModifiers(parameter.getModifiers());
+      parameterSpecs.add(paramBuilder.build());
     }
     methodBuilder.addParameters(parameterSpecs);
     methodBuilder.varargs(method.isVarArgs());
