@@ -11,6 +11,7 @@ import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
+import com.diamondq.common.utils.misc.Holder;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -521,11 +522,13 @@ public class VertxUtils {
   /* **************************************** VERTX DATASTREAM ************************************************** */
 
   public static ContextExtendedCompletionStage<@Nullable Void> readStream(ReadStream<Buffer> pStream,
-    Consumer2<Buffer, Context> pHandler) {
+    Function2<Buffer, Context, ContextExtendedCompletionStage<@Nullable Void>> pHandler) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     AtomicBoolean closed = new AtomicBoolean(false);
     ContextExtendedCompletableFuture<@Nullable Void> finished = FutureUtils.newCompletableFuture();
+
+    Holder<@Nullable Throwable> pendingError = new Holder<>(null);
 
     /* Handle the end of stream */
 
@@ -534,7 +537,10 @@ public class VertxUtils {
         try (Context ctx = currentContext.activateOnThread("")) {
         }
       }
-      finished.complete(null);
+      if (pendingError.object != null)
+        finished.completeExceptionally(pendingError.object);
+      else
+        finished.complete(null);
     });
 
     /* Handle an error */
@@ -550,9 +556,31 @@ public class VertxUtils {
     /* Handle each block of data */
 
     pStream.handler((buffer) -> {
+      if (pendingError.object != null) {
+        Throwable throwable = pendingError.object;
+        pendingError.object = null;
+        if (throwable instanceof RuntimeException)
+          throw ((RuntimeException) throwable);
+        throw new RuntimeException(throwable);
+      }
       currentContext.prepareForAlternateThreads();
       try (Context ctx = currentContext.activateOnThread("")) {
-        pHandler.accept(buffer, ctx);
+        ContextExtendedCompletionStage<@Nullable Void> result = pHandler.apply(buffer, ctx);
+        boolean isDone;
+        if (result instanceof ContextExtendedCompletableFuture)
+          isDone = ((ContextExtendedCompletableFuture<@Nullable Void>) result).isDone();
+        else
+          isDone = false;
+        if (isDone == false) {
+          pStream.pause();
+          result.handle((v, ex) -> {
+            if (ex != null) {
+              pendingError.object = ex;
+            }
+            pStream.resume();
+            return null;
+          });
+        }
       }
     });
 
