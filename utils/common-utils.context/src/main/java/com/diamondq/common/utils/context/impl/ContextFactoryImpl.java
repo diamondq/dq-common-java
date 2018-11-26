@@ -208,6 +208,14 @@ public class ContextFactoryImpl implements SPIContextFactory {
     return mNOOP_CONTEXT;
   }
 
+  @Override
+  public @Nullable Context getNullableCurrentContext() {
+    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    if (contextStack.isEmpty() == false)
+      return contextStack.peek();
+    return null;
+  }
+
   /**
    * @see com.diamondq.common.utils.context.ContextFactory#reportThrowable(java.lang.Class, java.lang.Object,
    *      java.lang.Throwable)

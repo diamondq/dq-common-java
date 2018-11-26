@@ -14,6 +14,10 @@ public interface ContextFactory {
     return getInstance().getCurrentContext();
   }
 
+  public static @Nullable Context nullableCurrentContext() {
+    return getInstance().getNullableCurrentContext();
+  }
+
   public static void staticReportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
     getInstance().reportTrace(pClass, pThis, pArgs);
   }
@@ -58,6 +62,13 @@ public interface ContextFactory {
    * @return the context
    */
   public Context getCurrentContext();
+
+  /**
+   * Returns the current context within the current thread. If there is no context, then null is returned.
+   * 
+   * @return the context
+   */
+  public @Nullable Context getNullableCurrentContext();
 
   /**
    * Report an exception outside of a context. It will automatically create a context, report the exception and then end

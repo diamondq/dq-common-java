@@ -53,7 +53,9 @@ public class DQContext extends ClassicConverter {
    */
   @Override
   public String convert(ILoggingEvent pEvent) {
-    ContextClass context = (ContextClass) ContextFactory.currentContext();
+    ContextClass context = (ContextClass) ContextFactory.nullableCurrentContext();
+    if (context == null)
+      return "";
     List<String> stack = context.getContextStackNames(mPrintRefCount);
     StringBuilder sb = new StringBuilder();
     int size = stack.size();
