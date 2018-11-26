@@ -116,7 +116,11 @@ public abstract class AbstractVerticleOsgi {
       try {
         Pair<String, String> registration = mRegistration;
         if (registration != null) {
-          mShutdownMethod.invoke(null, mContextFactory, mServiceDiscovery, mVertx, registration);
+          @SuppressWarnings("unchecked")
+          ContextExtendedCompletionStage<@Nullable Void> result =
+            (ContextExtendedCompletionStage<@Nullable Void>) mShutdownMethod.invoke(null, mContextFactory,
+              mServiceDiscovery, mVertx, registration);
+          result.join();
         }
       }
       catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
