@@ -1,6 +1,8 @@
 package com.diamondq.common.vertx.processor.generators;
 
+import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
+import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
@@ -12,6 +14,7 @@ import com.diamondq.common.utils.misc.errors.ExtendedIllegalStateException;
 import com.diamondq.common.utils.misc.errors.Verify;
 import com.diamondq.common.vertx.MessageContext;
 import com.diamondq.common.vertx.VertxMessages;
+import com.diamondq.common.vertx.VertxUtils;
 import com.diamondq.common.vertx.annotations.ProxyGen;
 import com.diamondq.common.vertx.processor.Generator;
 import com.diamondq.common.vertx.processor.Messages;
@@ -256,9 +259,18 @@ public class ImplGenerator implements Generator {
         paramNames.add(param.getName());
         // String pValue = Verify.notNull(body.getString("pValue"));
         if (TypeName.BOOLEAN.equals(typeName)) {
-          methodBuilder =
-            methodBuilder.addStatement("boolean $N = $T.notNullArg(body.getBoolean($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+          methodBuilder = methodBuilder //
+            .addStatement("boolean $N = $T.notNullArg(body.getBoolean($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.BOOLEAN.box().equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("Boolean $N = $T.notNullArg(body.getBoolean($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.BOOLEAN.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("@$T Boolean $N = body.getBoolean($S)", Nullable.class, param.getName(), param.getName());
         }
         else if (TypeName.BYTE.equals(typeName)) {
           methodBuilder = methodBuilder
@@ -279,24 +291,60 @@ public class ImplGenerator implements Generator {
             .addStatement("char $N = $N_string.charAt(0)", param.getName(), param.getName());
         }
         else if (TypeName.DOUBLE.equals(typeName)) {
-          methodBuilder =
-            methodBuilder.addStatement("double $N = $T.notNullArg(body.getDouble($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+          methodBuilder = methodBuilder //
+            .addStatement("double $N = $T.notNullArg(body.getDouble($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.DOUBLE.box().equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("Double $N = $T.notNullArg(body.getDouble($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.DOUBLE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("@$T Double $N = body.getDouble($S)", Nullable.class, param.getName(), param.getName());
         }
         else if (TypeName.FLOAT.equals(typeName)) {
-          methodBuilder =
-            methodBuilder.addStatement("float $N = $T.notNullArg(body.getFloat($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+          methodBuilder = methodBuilder //
+            .addStatement("float $N = $T.notNullArg(body.getFloat($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.FLOAT.box().equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("Float $N = $T.notNullArg(body.getFloat($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.FLOAT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("@$T Float $N = body.getFloat($S)", Nullable.class, param.getName(), param.getName());
         }
         else if (TypeName.INT.equals(typeName)) {
-          methodBuilder =
-            methodBuilder.addStatement("int $N = $T.notNullArg(body.getInteger($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+          methodBuilder = methodBuilder //
+            .addStatement("int $N = $T.notNullArg(body.getInteger($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.INT.box().equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("Integer $N = $T.notNullArg(body.getInteger($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.INT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("@$T Integer $N = body.getInteger($S)", Nullable.class, param.getName(), param.getName());
         }
         else if (TypeName.LONG.equals(typeName)) {
-          methodBuilder =
-            methodBuilder.addStatement("long $N = $T.notNullArg(body.getLong($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+          methodBuilder = methodBuilder //
+            .addStatement("long $N = $T.notNullArg(body.getLong($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.LONG.box().equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("Long $N = $T.notNullArg(body.getLong($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
+              Verify.class, param.getName(), MiscMessages.class, param.getName());
+        }
+        else if (TypeName.LONG.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+          methodBuilder = methodBuilder //
+            .addStatement("@$T Long $N = body.getLong($S)", Nullable.class, param.getName(), param.getName());
         }
         else if (TypeName.SHORT.equals(typeName)) {
           methodBuilder = methodBuilder
@@ -307,9 +355,27 @@ public class ImplGenerator implements Generator {
             .addStatement("throw new IllegalArgumentException()") //
             .endControlFlow() //
             .addStatement("short $N = (short)$N_int", param.getName(), param.getName());
-          ;
         }
-
+        else if (TypeName.SHORT.box().equals(typeName)) {
+          methodBuilder = methodBuilder
+            .addStatement("Integer $N_int = $T.notNullArg(body.getInteger($S), $T.VERIFY_PARAM_NULL, $S)",
+              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName()) //
+            .beginControlFlow("if (($N_int > Short.MAX_VALUE) || ($N_int < Short.MIN_VALUE))", param.getName(),
+              param.getName()) //
+            .addStatement("throw new IllegalArgumentException()") //
+            .endControlFlow() //
+            .addStatement("Short $N = $N_int.shortValue()", param.getName(), param.getName());
+        }
+        else if (TypeName.SHORT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+          methodBuilder = methodBuilder
+            .addStatement("@$T Integer $N_int = body.getInteger($S)", Nullable.class, param.getName(), param.getName()) //
+            .beginControlFlow("if (($N_int != null) && (($N_int > Short.MAX_VALUE) || ($N_int < Short.MIN_VALUE)))",
+              param.getName(), param.getName(), param.getName()) //
+            .addStatement("throw new IllegalArgumentException()") //
+            .endControlFlow() //
+            .addStatement("@$T Short $N = ($N_int == null ? null : $N_int.shortValue())", Nullable.class,
+              param.getName(), param.getName(), param.getName());
+        }
         /* Handle byte array */
 
         else if (ArrayTypeName.of(TypeName.BYTE).equals(typeName)) {
@@ -1029,110 +1095,40 @@ public class ImplGenerator implements Generator {
   private TypeSpec.Builder generateShutdown(ImplClass pImplClass, TypeSpec.Builder pClassBuilder) {
 
     MethodSpec.Builder undeployMethod =
-      MethodSpec.methodBuilder("handle").addModifiers(Modifier.PUBLIC).addAnnotation(Override.class)
-        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())), "par").build())
-        // (par) -> {
-        // try (Context ctx3 = ctx2.activateOnThread("")) {
-        .beginControlFlow("try ($T ctx3 = ctx2.activateOnThread($S))", Context.class, "")
-        // try {
-        .beginControlFlow("try")
-        // if (par.succeeded() == true) {
-        .beginControlFlow("if (par.succeeded() == true)")
-        // if (failure == null) {
-        .beginControlFlow("if (failure == null)")
-        // result.complete(null);
-        .addStatement("result.complete(null)")
-        // } else {
-        .nextControlFlow("else")
-        // result.completeExceptionally(failure);
-        .addStatement("result.completeExceptionally(failure)")
-        // }
-        .endControlFlow()
-        // } else {
-        .nextControlFlow("else")
-        // Verify.throwRuntimeException(par.cause());
-        .addStatement("$T.throwRuntimeException(par.cause())", Verify.class)
-        // }
-        .endControlFlow()
-        // } catch (RuntimeException ex) {
-        .nextControlFlow("catch(RuntimeException ex)")
-        // /* Attempt to pass the error back to the caller */
-        //
-        .addCode("\n/* Attempt to pass the error back to the caller */\n\n")
-        // if (result.completeExceptionally(ex) == false) {
-        .beginControlFlow("if (result.completeExceptionally(ex) == false)")
-        //
-        // /* The result has already been completed. At this point, just report the error */
-        //
-        .addCode("\n/* The result has already been completed. At this point, just report the error */\n\n")
-        // ctx3.reportThrowable(ex);
-        .addStatement("ctx3.reportThrowable(ex)")
-        // }
-        .endControlFlow()
-        // }
-        .endControlFlow()
-        // }
-        .endControlFlow()
+      MethodSpec.methodBuilder("apply").addModifiers(Modifier.PUBLIC).addAnnotation(Override.class)
+        .addParameter(ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build()), "v")
+        .addParameter(ClassName.get(Context.class), "ctx2")
+        .returns(ParameterizedTypeName.get(ClassName.get(ContextExtendedCompletionStage.class),
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())))
+        // return VertxUtils.<String, @Nullable Void> callReturnsNullable(pVertx::undeploy, pReg.getValue1());
+        .addStatement("return $T.<String, @$T Void> callReturnsNullable(pVertx::undeploy, pReg.getValue1())",
+          VertxUtils.class, Nullable.class)
     // });
     ;
     TypeSpec undeployHandler = TypeSpec.anonymousClassBuilder("")
-      .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class),
-        ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
+      .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Function2.class),
+        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build()),
+        ClassName.get(Context.class),
+        ParameterizedTypeName.get(ClassName.get(ExtendedCompletionStage.class),
           ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build()))))
       .addMethod(undeployMethod.build()) //
       .build();
 
-    MethodSpec.Builder unpublishMethod = MethodSpec.methodBuilder("handle").addModifiers(Modifier.PUBLIC)
-      .addAnnotation(Override.class)
-      .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())), "ar").build())
-      // (ar) -> {
-      // try (Context ctx2 = ctx.activateOnThread("")) {
-      .beginControlFlow("try ($T ctx2 = ctx.activateOnThread($S))", Context.class, "")
-      // try {
-      .beginControlFlow("try")
-      //
-      // /* Even during an unpublish failure, we're still going to undeploy, so just report the error */
-      //
-      .addCode("\n/* Even during an unpublish failure, we're still going to undeploy, so just report the error */\n\n")
-      // Throwable failure = (ar.failed() == true ? Verify.notNull(ar.cause()) : null);
-      .addStatement("Throwable failure = (ar.failed() == true ? $T.notNull(ar.cause()) : null)", Verify.class)
-      //
-      // /* Now attempt to undeploy */
-      //
-      .addCode("\n/* Now attempt to undeploy */\n\n")
-      // ctx2.prepareForAlternateThreads();
-      .addStatement("ctx2.prepareForAlternateThreads()")
-      // pVertx.undeploy(pReg.getValue1(),
-      .addStatement("pVertx.undeploy(pReg.getValue1(), $L)", undeployHandler)
-      // } catch (RuntimeException ex) {
-      .nextControlFlow("catch (RuntimeException ex)")
-      //
-      // /* Attempt to pass the error back to the caller */
-      //
-      .addCode("\n/* Attempt to pass the error back to the caller */\n\n")
-      // if (result.completeExceptionally(ex) == false) {
-      .beginControlFlow("if (result.completeExceptionally(ex) == false)")
-      //
-      // /* The result has already been completed. At this point, just report the error */
-      //
-      .addCode("\n/* The result has already been completed. At this point, just report the error */\n\n")
-      // ctx2.reportThrowable(ex);
-      .addStatement("ctx2.reportThrowable(ex)")
-      // }
-      .endControlFlow()
-      // }
-      .endControlFlow()
-      // }
-      .endControlFlow()
+    MethodSpec.Builder exceptionallyMethod =
+      MethodSpec.methodBuilder("apply").addModifiers(Modifier.PUBLIC).addAnnotation(Override.class)
+        .addParameter(ClassName.get(Throwable.class), "ex").addParameter(ClassName.get(Context.class), "ctx2")
+        .returns(ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build()))
+        // ctx2.reportThrowable(ex);
+        .addStatement("ctx2.reportThrowable(ex)")
+        // return null;
+        .addStatement("return null")
     // });
     ;
-    TypeSpec unpublishHandler = TypeSpec.anonymousClassBuilder("")
-      .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class),
-        ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build()))))
-      .addMethod(unpublishMethod.build()) //
+    TypeSpec exceptionallyHandler = TypeSpec.anonymousClassBuilder("")
+      .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Function2.class), ClassName.get(Throwable.class),
+        ClassName.get(Context.class),
+        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())))
+      .addMethod(exceptionallyMethod.build()) //
       .build();
 
     MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("shutdown");
@@ -1166,9 +1162,6 @@ public class ImplGenerator implements Generator {
       // * @return
       .addJavadoc("@return a future indicating that the verticles are shutdown\n\n");
 
-    TypeName returnVar = ParameterizedTypeName.get(ClassName.get(ContextExtendedCompletableFuture.class),
-      ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build()));
-
     // try (Context ctx =
     // pContextFactory.newContext(SimpleProxyImpl.class, null, pReg)) {
     methodBuilder = methodBuilder
@@ -1176,24 +1169,25 @@ public class ImplGenerator implements Generator {
         pImplClass.getImplQualifiedTypeName())
 
       //
-      // /* Define a completable future to indicate when undeployment is complete */
-      //
-      .addCode("\n/* Define a completable future to indicate when undeployment is complete */\n\n")
-
-      // ContextExtendedCompletableFuture<@Nullable Void> result = FutureUtils.newCompletableFuture();
-      .addStatement("$T result = $T.newCompletableFuture()", returnVar, FutureUtils.class)
-
-      //
       // /* First, unpublish the record */
       //
       .addCode("\n/* First, unpublish the record */\n\n")
-      // ctx.prepareForAlternateThreads();
-      .addStatement("ctx.prepareForAlternateThreads()")
-      // pServiceDiscovery.unpublish(pReg.getValue0(),
-      .addStatement("pServiceDiscovery.unpublish(pReg.getValue0(), $L)", unpublishHandler)
+      // return VertxUtils.<String, @Nullable Void> callReturnsNullable(pServiceDiscovery::unpublish, pReg.getValue0())
+      // //
+      .addCode("return $T.<String, @$T Void> callReturnsNullable(pServiceDiscovery::unpublish, pReg.getValue0())",
+        VertxUtils.class, Nullable.class)
 
-      // return result;
-      .addStatement("return result")
+      //
+      // /* Even during an unpublish failure, we're still going to undeploy, so just report the error */
+      //
+      .addCode("\n\n/* Even during an unpublish failure, we're still going to undeploy, so just report the error */\n\n")
+      // .exceptionally((ex, ctx2) -> {
+      .addCode(".exceptionally($L)", exceptionallyHandler)
+      //
+      // /* Now attempt to undeploy */
+      //
+      .addCode("\n\n/* Now attempt to undeploy */\n\n") //
+      .addStatement(".thenCompose($L)", undeployHandler)
       // }
       .endControlFlow();
 
