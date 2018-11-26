@@ -100,7 +100,7 @@ public class VertxProcessor extends AbstractProcessor {
 
             }
             catch (Exception ex) {
-              sLogger.error("Here:", ex);
+              sLogger.error("Error on: {}", annotatedElement.getSimpleName());
               throw new ElementIllegalArgumentException(annotatedElement, ex, Messages.PROXYGENERATOR_ERROR,
                 ProxyGen.class.getSimpleName());
             }
