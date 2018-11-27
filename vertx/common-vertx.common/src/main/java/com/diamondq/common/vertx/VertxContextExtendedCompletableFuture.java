@@ -8,8 +8,8 @@ import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
-import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -93,7 +93,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenApply(com.diamondq.common.lambda.interfaces.Function2)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenApply(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenApply(Function2<T, Context, U> pFn) {
@@ -101,7 +101,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function1)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn) {
@@ -109,7 +109,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function2)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<T, Context, U> pFn) {
@@ -117,7 +117,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer1)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer1<T> pAction) {
@@ -125,7 +125,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer2)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<T, Context> pAction) {
@@ -133,7 +133,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer1)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction) {
@@ -141,7 +141,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer2)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction) {
@@ -149,7 +149,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
@@ -159,7 +159,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
@@ -169,7 +169,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
@@ -179,7 +179,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
    *      com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
@@ -189,7 +189,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCompose(com.diamondq.common.lambda.interfaces.Function2)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenCompose(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenCompose(Function2<T, Context, ExtendedCompletionStage<U>> pFn) {
@@ -197,7 +197,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenCompose(com.diamondq.common.lambda.interfaces.Function1)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenCompose(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenCompose(Function1<T, ExtendedCompletionStage<U>> pFn) {
@@ -205,7 +205,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function1)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn) {
@@ -213,7 +213,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function2)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenComposeAsync(Function2<T, Context, ExtendedCompletionStage<U>> pFn) {
@@ -221,7 +221,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#exceptionallyCompose(com.diamondq.common.lambda.interfaces.Function2)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#exceptionallyCompose(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
   public ContextExtendedCompletionStage<T> exceptionallyCompose(
@@ -230,7 +230,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   }
 
   /**
-   * @see com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture#exceptionallyCompose(com.diamondq.common.lambda.interfaces.Function1)
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletableFuture#exceptionallyCompose(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
   public ContextExtendedCompletableFuture<T> exceptionallyCompose(

@@ -2,8 +2,8 @@ package com.diamondq.common.vertx.processor.generators;
 
 import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.misc.MiscMessages;
 import com.diamondq.common.utils.misc.converters.ConverterManager;
 import com.diamondq.common.utils.misc.errors.Verify;

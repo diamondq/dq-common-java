@@ -1,6 +1,6 @@
 package com.diamondq.common.vertx;
 
-import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
+import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 

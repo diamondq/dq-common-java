@@ -15,8 +15,8 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
+import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
-import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 
 import java.util.Collection;
 import java.util.List;

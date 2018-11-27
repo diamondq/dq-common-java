@@ -6,9 +6,9 @@ import com.diamondq.common.lambda.interfaces.Consumer4;
 import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.utils.context.Context;
+import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.misc.errors.Verify;
 import com.diamondq.common.vertx.streams.impl.ReadStreamBackPressure;
 

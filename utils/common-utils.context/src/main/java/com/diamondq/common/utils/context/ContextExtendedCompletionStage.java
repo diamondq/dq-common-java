@@ -7,7 +7,6 @@ import com.diamondq.common.lambda.interfaces.Consumer3;
 import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
-import com.diamondq.common.utils.context.spi.ContextExtendedCompletableFuture;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.diamondq.common.utils.context.spi;
+package com.diamondq.common.utils.context;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
@@ -8,9 +8,6 @@ import com.diamondq.common.lambda.interfaces.Consumer3;
 import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.Holder;
 
 import java.util.Collection;
