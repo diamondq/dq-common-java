@@ -12,7 +12,6 @@ import com.diamondq.common.utils.misc.MiscMessages;
 import com.diamondq.common.utils.misc.converters.ConverterManager;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalStateException;
 import com.diamondq.common.utils.misc.errors.Verify;
-import com.diamondq.common.vertx.MessageContext;
 import com.diamondq.common.vertx.VertxMessages;
 import com.diamondq.common.vertx.VertxUtils;
 import com.diamondq.common.vertx.annotations.ProxyGen;
@@ -68,6 +67,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.eventbus.ReplyException;
+import io.vertx.core.eventbus.ReplyFailure;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
@@ -152,9 +153,6 @@ public class ImplGenerator implements Generator {
 
     builder = builder.addField(FieldSpec.builder(ParameterizedTypeName.get(MessageConsumer.class, JsonObject.class)
       .annotated(AnnotationSpec.builder(Nullable.class).build()), "mConsumer", Modifier.PRIVATE).build());
-
-    builder = builder
-      .addField(FieldSpec.builder(ClassName.get(MessageContext.class), "mMessageContext", Modifier.PROTECTED).build());
 
     builder = builder
       .addField(FieldSpec.builder(pImplClass.getBaseQualifiedTypeName(), "mSelfProxy", Modifier.PROTECTED).build());
@@ -548,6 +546,9 @@ public class ImplGenerator implements Generator {
             methodBuilder = methodBuilder.endControlFlow();
             methodBuilder = methodBuilder.endControlFlow();
           }
+          else if ("com.diamondq.common.utils.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+            methodBuilder = methodBuilder.addCode("\n/* CODE HERE 2 */\n\n");
+          }
           else
             throw new UnsupportedOperationException(
               "Method: " + proxyMethod.toString() + " Param: " + param.toString());
@@ -628,7 +629,7 @@ public class ImplGenerator implements Generator {
         // } else {
         .nextControlFlow("else");
 
-      completionMethod = generateMessageReply(returnType, proxyMethod, completionMethod);
+      completionMethod = generateMessageReply(returnType, proxyMethod, pImplClass, completionMethod);
 
       completionMethod = completionMethod
         // }
@@ -701,7 +702,7 @@ public class ImplGenerator implements Generator {
 
   }
 
-  private MethodSpec.Builder generateMessageReply(BaseType pReturnType, ProxyMethod pProxyMethod,
+  private MethodSpec.Builder generateMessageReply(BaseType pReturnType, ProxyMethod pProxyMethod, ImplClass pImplClass,
     MethodSpec.Builder pBuilder) {
 
     TypeName typeName = pReturnType.getTypeName();
@@ -849,6 +850,77 @@ public class ImplGenerator implements Generator {
           pBuilder = pBuilder.endControlFlow();
         pBuilder = pBuilder.addStatement("pMessage.reply(r_array)");
 
+      }
+      else if ("com.diamondq.common.utils.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+
+        BaseType actualReturnType = pReturnType.getParameterizedType(0);
+        TypeName actualTypeName = actualReturnType.getTypeName();
+
+        // @Override
+        // public @Nullable Void apply(@Nullable Void r2, @Nullable Throwable ex2, Context ctx3) {
+        MethodSpec.Builder replyMethod = MethodSpec.methodBuilder("apply") //
+          .addAnnotation(Override.class) //
+          .addModifiers(Modifier.PUBLIC) //
+          .returns(TypeName.VOID.box().annotated(AnnotationSpec.builder(Nullable.class).build())) //
+          .addParameter(ParameterSpec
+            .builder(TypeName.VOID.box().annotated(AnnotationSpec.builder(Nullable.class).build()), "r2").build()) //
+          .addParameter(ParameterSpec
+            .builder(ClassName.get(Throwable.class).annotated(AnnotationSpec.builder(Nullable.class).build()), "ex2")
+            .build()) //
+          .addParameter(ParameterSpec.builder(Context.class, "ctx3").build()) //
+          // try {
+          .beginControlFlow("try")
+          // if (ex2 != null) {
+          .beginControlFlow("if (ex2 != null)")
+          // ExtendedIllegalStateException exception = new ExtendedIllegalStateException(ex2,
+          // VertxMessages.CALLPROXY_FAILED, "scanFolderAndInjest", "LocalFileEngine", ex2.getClass().getSimpleName(),
+          // ex2.getMessage());
+          .addStatement(
+            "$T exception = new $T(ex2, $T.CALLPROXY_FAILED, $S, $S, ex2.getClass().getSimpleName(), ex2.getMessage())",
+            ExtendedIllegalStateException.class, ExtendedIllegalStateException.class, VertxMessages.class,
+            pProxyMethod.getMethodName(), pImplClass.getBaseSimpleName())
+          // vertx.eventBus().send(replyAddress,
+          // new ReplyException(ReplyFailure.RECIPIENT_FAILURE, -1, exception.getMessage()));
+          .addStatement("vertx.eventBus().send(replyAddress, new $T($T.RECIPIENT_FAILURE, -1, exception.getMessage()))",
+            ReplyException.class, ReplyFailure.class)
+          // ctx3.reportThrowable(exception);
+          .addStatement("ctx3.reportThrowable(exception)")
+          // } else {
+          .nextControlFlow("else")
+          // vertx.eventBus().send(replyAddress, r2);
+          .addStatement("vertx.eventBus().send(replyAddress, r2)")
+          // }
+          .endControlFlow()
+          // } catch (RuntimeException ex3) {
+          .nextControlFlow("catch (RuntimeException ex3)")
+          // ctx3.reportThrowable(ex3);
+          .addStatement("ctx3.reportThrowable(ex3)")
+          // vertx.eventBus().send(replyAddress,
+          // new ReplyException(ReplyFailure.RECIPIENT_FAILURE, -1, ex3.getMessage()));
+          .addStatement("vertx.eventBus().send(replyAddress, new $T($T.RECIPIENT_FAILURE, -1, ex3.getMessage()))",
+            ReplyException.class, ReplyFailure.class)
+          // }
+          .endControlFlow()
+          // return null;
+          .addStatement("return null")
+        // }
+        // });
+        ;
+
+        TypeSpec replyHandler = TypeSpec.anonymousClassBuilder("")
+          .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Function3.class), actualTypeName,
+            ClassName.get(Throwable.class).annotated(AnnotationSpec.builder(Nullable.class).build()),
+            ClassName.get(Context.class), TypeName.VOID.box().annotated(AnnotationSpec.builder(Nullable.class).build())))
+          .addMethod(replyMethod.build()) //
+          .build();
+
+        pBuilder = pBuilder //
+          // String replyAddress = Verify.notNull(body.getString("__replyAddress"));
+          .addStatement("String replyAddress = $T.notNull(body.getString($S))", Verify.class, "__replyAddress")
+          // Verify.notNull(r).handle(
+          .addStatement("$T.notNull(r).handle($L)", Verify.class, replyHandler)
+          // pMessage.reply(null);
+          .addStatement("pMessage.reply(null)");
       }
       else
         throw new UnsupportedOperationException(
@@ -1180,7 +1252,8 @@ public class ImplGenerator implements Generator {
       //
       // /* Even during an unpublish failure, we're still going to undeploy, so just report the error */
       //
-      .addCode("\n\n/* Even during an unpublish failure, we're still going to undeploy, so just report the error */\n\n")
+      .addCode(
+        "\n\n/* Even during an unpublish failure, we're still going to undeploy, so just report the error */\n\n")
       // .exceptionally((ex, ctx2) -> {
       .addCode(".exceptionally($L)", exceptionallyHandler)
       //

@@ -61,6 +61,7 @@ import javax.lang.model.type.TypeVariable;
 import javax.tools.JavaFileObject;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.reflection.qual.MethodValBottom;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
@@ -703,6 +704,58 @@ public class ProxyGenerator implements Generator {
         throw new UnsupportedOperationException("TypeName: " + typeName.toString() + " Param: |" + param.toString()
           + "| Method: |" + pProxyMethod.toString() + "|");
     }
+
+    /* Handle the special ContextExtendableStage return type */
+
+    BaseType returnType = pProxyMethod.getReturnType();
+    if (returnType.getNonGenericNonAnnotatedTypeName()
+      .equals("com.diamondq.common.utils.context.ContextExtendedCompletionStage")) {
+      BaseType paramType = returnType.getParameterizedType(0);
+      if (paramType.getNonGenericNonAnnotatedTypeName()
+        .equals("com.diamondq.common.utils.context.ContextExtendedCompletionStage")) {
+
+        BaseType actualReturnType = paramType.getParameterizedType(0);
+        TypeName actualTypeName = actualReturnType.getTypeName();
+
+        MethodSpec.Builder replyMethod = MethodSpec.methodBuilder("handle") //
+          .addAnnotation(Override.class) //
+          .addModifiers(Modifier.PUBLIC) //
+          .addParameter(ParameterSpec
+            .builder(ParameterizedTypeName.get(ClassName.get(Message.class), actualTypeName), "pEvent").build()) //
+          .addStatement("$T body = pEvent.body()", actualTypeName) //
+          .addStatement("finalResult.complete(body)");
+        ;
+
+        TypeSpec replyHandler = TypeSpec.anonymousClassBuilder("")
+          .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class),
+            ParameterizedTypeName.get(ClassName.get(Message.class), actualTypeName))) //
+          .addMethod(replyMethod.build()) //
+          .build();
+
+        pBuilder = pBuilder //
+          // String returnReplyAddress = UUID.randomUUID().toString();
+          .addStatement("String returnReplyAddress = $T.randomUUID().toString()", UUID.class)
+          // message.put("__replyAddress", returnReplyAddress);
+          .addStatement("message.put($S, returnReplyAddress)", "__replyAddress")
+          // ContextExtendedCompletableFuture<@Nullable Void> finalResult = FutureUtils.newCompletableFuture();
+          .addStatement("$T<$T> finalResult = $T.newCompletableFuture()", ContextExtendedCompletableFuture.class,
+            actualTypeName, FutureUtils.class)
+          // MessageConsumer<@Nullable Void> replyConsumer = mVertx.eventBus().consumer(returnReplyAddress);
+          .addStatement("$T<$T> replyConsumer = mVertx.eventBus().consumer(returnReplyAddress)", MessageConsumer.class,
+            actualTypeName)
+          // replyConsumer.handler(new Handler<Message<@Nullable Void>>() {
+          .addStatement("replyConsumer.handler($L)", replyHandler)
+        // @Override
+        // public void handle(Message<@Nullable Void> pEvent) {
+        // Void body = pEvent.body();
+        // finalResult.complete(body);
+        // }
+        // });
+        ;
+      }
+
+    }
+
     return pBuilder;
   }
 
@@ -740,6 +793,9 @@ public class ProxyGenerator implements Generator {
       BaseType actualReturnType = returnType.getParameterizedType(0);
       TypeName returnTypeName = actualReturnType.getTypeName();
       TypeName replyReturnType;
+
+      Boolean isReturnTypeNullable = null;
+      boolean isReplyUsed = true;
 
       if (ClassName.get("java.lang", "Void").equals(returnTypeName.withoutAnnotations())) {
         replyReturnType = returnTypeName;
@@ -801,6 +857,11 @@ public class ProxyGenerator implements Generator {
           || ("java.util.Set".equals(basicTypeName) == true)) {
           replyReturnType = TypeName.get(JsonArray.class);
         }
+        else if ("com.diamondq.common.utils.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+          replyReturnType = TypeName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build());
+          isReturnTypeNullable = true;
+          isReplyUsed = false;
+        }
         else
           throw new UnsupportedOperationException(
             "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
@@ -819,6 +880,8 @@ public class ProxyGenerator implements Generator {
           "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
 
       if (actualReturnType.isNullable()) {
+        if (isReturnTypeNullable == null)
+          isReturnTypeNullable = true;
         boolean needsNullable = true;
         for (AnnotationSpec spec : replyReturnType.annotations) {
           if (spec.type.equals(TypeName.get(Nullable.class)))
@@ -826,6 +889,10 @@ public class ProxyGenerator implements Generator {
         }
         if (needsNullable == true)
           replyReturnType = replyReturnType.annotated(AnnotationSpec.builder(Nullable.class).build());
+      }
+      else {
+        if (isReturnTypeNullable == null)
+          isReturnTypeNullable = false;
       }
 
       // (ar) -> {
@@ -848,10 +915,13 @@ public class ProxyGenerator implements Generator {
         // result.completeExceptionally(new IllegalStateException());
         .addStatement("result.completeExceptionally(new IllegalStateException())")
         // else {
-        .endControlFlow().beginControlFlow("else")
-        // String replyResult = replyMessage.body();
-        .addStatement("$T replyResult = replyMessage.body()", replyReturnType);
-      if (actualReturnType.isNullable() == false) {
+        .endControlFlow().beginControlFlow("else");
+      if (isReplyUsed == true) {
+        methodBuilder = methodBuilder
+          // String replyResult = replyMessage.body();
+          .addStatement("$T replyResult = replyMessage.body()", replyReturnType);
+      }
+      if (isReturnTypeNullable == false) {
         methodBuilder = methodBuilder.beginControlFlow("if (replyResult == null)") //
           .addStatement("result.completeExceptionally(new IllegalStateException())") //
           .endControlFlow().beginControlFlow("else");
@@ -1051,6 +1121,11 @@ public class ProxyGenerator implements Generator {
           methodBuilder = methodBuilder.addStatement("result.complete(r_array)");
 
         }
+        else if ("com.diamondq.common.utils.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+          methodBuilder = methodBuilder //
+            // result.complete(finalResult);
+            .addStatement("result.complete(finalResult)");
+        }
         else
           throw new UnsupportedOperationException(
             "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
@@ -1096,7 +1171,7 @@ public class ProxyGenerator implements Generator {
         throw new UnsupportedOperationException(
           "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
 
-      if (actualReturnType.isNullable() == false) {
+      if (isReturnTypeNullable == false) {
         methodBuilder = methodBuilder.endControlFlow();
       }
       // }
