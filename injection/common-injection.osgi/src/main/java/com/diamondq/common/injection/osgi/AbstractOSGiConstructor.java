@@ -281,6 +281,8 @@ public class AbstractOSGiConstructor {
               value = PropertiesParsing.getNullableString(mCurrentProps, propValue);
             else if ((arg.argumentClass == Integer.class) || (arg.argumentClass == Integer.TYPE))
               value = PropertiesParsing.getNullableInt(mCurrentProps, propValue);
+            else if ((arg.argumentClass == Long.class) || (arg.argumentClass == Long.TYPE))
+              value = PropertiesParsing.getNullableLong(mCurrentProps, propValue);
             else if ((arg.argumentClass == Boolean.class) || (arg.argumentClass == Boolean.TYPE))
               value = PropertiesParsing.getNullableBoolean(mCurrentProps, propValue);
             else if (arg.argumentClass == File.class) {
