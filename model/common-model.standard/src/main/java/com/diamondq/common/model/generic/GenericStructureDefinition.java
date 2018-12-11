@@ -23,7 +23,12 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,6 +85,86 @@ public class GenericStructureDefinition implements StructureDefinition {
       if (p instanceof GenericPropertyDefinition)
         ((GenericPropertyDefinition) p).validate();
     });
+  }
+
+  public GenericStructureDefinition(Scope pScope, byte[] pBytes) {
+    try {
+      mScope = pScope;
+      ByteBuffer buffer = ByteBuffer.wrap(pBytes);
+      buffer = buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+      /* Name */
+      int len = buffer.getInt();
+      byte[] bytes = new byte[len];
+      buffer.get(bytes);
+      mName = new String(bytes, "UTF-8");
+
+      /* Revision */
+      mRevision = buffer.getInt();
+
+      /* Label */
+      len = buffer.getInt();
+      if (len > 0) {
+        bytes = new byte[len];
+        buffer.get(bytes);
+        mLabel = new GenericTranslatableString(pScope, new String(bytes, "UTF-8"));
+      }
+      else
+        mLabel = null;
+
+      /* SingleInstance */
+      mSingleInstance = buffer.get() == 1 ? true : false;
+
+      /* ParentDefinitions */
+      int count = buffer.getInt();
+      ImmutableSet.Builder<StructureDefinitionRef> builder = ImmutableSet.builder();
+      for (int i = 0; i < count; i++) {
+        len = buffer.getInt();
+        bytes = new byte[len];
+        buffer.get(bytes);
+        GenericStructureDefinitionRef sdr = new GenericStructureDefinitionRef(pScope, new String(bytes, "UTF-8"));
+        builder.add(sdr);
+      }
+      mParentDefinitions = builder.build();
+
+      /* Properties */
+      count = buffer.getInt();
+      ImmutableMap.Builder<String, PropertyDefinition> propBuilder = ImmutableMap.builder();
+      for (int i = 0; i < count; i++) {
+        len = buffer.getInt();
+        bytes = new byte[len];
+        buffer.get(bytes);
+        String key = new String(bytes, "UTF-8");
+        len = buffer.getInt();
+        bytes = new byte[len];
+        buffer.get(bytes);
+        GenericPropertyDefinition gpd = new GenericPropertyDefinition(pScope, bytes);
+        propBuilder.put(key, gpd);
+      }
+      mProperties = propBuilder.build();
+
+      /* Keywords */
+      count = buffer.getInt();
+      ImmutableMultimap.Builder<String, String> keywordBuilder = ImmutableMultimap.builder();
+      for (int i = 0; i < count; i++) {
+        len = buffer.getInt();
+        bytes = new byte[len];
+        buffer.get(bytes);
+        String key = new String(bytes, "UTF-8");
+        int subcount = buffer.getInt();
+        for (int o = 0; o < subcount; o++) {
+          len = buffer.getInt();
+          bytes = new byte[len];
+          buffer.get(bytes);
+          String value = new String(bytes, "UTF-8");
+          keywordBuilder.put(key, value);
+        }
+      }
+      mKeywords = keywordBuilder.build();
+    }
+    catch (UnsupportedEncodingException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   public void validate() {
@@ -380,6 +465,121 @@ public class GenericStructureDefinition implements StructureDefinition {
   @Override
   public List<String> lookupPrimaryKeyNames() {
     return mMemoizer.memoize(this::internalLookupPrimaryKeyNames, "pkn");
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.StructureDefinition#saveToByteArray()
+   */
+  @Override
+  public byte[] saveToByteArray() {
+    //
+    // private final String mName;
+    //
+    // private final int mRevision;
+    //
+    // private final @Nullable TranslatableString mLabel;
+    //
+    // private final boolean mSingleInstance;
+    //
+    // private final ImmutableMap<String, PropertyDefinition> mProperties;
+    //
+    // private final ImmutableSet<StructureDefinitionRef> mParentDefinitions;
+    //
+    // private final ImmutableMultimap<String, String> mKeywords;
+    try {
+      int size = 0;
+      /* Name */
+      byte[] nameBytes = mName.getBytes("UTF-8");
+      size = size + 4 + nameBytes.length;
+      /* Revision */
+      size = size + 4;
+      /* Label */
+      byte[] labelBytes = null;
+      if (mLabel != null)
+        labelBytes = mLabel.getKey().getBytes("UTF-8");
+      size = size + 4 + (labelBytes == null ? 0 : labelBytes.length);
+      /* SingleInstance */
+      size = size + 1;
+      /* ParentDefinitions */
+      List<byte[]> parentDefinitionBytes = new ArrayList<>();
+      size = size + 4;
+      for (StructureDefinitionRef sdr : mParentDefinitions) {
+        String str = sdr.getSerializedString();
+        byte[] bytes = str.getBytes("UTF-8");
+        parentDefinitionBytes.add(bytes);
+        size = size + 4 + bytes.length;
+      }
+      /* Properties */
+      size = size + 4;
+      Map<byte[], byte[]> propsBytes = new HashMap<>();
+      for (Map.Entry<String, PropertyDefinition> pair : mProperties.entrySet()) {
+        String propertyName = pair.getKey();
+        byte[] propNameBytes = propertyName.getBytes("UTF-8");
+        PropertyDefinition propDef = pair.getValue();
+        byte[] propBytes = propDef.saveToByteArray();
+        propsBytes.put(propNameBytes, propBytes);
+        size = size + 4 + propNameBytes.length + 4 + propBytes.length;
+      }
+      /* Keywords */
+      size = size + 4;
+      Map<byte[], List<byte[]>> keywordBytes = new HashMap<>();
+      for (String key : mKeywords.keys()) {
+        byte[] keyBytes = key.getBytes("UTF-8");
+        List<byte[]> valueList = new ArrayList<>();
+        keywordBytes.put(keyBytes, valueList);
+        size = size + 4 + keyBytes.length + 4;
+        for (String value : mKeywords.get(key)) {
+          byte[] valueBytes = value.getBytes("UTF-8");
+          size = size + 4 + valueBytes.length;
+          valueList.add(valueBytes);
+        }
+      }
+
+      ByteBuffer buffer = ByteBuffer.allocate(size);
+      buffer = buffer.order(ByteOrder.LITTLE_ENDIAN);
+      /* Name */
+      buffer.putInt(nameBytes.length);
+      buffer.put(nameBytes);
+      /* Revision */
+      buffer.putInt(mRevision);
+      /* Label */
+      buffer.putInt((labelBytes == null ? 0 : labelBytes.length));
+      if (labelBytes != null)
+        buffer.put(labelBytes);
+      /* SingleInstance */
+      buffer.put((byte) (mSingleInstance == true ? 1 : 0));
+      /* ParentDefinitions */
+      buffer.putInt(parentDefinitionBytes.size());
+      for (byte[] bytes : parentDefinitionBytes) {
+        buffer.putInt(bytes.length);
+        buffer.put(bytes);
+      }
+      /* Properties */
+      buffer.putInt(propsBytes.size());
+      for (Map.Entry<byte[], byte[]> pair : propsBytes.entrySet()) {
+        buffer.putInt(pair.getKey().length);
+        buffer.put(pair.getKey());
+        buffer.putInt(pair.getValue().length);
+        buffer.put(pair.getValue());
+      }
+      /* Keywords */
+      buffer.putInt(keywordBytes.size());
+      for (Map.Entry<byte[], List<byte[]>> pair : keywordBytes.entrySet()) {
+        buffer.putInt(pair.getKey().length);
+        buffer.put(pair.getKey());
+        List<byte[]> values = pair.getValue();
+        buffer.putInt(values.size());
+        for (byte[] bytes : values) {
+          buffer.putInt(bytes.length);
+          buffer.put(bytes);
+        }
+      }
+      buffer.flip();
+      return buffer.array();
+    }
+    catch (UnsupportedEncodingException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   /**

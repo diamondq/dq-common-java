@@ -1,6 +1,7 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
+import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyType;
@@ -623,6 +624,15 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   public static PropertiesFilePersistenceLayerBuilder builder() {
     return new PropertiesFilePersistenceLayerBuilder();
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
+   *      com.diamondq.common.model.interfaces.Scope)
+   */
+  @Override
+  public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
+    return false;
   }
 
 }

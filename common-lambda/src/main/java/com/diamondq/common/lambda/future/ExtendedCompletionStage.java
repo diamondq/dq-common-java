@@ -938,125 +938,109 @@ public interface ExtendedCompletionStage<T> {
         pTestPostFunction, null, null, pEndPostFunction, pExecutor);
   }
 
-  // /**
-  // * This creates a loop that starts with the pStart value and increments by pIncrement until reaching pEnd. For each
-  // * value, it calls the pPerformFunction. After each perform, it calls the pCheckFunction (if provided), and if that
-  // * returns true, then it exits early.
-  // *
-  // * @param pStart the starting number
-  // * @param pEnd the ending number
-  // * @param pIncrement the increment (may be negative)
-  // * @param pPerformFunction the function to perform on each iteration
-  // * @param pCheckFunction the optional early exit check function
-  // * @return the final value from the perform function
-  // */
-  // public default <U> ExtendedCompletionStage<U> thenLoop(int pStart, int pEnd, int pIncrement,
-  // BiFunction<T, @NonNull Integer, ExtendedCompletionStage<U>> pPerformFunction,
-  // @Nullable BiFunction<U, Integer, Boolean> pCheckFunction) {
-  //
-  // Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void,
-  // Boolean, @Nullable Void, @Nullable Void, U>, Integer> startPreFunction =
-  // (loopState) -> {
-  // loopState.startPost = pEnd;
-  // loopState.testPre = pIncrement;
-  // return pStart;
-  // };
-  //
-  // Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void,
-  // Boolean, @Nullable Void, @Nullable Void, U>, ExtendedCompletionStage<U>> actionFunction =
-  // (loopState) -> {
-  // @SuppressWarnings("null")
-  // CompletionStage<U> completionStage = pPerformFunction.apply(loopState.input, loopState.startPre);
-  // if (completionStage instanceof ExtendedCompletionStage)
-  // return (ExtendedCompletionStage<U>) completionStage;
-  // return ExtendedCompletionStage.of(completionStage);
-  // };
-  //
-  // /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
-  //
-  // Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void,
-  // Boolean, @Nullable Void, @Nullable Void, U>, Boolean> testPostFunction =
-  // (loopState) -> {
-  // loopState.startPre += loopState.testPre;
-  // if (loopState.startPre >= loopState.startPost)
-  // return false;
-  // if (pCheckFunction != null)
-  // if (pCheckFunction.apply(loopState.actionResult, loopState.startPre) == true)
-  // return false;
-  //
-  // return true;
-  // };
-  //
-  // Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void,
-  // Boolean, @Nullable Void, @Nullable Void, U>, U> endPostFunction =
-  // (loopState) -> loopState.actionResult;
-  // return this
-  // .<Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable
-  // Void, @Nullable Void, U> thenDoWhile(
-  // startPreFunction, null, null, null, actionFunction, null, null, null, testPostFunction, null, null,
-  // endPostFunction);
-  // }
-  //
-  // /**
-  // * This creates a loop that starts with the pStart value and increments by pIncrement until reaching pEnd. For each
-  // * value, it calls the pPerformFunction. After each perform, it calls the pCheckFunction (if provided), and if that
-  // * returns true, then it exits early.
-  // *
-  // * @param pStart the starting number
-  // * @param pEnd the ending number
-  // * @param pIncrement the increment (may be negative)
-  // * @param pPerformFunction the function to perform on each iteration
-  // * @param pCheckFunction the optional early exit check function
-  // * @param pExecutor the executor
-  // * @return the final value from the perform function
-  // */
-  // public default <U> ExtendedCompletionStage<U> thenLoopAsync(int pStart, int pEnd, int pIncrement,
-  // BiFunction<T, @NonNull Integer, ExtendedCompletionStage<U>> pPerformFunction,
-  // @Nullable BiFunction<U, Integer, Boolean> pCheckFunction, Executor pExecutor) {
-  //
-  // Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void,
-  // Boolean, @Nullable Void, @Nullable Void, U>, Integer> pStartPreFunction =
-  // (loopState) -> {
-  // loopState.startPost = pEnd;
-  // loopState.testPre = pIncrement;
-  // return pStart;
-  // };
-  //
-  // Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void,
-  // Boolean, @Nullable Void, @Nullable Void, U>, ExtendedCompletionStage<U>> pActionFunction =
-  // (loopState) -> {
-  // @SuppressWarnings("null")
-  // CompletionStage<U> completionStage = pPerformFunction.apply(loopState.input, loopState.startPre);
-  // if (completionStage instanceof ExtendedCompletionStage)
-  // return (ExtendedCompletionStage<U>) completionStage;
-  // return ExtendedCompletionStage.of(completionStage);
-  // };
-  //
-  // /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
-  //
-  // Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void,
-  // Boolean, @Nullable Void, @Nullable Void, U>, Boolean> pTestPostFunction =
-  // (loopState) -> {
-  // loopState.startPre += loopState.testPre;
-  // if (loopState.startPre >= loopState.startPost)
-  // return false;
-  // if (pCheckFunction != null)
-  // if (pCheckFunction.apply(loopState.actionResult, loopState.startPre) == true)
-  // return false;
-  //
-  // return true;
-  // };
-  //
-  // Function<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void,
-  // Boolean, @Nullable Void, @Nullable Void, U>, U> pEndPostFunction =
-  // (loopState) -> loopState.actionResult;
-  // return this
-  // .<Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable
-  // Void, @Nullable Void, U> thenDoWhileAsync(
-  // pStartPreFunction, null, null, null, pActionFunction, null, null, null, pTestPostFunction, null, null,
-  // pEndPostFunction, pExecutor);
-  // }
-  //
+  /**
+   * This creates a loop that starts with the pStart value and increments by pIncrement until reaching pEnd. For each
+   * value, it calls the pPerformFunction. After each perform, it calls the pCheckFunction (if provided), and if that
+   * returns true, then it exits early.
+   *
+   * @param pStart the starting number
+   * @param pEnd the ending number
+   * @param pIncrement the increment (may be negative)
+   * @param pPerformFunction the function to perform on each iteration
+   * @param pCheckFunction the optional early exit check function
+   * @return the final value from the perform function
+   */
+  public default <U> ExtendedCompletionStage<U> thenLoop(int pStart, int pEnd, int pIncrement,
+    Function2<T, @NonNull Integer, ExtendedCompletionStage<U>> pPerformFunction,
+    @Nullable Function2<U, Integer, Boolean> pCheckFunction) {
+
+    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Integer> startPreFunction =
+      (loopState) -> {
+        loopState.startPost = pEnd;
+        loopState.testPre = pIncrement;
+        return pStart;
+      };
+
+    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, ExtendedCompletionStage<U>> actionFunction =
+      (loopState) -> {
+        ExtendedCompletionStage<U> completionStage = pPerformFunction.apply(loopState.input, loopState.startPre);
+        return completionStage;
+      };
+
+    /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
+
+    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Boolean> testPostFunction =
+      (loopState) -> {
+        loopState.startPre += loopState.testPre;
+        if (loopState.startPre >= loopState.startPost)
+          return false;
+        if (pCheckFunction != null)
+          if (pCheckFunction.apply(loopState.actionResult, loopState.startPre) == true)
+            return false;
+
+        return true;
+      };
+
+    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, U> endPostFunction =
+      (loopState) -> loopState.actionResult;
+    return this
+      .<Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U> thenDoWhile(
+        startPreFunction, null, null, null, actionFunction, null, null, null, testPostFunction, null, null,
+        endPostFunction);
+  }
+
+  /**
+   * This creates a loop that starts with the pStart value and increments by pIncrement until reaching pEnd. For each
+   * value, it calls the pPerformFunction. After each perform, it calls the pCheckFunction (if provided), and if that
+   * returns true, then it exits early.
+   *
+   * @param pStart the starting number
+   * @param pEnd the ending number
+   * @param pIncrement the increment (may be negative)
+   * @param pPerformFunction the function to perform on each iteration
+   * @param pCheckFunction the optional early exit check function
+   * @param pExecutor the executor
+   * @return the final value from the perform function
+   */
+  public default <U> ExtendedCompletionStage<U> thenLoopAsync(int pStart, int pEnd, int pIncrement,
+    Function2<T, @NonNull Integer, ExtendedCompletionStage<U>> pPerformFunction,
+    @Nullable Function2<U, Integer, Boolean> pCheckFunction, Executor pExecutor) {
+
+    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Integer> pStartPreFunction =
+      (loopState) -> {
+        loopState.startPost = pEnd;
+        loopState.testPre = pIncrement;
+        return pStart;
+      };
+
+    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, ExtendedCompletionStage<U>> pActionFunction =
+      (loopState) -> {
+        ExtendedCompletionStage<U> completionStage = pPerformFunction.apply(loopState.input, loopState.startPre);
+        return completionStage;
+      };
+
+    /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
+
+    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Boolean> pTestPostFunction =
+      (loopState) -> {
+        loopState.startPre += loopState.testPre;
+        if (loopState.startPre >= loopState.startPost)
+          return false;
+        if (pCheckFunction != null)
+          if (pCheckFunction.apply(loopState.actionResult, loopState.startPre) == true)
+            return false;
+
+        return true;
+      };
+
+    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, U> pEndPostFunction =
+      (loopState) -> loopState.actionResult;
+    return this
+      .<Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U> thenDoWhileAsync(
+        pStartPreFunction, null, null, null, pActionFunction, null, null, null, pTestPostFunction, null, null,
+        pEndPostFunction, pExecutor);
+  }
+
   public ExtendedCompletionStage<T> orTimeoutAsync(long pTimeout, TimeUnit pUnit, ScheduledExecutorService pService);
 
   public ExtendedCompletionStage<T> completeOnTimeout​Async(T value, long timeout, TimeUnit unit,
@@ -1112,7 +1096,7 @@ public interface ExtendedCompletionStage<T> {
   // });
   // }
   //
-  public <U> ExtendedCompletionStage<List<U>> relatedListOf(Collection<ExtendedCompletionStage<U>> cfs);
+  public <U> ExtendedCompletionStage<List<U>> relatedListOf(Collection<? extends ExtendedCompletionStage<U>> cfs);
 
   public <U> ExtendedCompletableFuture<U> relatedCompletedFuture(U value);
 

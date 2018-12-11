@@ -200,10 +200,35 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
             if ((userTransaction == null) || (userTransaction.getStatus() == Status.STATUS_NO_TRANSACTION))
               connection.setAutoCommit(true);
 
+            /* Find the actual schema */
+
+            String matchingSchema = null;
+            if (tableSchema != null) {
+
+              /* Check the schema */
+
+              boolean missingSchema = true;
+              try (ResultSet rs = connection.getMetaData().getSchemas(null, null)) {
+                while (rs.next() == true) {
+                  String str = rs.getString(1);
+                  if (str == null)
+                    continue;
+                  String testName = str.toLowerCase();
+                  if (tableSchema.equals(testName) == true) {
+                    missingSchema = false;
+                    matchingSchema = str;
+                    break;
+                  }
+                }
+              }
+              if (missingSchema == true)
+                throw new IllegalStateException();
+            }
+
             /* Check the table itself */
 
             boolean missingIndex = true;
-            try (ResultSet rs = connection.getMetaData().getIndexInfo(null, tableSchema, tableName, false, false)) {
+            try (ResultSet rs = connection.getMetaData().getIndexInfo(null, matchingSchema, tableName, false, false)) {
               while (rs.next() == true) {
                 String str = rs.getString(6);
                 if (str == null)
@@ -365,7 +390,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
                   String testName = str.toLowerCase();
                   if (tableSchema.equals(testName) == true) {
                     missingSchema = false;
-                    matchingSchema = testName;
+                    matchingSchema = str;
                     break;
                   }
                 }

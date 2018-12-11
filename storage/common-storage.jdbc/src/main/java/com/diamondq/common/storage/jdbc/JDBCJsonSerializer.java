@@ -39,7 +39,7 @@ public class JDBCJsonSerializer implements IPreparedStatementSerializer {
    *      com.diamondq.common.storage.kv.IKVColumnDefinition, java.sql.PreparedStatement, int)
    */
   @Override
-  public void serializeColumnToPreparedStatement(@Nullable Object pValue, IKVColumnDefinition pColDef,
+  public @Nullable Object serializeColumnToPreparedStatement(@Nullable Object pValue, IKVColumnDefinition pColDef,
     PreparedStatement pPs, int pParamCount) {
     throw new UnsupportedOperationException();
   }

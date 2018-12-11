@@ -35,9 +35,11 @@ public interface PersistenceLayer {
 
   public StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName, int pRevision);
 
+  public StructureDefinition populateStructureDefinition(Toolkit pToolkit, Scope pScope, byte[] pBytes);
+
   public StructureDefinition createNewTombstoneStructureDefinition(Toolkit pToolkit, Scope pScope, String pName);
 
-  public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
+  public StructureDefinition writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
   /**
    * Only called by the CombinedPeristenceLayer to enable the StructureDefinition on layers that don't persist the
@@ -184,5 +186,7 @@ public interface PersistenceLayer {
   public @Nullable Integer lookupLatestStructureDefinitionRevision(Toolkit pToolkit, Scope pScope, String pDefName);
 
   public AsyncPersistenceLayer getAsyncPersistenceLayer();
+
+  public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope);
 
 }

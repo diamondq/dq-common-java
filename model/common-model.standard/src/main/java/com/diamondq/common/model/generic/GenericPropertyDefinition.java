@@ -18,8 +18,15 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -85,6 +92,122 @@ public class GenericPropertyDefinition implements PropertyDefinition {
     mFinal = pFinal;
     mPropertyPattern = pPropertyPattern;
     mKeywords = pKeywords == null ? ImmutableMultimap.of() : ImmutableMultimap.copyOf(pKeywords);
+  }
+
+  public GenericPropertyDefinition(Scope pScope, byte[] pBytes) {
+    mScope = pScope;
+    try {
+      ByteBuffer buffer = ByteBuffer.wrap(pBytes);
+      buffer = buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+      /* mName */
+      int len = buffer.getInt();
+      byte[] bytes = new byte[len];
+      buffer.get(bytes);
+      mName = new String(bytes, "UTF-8");
+
+      /* mLabel */
+      len = buffer.getInt();
+      if (len > 0) {
+        bytes = new byte[len];
+        buffer.get(bytes);
+        mLabel = new GenericTranslatableString(pScope, new String(bytes, "UTF-8"));
+      }
+      else
+        mLabel = null;
+
+      /* mIsPrimaryKey */
+      mIsPrimaryKey = (buffer.get() == 1 ? true : false);
+
+      /* mPrimaryKeyOrder */
+      mPrimaryKeyOrder = buffer.getInt();
+
+      /* mType */
+      mType = PropertyType.valueOf(buffer.getInt());
+
+      /* mValidationScript */
+      mValidationScript = null;
+
+      /* mDefaultValue */
+      len = buffer.getInt();
+      if (len > 0) {
+        bytes = new byte[len];
+        buffer.get(bytes);
+        mDefaultValue = new String(bytes, "UTF-8");
+      }
+      else
+        mDefaultValue = null;
+
+      /* mDefaultValueScript */
+      mDefaultValueScript = null;
+
+      /* mReferenceTypes */
+      int count = buffer.getInt();
+      ImmutableSet.Builder<StructureDefinitionRef> refBuilder = ImmutableSet.builder();
+      for (int i = 0; i < count; i++) {
+        len = buffer.getInt();
+        bytes = new byte[len];
+        buffer.get(bytes);
+        GenericStructureDefinitionRef gsdr = new GenericStructureDefinitionRef(pScope, new String(bytes, "UTF-8"));
+        refBuilder.add(gsdr);
+      }
+      mReferenceTypes = refBuilder.build();
+
+      /* mMinValue */
+      len = buffer.getInt();
+      if (len > 0) {
+        bytes = new byte[len];
+        buffer.get(bytes);
+        mMinValue = new BigDecimal(new String(bytes, "UTF-8"));
+      }
+      else
+        mMinValue = null;
+
+      /* mMaxValue */
+      len = buffer.getInt();
+      if (len > 0) {
+        bytes = new byte[len];
+        buffer.get(bytes);
+        mMaxValue = new BigDecimal(new String(bytes, "UTF-8"));
+      }
+      else
+        mMaxValue = null;
+
+      /* mMaxLength */
+      int maxLength = buffer.getInt();
+      if (maxLength == -1)
+        mMaxLength = null;
+      else
+        mMaxLength = maxLength;
+
+      /* mFinal */
+      mFinal = buffer.get() == 1 ? true : false;
+
+      /* mPropertyPattern */
+      mPropertyPattern = PropertyPattern.valueOf(buffer.getInt());
+
+      /* mKeywords */
+      count = buffer.getInt();
+      ImmutableMultimap.Builder<String, String> keywordBuilder = ImmutableMultimap.builder();
+      for (int i = 0; i < count; i++) {
+        len = buffer.getInt();
+        bytes = new byte[len];
+        buffer.get(bytes);
+        String key = new String(bytes, "UTF-8");
+        int subcount = buffer.getInt();
+        for (int o = 0; o < subcount; o++) {
+          len = buffer.getInt();
+          bytes = new byte[len];
+          buffer.get(bytes);
+          String value = new String(bytes, "UTF-8");
+          keywordBuilder.put(key, value);
+        }
+      }
+      mKeywords = keywordBuilder.build();
+    }
+    catch (UnsupportedEncodingException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   /**
@@ -338,6 +461,173 @@ public class GenericPropertyDefinition implements PropertyDefinition {
     return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, pOrder, mType, mValidationScript,
       mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal, mPropertyPattern,
       mKeywords);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.PropertyDefinition#saveToByteArray()
+   */
+  @Override
+  public byte[] saveToByteArray() {
+    try {
+      int size = 0;
+      /* mName */
+      byte[] nameBytes = mName.getBytes("UTF-8");
+      size = size + 4 + nameBytes.length;
+
+      /* mLabel */
+      byte[] labelBytes = null;
+      if (mLabel != null)
+        labelBytes = mLabel.getKey().getBytes("UTF-8");
+      size = size + 4 + (labelBytes == null ? 0 : labelBytes.length);
+
+      /* mIsPrimaryKey */
+      size = size + 1;
+
+      /* mPrimaryKeyOrder */
+      size = size + 4;
+
+      /* mType */
+      size = size + 4;
+
+      /* mValidationScript */
+      if (mValidationScript != null)
+        throw new UnsupportedOperationException();
+
+      /* mDefaultValue */
+      byte[] defaultValueBytes = null;
+      if (mDefaultValue != null)
+        defaultValueBytes = mDefaultValue.getBytes("UTF-8");
+      size = size + 4 + (defaultValueBytes == null ? 0 : defaultValueBytes.length);
+
+      /* mDefaultValueScript */
+      if (mDefaultValueScript != null)
+        throw new UnsupportedOperationException();
+
+      /* mReferenceTypes */
+      List<byte[]> referenceTypesBytes = new ArrayList<>();
+      size = size + 4;
+      for (StructureDefinitionRef sdr : mReferenceTypes) {
+        byte[] refBytes = sdr.getSerializedString().getBytes("UTF-8");
+        referenceTypesBytes.add(refBytes);
+        size = size + 4 + refBytes.length;
+      }
+
+      /* mMinValue */
+      byte[] minValueBytes = null;
+      if (mMinValue != null)
+        minValueBytes = mMinValue.toString().getBytes("UTF-8");
+      size = size + 4 + (minValueBytes == null ? 0 : minValueBytes.length);
+
+      /* mMaxValue */
+      byte[] maxValueBytes = null;
+      if (mMaxValue != null)
+        maxValueBytes = mMaxValue.toString().getBytes("UTF-8");
+      size = size + 4 + (maxValueBytes == null ? 0 : maxValueBytes.length);
+
+      /* mMaxLength */
+      size = size + 4;
+
+      /* mFinal */
+      size = size + 1;
+
+      /* mPropertyPattern */
+      size = size + 4;
+
+      /* mKeywords */
+      size = size + 4;
+      Map<byte[], List<byte[]>> keywordBytes = new HashMap<>();
+      for (String key : mKeywords.keys()) {
+        byte[] keyBytes = key.getBytes("UTF-8");
+        List<byte[]> valueList = new ArrayList<>();
+        keywordBytes.put(keyBytes, valueList);
+        size = size + 4 + keyBytes.length + 4;
+        for (String value : mKeywords.get(key)) {
+          byte[] valueBytes = value.getBytes("UTF-8");
+          size = size + 4 + valueBytes.length;
+          valueList.add(valueBytes);
+        }
+      }
+
+      ByteBuffer buffer = ByteBuffer.allocate(size);
+      buffer = buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+      /* mName */
+      buffer.putInt(nameBytes.length);
+      buffer.put(nameBytes);
+
+      /* mLabel */
+      buffer.putInt(labelBytes == null ? 0 : labelBytes.length);
+      if (labelBytes != null)
+        buffer.put(labelBytes);
+
+      /* mIsPrimaryKey */
+      buffer.put((byte) (mIsPrimaryKey == true ? 1 : 0));
+
+      /* mPrimaryKeyOrder */
+      buffer.putInt(mPrimaryKeyOrder);
+
+      /* mType */
+      buffer.putInt(mType.getValue());
+
+      /* mValidationScript */
+      if (mValidationScript != null)
+        throw new UnsupportedOperationException();
+
+      /* mDefaultValue */
+      buffer.putInt(defaultValueBytes == null ? 0 : defaultValueBytes.length);
+      if (defaultValueBytes != null)
+        buffer.put(defaultValueBytes);
+
+      /* mDefaultValueScript */
+      if (mDefaultValueScript != null)
+        throw new UnsupportedOperationException();
+
+      /* mReferenceTypes */
+      buffer.putInt(referenceTypesBytes.size());
+      for (byte[] bytes : referenceTypesBytes) {
+        buffer.putInt(bytes.length);
+        buffer.put(bytes);
+      }
+
+      /* mMinValue */
+      buffer.putInt(minValueBytes == null ? 0 : minValueBytes.length);
+      if (minValueBytes != null)
+        buffer.put(minValueBytes);
+
+      /* mMaxValue */
+      buffer.putInt(maxValueBytes == null ? 0 : maxValueBytes.length);
+      if (maxValueBytes != null)
+        buffer.put(maxValueBytes);
+
+      /* mMaxLength */
+      Integer maxLength = mMaxLength;
+      buffer.putInt(maxLength == null ? -1 : maxLength);
+
+      /* mFinal */
+      buffer.put((byte) (mFinal == true ? 1 : 0));
+
+      /* mPropertyPattern */
+      buffer.putInt(mPropertyPattern.getValue());
+
+      /* mKeywords */
+      buffer.putInt(keywordBytes.size());
+      for (Map.Entry<byte[], List<byte[]>> pair : keywordBytes.entrySet()) {
+        buffer.putInt(pair.getKey().length);
+        buffer.put(pair.getKey());
+        List<byte[]> values = pair.getValue();
+        buffer.putInt(values.size());
+        for (byte[] bytes : values) {
+          buffer.putInt(bytes.length);
+          buffer.put(bytes);
+        }
+      }
+
+      buffer.flip();
+      return buffer.array();
+    }
+    catch (UnsupportedEncodingException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   /**

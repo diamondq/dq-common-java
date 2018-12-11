@@ -61,7 +61,6 @@ import javax.lang.model.type.TypeVariable;
 import javax.tools.JavaFileObject;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.common.reflection.qual.MethodValBottom;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
@@ -1004,7 +1003,7 @@ public class ProxyGenerator implements Generator {
           TypeName itemTypeName = itemType.getTypeName();
           if (actualReturnType.isNullable() == true)
             methodBuilder = methodBuilder.addStatement("$T r_array = (replyResult == null ? null : new $T<>())",
-              actualReturnType, concreteTypeName);
+              returnTypeName, concreteTypeName);
           else
             methodBuilder = methodBuilder.addStatement("$T r_array = new $T<>()", returnTypeName, concreteTypeName);
           if (actualReturnType.isNullable())
@@ -1111,9 +1110,27 @@ public class ProxyGenerator implements Generator {
               .addStatement("$T r_obj = replyResult.getString(i)", String.class) //
               .addStatement("r_array.add(r_obj == null ? null : $T.fromString(r_obj))", UUID.class);
           }
+          else if (itemType.isConverterAvailable() == true) {
+            if (itemType.isNullable() == true) {
+              methodBuilder = methodBuilder //
+                .addStatement("$T r_obj = replyResult.getJsonObject(i)", JsonObject.class) //
+                .addStatement("r_array.add(r_obj == null ? null : mConverterManager.convert(r_obj, $T.class))",
+                  itemTypeName.withoutAnnotations());
+            }
+            else {
+              methodBuilder = methodBuilder //
+                .addStatement("$T r_obj = replyResult.getJsonObject(i)", JsonObject.class) //
+                .beginControlFlow("if (r_obj == null)") //
+                .addStatement("throw new $T()", IllegalStateException.class) //
+                .endControlFlow() //
+                .addStatement("r_array.add(mConverterManager.convert(replyResult, $T.class))",
+                  itemTypeName.withoutAnnotations());
+            }
+          }
+
           else
-            throw new UnsupportedOperationException(
-              "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
+            throw new UnsupportedOperationException("Unrecognized Return of List<??> -> Method: |"
+              + pProxyMethod.toString() + "| Return: |" + actualReturnType.toString() + "|");
           methodBuilder = methodBuilder.endControlFlow();
           methodBuilder = methodBuilder.endControlFlow();
           if (actualReturnType.isNullable())
@@ -1127,8 +1144,8 @@ public class ProxyGenerator implements Generator {
             .addStatement("result.complete(finalResult)");
         }
         else
-          throw new UnsupportedOperationException(
-            "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
+          throw new UnsupportedOperationException("Unrecognized Return of ??<??> -> Method: |" + pProxyMethod.toString()
+            + "| Return: |" + actualReturnType.toString() + "|");
       }
 
       else if (actualReturnType.isProxyType() == true) {
@@ -1168,8 +1185,8 @@ public class ProxyGenerator implements Generator {
       }
 
       else
-        throw new UnsupportedOperationException(
-          "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
+        throw new UnsupportedOperationException("Unrecognized Return of ?? -> Method: |" + pProxyMethod.toString()
+          + "| Return: |" + actualReturnType.toString() + "|");
 
       if (isReturnTypeNullable == false) {
         methodBuilder = methodBuilder.endControlFlow();

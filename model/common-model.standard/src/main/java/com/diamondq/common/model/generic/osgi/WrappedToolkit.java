@@ -22,6 +22,7 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,33 +38,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WrappedToolkit implements Toolkit {
-  private static final Logger     sLogger                          = LoggerFactory.getLogger(WrappedToolkit.class);
+  private static final Logger               sLogger                          =
+    LoggerFactory.getLogger(WrappedToolkit.class);
 
-  protected Toolkit               mToolkit;
+  protected Toolkit                         mToolkit;
 
-  protected volatile boolean      mWriteStructure                  = false;
+  protected volatile boolean                mWriteStructure                  = false;
 
-  protected volatile boolean      mWriteStructureDefinition        = false;
+  protected volatile boolean                mWriteStructureDefinition        = false;
 
-  protected volatile boolean      mWriteEditorStructureDefinition  = false;
+  protected volatile boolean                mWriteEditorStructureDefinition  = false;
 
-  protected volatile boolean      mWriteResource                   = false;
+  protected volatile boolean                mWriteResource                   = false;
 
-  protected volatile boolean      mDeleteStructure                 = false;
+  protected volatile boolean                mDeleteStructure                 = false;
 
-  protected volatile boolean      mDeleteStructureDefinition       = false;
+  protected volatile boolean                mDeleteStructureDefinition       = false;
 
-  protected volatile boolean      mDeleteEditorStructureDefinition = false;
+  protected volatile boolean                mDeleteEditorStructureDefinition = false;
 
-  protected volatile boolean      mDeleteResource                  = false;
+  protected volatile boolean                mDeleteResource                  = false;
 
-  protected volatile AsyncToolkit mAsyncToolkit;
+  protected volatile @Nullable AsyncToolkit mAsyncToolkit;
 
-  protected volatile AsyncToolkit mWrappedAsyncToolkit;
+  protected volatile @Nullable AsyncToolkit mWrappedAsyncToolkit;
 
   @SuppressWarnings("null")
   public WrappedToolkit() {
     mToolkit = null;
+  }
+
+  WrappedToolkit(Toolkit pToolkit) {
+    mToolkit = pToolkit;
   }
 
   public void onActivate() {
@@ -133,7 +139,7 @@ public class WrappedToolkit implements Toolkit {
     AsyncToolkit asyncToolkit = mToolkit.getAsyncToolkit();
     synchronized (this) {
       if (mAsyncToolkit == asyncToolkit)
-        return mWrappedAsyncToolkit;
+        return Verify.notNull(mWrappedAsyncToolkit);
       mAsyncToolkit = asyncToolkit;
       mWrappedAsyncToolkit = new WrappedAsyncToolkit(mAsyncToolkit);
       return mWrappedAsyncToolkit;
@@ -203,9 +209,9 @@ public class WrappedToolkit implements Toolkit {
    *      com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public void writeStructureDefinition(Scope pScope, StructureDefinition pValue) {
+  public StructureDefinition writeStructureDefinition(Scope pScope, StructureDefinition pValue) {
     mWriteStructureDefinition = true;
-    mToolkit.writeStructureDefinition(dewrapScope(pScope), pValue);
+    return mToolkit.writeStructureDefinition(dewrapScope(pScope), pValue);
   }
 
   /**
@@ -626,4 +632,20 @@ public class WrappedToolkit implements Toolkit {
     return mToolkit.lookupLatestStructureDefinitionRevision(dewrapScope(pScope), pDefName);
   }
 
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#inferStructureDefinitions(com.diamondq.common.model.interfaces.Scope)
+   */
+  @Override
+  public boolean inferStructureDefinitions(Scope pScope) {
+    return mToolkit.inferStructureDefinitions(dewrapScope(pScope));
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#populateStructureDefinition(com.diamondq.common.model.interfaces.Scope,
+   *      byte[])
+   */
+  @Override
+  public StructureDefinition populateStructureDefinition(Scope pScope, byte[] pBytes) {
+    return mToolkit.populateStructureDefinition(dewrapScope(pScope), pBytes);
+  }
 }

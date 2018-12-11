@@ -1,6 +1,7 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractCachingPersistenceLayer;
+import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.Scope;
@@ -212,16 +213,18 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  protected void internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
+  protected StructureDefinition internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope,
+    StructureDefinition pValue) {
+    return pValue;
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, int)
    */
   @Override
   protected @Nullable StructureDefinition internalLookupStructureDefinitionByNameAndRevision(Toolkit pToolkit,
-    Scope pScope, String pName, @Nullable Integer pRevision) {
+    Scope pScope, String pName, int pRevision) {
     return null;
   }
 
@@ -318,4 +321,12 @@ public class MemoryPersistenceLayer extends AbstractCachingPersistenceLayer {
     return new MemoryPersistenceLayerBuilder();
   }
 
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
+   *      com.diamondq.common.model.interfaces.Scope)
+   */
+  @Override
+  public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
+    return false;
+  }
 }

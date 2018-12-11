@@ -61,12 +61,8 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
   @Override
   public ContextExtendedCompletionStage<StructureDefinition> writeStructureDefinition(AsyncToolkit pToolkit,
     Scope pScope, StructureDefinition pValue) {
-    mPersistenceLayer.writeStructureDefinition(pToolkit.getSyncToolkit(), pScope, pValue);
-    StructureDefinition result =
-      mPersistenceLayer.lookupStructureDefinitionByName(pToolkit.getSyncToolkit(), pScope, pValue.getName());
-    if (result == null)
-      throw new IllegalArgumentException();
-    return FutureUtils.completedFuture(result);
+    return FutureUtils
+      .completedFuture(mPersistenceLayer.writeStructureDefinition(pToolkit.getSyncToolkit(), pScope, pValue));
   }
 
   /**

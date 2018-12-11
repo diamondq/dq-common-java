@@ -16,6 +16,7 @@ import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
+import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +29,11 @@ import org.javatuples.Pair;
 
 public class WrappedAsyncToolkit implements AsyncToolkit {
 
-  private final AsyncToolkit mAsyncToolkit;
+  private final AsyncToolkit           mAsyncToolkit;
+
+  protected volatile @Nullable Toolkit mSyncToolkit;
+
+  protected volatile @Nullable Toolkit mWrappedSyncToolkit;
 
   public WrappedAsyncToolkit(AsyncToolkit pAsyncToolkit) {
     mAsyncToolkit = pAsyncToolkit;
@@ -222,7 +227,14 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
 
   @Override
   public Toolkit getSyncToolkit() {
-    return mAsyncToolkit.getSyncToolkit();
+    Toolkit toolkit = mAsyncToolkit.getSyncToolkit();
+    synchronized (this) {
+      if (mSyncToolkit == toolkit)
+        return Verify.notNull(mWrappedSyncToolkit);
+      mSyncToolkit = toolkit;
+      mWrappedSyncToolkit = new WrappedToolkit(toolkit);
+      return mWrappedSyncToolkit;
+    }
   }
 
 }

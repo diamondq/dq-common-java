@@ -2,6 +2,7 @@ package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
 import com.diamondq.common.model.generic.GenericModelQuery;
+import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.CommonKeywordValues;
@@ -1011,4 +1012,14 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       }
     }
   }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
+   *      com.diamondq.common.model.interfaces.Scope)
+   */
+  @Override
+  public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
+    return false;
+  }
+
 }

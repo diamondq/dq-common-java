@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -459,8 +460,19 @@ public class JDBCKVTransaction implements IKVTransaction {
         String table = pQuery.getDefinitionName();
         JDBCTableInfo info = mStore.validateTable(c, table, pClass);
         String querySQL = mStore.getQuerySQL(info, pQuery);
+        StringBuilder traceBuilder;
+        List<@Nullable Object> traceArgs;
+        if (context.isTraceEnabled() == true) {
+          traceBuilder = new StringBuilder();
+          traceBuilder.append("{}");
+          traceArgs = new ArrayList<>();
+          traceArgs.add(querySQL);
+        }
+        else {
+          traceBuilder = null;
+          traceArgs = null;
+        }
         try (PreparedStatement ps = c.prepareStatement(querySQL)) {
-          context.trace("{}", querySQL);
           List<WhereInfo> whereList = pQuery.getWhereList();
           int paramCount = 0;
           for (WhereInfo where : whereList) {
@@ -477,7 +489,21 @@ public class JDBCKVTransaction implements IKVTransaction {
                 throw new UnsupportedOperationException();
               colDef = sPRIMARY_KEY_2_DEF;
             }
-            info.serializer.serializeColumnToPreparedStatement(value, colDef, ps, paramCount);
+            Object writtenValue = info.serializer.serializeColumnToPreparedStatement(value, colDef, ps, paramCount);
+            if (traceBuilder != null)
+              traceBuilder.append(" {}=|{}|");
+            if (traceArgs != null) {
+              traceArgs.add(paramCount);
+              traceArgs.add(writtenValue);
+            }
+          }
+          if ((traceBuilder != null) && (traceArgs != null)) {
+            @SuppressWarnings("null")
+            @Nullable
+            Object @NonNull [] startArray = new Object[traceArgs.size()];
+            @Nullable
+            Object @NonNull [] args = traceArgs.<@Nullable Object> toArray(startArray);
+            context.trace(traceBuilder.toString(), args);
           }
           try (ResultSet rs = ps.executeQuery()) {
             while (rs.next() == true)

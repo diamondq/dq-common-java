@@ -948,4 +948,13 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
   public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
 
   }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#populateStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, byte[])
+   */
+  @Override
+  public StructureDefinition populateStructureDefinition(Toolkit pToolkit, Scope pScope, byte[] pBytes) {
+    return new GenericStructureDefinition(pScope, pBytes);
+  }
 }

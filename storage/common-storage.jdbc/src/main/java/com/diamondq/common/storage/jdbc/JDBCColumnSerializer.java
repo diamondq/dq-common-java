@@ -27,7 +27,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
    *      com.diamondq.common.storage.kv.IKVColumnDefinition, java.sql.PreparedStatement, int)
    */
   @Override
-  public void serializeColumnToPreparedStatement(@Nullable Object obj, IKVColumnDefinition pColDef,
+  public @Nullable Object serializeColumnToPreparedStatement(@Nullable Object obj, IKVColumnDefinition pColDef,
     PreparedStatement pPs, int pParamCount) {
     try {
       switch (pColDef.getType()) {
@@ -42,7 +42,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
         else
           throw new IllegalArgumentException("Only Boolean or String supported, but found " + obj.getClass());
         mDialect.writeBoolean(pPs, pParamCount, value);
-        break;
+        return value;
       }
       case Decimal: {
         BigDecimal minValue = pColDef.getMinValue();
@@ -62,6 +62,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
             throw new IllegalArgumentException(
               "Only Long, BigDecimal or String supported, but found " + obj.getClass());
           mDialect.writeLong(pPs, pParamCount, value);
+          return value;
         }
         else {
           BigDecimal value;
@@ -74,8 +75,8 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           else
             throw new IllegalArgumentException("Only BigDecimal or String supported, but found " + obj.getClass());
           mDialect.writeDecimal(pPs, pParamCount, value);
+          return value;
         }
-        break;
       }
       case Integer: {
         Integer value;
@@ -91,7 +92,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           throw new IllegalArgumentException(
             "Only Integer, BigDecimal or String supported, but found " + obj.getClass());
         mDialect.writeInteger(pPs, pParamCount, value);
-        break;
+        return value;
       }
       case Long: {
         Long value;
@@ -109,7 +110,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           throw new IllegalArgumentException(
             "Only Integer, Long, BigDecimal or String supported, but found " + obj.getClass());
         mDialect.writeLong(pPs, pParamCount, value);
-        break;
+        return value;
       }
       case String: {
         String value;
@@ -126,7 +127,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
           mDialect.writeText(pPs, pParamCount, value);
         else
           mDialect.writeUnlimitedText(pPs, pParamCount, value);
-        break;
+        return value;
       }
       case Timestamp: {
         Long value;
@@ -141,7 +142,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
         else
           throw new IllegalArgumentException("Only Long, BigDecimal or String supported, but found " + obj.getClass());
         mDialect.writeTimestamp(pPs, pParamCount, value);
-        break;
+        return value;
       }
       case UUID: {
         UUID value;
@@ -152,7 +153,7 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
         else
           throw new IllegalArgumentException("Only UUID supported, but found " + obj.getClass());
         mDialect.writeUUID(pPs, pParamCount, value);
-        break;
+        return value;
       }
       case Binary: {
         byte[] value;
@@ -163,9 +164,10 @@ public class JDBCColumnSerializer implements IPreparedStatementSerializer {
         else
           throw new IllegalArgumentException("Only byte[] supported, but found " + obj.getClass());
         mDialect.writeBinary(pPs, pParamCount, value);
-        break;
+        return value;
       }
       }
+      return null;
     }
     catch (SQLException ex) {
       throw new RuntimeException(ex);

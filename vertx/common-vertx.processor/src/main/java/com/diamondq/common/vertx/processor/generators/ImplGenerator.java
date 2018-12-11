@@ -784,7 +784,7 @@ public class ImplGenerator implements Generator {
         BaseType itemType = pReturnType.getParameterizedType(0);
         TypeName itemTypeName = itemType.getTypeName();
         if (pReturnType.isNullable() == true)
-          pBuilder = pBuilder.addStatement("@T $T r_array = (r == null ? null : new $T())", Nullable.class,
+          pBuilder = pBuilder.addStatement("@$T $T r_array = (r == null ? null : new $T())", Nullable.class,
             JsonArray.class, JsonArray.class);
         else
           pBuilder = pBuilder.addStatement("$T r_array = new $T()", JsonArray.class, JsonArray.class);
@@ -842,9 +842,25 @@ public class ImplGenerator implements Generator {
           .equals(itemTypeName)) {
           pBuilder = pBuilder.addStatement("r_array.add(item == null ? null : item.toString())");
         }
+
+        else if (itemType.isConverterAvailable() == true) {
+          if (itemType.isNullable() == true) {
+            pBuilder = pBuilder
+              // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
+              .addStatement("@$T $T r_obj = (r == null ? null : mConverterManager.convert(item, $T.class))",
+                Nullable.class, JsonObject.class, JsonObject.class) //
+              .addStatement("r_array.add(r_obj)");
+          }
+          else {
+            pBuilder = pBuilder
+              // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
+              .addStatement("$T r_obj = mConverterManager.convert(item, $T.class)", JsonObject.class, JsonObject.class) //
+              .addStatement("r_array.add(r_obj)");
+          }
+        }
         else
-          throw new UnsupportedOperationException(
-            "Method: " + pProxyMethod.toString() + " Return: " + pReturnType.toString());
+          throw new UnsupportedOperationException("Unrecognized Return List<??> -> Method: |" + pProxyMethod.toString()
+            + "| Return: |" + pReturnType.toString() + "|");
         pBuilder = pBuilder.endControlFlow();
         if (pReturnType.isNullable())
           pBuilder = pBuilder.endControlFlow();
@@ -910,7 +926,8 @@ public class ImplGenerator implements Generator {
         TypeSpec replyHandler = TypeSpec.anonymousClassBuilder("")
           .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Function3.class), actualTypeName,
             ClassName.get(Throwable.class).annotated(AnnotationSpec.builder(Nullable.class).build()),
-            ClassName.get(Context.class), TypeName.VOID.box().annotated(AnnotationSpec.builder(Nullable.class).build())))
+            ClassName.get(Context.class),
+            TypeName.VOID.box().annotated(AnnotationSpec.builder(Nullable.class).build())))
           .addMethod(replyMethod.build()) //
           .build();
 
@@ -923,8 +940,8 @@ public class ImplGenerator implements Generator {
           .addStatement("pMessage.reply(null)");
       }
       else
-        throw new UnsupportedOperationException(
-          "Method: " + pProxyMethod.toString() + " Return: " + pReturnType.toString());
+        throw new UnsupportedOperationException("Unrecognized Return ??<??> -> Method: |" + pProxyMethod.toString()
+          + "| Return: |" + pReturnType.toString() + "|");
     }
 
     else if (pReturnType.isProxyType() == true) {
@@ -977,7 +994,7 @@ public class ImplGenerator implements Generator {
 
     else
       throw new UnsupportedOperationException(
-        "Method: " + pProxyMethod.toString() + " Return: " + pReturnType.toString());
+        "Unrecognized Return ?? -> Method: |" + pProxyMethod.toString() + "| Return: |" + pReturnType.toString() + "|");
 
     return pBuilder;
   }

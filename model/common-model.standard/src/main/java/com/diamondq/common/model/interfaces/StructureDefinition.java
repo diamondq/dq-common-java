@@ -19,7 +19,6 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
    *
    * @return the name
    */
-
   public String getName();
 
   /* Revision */
@@ -151,4 +150,10 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
    */
   public StructureDefinition removeKeyword(String pKey, String pValue);
 
+  /**
+   * Saves the Structure into a byte array
+   * 
+   * @return the byte array
+   */
+  public byte[] saveToByteArray();
 }

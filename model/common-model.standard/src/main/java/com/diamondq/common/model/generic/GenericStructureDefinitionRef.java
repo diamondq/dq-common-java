@@ -17,6 +17,13 @@ public class GenericStructureDefinitionRef extends AbstractRef<StructureDefiniti
     mRevision = pRevision;
   }
 
+  public GenericStructureDefinitionRef(Scope pScope, String pSerializedString) {
+    super(pScope, pSerializedString.indexOf(':') == -1 ? pSerializedString
+      : pSerializedString.substring(0, pSerializedString.indexOf(':')), StructureDefinition.class);
+    mRevision = pSerializedString.indexOf(':') == -1 ? null
+      : Integer.valueOf(pSerializedString.substring(pSerializedString.indexOf(':') + 1));
+  }
+
   /**
    * @see com.diamondq.common.model.interfaces.StructureDefinitionRef#isWildcardReference()
    */

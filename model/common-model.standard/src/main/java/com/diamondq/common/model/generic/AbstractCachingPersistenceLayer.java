@@ -242,7 +242,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
+  public StructureDefinition writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
     Cache<String, StructureDefinition> structureDefinitionCache = mStructureDefinitionCache;
     if (structureDefinitionCache != null) {
       int revision = pValue.getRevision();
@@ -257,10 +257,11 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
       }
     }
 
-    internalWriteStructureDefinition(pToolkit, pScope, pValue);
+    return internalWriteStructureDefinition(pToolkit, pScope, pValue);
   }
 
-  protected abstract void internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
+  protected abstract StructureDefinition internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope,
+    StructureDefinition pValue);
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Toolkit,
@@ -268,17 +269,10 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
    */
   @Override
   public @Nullable StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName) {
-    Cache<String, Integer> structureDefinitionRevisionCache = mStructureDefinitionRevisionCache;
-    Integer revision =
-      (structureDefinitionRevisionCache == null ? null : structureDefinitionRevisionCache.getIfPresent(pName));
-    if (revision != null)
-      return lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, revision);
-
-    StructureDefinition result = internalLookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, null);
-    if ((result != null) && (structureDefinitionRevisionCache != null))
-      structureDefinitionRevisionCache.put(pName, result.getRevision());
-
-    return result;
+    Integer revision = lookupLatestStructureDefinitionRevision(pToolkit, pScope, pName);
+    if (revision == null)
+      return null;
+    return lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, revision);
   }
 
   /**
@@ -291,18 +285,25 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
     Cache<String, StructureDefinition> structureDefinitionCache = mStructureDefinitionCache;
     if (pRevision == null)
       pRevision = lookupLatestStructureDefinitionRevision(pToolkit, pScope, pName);
-    if (pRevision != null) {
-      String cacheKey = new StringBuilder(pName).append('-').append(pRevision).toString();
-      StructureDefinition result =
-        (structureDefinitionCache == null ? null : structureDefinitionCache.getIfPresent(cacheKey));
-      if (result != null)
-        return result;
-    }
+    if (pRevision == null)
+      return null;
 
-    StructureDefinition result = internalLookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, pRevision);
+    String cacheKey = new StringBuilder(pName).append('-').append(pRevision).toString();
+    StructureDefinition result =
+      (structureDefinitionCache == null ? null : structureDefinitionCache.getIfPresent(cacheKey));
+    if (result != null)
+      return result;
+
+    result = internalLookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, pRevision);
     if ((result != null) && (structureDefinitionCache != null)) {
-      String cacheKey = new StringBuilder(pName).append('-').append(result.getRevision()).toString();
+      cacheKey = new StringBuilder(pName).append('-').append(result.getRevision()).toString();
       structureDefinitionCache.put(cacheKey, result);
+      Cache<String, Integer> structureDefinitionRevisionCache = mStructureDefinitionRevisionCache;
+      if (structureDefinitionRevisionCache != null) {
+        Integer oldRevision = structureDefinitionRevisionCache.getIfPresent(pName);
+        if ((oldRevision == null) || (oldRevision < result.getRevision()))
+          structureDefinitionRevisionCache.put(pName, result.getRevision());
+      }
     }
 
     return result;
@@ -320,18 +321,35 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
     if (revision != null)
       return revision;
 
-    StructureDefinition result = internalLookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pDefName, null);
-    if (result == null)
-      return null;
+    /*
+     * Force all structures to be loaded. NOTE: This is inefficient because it generates references that are then
+     * disposed of, but it keeps the code simple for what should be a single call as the cache should keep it populated
+     * in the future.
+     */
 
+    Collection<StructureDefinitionRef> refs = getAllStructureDefinitionRefs(pToolkit, pScope);
     if (structureDefinitionRevisionCache != null)
-      structureDefinitionRevisionCache.put(pDefName, result.getRevision());
+      return structureDefinitionRevisionCache.getIfPresent(pDefName);
 
-    return result.getRevision();
+    /*
+     * If there is no cache, then we'll traverse the refs to find the latest. This is very inefficient, but again,
+     * shouldn't happen, since we should be using the cache is 99.999% of the cases
+     */
+    int latestRevision = -1;
+    for (StructureDefinitionRef ref : refs) {
+      StructureDefinition sd = ref.resolve();
+      if (sd != null)
+        if (sd.getName().equals(pDefName)) {
+          int rev = sd.getRevision();
+          if (rev > latestRevision)
+            latestRevision = rev;
+        }
+    }
+    return latestRevision;
   }
 
   protected abstract @Nullable StructureDefinition internalLookupStructureDefinitionByNameAndRevision(Toolkit pToolkit,
-    Scope pScope, String pName, @Nullable Integer pRevision);
+    Scope pScope, String pName, int pRevision);
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
@@ -364,8 +382,16 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
         internalGetAllMissingStructureDefinitionRefs(pToolkit, pScope, mStructureDefinitionCache);
       for (StructureDefinitionRef ref : missing) {
         StructureDefinition sd = ref.resolve();
-        if (sd != null)
-          structureDefinitionCache.put(sd.getName(), sd);
+        if (sd != null) {
+          String cacheKey = new StringBuilder(sd.getName()).append('-').append(sd.getRevision()).toString();
+          structureDefinitionCache.put(cacheKey, sd);
+          Cache<String, Integer> structureDefinitionRevisionCache = mStructureDefinitionRevisionCache;
+          if (structureDefinitionRevisionCache != null) {
+            Integer oldRevision = structureDefinitionRevisionCache.getIfPresent(sd.getName());
+            if ((oldRevision == null) || (oldRevision < sd.getRevision()))
+              structureDefinitionRevisionCache.put(sd.getName(), sd.getRevision());
+          }
+        }
       }
 
       return Collections2.transform(structureDefinitionCache.asMap().values(),

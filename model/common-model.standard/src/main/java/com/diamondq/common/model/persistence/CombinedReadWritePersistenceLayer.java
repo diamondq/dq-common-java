@@ -1,6 +1,7 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractPersistenceLayer;
+import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
@@ -232,9 +233,10 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public void writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
-    mStructureDefinitionWriteLayer.writeStructureDefinition(pToolkit, pScope, pValue);
+  public StructureDefinition writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
+    StructureDefinition result = mStructureDefinitionWriteLayer.writeStructureDefinition(pToolkit, pScope, pValue);
     enableStructureDefinition(pToolkit, pScope, pValue);
+    return result;
   }
 
   /**
@@ -578,5 +580,21 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   public static CombinedReadWritePersistenceLayerBuilder builder() {
     return new CombinedReadWritePersistenceLayerBuilder();
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
+   *      com.diamondq.common.model.interfaces.Scope)
+   */
+  @Override
+  public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
+    boolean inferred = false;
+    PersistenceLayer layer = mStructureReadLayer;
+    if (layer != null)
+      if (layer.inferStructureDefinitions(pGenericToolkit, pScope) == true)
+        inferred = true;
+    if (mStructureWriteLayer.inferStructureDefinitions(pGenericToolkit, pScope) == true)
+      inferred = true;
+    return inferred;
   }
 }

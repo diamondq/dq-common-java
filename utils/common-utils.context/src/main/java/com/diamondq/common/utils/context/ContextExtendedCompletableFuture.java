@@ -93,7 +93,8 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   @Override
-  public <U> ContextExtendedCompletionStage<List<U>> relatedListOf(Collection<ExtendedCompletionStage<U>> pCfs) {
+  public <U> ContextExtendedCompletionStage<List<U>> relatedListOf(
+    Collection<? extends ExtendedCompletionStage<U>> pCfs) {
     ContextExtendedCompletionStage<List<U>> result =
       (ContextExtendedCompletionStage<List<U>>) super.relatedListOf(pCfs);
     return result;

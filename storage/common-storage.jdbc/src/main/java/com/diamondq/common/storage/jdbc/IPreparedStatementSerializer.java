@@ -28,8 +28,9 @@ public interface IPreparedStatementSerializer {
    * @param pColDef the column definition
    * @param pPs the prepared statement
    * @param pParamCount the parameter count
+   * @return the object written to the column (mostly used for debugging)
    */
-  public void serializeColumnToPreparedStatement(@Nullable Object pValue, IKVColumnDefinition pColDef,
+  public @Nullable Object serializeColumnToPreparedStatement(@Nullable Object pValue, IKVColumnDefinition pColDef,
     PreparedStatement pPs, int pParamCount);
 
 }

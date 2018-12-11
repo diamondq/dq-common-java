@@ -1192,8 +1192,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public <U> ExtendedCompletionStage<U> relatedOf(CompletionStage<U> pFuture) {
     if (pFuture instanceof CompletableFuture)
       return new ExtendedCompletableFuture<>((CompletableFuture<U>) pFuture);
-    /* Should be creating an ExtendedCompletionStageImpl */
-    throw new UnsupportedOperationException();
+    return new ExtendedCompletableFuture<>(pFuture.toCompletableFuture());
   }
 
   /**
@@ -1427,7 +1426,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @Override
-  public <U> ExtendedCompletionStage<List<U>> relatedListOf(Collection<ExtendedCompletionStage<U>> cfs) {
+  public <U> ExtendedCompletionStage<List<U>> relatedListOf(Collection<? extends ExtendedCompletionStage<U>> cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
     int i = 0;
     for (ExtendedCompletionStage<U> cf : cfs)

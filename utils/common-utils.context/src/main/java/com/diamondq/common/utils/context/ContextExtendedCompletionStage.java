@@ -202,5 +202,6 @@ public interface ContextExtendedCompletionStage<T> extends ExtendedCompletionSta
     @NonNull ExtendedCompletionStage<?> @NonNull... pCfs);
 
   @Override
-  public <U> ContextExtendedCompletionStage<List<U>> relatedListOf(Collection<ExtendedCompletionStage<U>> pCfs);
+  public <U> ContextExtendedCompletionStage<List<U>> relatedListOf(
+    Collection<? extends ExtendedCompletionStage<U>> pCfs);
 }

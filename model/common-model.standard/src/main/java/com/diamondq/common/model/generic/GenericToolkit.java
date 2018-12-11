@@ -148,10 +148,10 @@ public class GenericToolkit implements Toolkit {
    *      com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public void writeStructureDefinition(Scope pScope, StructureDefinition pValue) {
+  public StructureDefinition writeStructureDefinition(Scope pScope, StructureDefinition pValue) {
     if (pValue instanceof GenericStructureDefinition)
       ((GenericStructureDefinition) pValue).validate();
-    getPersistenceLayer(pScope).writeStructureDefinition(this, pScope, pValue);
+    return getPersistenceLayer(pScope).writeStructureDefinition(this, pScope, pValue);
   }
 
   /**
@@ -570,5 +570,22 @@ public class GenericToolkit implements Toolkit {
   @Override
   public @Nullable Integer lookupLatestStructureDefinitionRevision(Scope pScope, String pDefName) {
     return getPersistenceLayer(pScope).lookupLatestStructureDefinitionRevision(this, pScope, pDefName);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#inferStructureDefinitions(com.diamondq.common.model.interfaces.Scope)
+   */
+  @Override
+  public boolean inferStructureDefinitions(Scope pScope) {
+    return getPersistenceLayer(pScope).inferStructureDefinitions(this, pScope);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#populateStructureDefinition(com.diamondq.common.model.interfaces.Scope,
+   *      byte[])
+   */
+  @Override
+  public StructureDefinition populateStructureDefinition(Scope pScope, byte[] pBytes) {
+    return getPersistenceLayer(pScope).populateStructureDefinition(this, pScope, pBytes);
   }
 }

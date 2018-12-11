@@ -85,8 +85,9 @@ public interface Toolkit {
    *
    * @param pScope the scope
    * @param pValue the StructureDefinition to write
+   * @return the updated StructureDefinition
    */
-  public void writeStructureDefinition(Scope pScope, StructureDefinition pValue);
+  public StructureDefinition writeStructureDefinition(Scope pScope, StructureDefinition pValue);
 
   /**
    * Deletes an existing StructureDefinition from permanent storage.
@@ -528,4 +529,21 @@ public interface Toolkit {
    * @return the revision (or null if the definition doesn't exist)
    */
   public @Nullable Integer lookupLatestStructureDefinitionRevision(Scope pScope, String pDefName);
+
+  /**
+   * If possible, it attempts to infer the structure definitions by looking at the underlying persistence engine
+   * 
+   * @param pScope the scope
+   * @return true if some structure definitions were inferred or false if none were inferred
+   */
+  public boolean inferStructureDefinitions(Scope pScope);
+
+  /**
+   * Inflates a StructureDefinition with the contents of the bytes (presumably saved earlier with a saveToBytes call)
+   * 
+   * @param pScope the scope
+   * @param pBytes the bytes
+   * @return the StructureDefinition
+   */
+  public StructureDefinition populateStructureDefinition(Scope pScope, byte[] pBytes);
 }

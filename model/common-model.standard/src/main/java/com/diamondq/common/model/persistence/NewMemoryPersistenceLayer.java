@@ -1,6 +1,7 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
+import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
@@ -339,6 +340,15 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   public static MemoryPersistenceLayerBuilder builder() {
     return new MemoryPersistenceLayerBuilder();
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
+   *      com.diamondq.common.model.interfaces.Scope)
+   */
+  @Override
+  public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
+    return false;
   }
 
 }

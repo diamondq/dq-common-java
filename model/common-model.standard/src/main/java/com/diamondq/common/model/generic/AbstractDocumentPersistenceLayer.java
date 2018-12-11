@@ -782,11 +782,11 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
+   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, int)
    */
   @Override
   protected @Nullable StructureDefinition internalLookupStructureDefinitionByNameAndRevision(Toolkit pToolkit,
-    Scope pScope, String pName, @Nullable Integer pRevision) {
+    Scope pScope, String pName, int pRevision) {
     if (mPersistStructureDefinitions == false)
       return null;
 
@@ -810,9 +810,10 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
    *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  protected void internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
-    if (mPersistEditorStructureDefinitions == false)
-      return;
+  protected StructureDefinition internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope,
+    StructureDefinition pValue) {
+    if (mPersistStructureDefinitions == false)
+      return pValue;
 
     throw new UnsupportedOperationException();
   }

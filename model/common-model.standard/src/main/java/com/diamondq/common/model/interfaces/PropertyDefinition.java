@@ -130,4 +130,6 @@ public interface PropertyDefinition
   public PropertyDefinition setPropertyPattern(PropertyPattern pValue);
 
   public Scope getScope();
+  
+  public byte[] saveToByteArray();
 }
