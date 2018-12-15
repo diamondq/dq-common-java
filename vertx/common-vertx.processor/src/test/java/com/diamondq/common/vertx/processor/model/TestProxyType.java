@@ -1,5 +1,7 @@
 package com.diamondq.common.vertx.processor.model;
 
+import java.util.Collections;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -41,7 +43,7 @@ public class TestProxyType {
         Assert.assertNotNull("Missing valueString on " + ee.toString(), valueString);
 
         try {
-          BaseType type = new BaseType(ee.getReturnType(), BaseType.constructor(), processingEnv);
+          BaseType type = new BaseType(ee.getReturnType(), BaseType.constructor(), processingEnv, Collections.emptyMap());
           Assert.assertNotNull(type);
           String value = type.getTypeName().toString();
           Assert.assertEquals("Return type does not match for " + ee.toString(), valueString.value(), value);

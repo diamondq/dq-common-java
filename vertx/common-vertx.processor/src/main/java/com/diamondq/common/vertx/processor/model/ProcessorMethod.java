@@ -8,10 +8,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -21,7 +23,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <R> the actual type
  * @param <P> the actual param type
  */
-public class ProcessorMethod<R extends ProcessorType<R>, P extends ProcessorParam<R>> {
+public abstract class ProcessorMethod<R extends ProcessorType<R>, P extends ProcessorParam<R>> {
 
   protected final ExecutableElement mExecutableElement;
 
@@ -34,7 +36,7 @@ public class ProcessorMethod<R extends ProcessorType<R>, P extends ProcessorPara
   protected final boolean           mNeedsConverter;
 
   public ProcessorMethod(ExecutableElement pElement, Constructor<P> pParamConstructor, Constructor<R> pTypeConstructor,
-    ProcessingEnvironment pProcessingEnv) {
+    ProcessingEnvironment pProcessingEnv, Map<String, TypeMirror> pTypeMap) {
 
     mExecutableElement = pElement;
 
@@ -43,7 +45,7 @@ public class ProcessorMethod<R extends ProcessorType<R>, P extends ProcessorPara
     /* Get the return type */
 
     try {
-      mReturnType = pTypeConstructor.newInstance(pElement.getReturnType(), pTypeConstructor, pProcessingEnv);
+      mReturnType = pTypeConstructor.newInstance(pElement.getReturnType(), pTypeConstructor, pProcessingEnv, pTypeMap);
 
       /* Get the parameters */
 
@@ -51,7 +53,7 @@ public class ProcessorMethod<R extends ProcessorType<R>, P extends ProcessorPara
       boolean needsConverter = mReturnType.isConverterAvailable();
       for (VariableElement ve : pElement.getParameters()) {
         @NonNull
-        P param = pParamConstructor.newInstance(ve, pTypeConstructor, pProcessingEnv);
+        P param = pParamConstructor.newInstance(ve, pTypeConstructor, pProcessingEnv, pTypeMap);
         if (param.isNeedsConverter() == true)
           needsConverter = true;
         params.add(param);

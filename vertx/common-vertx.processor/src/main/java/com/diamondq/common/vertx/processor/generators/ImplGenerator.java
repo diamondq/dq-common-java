@@ -963,7 +963,7 @@ public class ImplGenerator implements Generator {
       else {
         pBuilder = pBuilder //
           .addStatement("$T r_obj = new $T()", JsonObject.class, JsonObject.class) //
-          .addStatement("$T.notNull(r))", Verify.class) //
+          .addStatement("$T.notNull(r)", Verify.class) //
           .beginControlFlow("if (r instanceof $TProxy)", typeName.withoutAnnotations()) //
           .addStatement("r_obj.put($S, (($TProxy)r).getAddress())", "address", typeName) //
           .nextControlFlow("else") //

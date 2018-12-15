@@ -1,5 +1,7 @@
 package com.diamondq.common.vertx.processor.model;
 
+import java.util.Collections;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -36,7 +38,8 @@ public class TestProxyMethod {
     for (Element element : typeElement.getEnclosedElements()) {
       if (element.getKind() == ElementKind.METHOD) {
         ExecutableElement ee = (ExecutableElement) element;
-        ProxyMethod method = new ProxyMethod(ee, BaseParam.constructor(), BaseType.constructor(), processingEnv);
+        ProxyMethod method =
+          new ProxyMethod(ee, BaseParam.constructor(), BaseType.constructor(), processingEnv, Collections.emptyMap());
         Assert.assertNotNull(method);
       }
     }

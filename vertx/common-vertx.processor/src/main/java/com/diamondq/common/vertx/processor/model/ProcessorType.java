@@ -15,24 +15,31 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Describes a type (Parameter Type or Return Type)
  * 
  * @param <R>
  */
-public class ProcessorType<R extends ProcessorType<R>> {
+public abstract class ProcessorType<R extends ProcessorType<R>> {
+
+  private static final Logger           sLogger = LoggerFactory.getLogger(ProcessorType.class);
 
   protected final boolean               mPrimitive;
 
@@ -52,9 +59,24 @@ public class ProcessorType<R extends ProcessorType<R>> {
 
   protected final @Nullable TypeElement mDeclaredTypeElement;
 
-  public ProcessorType(TypeMirror pType, Constructor<R> pTypeConstructor, ProcessingEnvironment pProcessingEnv) {
+  public ProcessorType(TypeMirror pType, Constructor<R> pTypeConstructor, ProcessingEnvironment pProcessingEnv,
+    Map<String, TypeMirror> pTypeMap) {
     try {
+      if (pType.getKind() == TypeKind.TYPEVAR) {
+        TypeVariable tv = (TypeVariable) pType;
+        TypeParameterElement tpe = (TypeParameterElement) tv.asElement();
+        String varName = tpe.getSimpleName().toString();
+
+        /* Resolve against the set */
+
+        TypeMirror newType = pTypeMap.get(varName);
+        if (newType == null)
+          throw new IllegalArgumentException("Unable to resolve type variable " + varName);
+        sLogger.info("Changed {} to {}", pType, newType);
+        pType = newType;
+      }
       mTypeKind = pType.getKind();
+
       TypeName typeName;
       List<R> typeList = new ArrayList<>();
       switch (mTypeKind) {
@@ -114,7 +136,7 @@ public class ProcessorType<R extends ProcessorType<R>> {
         }
         List<TypeName> typeNameList = new ArrayList<>();
         for (TypeMirror type : dt.getTypeArguments()) {
-          R proxyType = pTypeConstructor.newInstance(type, pTypeConstructor, pProcessingEnv);
+          R proxyType = pTypeConstructor.newInstance(type, pTypeConstructor, pProcessingEnv, pTypeMap);
           if (proxyType.isConverterAvailable() == true)
             converterAvailable = true;
           typeList.add(proxyType);

@@ -5,11 +5,13 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
-public class ProcessorParam<R extends ProcessorType<R>> {
+public abstract class ProcessorParam<R extends ProcessorType<R>> {
 
   private final String  mName;
 
@@ -18,11 +20,11 @@ public class ProcessorParam<R extends ProcessorType<R>> {
   private final boolean mNeedsConverter;
 
   public ProcessorParam(VariableElement pElement, Constructor<R> pTypeConstructor,
-    ProcessingEnvironment pProcessingEnv) {
+    ProcessingEnvironment pProcessingEnv, Map<String, TypeMirror> pTypeMap) {
     mName = pElement.getSimpleName().toString();
 
     try {
-      mType = pTypeConstructor.newInstance(pElement.asType(), pTypeConstructor, pProcessingEnv);
+      mType = pTypeConstructor.newInstance(pElement.asType(), pTypeConstructor, pProcessingEnv, pTypeMap);
       mNeedsConverter = mType.isConverterAvailable();
     }
     catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {

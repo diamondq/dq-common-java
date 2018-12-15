@@ -48,14 +48,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.tools.JavaFileObject;
@@ -1315,14 +1313,11 @@ public class ProxyGenerator implements Generator {
 
     methodBuilder.returns(pMethod.getReturnType().getTypeName());
     List<ParameterSpec> parameterSpecs = new ArrayList<>();
-    for (VariableElement parameter : method.getParameters()) {
-      TypeMirror paramType = parameter.asType();
-      TypeName type = TypeName.get(paramType);
-      for (AnnotationMirror mirror : paramType.getAnnotationMirrors()) {
-        type = type.annotated(AnnotationSpec.get(mirror));
-      }
-      String name = parameter.getSimpleName().toString();
-      ParameterSpec.Builder paramBuilder = ParameterSpec.builder(type, name).addModifiers(parameter.getModifiers());
+    for (BaseParam param : pMethod.getParameters()) {
+      BaseType paramType = param.getType();
+      TypeName type = paramType.getTypeName();
+      String name = param.getName();
+      ParameterSpec.Builder paramBuilder = ParameterSpec.builder(type, name);
       parameterSpecs.add(paramBuilder.build());
     }
     methodBuilder.addParameters(parameterSpecs);

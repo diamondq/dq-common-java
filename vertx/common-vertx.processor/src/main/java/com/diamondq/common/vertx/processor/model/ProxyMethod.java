@@ -5,11 +5,13 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * This describes a method
@@ -23,7 +25,7 @@ public class ProxyMethod extends ProcessorMethod<BaseType, BaseParam> {
   public static Constructor<ProxyMethod> constructor() {
     try {
       Constructor<ProxyMethod> constructor = ProxyMethod.class.getConstructor(ExecutableElement.class,
-        Constructor.class, Constructor.class, ProcessingEnvironment.class);
+        Constructor.class, Constructor.class, ProcessingEnvironment.class, Map.class);
       return constructor;
     }
     catch (NoSuchMethodException | SecurityException ex) {
@@ -32,8 +34,8 @@ public class ProxyMethod extends ProcessorMethod<BaseType, BaseParam> {
   }
 
   public ProxyMethod(ExecutableElement pElement, Constructor<BaseParam> pParamConstructor,
-    Constructor<BaseType> pTypeConstructor, ProcessingEnvironment pProcessingEnv) {
-    super(pElement, pParamConstructor, pTypeConstructor, pProcessingEnv);
+    Constructor<BaseType> pTypeConstructor, ProcessingEnvironment pProcessingEnv, Map<String, TypeMirror> pTypeMap) {
+    super(pElement, pParamConstructor, pTypeConstructor, pProcessingEnv, pTypeMap);
 
     /* The return type must be a completionStage or null */
 
@@ -41,7 +43,7 @@ public class ProxyMethod extends ProcessorMethod<BaseType, BaseParam> {
       mHasReturn = false;
       PrimitiveType primitiveType = pProcessingEnv.getTypeUtils().getPrimitiveType(TypeKind.VOID);
       try {
-        mActualReturn = pTypeConstructor.newInstance(primitiveType, pTypeConstructor, pProcessingEnv);
+        mActualReturn = pTypeConstructor.newInstance(primitiveType, pTypeConstructor, pProcessingEnv, pTypeMap);
       }
       catch (InstantiationException | IllegalAccessException | IllegalArgumentException
         | InvocationTargetException ex) {
