@@ -203,7 +203,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @SuppressWarnings({"null", "unused"})
-  private static <U> CompletableFuture<U> decomposeToCompletableFuture(ExtendedCompletionStage<U> pFuture) {
+  protected static <U> CompletableFuture<U> decomposeToCompletableFuture(ExtendedCompletionStage<U> pFuture) {
     if (pFuture == null)
       return null;
     if (pFuture instanceof ExtendedCompletableFuture)
@@ -1002,6 +1002,23 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
 
   public static <T> ExtendedCompletableFuture<T> newCompletableFuture() {
     return new ExtendedCompletableFuture<>();
+  }
+
+  public static <T> ExtendedCompletionStage<List<T>> listOf(Collection<? extends ExtendedCompletionStage<T>> cfs) {
+    CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
+    int i = 0;
+    for (ExtendedCompletionStage<T> cf : cfs)
+      args[i++] = decomposeToCompletableFuture(cf);
+    return of(CompletableFuture.allOf(args).thenApply((v) -> {
+      List<T> results = new ArrayList<>();
+      for (ExtendedCompletionStage<T> stage : cfs) {
+        if (stage instanceof ExtendedCompletableFuture)
+          results.add(((ExtendedCompletableFuture<T>) stage).join());
+        else
+          throw new UnsupportedOperationException();
+      }
+      return results;
+    }));
   }
 
   /**

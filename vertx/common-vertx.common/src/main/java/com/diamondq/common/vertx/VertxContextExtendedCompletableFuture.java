@@ -11,6 +11,8 @@ import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
@@ -47,6 +49,15 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
     mExecutor = pExecutor;
   }
 
+  private VertxContextExtendedCompletableFuture(CompletableFuture<T> pFuture) {
+    super(pFuture);
+    Vertx vertx = VertxUtils.getDefaultVertx();
+    if (vertx == null)
+      throw new IllegalStateException();
+    mVertxContext = vertx.getOrCreateContext();
+    mExecutor = new ContextWrappedExecutor(mVertxContext);
+  }
+
   public static <T> VertxContextExtendedCompletableFuture<T> newCompletableFuture() {
     return new VertxContextExtendedCompletableFuture<>();
   }
@@ -61,6 +72,24 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
     VertxContextExtendedCompletableFuture<T> future = new VertxContextExtendedCompletableFuture<>();
     future.completeExceptionally(pValue);
     return future;
+  }
+
+  public static <T> VertxContextExtendedCompletableFuture<List<T>> listOf(
+    List<? extends ExtendedCompletionStage<T>> cfs) {
+    CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
+    int i = 0;
+    for (ExtendedCompletionStage<T> cf : cfs)
+      args[i++] = decomposeToCompletableFuture(cf);
+    return new VertxContextExtendedCompletableFuture<List<T>>(CompletableFuture.allOf(args).thenApply((v) -> {
+      List<T> results = new ArrayList<>();
+      for (ExtendedCompletionStage<T> stage : cfs) {
+        if (stage instanceof ExtendedCompletableFuture)
+          results.add(((ExtendedCompletableFuture<T>) stage).join());
+        else
+          throw new UnsupportedOperationException();
+      }
+      return results;
+    }));
   }
 
   /**

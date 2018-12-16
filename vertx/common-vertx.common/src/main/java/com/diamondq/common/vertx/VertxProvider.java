@@ -8,6 +8,7 @@ import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -43,11 +44,12 @@ public class VertxProvider extends AbstractOSGiConstructor {
         VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFuture", Object.class);
       Method completedFailure =
         VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFailure", Throwable.class);
+      Method listOf = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("listOf", List.class);
       Set<Class<?>> replacements = new HashSet<>();
       replacements.add(ContextExtendedCompletableFuture.class);
       replacements.add(ExtendedCompletableFuture.class);
 
-      FutureUtils.setMethods(newCompletableFuture, completedFuture, completedFailure,
+      FutureUtils.setMethods(newCompletableFuture, completedFuture, completedFailure, listOf,
         VertxContextExtendedCompletableFuture.class, replacements);
     }
     catch (NoSuchMethodException | SecurityException ex) {

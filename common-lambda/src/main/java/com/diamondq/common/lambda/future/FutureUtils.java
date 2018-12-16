@@ -2,6 +2,7 @@ package com.diamondq.common.lambda.future;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 
 public class FutureUtils {
@@ -12,6 +13,8 @@ public class FutureUtils {
 
   private static volatile Method   failedFutureMethod;
 
+  private static volatile Method   listOfFutureMethod;
+
   private static volatile Class<?> completedClass;
 
   static {
@@ -19,6 +22,7 @@ public class FutureUtils {
       newCompletableFutureMethod = ExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
       completedFutureMethod = ExtendedCompletableFuture.class.getDeclaredMethod("completedFuture", Object.class);
       failedFutureMethod = ExtendedCompletableFuture.class.getDeclaredMethod("completedFailure", Throwable.class);
+      listOfFutureMethod = ExtendedCompletableFuture.class.getDeclaredMethod("listOf", List.class);
       completedClass = ExtendedCompletableFuture.class;
     }
     catch (NoSuchMethodException | SecurityException ex) {
@@ -27,7 +31,8 @@ public class FutureUtils {
   }
 
   public static boolean setMethods(Method pNewCompletabledFutureMethod, Method pCompletedFutureMethod,
-    Method pCompletedFailureMethod, Class<?> pCompletedClass, Set<Class<?>> pValidReplacements) {
+    Method pCompletedFailureMethod, Method pListOfFutureMethod, Class<?> pCompletedClass,
+    Set<Class<?>> pValidReplacements) {
 
     synchronized (FutureUtils.class) {
       if (pValidReplacements.contains(completedClass) == false)
@@ -35,6 +40,7 @@ public class FutureUtils {
       newCompletableFutureMethod = pNewCompletabledFutureMethod;
       completedFutureMethod = pCompletedFutureMethod;
       failedFutureMethod = pCompletedFailureMethod;
+      listOfFutureMethod = pListOfFutureMethod;
       completedClass = pCompletedClass;
       return true;
     }
@@ -83,6 +89,19 @@ public class FutureUtils {
   public static <T, U extends ExtendedCompletableFuture<T>> U newCompletableFuture() {
     try {
       Object resultObj = newCompletableFutureMethod.invoke(null);
+      @SuppressWarnings("unchecked")
+      U result = (U) resultObj;
+      return result;
+    }
+    catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  public static <T, U extends ExtendedCompletionStage<List<T>>> U listOf(
+    List<? extends ExtendedCompletionStage<T>> pList) {
+    try {
+      Object resultObj = listOfFutureMethod.invoke(pList);
       @SuppressWarnings("unchecked")
       U result = (U) resultObj;
       return result;
