@@ -1004,7 +1004,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     return new ExtendedCompletableFuture<>();
   }
 
-  public static <T> ExtendedCompletionStage<List<T>> listOf(Collection<? extends ExtendedCompletionStage<T>> cfs) {
+  public static <T> ExtendedCompletionStage<List<T>> listOf(List<? extends ExtendedCompletionStage<T>> cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
     int i = 0;
     for (ExtendedCompletionStage<T> cf : cfs)

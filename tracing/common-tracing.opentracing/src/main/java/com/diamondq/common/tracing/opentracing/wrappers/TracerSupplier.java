@@ -1,8 +1,7 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
 import com.diamondq.common.lambda.interfaces.CancelableSupplier;
-
-import java.util.function.Supplier;
+import com.diamondq.common.lambda.interfaces.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

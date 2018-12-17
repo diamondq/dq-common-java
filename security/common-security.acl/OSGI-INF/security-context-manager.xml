@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" immediate="false"
+  name="com.diamondq.common.security.acl.impl.securitycontextmanagerimpl">
+  <implementation
+    class="com.diamondq.common.security.acl.impl.SecurityContextManagerImpl" />
+  <service>
+     <provide interface="com.diamondq.common.security.acl.api.SecurityContextManager"/>
+  </service>
+  <reference bind="addSecurityContextSerializer" cardinality="0..n" interface="com.diamondq.common.security.acl.spi.SecurityContextSerializer" name="SecurityContextSerializer" policy="dynamic" unbind="removeSecurityContextSerializer"/>
+</scr:component>
