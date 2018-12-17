@@ -62,6 +62,8 @@ public abstract class ProcessorType<R extends ProcessorType<R>> {
   public ProcessorType(TypeMirror pType, Constructor<R> pTypeConstructor, ProcessingEnvironment pProcessingEnv,
     Map<String, TypeMirror> pTypeMap) {
     try {
+      List<@NonNull ? extends AnnotationMirror> annotationMirrors = pType.getAnnotationMirrors();
+
       if (pType.getKind() == TypeKind.TYPEVAR) {
         TypeVariable tv = (TypeVariable) pType;
         TypeParameterElement tpe = (TypeParameterElement) tv.asElement();
@@ -234,7 +236,7 @@ public abstract class ProcessorType<R extends ProcessorType<R>> {
 
       boolean isNullable = false;
       List<AnnotationSpec> annoSpecs = new ArrayList<>();
-      for (AnnotationMirror anno : pType.getAnnotationMirrors()) {
+      for (AnnotationMirror anno : annotationMirrors) {
         String simpleName = ((TypeElement) anno.getAnnotationType().asElement()).getSimpleName().toString();
         if (simpleName.equalsIgnoreCase("Nullable"))
           isNullable = true;

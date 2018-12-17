@@ -1,6 +1,8 @@
 package com.diamondq.common.vertx.processor.generators;
 
 import com.diamondq.common.lambda.future.FutureUtils;
+import com.diamondq.common.security.acl.api.SecurityContext;
+import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextFactory;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -161,13 +164,15 @@ public class ProxyGenerator implements Generator {
     if (pProxyClass.isNeedsConverter()) {
       announceMethod = announceMethod
         // Engine instance = new EngineProxy(mContextFactory, mVertx, address);
-        .addStatement("$T instance = new $T(mContextFactory, mConverterManager, mVertx, address, mDeliveryTimeout)",
+        .addStatement(
+          "$T instance = new $T(mContextFactory, mConverterManager, mSecurityContextManager, mVertx, address, mDeliveryTimeout)",
           pProxyClass.getBaseQualifiedTypeName(), pProxyClass.getProxyQualifiedTypeName());
     }
     else {
       announceMethod = announceMethod
         // Engine instance = new EngineProxy(mContextFactory, mVertx, address);
-        .addStatement("$T instance = new $T(mContextFactory, mVertx, address, mDeliveryTimeout)",
+        .addStatement(
+          "$T instance = new $T(mContextFactory, mSecurityContextManager, mVertx, address, mDeliveryTimeout)",
           pProxyClass.getBaseQualifiedTypeName(), pProxyClass.getProxyQualifiedTypeName());
     }
     announceMethod = announceMethod
@@ -259,6 +264,9 @@ public class ProxyGenerator implements Generator {
 
     builder = builder
       //
+      // private SecurityContextManager mSecurityContextManager;
+      .addField(FieldSpec.builder(SecurityContextManager.class, "mSecurityContextManager", Modifier.PRIVATE).build())
+      //
       // private ServiceDiscovery mServiceDiscovery;
       .addField(FieldSpec.builder(ServiceDiscovery.class, "mServiceDiscovery", Modifier.PRIVATE).build())
       //
@@ -314,6 +322,18 @@ public class ProxyGenerator implements Generator {
           // }
           .build());
     builder = builder
+      //
+      // public void setSecurityContextManager(SecurityContextManager pSecurityContextManager) {
+      .addMethod(MethodSpec.methodBuilder("setSecurityContextManager")
+        .addParameter(ParameterSpec.builder(SecurityContextManager.class, "pSecurityContextManager").build())
+        // ContextFactory.staticReportTrace(EngineProxy.OsgiManager.class, this, pSecurityContextManager);
+        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pSecurityContextManager)", ContextFactory.class,
+          pProxyClass.getProxySimpleName())
+        // mSecurityContextManager = pSecurityContextManager;
+        .addStatement("mSecurityContextManager = pSecurityContextManager")
+        // }
+        .build())
+      //
       //
       // public void setVertx(Vertx pVertx) {
       .addMethod(MethodSpec.methodBuilder("setVertx").addParameter(ParameterSpec.builder(Vertx.class, "pVertx").build())
@@ -443,6 +463,11 @@ public class ProxyGenerator implements Generator {
       builder = builder.addField(
         FieldSpec.builder(ConverterManager.class, "mConverterManager", Modifier.PROTECTED, Modifier.FINAL).build());
 
+    /* **** SecurityContextManager */
+
+    builder = builder.addField(FieldSpec.builder(ClassName.get(SecurityContextManager.class), "mSecurityContextManager",
+      Modifier.PROTECTED, Modifier.FINAL).build());
+
     /* **** Vertx */
 
     ClassName vertxName = ClassName.get("io.vertx.core", "Vertx");
@@ -465,6 +490,7 @@ public class ProxyGenerator implements Generator {
     if (pAnnotatedClass.isNeedsConverter())
       constructorBuilder = constructorBuilder.addParameter(ConverterManager.class, "pConverterManager");
     constructorBuilder = constructorBuilder //
+      .addParameter(SecurityContextManager.class, "pSecurityContextManager") //
       .addParameter(vertxName, "pVertx") //
       .addParameter(String.class, "pAddress")//
       .addParameter(Long.TYPE, "pDeliveryTimeout") //
@@ -473,6 +499,7 @@ public class ProxyGenerator implements Generator {
       constructorBuilder = constructorBuilder //
         .addStatement("$N = $N", "mConverterManager", "pConverterManager");
     constructorBuilder = constructorBuilder //
+      .addStatement("$N = $N", "mSecurityContextManager", "pSecurityContextManager") //
       .addStatement("$N = $N", "mVertx", "pVertx") //
       .addStatement("$N = $N", "mAddress", "pAddress") //
       .addStatement("$N = $N", "mDeliveryTimeout", "pDeliveryTimeout");
@@ -574,9 +601,15 @@ public class ProxyGenerator implements Generator {
       /* Handle UUID */
 
       else if (ClassName.get(UUID.class).equals(typeName.withoutAnnotations())) {
+        if (type.isNullable() == true)
+          pBuilder = pBuilder //
+            .addStatement("@$T String $N_str = ($N == null ? null : $N.toString())", Nullable.class, param.getName(),
+              param.getName(), param.getName());
+        else
+          pBuilder = pBuilder //
+            .addStatement("@$T($S) @$T String $N_str = ($N == null ? null : $N.toString())", SuppressWarnings.class,
+              "null", Nullable.class, param.getName(), param.getName(), param.getName());
         pBuilder = pBuilder //
-          .addStatement("@$T($S) @$T String $N_str = ($N == null ? null : $N.toString())", SuppressWarnings.class,
-            "null", Nullable.class, param.getName(), param.getName(), param.getName())
           .addStatement("message.put($S, $N_str)", param.getName(), param.getName());
       }
 
@@ -690,10 +723,15 @@ public class ProxyGenerator implements Generator {
 
       else if (type.isConverterAvailable() == true) {
         // JsonObject obj = mConverterManager.convert(pObj, JsonObject.class)
-        pBuilder = pBuilder.addStatement(
-          "@$T($S) @$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
-          SuppressWarnings.class, "null", Nullable.class, JsonObject.class, param.getName(), param.getName(),
-          param.getName(), JsonObject.class);
+        if (type.isNullable() == true)
+          pBuilder =
+            pBuilder.addStatement("@$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
+              Nullable.class, JsonObject.class, param.getName(), param.getName(), param.getName(), JsonObject.class);
+        else
+          pBuilder = pBuilder.addStatement(
+            "@$T($S) @$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
+            SuppressWarnings.class, "null", Nullable.class, JsonObject.class, param.getName(), param.getName(),
+            param.getName(), JsonObject.class);
         pBuilder = pBuilder.addStatement("message.put($S, $N_jsonobject)", param.getName(), param.getName());
       }
 
@@ -1156,10 +1194,9 @@ public class ProxyGenerator implements Generator {
             .beginControlFlow("if (replyResult != null)");
         methodBuilder = methodBuilder //
           .addStatement("String address = $T.notNull(replyResult.getString($S))", Verify.class, "address") //
-          .addStatement(
-            returnProxy.isNeedsConverter() == true
-              ? "result.complete(new $TProxy(mContextFactory, mConverterManager, mVertx, address, mDeliveryTimeout))"
-              : "result.complete(new $TProxy(mContextFactory, mVertx, address, mDeliveryTimeout))",
+          .addStatement(returnProxy.isNeedsConverter() == true
+            ? "result.complete(new $TProxy(mContextFactory, mConverterManager, mSecurityContextManager, mVertx, address, mDeliveryTimeout))"
+            : "result.complete(new $TProxy(mContextFactory, mSecurityContextManager, mVertx, address, mDeliveryTimeout))",
             returnTypeName.withoutAnnotations());
         if (actualReturnType.isNullable() == true)
           methodBuilder = methodBuilder //
@@ -1245,6 +1282,21 @@ public class ProxyGenerator implements Generator {
       builder = builder.addCode("\n/* Add the options including the method to call */\n\n")
         .addStatement("$T options = new $T().addHeader($S, $S).setSendTimeout(mDeliveryTimeout)", DeliveryOptions.class,
           DeliveryOptions.class, "action", pProxyMethod.getMethodName()) //
+
+        // SecurityContext securityContext = ctx.getData("securityContext", true, SecurityContext.class);
+        .addStatement("$T securityContext = ctx.getData($S, true, $T.class)", SecurityContext.class, "securityContext",
+          SecurityContext.class)
+
+        // if (securityContext != null) {
+        .beginControlFlow("if (securityContext != null)")
+        // options = options.addHeader("securityContext",
+        // Base64.getEncoder().encodeToString(mSecurityContextManager.serialize(securityContext)));
+        .addStatement(
+          "options = options.addHeader($S, $T.getEncoder().encodeToString(mSecurityContextManager.serialize(securityContext)))",
+          "securityContext", Base64.class)
+        // }
+        .endControlFlow()
+        //
 
         .addCode("\n/* Define the return future */\n\n")
 

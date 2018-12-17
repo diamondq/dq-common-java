@@ -7,9 +7,6 @@ import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -19,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +42,7 @@ public class AbstractOSGiConstructor {
   private static final Set<String> sSKIP_PROPS;
 
   static {
-    Builder<String> b = ImmutableSet.<String> builder();
+    Set<String> b = new HashSet<>();
     b.add(Constants.SERVICE_BUNDLEID);
     b.add(Constants.SERVICE_DESCRIPTION);
     b.add(Constants.SERVICE_EXPORTED_CONFIGS);
@@ -61,7 +59,7 @@ public class AbstractOSGiConstructor {
     b.add(Constants.SERVICE_VENDOR);
     b.add(ConfigurationAdmin.SERVICE_FACTORYPID);
     b.add(ConfigurationAdmin.SERVICE_BUNDLELOCATION);
-    sSKIP_PROPS = b.build();
+    sSKIP_PROPS = Collections.unmodifiableSet(b);
   }
 
   protected final Map<String, FilterTracker> mTrackers = new HashMap<>();
@@ -102,7 +100,7 @@ public class AbstractOSGiConstructor {
     try (Context context = mContextFactory.newContext(AbstractOSGiConstructor.class, this, pContext, pProps)) {
       synchronized (this) {
         mComponentContext = pContext;
-        mCurrentProps = ImmutableMap.copyOf(pProps);
+        mCurrentProps = Collections.unmodifiableMap(pProps);
       }
       processProperties();
     }
@@ -116,7 +114,7 @@ public class AbstractOSGiConstructor {
 
       synchronized (this) {
         mComponentContext = pContext;
-        mCurrentProps = ImmutableMap.copyOf(pProps);
+        mCurrentProps = Collections.unmodifiableMap(pProps);
       }
       processProperties();
     }

@@ -4,8 +4,8 @@ import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.misc.errors.Verify;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
-import com.google.common.collect.Iterables;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -117,12 +117,12 @@ public class SLF4JReporter {
         for (Measurement measurement : meter.measure()) {
           Statistic statistic = measurement.getStatistic();
           double value = measurement.getValue();
-          if (tags.isEmpty() == false)
-            context.info("{}({}) / {} = {} : {}", name, String.join(", ", Iterables.transform(tags, (t) -> {
-              if (t == null)
-                throw new IllegalArgumentException();
-              return t.toString();
-            })), type, statistic, value);
+          if (tags.isEmpty() == false) {
+            List<String> tagStrings = new ArrayList<>();
+            for (Tag tag : tags)
+              tagStrings.add(tag.toString());
+            context.info("{}({}) / {} = {} : {}", name, String.join(", ", tagStrings), type, statistic, value);
+          }
           else
             context.info("{} / {} = {} : {}", name, type, statistic, value);
         }

@@ -4,6 +4,8 @@ import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
+import com.diamondq.common.security.acl.api.SecurityContext;
+import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
@@ -39,6 +41,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -151,6 +154,12 @@ public class ImplGenerator implements Generator {
       builder = builder.addField(
         FieldSpec.builder(ConverterManager.class, "mConverterManager", Modifier.PROTECTED, Modifier.FINAL).build());
 
+    builder = builder
+      //
+      // private SecurityContextManager mSecurityContextManager;
+      .addField(FieldSpec
+        .builder(SecurityContextManager.class, "mSecurityContextManager", Modifier.PROTECTED, Modifier.FINAL).build());
+
     builder = builder.addField(FieldSpec.builder(ParameterizedTypeName.get(MessageConsumer.class, JsonObject.class)
       .annotated(AnnotationSpec.builder(Nullable.class).build()), "mConsumer", Modifier.PRIVATE).build());
 
@@ -184,9 +193,12 @@ public class ImplGenerator implements Generator {
       .addParameter(contextFactoryName, "pContextFactory");
     if (pImplClass.isNeedsConverter() == true)
       constructorBuilder = constructorBuilder.addParameter(ConverterManager.class, "pConverterManager");
+    constructorBuilder = constructorBuilder.addParameter(SecurityContextManager.class, "pSecurityContextManager");
     constructorBuilder = constructorBuilder.addStatement("$N = $N", "mContextFactory", "pContextFactory");
     if (pImplClass.isNeedsConverter() == true)
       constructorBuilder = constructorBuilder.addStatement("$N = $N", "mConverterManager", "pConverterManager");
+    constructorBuilder =
+      constructorBuilder.addStatement("$N = $N", "mSecurityContextManager", "pSecurityContextManager");
 
     builder = builder.addMethod(constructorBuilder.build());
 
@@ -220,14 +232,44 @@ public class ImplGenerator implements Generator {
       .addCode("\n/* Get the action */\n\n")
       // String action = m.headers().get("action");
       .addStatement("String action = $T.notNull(pMessage.headers().get($S))", Verify.class, "action")
+
+      // /* Propagate the SecurityContext */
       //
-      .addCode("\n")
-      // JsonObject body = Verify.notNull(m.body());
-      .addStatement("$T body = $T.notNull(pMessage.body())", JsonObject.class, Verify.class)
-      //
-      // /* Now handle each of the possible actions */
-      //
-      .addCode("\n/* Now handle each of the possible actions */\n\n");
+      .addCode("\n/* Propagate the SecurityContext */\n\n")
+      // @Nullable String securityContextStr = pMessage.headers().get("securityContext");
+      .addStatement("@$T String securityContextStr = pMessage.headers().get($S)", Nullable.class, "securityContext")
+      // if (securityContextStr != null) {
+      .beginControlFlow("if (securityContextStr != null)")
+      // SecurityContext securityContext =
+      // mSecurityContextManager.deserialize(Base64.getDecoder().decode(securityContextStr));
+      .addStatement(
+        "$T securityContext = mSecurityContextManager.deserialize($T.getDecoder().decode(securityContextStr))",
+        SecurityContext.class, Base64.class)
+      // ctx.setData("securityContext", securityContext);
+      .addStatement("ctx.setData($S, securityContext)", "securityContext")
+      // }
+      .endControlFlow();
+
+    /* Make sure there is at least one parameter */
+
+    boolean hasParams = false;
+    for (ProxyMethod proxyMethod : pImplClass.getMethods()) {
+      if (proxyMethod.getParameters().isEmpty() == false) {
+        hasParams = true;
+        break;
+      }
+    }
+
+    if (hasParams == true)
+      methodBuilder = methodBuilder
+        //
+        .addCode("\n")
+        // JsonObject body = Verify.notNull(m.body());
+        .addStatement("$T body = $T.notNull(pMessage.body())", JsonObject.class, Verify.class);
+    //
+    // /* Now handle each of the possible actions */
+    //
+    methodBuilder = methodBuilder.addCode("\n/* Now handle each of the possible actions */\n\n");
 
     boolean isFirstMethod = true;
     for (ProxyMethod proxyMethod : pImplClass.getMethods()) {
@@ -405,9 +447,9 @@ public class ImplGenerator implements Generator {
         else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
           methodBuilder = methodBuilder
             // @Nullable String str = body.getString("a");
-            .addStatement("@T String $N_str = body.getString($S)", Nullable.class, param.getName(), param.getName())
+            .addStatement("@$T String $N_str = body.getString($S)", Nullable.class, param.getName(), param.getName())
             // @Nullable UUID uuid = (str == null ? null : UUID.fromString(str));
-            .addStatement("@T $T $N = ($N_str == null ? null : $T.fromString($N_str))", Nullable.class, UUID.class,
+            .addStatement("@$T $T $N = ($N_str == null ? null : $T.fromString($N_str))", Nullable.class, UUID.class,
               param.getName(), param.getName(), UUID.class, param.getName());
         }
 
@@ -509,7 +551,7 @@ public class ImplGenerator implements Generator {
             else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build())
               .equals(itemTypeName)) {
               methodBuilder = methodBuilder //
-                .addStatement("@T String $N_string = $N_jsonarray.getString(i)", Nullable.class, param.getName(),
+                .addStatement("@$T String $N_string = $N_jsonarray.getString(i)", Nullable.class, param.getName(),
                   param.getName())
                 .addStatement("$N.add($N_string == null ? null : $T.fromString($N_string))", param.getName(),
                   param.getName(), UUID.class, param.getName());
@@ -520,8 +562,9 @@ public class ImplGenerator implements Generator {
                   .addStatement("@$T $T $N_jsonobject = $N_jsonarray.getJsonObject(i)", Nullable.class,
                     JsonObject.class, param.getName(), param.getName())
                   .addStatement(
-                    "@$T $T $N_obj = ($N_jsonobject == null ? null : mConverter.convert($N_json, $T.class))",
-                    Nullable.class, itemTypeName, param.getName(), param.getName(), param.getName(), itemTypeName)
+                    "@$T $T $N_obj = ($N_jsonobject == null ? null : mConverterManager.convert($N_json, $T.class))",
+                    Nullable.class, itemTypeName.withoutAnnotations(), param.getName(), param.getName(),
+                    param.getName(), itemTypeName.withoutAnnotations())
                   .addStatement("$N.add($N_obj)", param.getName(), param.getName())
                 //
                 ;
@@ -565,8 +608,8 @@ public class ImplGenerator implements Generator {
             .addStatement("String $N_address = $T.notNull($N_json.getString($S))", param.getName(), Verify.class,
               param.getName(), "address") //
             .addStatement(proxyClass.isNeedsConverter() == true
-              ? "$T $N = new $TProxy(mContextFactory, mConverterManager, vertx, $N_address, Long.parseLong(System.getProperty($S, $S)) * 1000L)"
-              : "$T $N = new $TProxy(mContextFactory, vertx, $N_address, Long.parseLong(System.getProperty($S, $S)) * 1000L)",
+              ? "$T $N = new $TProxy(mContextFactory, mConverterManager, mSecurityContextManager, vertx, $N_address, Long.parseLong(System.getProperty($S, $S)) * 1000L)"
+              : "$T $N = new $TProxy(mContextFactory, mSecurityContextManager, vertx, $N_address, Long.parseLong(System.getProperty($S, $S)) * 1000L)",
               typeName, param.getName(), typeName, param.getName(), "vertx-delivery-timeout", "30")
           //
           ;
@@ -585,15 +628,16 @@ public class ImplGenerator implements Generator {
                 JsonObject.class, param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
             // MyObject obj = mConverterManager.convert(obj_json, MyObject.class);
             methodBuilder = methodBuilder.addStatement("$T $N = mConverterManager.convert($N_json, $T.class)", typeName,
-              param.getName(), param.getName(), typeName);
+              param.getName(), param.getName(), typeName.withoutAnnotations());
           }
           else {
-            methodBuilder = methodBuilder.addStatement("@T $T $N_json = body.getJsonObject($S)", Nullable.class,
+            methodBuilder = methodBuilder.addStatement("@$T $T $N_json = body.getJsonObject($S)", Nullable.class,
               JsonObject.class, param.getName(), param.getName());
-            // MyObject obj = mConverter.convert(obj_json, MyObject.class);
-            methodBuilder =
-              methodBuilder.addStatement("@T $T $N = $N_json == null ? null : mConverter.convert($N_json, $T.class)",
-                Nullable.class, typeName, param.getName(), param.getName(), param.getName(), typeName);
+            // MyObject obj = mConverterManager.convert(obj_json, MyObject.class);
+            methodBuilder = methodBuilder.addStatement(
+              "@$T $T $N = $N_json == null ? null : mConverterManager.convert($N_json, $T.class)", Nullable.class,
+              typeName.withoutAnnotations(), param.getName(), param.getName(), param.getName(),
+              typeName.withoutAnnotations());
           }
         }
 
@@ -1157,8 +1201,8 @@ public class ImplGenerator implements Generator {
       // mSelfProxy = new LocalFileEngineProxy(mContextFactory, vertx, address,
       // Long.parseLong(System.getProperty("vertx-delivery-timeout", "30")) * 1000L);
       .addStatement(pImplClass.isNeedsConverter()
-        ? "mSelfProxy = new $NProxy(mContextFactory, mConverterManager, vertx, mAddress, Long.parseLong(System.getProperty($S, $S)) * 1000L)"
-        : "mSelfProxy = new $NProxy(mContextFactory, vertx, mAddress, Long.parseLong(System.getProperty($S, $S)) * 1000L)",
+        ? "mSelfProxy = new $NProxy(mContextFactory, mConverterManager, mSecurityContextManager, vertx, mAddress, Long.parseLong(System.getProperty($S, $S)) * 1000L)"
+        : "mSelfProxy = new $NProxy(mContextFactory, mSecurityContextManager, vertx, mAddress, Long.parseLong(System.getProperty($S, $S)) * 1000L)",
         pImplClass.getBaseSimpleName(), "vertx-delivery-timeout", "30")
       //
       // /* Register a handler to callback when the consumer is fully registered */

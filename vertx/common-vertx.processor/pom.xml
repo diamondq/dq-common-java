@@ -29,6 +29,10 @@
       <artifactId>common-utils.misc</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-security.acl</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.auto.service</groupId>
       <artifactId>auto-service</artifactId>
       <optional>true</optional>

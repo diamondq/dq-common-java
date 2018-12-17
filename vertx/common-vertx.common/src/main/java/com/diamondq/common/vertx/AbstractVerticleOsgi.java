@@ -1,5 +1,6 @@
 package com.diamondq.common.vertx;
 
+import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
@@ -27,6 +28,8 @@ public abstract class AbstractVerticleOsgi {
   protected ContextFactory                          mContextFactory;
 
   protected ConverterManager                        mConverterManager;
+
+  protected SecurityContextManager                  mSecurityContextManager;
 
   protected ServiceDiscovery                        mServiceDiscovery;
 
@@ -76,6 +79,11 @@ public abstract class AbstractVerticleOsgi {
     mConverterManager = pConverterManager;
   }
 
+  public void setSecurityContextManager(SecurityContextManager pSecurityContextManager) {
+    ContextFactory.staticReportTrace(AbstractVerticleOsgi.class, this, pSecurityContextManager);
+    mSecurityContextManager = pSecurityContextManager;
+  }
+  
   public void setServiceDiscovery(ServiceDiscovery pServiceDiscovery) {
     ContextFactory.staticReportTrace(AbstractVerticleOsgi.class, this, pServiceDiscovery);
     mServiceDiscovery = pServiceDiscovery;
@@ -93,6 +101,7 @@ public abstract class AbstractVerticleOsgi {
     Verify.notNullArg(mContextFactory, MiscMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
     try (Context ctx = mContextFactory.newContext(AbstractVerticleOsgi.class, this)) {
       Verify.notNullArg(mConverterManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", pid);
+      Verify.notNullArg(mSecurityContextManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager", pid);
       Verify.notNullArg(mServiceDiscovery, MiscMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", pid);
       Verify.notNullArg(mVertx, MiscMessages.VERIFY_DEPENDENCY_MISSING, "vertx", pid);
       try {

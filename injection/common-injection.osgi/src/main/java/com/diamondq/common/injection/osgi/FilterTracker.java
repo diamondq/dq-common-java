@@ -1,11 +1,9 @@
 package com.diamondq.common.injection.osgi;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -56,12 +54,12 @@ public class FilterTracker implements ServiceTrackerCustomizer<Object, Object> {
 
   public FilterTracker(BundleContext pContext) {
     mBundleContext = pContext;
-    mReferences = Maps.newHashMap();
-    mRankedReferences = Lists.newArrayList();
+    mReferences = new HashMap<>();
+    mRankedReferences = new ArrayList<>();
   }
 
   public List<Triplet<Integer, Long, ServiceReference<Object>>> getReferences() {
-    return ImmutableList.copyOf(mRankedReferences);
+    return Collections.unmodifiableList(mRankedReferences);
   }
 
   public void closeForRebuild() {

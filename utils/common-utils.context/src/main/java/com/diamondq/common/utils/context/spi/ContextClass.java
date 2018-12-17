@@ -495,4 +495,20 @@ public class ContextClass implements Context {
   public @Nullable ContextClass getParentContextClass() {
     return mParentContextClass;
   }
+
+  /**
+   * @see com.diamondq.common.utils.context.Context#getRootContext()
+   */
+  @Override
+  public Context getRootContext() {
+    ContextClass current = this;
+    while (true) {
+      ContextClass parent = current.getParentContextClass();
+      if (parent == current)
+        throw new IllegalStateException();
+      if (parent == null)
+        return current;
+      current = parent;
+    }
+  }
 }

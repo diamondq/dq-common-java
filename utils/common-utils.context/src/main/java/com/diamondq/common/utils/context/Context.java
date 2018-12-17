@@ -11,6 +11,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface Context extends AutoCloseable {
 
   /**
+   * Returns the root context
+   * 
+   * @return the root context
+   */
+  public Context getRootContext();
+
+  /**
    * Report an explicit exit value for the context
    * 
    * @param pResult the exit value
