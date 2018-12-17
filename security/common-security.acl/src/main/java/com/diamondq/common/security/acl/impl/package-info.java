@@ -1,6 +1,6 @@
 /**
- * Information about the common.security.acl.model package
+ * Information about the common.security.acl.impl package
  */
 @org.checkerframework.framework.qual.DefaultQualifier(value = org.checkerframework.checker.nullness.qual.NonNull.class)
 @org.eclipse.jdt.annotation.NonNullByDefault
-package com.diamondq.common.security.acl.model;
+package com.diamondq.common.security.acl.impl;
