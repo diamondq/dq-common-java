@@ -101,7 +101,7 @@ public class FutureUtils {
   public static <T, U extends ExtendedCompletionStage<List<T>>> U listOf(
     List<? extends ExtendedCompletionStage<T>> pList) {
     try {
-      Object resultObj = listOfFutureMethod.invoke(pList);
+      Object resultObj = listOfFutureMethod.invoke(null, pList);
       @SuppressWarnings("unchecked")
       U result = (U) resultObj;
       return result;
