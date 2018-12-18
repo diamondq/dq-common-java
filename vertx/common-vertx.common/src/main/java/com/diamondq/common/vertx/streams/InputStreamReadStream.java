@@ -164,4 +164,11 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
     return this;
   }
 
+  /**
+   * @see io.vertx.core.streams.ReadStream#fetch(long)
+   */
+  @Override
+  public ReadStream<Buffer> fetch(long pAmount) {
+    throw new UnsupportedOperationException();
+  }
 }
