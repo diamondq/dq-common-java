@@ -381,6 +381,10 @@ public class ProxyGenerator implements Generator {
       // Verify.notNullArg(mServiceDiscovery, MiscMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", servicePid);
       .addStatement("$T.notNullArg(mServiceDiscovery, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
         MiscMessages.class, "serviceDiscovery")
+      // Verify.notNullArg(mSecurityContextManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager",
+      // servicePid);
+      .addStatement("$T.notNullArg(mSecurityContextManager, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)",
+        Verify.class, MiscMessages.class, "securityContextManager")
       //
       // /* Parse configuration properties */
       //
@@ -494,15 +498,15 @@ public class ProxyGenerator implements Generator {
       .addParameter(vertxName, "pVertx") //
       .addParameter(String.class, "pAddress")//
       .addParameter(Long.TYPE, "pDeliveryTimeout") //
-      .addStatement("$N = $N", "mContextFactory", "pContextFactory");
+      .addStatement("mContextFactory = $T.notNull(pContextFactory)", Verify.class);
     if (pAnnotatedClass.isNeedsConverter())
       constructorBuilder = constructorBuilder //
-        .addStatement("$N = $N", "mConverterManager", "pConverterManager");
+        .addStatement("mConverterManager = $T.notNull(pConverterManager)", Verify.class);
     constructorBuilder = constructorBuilder //
-      .addStatement("$N = $N", "mSecurityContextManager", "pSecurityContextManager") //
-      .addStatement("$N = $N", "mVertx", "pVertx") //
-      .addStatement("$N = $N", "mAddress", "pAddress") //
-      .addStatement("$N = $N", "mDeliveryTimeout", "pDeliveryTimeout");
+      .addStatement("mSecurityContextManager = $T.notNull(pSecurityContextManager)", Verify.class)
+      .addStatement("mVertx = $T.notNull(pVertx)", Verify.class)
+      .addStatement("mAddress = $T.notNull(pAddress)", Verify.class)
+      .addStatement("mDeliveryTimeout = pDeliveryTimeout");
 
     builder = builder.addMethod(constructorBuilder.build());
 
