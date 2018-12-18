@@ -8,13 +8,14 @@
       <pattern><![CDATA[%d{HH:mm:ss.SSS} [%-16.16thread] %-5level %-36.36logger{36} - %-15.15DQMDC{ctx} - %DQMDC{DQIndent}%DQIfMDC{!DQIndent,!DQT,!ctx,!bundle.id,!bundle.name,!bundle.version,!slf4j.marker,-\s}%DQMDC{!DQIndent,!DQT,!ctx,!bundle.id,!bundle.name,!bundle.version,!slf4j.marker}%DQIfMDC{!DQIndent,!DQT,!ctx,!bundle.id,!bundle.name,!bundle.version,!slf4j.marker,\s}%msg%n]]></pattern>
     </encoder>
   </appender>
-  <if condition='property("env.eclipse").equals("false") == false'>
+  <if condition='property("env.eclipse").equals("true") == false'>
     <then>
-      <logger name="com.diamondq" level="TRACE" />
+      <logger name="com.diamondq" level="DEBUG" />
       <logger name="com.diamondq.common.vertx.EventBusManager" level="TRACE" />
       <logger name="com.diamondq.common.metrics.micrometer" level="WARN" />
     </then>
   </if>
+  <logger name="io.netty.util.internal.PlatformDependent0" level="INFO" />
   <logger name="org.codehaus.janino" level="INFO" />
   <logger name="io.netty.channel.nio.NioEventLoop" level="INFO" />
   <root level="TRACE">
