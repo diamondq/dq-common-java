@@ -17,7 +17,8 @@ public class JDBCColumnDefinitionBuilder extends KVColumnDefinitionBuilder<JDBCC
     KVColumnType type = mType;
     if (type == null)
       throw new IllegalArgumentException("The type was not set in the JDBCColumnDefinitionBuilder");
-    return new JDBCColumnDefinition(name, type, mIsPrimaryKey, mMaxLength, mMinValue, mMaxValue);
+    return new JDBCColumnDefinition(name, type, mIsPrimaryKey, mMaxLength, mMinValue, mMaxValue, mAutoIncrementStart,
+      mAutoIncrementBy);
   }
 
 }

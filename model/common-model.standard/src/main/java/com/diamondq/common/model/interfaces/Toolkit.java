@@ -485,6 +485,16 @@ public interface Toolkit {
     @Nullable Map<String, Object> pParamValues);
 
   /**
+   * Executes a previously written query and returns the number of matching records
+   * 
+   * @param pScope the scope
+   * @param pQuery the query
+   * @param pParamValues the map of parameters
+   * @return the number of matching records
+   */
+  public int countByQuery(Scope pScope, ModelQuery pQuery, @Nullable Map<String, Object> pParamValues);
+
+  /**
    * Creates a new standard migration
    *
    * @param pScope the scope
@@ -546,4 +556,12 @@ public interface Toolkit {
    * @return the StructureDefinition
    */
   public StructureDefinition populateStructureDefinition(Scope pScope, byte[] pBytes);
+
+  /**
+   * Deletes all structures for the given structure definition
+   * 
+   * @param pScope the scope
+   * @param pStructureDef the structure definition
+   */
+  public void clearStructures(Scope pScope, StructureDefinition pStructureDef);
 }

@@ -9,20 +9,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class GenericKVColumnDefinition implements IKVColumnDefinition {
 
-  private final String       mName;
+  private final String               mName;
 
-  private final KVColumnType mType;
+  private final KVColumnType         mType;
 
-  private final boolean      mIsPrimaryKey;
+  private final boolean              mIsPrimaryKey;
 
-  @Nullable
-  private final Integer      mMaxLength;
+  private final @Nullable Integer    mMaxLength;
 
-  @Nullable
-  private final BigDecimal   mMinValue;
+  private final @Nullable BigDecimal mMinValue;
 
-  @Nullable
-  private final BigDecimal   mMaxValue;
+  private final @Nullable BigDecimal mMaxValue;
+
+  private final @Nullable BigDecimal mAutoIncrementStart;
+
+  private final @Nullable BigDecimal mAutoIncrementBy;
 
   /**
    * Default constructor
@@ -33,9 +34,12 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
    * @param pMaxLength the max length (can be null)
    * @param pMinValue the min value (can be null)
    * @param pMaxValue the max value (can be null)
+   * @param pAutoIncrementBy
+   * @param pAutoIncrementStart
    */
   public GenericKVColumnDefinition(String pName, KVColumnType pType, boolean pIsPrimaryKey,
-    @Nullable Integer pMaxLength, @Nullable BigDecimal pMinValue, @Nullable BigDecimal pMaxValue) {
+    @Nullable Integer pMaxLength, @Nullable BigDecimal pMinValue, @Nullable BigDecimal pMaxValue,
+    @Nullable BigDecimal pAutoIncrementStart, @Nullable BigDecimal pAutoIncrementBy) {
     super();
     mName = pName;
     mType = pType;
@@ -43,6 +47,8 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
     mMaxLength = pMaxLength;
     mMinValue = pMinValue;
     mMaxValue = pMaxValue;
+    mAutoIncrementStart = pAutoIncrementStart;
+    mAutoIncrementBy = pAutoIncrementBy;
   }
 
   /**
@@ -93,4 +99,19 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
     return mMaxValue;
   }
 
+  /**
+   * @see com.diamondq.common.storage.kv.IKVColumnDefinition#getAutoIncrementStart()
+   */
+  @Override
+  public @Nullable BigDecimal getAutoIncrementStart() {
+    return mAutoIncrementStart;
+  }
+
+  /**
+   * @see com.diamondq.common.storage.kv.IKVColumnDefinition#getAutoIncrementBy()
+   */
+  @Override
+  public @Nullable BigDecimal getAutoIncrementBy() {
+    return mAutoIncrementBy;
+  }
 }

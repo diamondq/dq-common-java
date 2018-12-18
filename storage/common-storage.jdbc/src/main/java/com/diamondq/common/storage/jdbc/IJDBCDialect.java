@@ -1,5 +1,7 @@
 package com.diamondq.common.storage.jdbc;
 
+import com.diamondq.common.storage.kv.KVColumnType;
+
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -83,4 +85,7 @@ public interface IJDBCDialect {
   public void writeBinary(PreparedStatement pPs, int pIndex, byte @Nullable [] pValue) throws SQLException;
 
   public Set<@NonNull String> getReservedWords();
+
+  public String getAutoIncrement(KVColumnType pType, BigDecimal pAutoIncrementStart,
+    @Nullable BigDecimal pAutoIncrementBy);
 }

@@ -189,4 +189,9 @@ public interface PersistenceLayer {
 
   public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope);
 
+  public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef);
+
+  public int countByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
+    @Nullable Map<String, Object> pParamValues);
+
 }

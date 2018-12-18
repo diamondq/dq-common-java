@@ -465,14 +465,26 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
                   }
                   else
                     sb.append(mDialect.getUnlimitedDecimalType());
+                  BigDecimal autoIncrementStart = cd.getAutoIncrementStart();
+                  BigDecimal autoIncrementBy = cd.getAutoIncrementBy();
+                  if (autoIncrementStart != null)
+                    sb.append(' ').append(mDialect.getAutoIncrement(cd.getType(), autoIncrementStart, autoIncrementBy));
                   break;
                 }
                 case Integer: {
                   sb.append(mDialect.getIntegerType());
+                  BigDecimal autoIncrementStart = cd.getAutoIncrementStart();
+                  BigDecimal autoIncrementBy = cd.getAutoIncrementBy();
+                  if (autoIncrementStart != null)
+                    sb.append(' ').append(mDialect.getAutoIncrement(cd.getType(), autoIncrementStart, autoIncrementBy));
                   break;
                 }
                 case Long: {
                   sb.append(mDialect.getLongType());
+                  BigDecimal autoIncrementStart = cd.getAutoIncrementStart();
+                  BigDecimal autoIncrementBy = cd.getAutoIncrementBy();
+                  if (autoIncrementStart != null)
+                    sb.append(' ').append(mDialect.getAutoIncrement(cd.getType(), autoIncrementStart, autoIncrementBy));
                   break;
                 }
                 case String: {

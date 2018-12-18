@@ -109,4 +109,13 @@ public interface IKVTransaction {
    * @return the result list
    */
   public <O> List<O> executeQuery(Query pQuery, Class<O> pClass, Map<String, Object> pParamValues);
+
+  /**
+   * Executes the given query but returns the count of records
+   * 
+   * @param pQuery the query
+   * @param pParamValues the parameters
+   * @return the count
+   */
+  public int countQuery(Query pQuery, Map<String, Object> pParamValues);
 }

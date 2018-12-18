@@ -142,4 +142,10 @@ public interface AsyncPersistenceLayer {
   public ContextExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(
     AsyncToolkit pToolkit, Scope pScope, String pDefName);
 
+  public ContextExtendedCompletionStage<@Nullable Void> clearStructures(AsyncToolkit pToolkit, Scope pScope,
+    StructureDefinition pStructureDef);
+
+  public ContextExtendedCompletionStage<Integer> countByQuery(AsyncToolkit pToolkit, Scope pScope, ModelQuery pQuery,
+    @Nullable Map<String, Object> pParamValues);
+
 }

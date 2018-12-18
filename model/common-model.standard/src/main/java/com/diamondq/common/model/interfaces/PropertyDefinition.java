@@ -129,7 +129,13 @@ public interface PropertyDefinition
 
   public PropertyDefinition setPropertyPattern(PropertyPattern pValue);
 
+  public @Nullable BigDecimal getAutoIncrementStart();
+
+  public @Nullable BigDecimal getAutoIncrementBy();
+
+  public PropertyDefinition setAutoIncrement(@Nullable BigDecimal pStart, @Nullable BigDecimal pIncrementBy);
+
   public Scope getScope();
-  
+
   public byte[] saveToByteArray();
 }

@@ -12,22 +12,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDefinitionBuilder<@NonNull CDB>> {
 
-  @Nullable
-  protected String       mName;
+  protected @Nullable String       mName;
 
-  @Nullable
-  protected Integer      mMaxLength;
+  protected @Nullable Integer      mMaxLength;
 
-  @Nullable
-  protected BigDecimal   mMinValue;
+  protected @Nullable BigDecimal   mMinValue;
 
-  @Nullable
-  protected BigDecimal   mMaxValue;
+  protected @Nullable BigDecimal   mMaxValue;
 
-  @Nullable
-  protected KVColumnType mType;
+  protected @Nullable KVColumnType mType;
 
-  protected boolean      mIsPrimaryKey = false;
+  protected boolean                mIsPrimaryKey = false;
+
+  protected @Nullable BigDecimal   mAutoIncrementStart;
+
+  protected @Nullable BigDecimal   mAutoIncrementBy;
 
   /**
    * Sets the name
@@ -97,6 +96,30 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
   @SuppressWarnings("unchecked")
   public CDB maxValue(BigDecimal pValue) {
     mMaxValue = pValue;
+    return (CDB) this;
+  }
+
+  /**
+   * Sets the autoincrement start value
+   * 
+   * @param pValue the value
+   * @return the builder
+   */
+  @SuppressWarnings("unchecked")
+  public CDB autoIncrementStart(@Nullable BigDecimal pValue) {
+    mAutoIncrementStart = pValue;
+    return (CDB) this;
+  }
+
+  /**
+   * Sets the autoincrement by value
+   * 
+   * @param pValue the value
+   * @return the builder
+   */
+  @SuppressWarnings("unchecked")
+  public CDB autoIncrementBy(@Nullable BigDecimal pValue) {
+    mAutoIncrementBy = pValue;
     return (CDB) this;
   }
 

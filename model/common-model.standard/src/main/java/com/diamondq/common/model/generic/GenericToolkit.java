@@ -588,4 +588,22 @@ public class GenericToolkit implements Toolkit {
   public StructureDefinition populateStructureDefinition(Scope pScope, byte[] pBytes) {
     return getPersistenceLayer(pScope).populateStructureDefinition(this, pScope, pBytes);
   }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#clearStructures(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public void clearStructures(Scope pScope, StructureDefinition pStructureDef) {
+    getPersistenceLayer(pScope).clearStructures(this, pScope, pStructureDef);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#countByQuery(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   */
+  @Override
+  public int countByQuery(Scope pScope, ModelQuery pQuery, @Nullable Map<String, Object> pParamValues) {
+    return getPersistenceLayer(pScope).countByQuery(this, pScope, pQuery, pParamValues);
+  }
 }

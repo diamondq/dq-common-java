@@ -132,7 +132,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
   public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope, String pName,
     PropertyType pType) {
     return new GenericPropertyDefinition(pScope, pName, null, false, 0, pType, null, null, null, null, null, null, null,
-      false, PropertyPattern.Normal, null);
+      false, PropertyPattern.Normal, null, null, null);
   }
 
   /**
@@ -724,6 +724,16 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
 
       return context.exit(ImmutableList.copyOf(results));
     }
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#countByQuery(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   */
+  @Override
+  public int countByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    return lookupStructuresByQuery(pToolkit, pScope, pQuery, pParamValues).size();
   }
 
   /**

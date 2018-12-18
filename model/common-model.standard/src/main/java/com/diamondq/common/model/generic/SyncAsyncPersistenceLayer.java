@@ -406,4 +406,25 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
       mPersistenceLayer.lookupLatestStructureDefinitionRevision(pToolkit.getSyncToolkit(), pScope, pDefName));
   }
 
+  /**
+   * @see com.diamondq.common.model.generic.AsyncPersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.AsyncToolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public ContextExtendedCompletionStage<@Nullable Void> clearStructures(AsyncToolkit pToolkit, Scope pScope,
+    StructureDefinition pStructureDef) {
+    mPersistenceLayer.clearStructures(pToolkit.getSyncToolkit(), pScope, pStructureDef);
+    return FutureUtils.completedFuture(null);
+  }
+
+  /**
+   * @see com.diamondq.common.model.generic.AsyncPersistenceLayer#countByQuery(com.diamondq.common.model.interfaces.AsyncToolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   */
+  @Override
+  public ContextExtendedCompletionStage<Integer> countByQuery(AsyncToolkit pToolkit, Scope pScope, ModelQuery pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    return FutureUtils
+      .completedFuture(mPersistenceLayer.countByQuery(pToolkit.getSyncToolkit(), pScope, pQuery, pParamValues));
+  }
 }

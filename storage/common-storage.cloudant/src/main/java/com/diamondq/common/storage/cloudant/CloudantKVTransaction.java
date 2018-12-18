@@ -179,4 +179,12 @@ public class CloudantKVTransaction implements IKVTransaction {
   public <O> List<O> executeQuery(Query pQuery, Class<O> pClass, Map<String, Object> pParamValues) {
     throw new UnsupportedOperationException();
   }
+
+  /**
+   * @see com.diamondq.common.storage.kv.IKVTransaction#countQuery(com.diamondq.common.storage.kv.Query, java.util.Map)
+   */
+  @Override
+  public int countQuery(Query pQuery, Map<String, Object> pParamValues) {
+    throw new UnsupportedOperationException();
+  }
 }

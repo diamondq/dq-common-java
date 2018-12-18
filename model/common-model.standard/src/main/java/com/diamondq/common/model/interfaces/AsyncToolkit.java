@@ -309,6 +309,17 @@ public interface AsyncToolkit {
     @Nullable Map<String, Object> pParamValues);
 
   /**
+   * Executes a previously written query and returns the number of matching records
+   * 
+   * @param pScope the scope
+   * @param pQuery the query
+   * @param pParamValues the map of parameters
+   * @return the number of matching records
+   */
+  public ContextExtendedCompletionStage<Integer> countByQuery(Scope pScope, ModelQuery pQuery,
+    @Nullable Map<String, Object> pParamValues);
+
+  /**
    * Creates a new standard migration
    *
    * @param pScope the scope
@@ -362,4 +373,13 @@ public interface AsyncToolkit {
    */
   public Toolkit getSyncToolkit();
 
+  /**
+   * Deletes all structures for the given structure definition
+   * 
+   * @param pScope the scope
+   * @param pStructureDef the structure definition
+   * @return the future
+   */
+  public ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope,
+    StructureDefinition pStructureDef);
 }

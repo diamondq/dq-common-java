@@ -310,4 +310,12 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef) {
+    throw new UnsupportedOperationException();
+  }
 }

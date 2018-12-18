@@ -1,5 +1,6 @@
 package com.diamondq.common.storage.jdbc.dialects;
 
+import com.diamondq.common.storage.kv.KVColumnType;
 import com.google.common.collect.ImmutableSet;
 
 import java.math.BigDecimal;
@@ -329,4 +330,19 @@ public class PostgreSQL extends AbstractDialect {
     return sRESERVED_WORDS;
   }
 
+  /**
+   * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getAutoIncrement(com.diamondq.common.storage.kv.KVColumnType,
+   *      java.math.BigDecimal, java.math.BigDecimal)
+   */
+  @Override
+  public String getAutoIncrement(KVColumnType pType, BigDecimal pAutoIncrementStart,
+    @Nullable BigDecimal pAutoIncrementBy) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("GENERATED AS IDENTITY(START WITH )");
+    sb.append(pAutoIncrementStart.toPlainString());
+    if (pAutoIncrementBy != null)
+      sb.append(" INCREMENT BY ").append(pAutoIncrementBy.toPlainString());
+    sb.append(')');
+    return sb.toString();
+  }
 }

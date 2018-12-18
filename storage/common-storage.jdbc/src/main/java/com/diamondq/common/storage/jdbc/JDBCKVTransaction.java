@@ -519,4 +519,11 @@ public class JDBCKVTransaction implements IKVTransaction {
     }
   }
 
+  /**
+   * @see com.diamondq.common.storage.kv.IKVTransaction#countQuery(com.diamondq.common.storage.kv.Query, java.util.Map)
+   */
+  @Override
+  public int countQuery(Query pQuery, Map<String, Object> pParamValues) {
+    throw new UnsupportedOperationException();
+  }
 }

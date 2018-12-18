@@ -50,4 +50,19 @@ public interface IKVColumnDefinition {
    * @return the max value (or null if it doesn't apply)
    */
   public @Nullable BigDecimal getMaxValue();
+
+  /**
+   * Returns the autoincrement start value
+   * 
+   * @return the value (or null if it doesn't apply)
+   */
+  public @Nullable BigDecimal getAutoIncrementStart();
+
+  /**
+   * Returns the autoincrement by value
+   * 
+   * @return the value (or null if it doesn't apply)
+   */
+  public @Nullable BigDecimal getAutoIncrementBy();
+
 }

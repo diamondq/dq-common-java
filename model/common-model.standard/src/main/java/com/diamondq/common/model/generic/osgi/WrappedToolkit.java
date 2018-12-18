@@ -648,4 +648,22 @@ public class WrappedToolkit implements Toolkit {
   public StructureDefinition populateStructureDefinition(Scope pScope, byte[] pBytes) {
     return mToolkit.populateStructureDefinition(dewrapScope(pScope), pBytes);
   }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#clearStructures(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public void clearStructures(Scope pScope, StructureDefinition pStructureDef) {
+    mToolkit.clearStructures(dewrapScope(pScope), pStructureDef);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.Toolkit#countByQuery(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   */
+  @Override
+  public int countByQuery(Scope pScope, ModelQuery pQuery, @Nullable Map<String, Object> pParamValues) {
+    return mToolkit.countByQuery(dewrapScope(pScope), pQuery, pParamValues);
+  }
 }

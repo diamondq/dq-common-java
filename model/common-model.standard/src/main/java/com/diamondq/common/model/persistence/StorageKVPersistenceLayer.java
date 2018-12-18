@@ -283,6 +283,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
                   BigDecimal maxValue = pd.getMaxValue();
                   if (maxValue != null)
                     colBuilder = colBuilder.maxValue(maxValue);
+                  BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
+                  if (autoIncrementStart != null)
+                    colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
+                  BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
+                  if (autoIncrementBy != null)
+                    colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
                   break;
                 }
                 case EmbeddedStructureList:
@@ -291,10 +297,22 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
                   throw new UnsupportedOperationException();
                 case Integer: {
                   colBuilder = colBuilder.type(KVColumnType.Integer);
+                  BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
+                  if (autoIncrementStart != null)
+                    colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
+                  BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
+                  if (autoIncrementBy != null)
+                    colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
                   break;
                 }
                 case Long: {
                   colBuilder = colBuilder.type(KVColumnType.Long);
+                  BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
+                  if (autoIncrementStart != null)
+                    colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
+                  BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
+                  if (autoIncrementBy != null)
+                    colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
                   break;
                 }
                 case PropertyRef: {
@@ -1014,6 +1032,37 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   }
 
   /**
+   * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#countByQuery(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   */
+  @Override
+  public int countByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pQuery, pParamValues)) {
+      GenericModelQuery gq = (GenericModelQuery) pQuery;
+
+      String defName = gq.getDefinitionName();
+
+      IKVTransaction transaction = mStructureStore.startTransaction();
+      boolean success = false;
+      try {
+        validateKVStoreTableSetup(pToolkit, pScope, defName);
+
+        int queryResults = transaction.countQuery(gq, (pParamValues == null ? Collections.emptyMap() : pParamValues));
+
+        success = true;
+        return context.exit(queryResults);
+      }
+      finally {
+        if (success == true)
+          transaction.commit();
+        else
+          transaction.rollback();
+      }
+    }
+  }
+
+  /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
    *      com.diamondq.common.model.interfaces.Scope)
    */
@@ -1022,4 +1071,31 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
     return false;
   }
 
+  /**
+   * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef) {
+    try (Context ctx = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pStructureDef)) {
+      String defName = pStructureDef.getName();
+
+      IKVTransaction transaction = mStructureStore.startTransaction();
+      boolean success = false;
+      try {
+        validateKVStoreTableSetup(pToolkit, pScope, defName);
+
+        transaction.clear(defName);
+
+        success = true;
+      }
+      finally {
+        if (success == true)
+          transaction.commit();
+        else
+          transaction.rollback();
+      }
+    }
+
+  }
 }

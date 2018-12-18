@@ -237,4 +237,23 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
     }
   }
 
+  /**
+   * @see com.diamondq.common.model.interfaces.AsyncToolkit#clearStructures(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  public ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope,
+    StructureDefinition pStructureDef) {
+    return mAsyncToolkit.clearStructures(dewrapScope(pScope), pStructureDef);
+  }
+
+  /**
+   * @see com.diamondq.common.model.interfaces.AsyncToolkit#countByQuery(com.diamondq.common.model.interfaces.Scope,
+   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   */
+  @Override
+  public ContextExtendedCompletionStage<Integer> countByQuery(Scope pScope, ModelQuery pQuery,
+    @Nullable Map<String, Object> pParamValues) {
+    return mAsyncToolkit.countByQuery(dewrapScope(pScope), pQuery, pParamValues);
+  }
 }
