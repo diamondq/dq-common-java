@@ -41,6 +41,8 @@ public class SecurityContextManagerImpl implements SecurityContextManager {
       if (bytes != null)
         byteMap.put(ser.getSerializerId(), bytes);
     }
+    if (byteMap.isEmpty() == true)
+      throw new ExtendedIllegalStateException(ACLMessages.NO_SUCH_SERIALIZER, pContext.getClass().getName());
     try {
       int byteCount = 1;
       for (Map.Entry<String, byte[]> pair : byteMap.entrySet()) {
