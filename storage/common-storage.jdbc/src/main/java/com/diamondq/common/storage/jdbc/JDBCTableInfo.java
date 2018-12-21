@@ -75,6 +75,11 @@ public class JDBCTableInfo {
   public final ConcurrentMap<Query, String> querySQL;
 
   /**
+   * A Map for caching the query SQL for a given Query object
+   */
+  public final ConcurrentMap<Query, String> countSQL;
+
+  /**
    * The actual munged table name (without schema)
    */
   public final String                       mungedTableName;
@@ -112,6 +117,7 @@ public class JDBCTableInfo {
     tableSchema = pTableSchema;
     definition = pDefinition;
     querySQL = new ConcurrentHashMap<>();
+    countSQL = new ConcurrentHashMap<>();
   }
 
 }

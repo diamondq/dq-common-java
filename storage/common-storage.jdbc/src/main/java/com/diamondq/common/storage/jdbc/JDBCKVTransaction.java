@@ -77,7 +77,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         Connection c = mConnection;
         if (c == null)
           throw new IllegalStateException();
-        JDBCTableInfo info = mStore.validateTable(c, pTable, pClass);
+        JDBCTableInfo info = mStore.validateTable(c, pTable);
         try (PreparedStatement ps = c.prepareStatement(info.getBySQL)) {
           ps.setString(1, pKey1);
           ps.setString(2, pKey2);
@@ -107,7 +107,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         Connection c = mConnection;
         if (c == null)
           throw new IllegalStateException();
-        JDBCTableInfo info = mStore.validateTable(c, pTable, (pObj == null ? null : pObj.getClass()));
+        JDBCTableInfo info = mStore.validateTable(c, pTable);
         if (info.supportsUpsert == true) {
           try (PreparedStatement ps = c.prepareStatement(info.putBySQL)) {
             ps.setString(1, pKey1);
@@ -165,7 +165,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         Connection c = mConnection;
         if (c == null)
           throw new IllegalStateException();
-        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        JDBCTableInfo info = mStore.validateTable(c, pTable);
         try (PreparedStatement ps = c.prepareStatement(info.removeBySQL)) {
           ps.setString(1, pKey1);
           ps.setString(2, pKey2);
@@ -192,7 +192,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         Connection c = mConnection;
         if (c == null)
           throw new IllegalStateException();
-        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        JDBCTableInfo info = mStore.validateTable(c, pTable);
         PreparedStatement ps = c.prepareStatement(info.keyIteratorSQL);
         try {
           context.trace("{}", info.keyIteratorSQL);
@@ -233,7 +233,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         Connection c = mConnection;
         if (c == null)
           throw new IllegalStateException();
-        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        JDBCTableInfo info = mStore.validateTable(c, pTable);
         PreparedStatement ps = c.prepareStatement(info.keyIterator2SQL);
         try {
           ps.setString(1, pKey1);
@@ -275,7 +275,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         Connection c = mConnection;
         if (c == null)
           throw new IllegalStateException();
-        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        JDBCTableInfo info = mStore.validateTable(c, pTable);
         try (PreparedStatement ps = c.prepareStatement(info.clearSQL)) {
           context.trace("{}", info.clearSQL);
           ps.executeUpdate();
@@ -298,7 +298,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         Connection c = mConnection;
         if (c == null)
           throw new IllegalStateException();
-        JDBCTableInfo info = mStore.validateTable(c, pTable, null);
+        JDBCTableInfo info = mStore.validateTable(c, pTable);
         try (PreparedStatement ps = c.prepareStatement(info.getCountSQL)) {
           context.trace("{}", info.getCountSQL);
           try (ResultSet rs = ps.executeQuery()) {
@@ -458,7 +458,7 @@ public class JDBCKVTransaction implements IKVTransaction {
         if (c == null)
           throw new IllegalStateException();
         String table = pQuery.getDefinitionName();
-        JDBCTableInfo info = mStore.validateTable(c, table, pClass);
+        JDBCTableInfo info = mStore.validateTable(c, table);
         String querySQL = mStore.getQuerySQL(info, pQuery);
         StringBuilder traceBuilder;
         List<@Nullable Object> traceArgs;
@@ -524,6 +524,74 @@ public class JDBCKVTransaction implements IKVTransaction {
    */
   @Override
   public int countQuery(Query pQuery, Map<String, Object> pParamValues) {
-    throw new UnsupportedOperationException();
+    try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pQuery)) {
+      int queryCount;
+      try {
+        validateConnection();
+        Connection c = mConnection;
+        if (c == null)
+          throw new IllegalStateException();
+        String table = pQuery.getDefinitionName();
+        JDBCTableInfo info = mStore.validateTable(c, table);
+        String querySQL = mStore.getCountSQL(info, pQuery);
+        StringBuilder traceBuilder;
+        List<@Nullable Object> traceArgs;
+        if (context.isTraceEnabled() == true) {
+          traceBuilder = new StringBuilder();
+          traceBuilder.append("{}");
+          traceArgs = new ArrayList<>();
+          traceArgs.add(querySQL);
+        }
+        else {
+          traceBuilder = null;
+          traceArgs = null;
+        }
+        try (PreparedStatement ps = c.prepareStatement(querySQL)) {
+          List<WhereInfo> whereList = pQuery.getWhereList();
+          int paramCount = 0;
+          for (WhereInfo where : whereList) {
+            paramCount++;
+            Object value;
+            if (where.constant != null)
+              value = where.constant;
+            else
+              value = pParamValues.get(where.paramKey);
+            IKVColumnDefinition colDef = info.definition.getColumnDefinitionsByName(where.key);
+            if (colDef == null) {
+              String singlePrimaryKeyName = info.definition.getSinglePrimaryKeyName();
+              if ((singlePrimaryKeyName == null) || (where.key.equals(singlePrimaryKeyName) == false))
+                throw new UnsupportedOperationException();
+              colDef = sPRIMARY_KEY_2_DEF;
+            }
+            Object writtenValue = info.serializer.serializeColumnToPreparedStatement(value, colDef, ps, paramCount);
+            if (traceBuilder != null)
+              traceBuilder.append(" {}=|{}|");
+            if (traceArgs != null) {
+              traceArgs.add(paramCount);
+              traceArgs.add(writtenValue);
+            }
+          }
+          if ((traceBuilder != null) && (traceArgs != null)) {
+            @SuppressWarnings("null")
+            @Nullable
+            Object @NonNull [] startArray = new Object[traceArgs.size()];
+            @Nullable
+            Object @NonNull [] args = traceArgs.<@Nullable Object> toArray(startArray);
+            context.trace(traceBuilder.toString(), args);
+          }
+          try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next() == true)
+              queryCount = rs.getInt(1);
+            else
+              queryCount = -1;
+          }
+        }
+      }
+      catch (SQLException ex) {
+        throw new RuntimeException(ex);
+      }
+
+      return queryCount;
+    }
   }
 }

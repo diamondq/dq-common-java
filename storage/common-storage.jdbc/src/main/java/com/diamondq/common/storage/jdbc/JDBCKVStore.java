@@ -301,10 +301,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
    *
    * @param pConnection the connection
    * @param pTable the table name
-   * @param pClass the class that will be stored in the table
    * @return the table info
    */
-  public <O> JDBCTableInfo validateTable(Connection pConnection, String pTable, @Nullable Class<O> pClass) {
+  public JDBCTableInfo validateTable(Connection pConnection, String pTable) {
     JDBCTableInfo tableInfo = mTableCache.getIfPresent(pTable);
     if (tableInfo == null)
       throw new IllegalStateException("The table has not yet been defined.");
@@ -794,6 +793,104 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
       String newQuerySQL = sb.toString();
       if ((querySQL = pInfo.querySQL.putIfAbsent(pQuery, newQuerySQL)) == null)
+        querySQL = newQuerySQL;
+    }
+
+    return querySQL;
+  }
+
+  public String getCountSQL(JDBCTableInfo pInfo, Query pQuery) {
+    String querySQL = pInfo.countSQL.get(pQuery);
+    if (querySQL != null)
+      return querySQL;
+    try (Context context = mContextFactory.newContext(JDBCKVStore.class, this, pInfo, pQuery)) {
+
+      /* Build the query sql */
+
+      StringBuilder sb = new StringBuilder();
+
+      sb.append("SELECT ");
+
+      sb.append("COUNT(1)");
+      
+      sb.append(" FROM ");
+      if (pInfo.tableSchema != null)
+        sb.append(pInfo.tableSchema).append('.');
+      sb.append(pInfo.mungedTableName);
+
+      List<WhereInfo> whereList = pQuery.getWhereList();
+      if (whereList.isEmpty() == false) {
+        sb.append(" WHERE ");
+        boolean isFirstWhere = true;
+        for (WhereInfo where : whereList) {
+          if (isFirstWhere == true)
+            isFirstWhere = false;
+          else
+            sb.append(" AND ");
+          IKVColumnDefinition colDef = pInfo.definition.getColumnDefinitionsByName(where.key);
+          if (colDef == null) {
+            String singlePrimaryKeyName = pInfo.definition.getSinglePrimaryKeyName();
+            if ((singlePrimaryKeyName == null) || (where.key.equals(singlePrimaryKeyName) == false))
+              throw new IllegalArgumentException();
+            sb.append(sPRIMARY_KEY_1);
+            sb.append("=");
+            sb.append("'__ROOT__'");
+            sb.append(" AND ");
+            sb.append(sPRIMARY_KEY_2);
+          }
+          else
+            sb.append(escapeColumnName(colDef.getName()));
+          switch (where.operator) {
+          case eq:
+            sb.append("=");
+            break;
+          case gt:
+            sb.append(">");
+            break;
+          case gte:
+            sb.append(">=");
+            break;
+          case lt:
+            sb.append("<");
+            break;
+          case lte:
+            sb.append("<=");
+            break;
+          case ne:
+            sb.append("!=");
+            break;
+          }
+          sb.append("?");
+        }
+      }
+
+      List<Pair<String, Boolean>> sortList = pQuery.getSortList();
+      if (sortList.isEmpty() == false) {
+        sb.append(" ORDER BY ");
+        boolean firstSort = true;
+        for (Pair<String, Boolean> sort : sortList) {
+          if (firstSort == true)
+            firstSort = false;
+          else
+            sb.append(", ");
+          IKVColumnDefinition colDef = pInfo.definition.getColumnDefinitionsByName(sort.getValue0());
+          if (colDef == null) {
+            String singlePrimaryKeyName = pInfo.definition.getSinglePrimaryKeyName();
+            if ((singlePrimaryKeyName == null) || (sort.getValue0().equals(singlePrimaryKeyName) == false))
+              throw new IllegalArgumentException();
+            sb.append(sPRIMARY_KEY_2);
+          }
+          else
+            sb.append(escapeColumnName(colDef.getName()));
+          if (sort.getValue1() == true)
+            sb.append(" ASC");
+          else
+            sb.append(" DESC");
+        }
+      }
+
+      String newQuerySQL = sb.toString();
+      if ((querySQL = pInfo.countSQL.putIfAbsent(pQuery, newQuerySQL)) == null)
         querySQL = newQuerySQL;
     }
 
