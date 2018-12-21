@@ -62,6 +62,16 @@ import javax.lang.model.type.TypeVariable;
 import javax.tools.JavaFileObject;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Decade;
+import org.javatuples.Ennead;
+import org.javatuples.Octet;
+import org.javatuples.Pair;
+import org.javatuples.Quartet;
+import org.javatuples.Quintet;
+import org.javatuples.Septet;
+import org.javatuples.Sextet;
+import org.javatuples.Triplet;
+import org.javatuples.Unit;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
@@ -901,6 +911,9 @@ public class ProxyGenerator implements Generator {
           isReturnTypeNullable = true;
           isReplyUsed = false;
         }
+        else if (basicTypeName.startsWith("org.javatuples.")) {
+          replyReturnType = TypeName.get(JsonArray.class);
+        }
         else
           throw new UnsupportedOperationException(
             "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
@@ -1051,126 +1064,10 @@ public class ProxyGenerator implements Generator {
           methodBuilder = methodBuilder.addStatement("int r_size = replyResult.size()");
           methodBuilder = methodBuilder.beginControlFlow("if (r_size > 0)");
           methodBuilder = methodBuilder.beginControlFlow("for (int i=0;i<r_size;i++)");
-          if (TypeName.BOOLEAN.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
-            methodBuilder = methodBuilder.addStatement("r_array.add(replyResult.getBoolean(i))");
-          }
-          else if (TypeName.BOOLEAN.box().equals(itemTypeName)) {
-            methodBuilder =
-              methodBuilder.addStatement("r_array.add($T.notNull(replyResult.getBoolean(i)))", Verify.class);
-          }
-          else if (TypeName.BYTE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("byte[] r_byte_array = replyResult.getBinary(i)") //
-              .addStatement("r_array.add(r_byte_array[0])");
-          }
-          else if (TypeName.BYTE.box().equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("byte[] r_byte_array = $T.notNull(replyResult.getBinary(i))", Verify.class) //
-              .addStatement("r_array.add(r_byte_array[0])");
-          }
-          else if (TypeName.CHAR.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("String r_string = replyResult.getString(i)") //
-              .addStatement("r_array.add(r_string.charAt(0))");
-          }
-          else if (TypeName.CHAR.box().equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("String r_string = $T.notNull(replyResult.getString(i))", Verify.class) //
-              .addStatement("r_array.add(r_string.charAt(0))");
-          }
-          else if (TypeName.DOUBLE.box().annotated(AnnotationSpec.builder(Nullable.class).build())
-            .equals(itemTypeName)) {
-            methodBuilder = methodBuilder.addStatement("r_array.add(replyResult.getDouble(i))");
-          }
-          else if (TypeName.DOUBLE.box().equals(itemTypeName)) {
-            methodBuilder =
-              methodBuilder.addStatement("r_array.add($T.notNull(replyResult.getDouble(i)))", Verify.class);
-          }
-          else if (TypeName.FLOAT.box().annotated(AnnotationSpec.builder(Nullable.class).build())
-            .equals(itemTypeName)) {
-            methodBuilder = methodBuilder.addStatement("r_array.add(replyResult.getFloat(i))");
-          }
-          else if (TypeName.FLOAT.box().equals(itemTypeName)) {
-            methodBuilder =
-              methodBuilder.addStatement("r_array.add($T.notNull(replyResult.getFloat(i)))", Verify.class);
-          }
-          else if (TypeName.INT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
-            methodBuilder = methodBuilder.addStatement("r_array.add(replyResult.getInteger(i))");
-          }
-          else if (TypeName.INT.box().equals(itemTypeName)) {
-            methodBuilder =
-              methodBuilder.addStatement("r_array.add($T.notNull(replyResult.getInteger(i)))", Verify.class);
-          }
-          else if (TypeName.LONG.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
-            methodBuilder = methodBuilder.addStatement("r_array.add(replyResult.getLong(i))");
-          }
-          else if (TypeName.LONG.box().equals(itemTypeName)) {
-            methodBuilder = methodBuilder.addStatement("r_array.add($T.notNull(replyResult.getLong(i)))", Verify.class);
-          }
-          else if (TypeName.SHORT.box().annotated(AnnotationSpec.builder(Nullable.class).build())
-            .equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("Integer r_int = replyResult.getInt(i)") //
-              .addStatement("r_array.add(r_int.shortValue())");
-          }
-          else if (TypeName.SHORT.box().equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("Integer r_int = $T.notNull(replyResult.getInt(i))", Verify.class) //
-              .addStatement("r_array.add(r_int.shortValue())");
-          }
 
-          /* Handle string */
+          methodBuilder = handleElement(pProxyMethod, actualReturnType, methodBuilder, itemType, itemTypeName,
+            "r_array.add(", ")", "replyResult", "i");
 
-          else if (ClassName.get(String.class).equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("$T r_obj = replyResult.getString(i)", String.class) //
-              .beginControlFlow("if (r_obj == null)") //
-              .addStatement("throw new $T()", IllegalStateException.class) //
-              .endControlFlow() //
-              .addStatement("r_array.add(replyResult.getString(i))");
-          }
-          else if (ClassName.get(String.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-            .equals(itemTypeName)) {
-            methodBuilder = methodBuilder.addStatement("r_array.add(replyResult.getString(i))");
-          }
-
-          /* Handle UUID */
-
-          else if (ClassName.get(UUID.class).equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("$T r_obj = replyResult.getString(i)", String.class) //
-              .beginControlFlow("if (r_obj == null)") //
-              .addStatement("throw new $T()", IllegalStateException.class) //
-              .endControlFlow() //
-              .addStatement("r_array.add($T.fromString(r_obj))", UUID.class);
-          }
-          else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-            .equals(itemTypeName)) {
-            methodBuilder = methodBuilder //
-              .addStatement("$T r_obj = replyResult.getString(i)", String.class) //
-              .addStatement("r_array.add(r_obj == null ? null : $T.fromString(r_obj))", UUID.class);
-          }
-          else if (itemType.isConverterAvailable() == true) {
-            if (itemType.isNullable() == true) {
-              methodBuilder = methodBuilder //
-                .addStatement("$T r_obj = replyResult.getJsonObject(i)", JsonObject.class) //
-                .addStatement("r_array.add(r_obj == null ? null : mConverterManager.convert(r_obj, $T.class))",
-                  itemTypeName.withoutAnnotations());
-            }
-            else {
-              methodBuilder = methodBuilder //
-                .addStatement("$T r_obj = replyResult.getJsonObject(i)", JsonObject.class) //
-                .beginControlFlow("if (r_obj == null)") //
-                .addStatement("throw new $T()", IllegalStateException.class) //
-                .endControlFlow() //
-                .addStatement("r_array.add(mConverterManager.convert(replyResult, $T.class))",
-                  itemTypeName.withoutAnnotations());
-            }
-          }
-
-          else
-            throw new UnsupportedOperationException("Unrecognized Return of List<??> -> Method: |"
-              + pProxyMethod.toString() + "| Return: |" + actualReturnType.toString() + "|");
           methodBuilder = methodBuilder.endControlFlow();
           methodBuilder = methodBuilder.endControlFlow();
           if (actualReturnType.isNullable())
@@ -1182,6 +1079,80 @@ public class ProxyGenerator implements Generator {
           methodBuilder = methodBuilder //
             // result.complete(finalResult);
             .addStatement("result.complete(finalResult)");
+        }
+        else if (basicTypeName.startsWith("org.javatuples.")) {
+
+          int typeSize = actualReturnType.getParameterizedTypeSize();
+          Class<?> tupleClass;
+          switch (typeSize) {
+          case 1:
+            tupleClass = Unit.class;
+            break;
+          case 2:
+            tupleClass = Pair.class;
+            break;
+          case 3:
+            tupleClass = Triplet.class;
+            break;
+          case 4:
+            tupleClass = Quartet.class;
+            break;
+          case 5:
+            tupleClass = Quintet.class;
+            break;
+          case 6:
+            tupleClass = Sextet.class;
+            break;
+          case 7:
+            tupleClass = Septet.class;
+            break;
+          case 8:
+            tupleClass = Octet.class;
+            break;
+          case 9:
+            tupleClass = Ennead.class;
+            break;
+          case 10:
+            tupleClass = Decade.class;
+            break;
+          default:
+            throw new UnsupportedOperationException();
+          }
+
+          /* Define the variables */
+
+          List<String> argNames = new ArrayList<>();
+          for (int i = 0; i < typeSize; i++) {
+            BaseType varType = actualReturnType.getParameterizedType(i);
+            TypeName varTypeName = varType.getTypeName();
+            String argName = "arg" + String.valueOf(i);
+            argNames.add(argName);
+            methodBuilder = methodBuilder //
+              .addStatement("$T " + argName, varTypeName);
+          }
+
+          /* Extract the variables */
+
+          for (int i = 0; i < typeSize; i++) {
+            BaseType varType = actualReturnType.getParameterizedType(i);
+            TypeName varTypeName = varType.getTypeName();
+            methodBuilder = methodBuilder //
+              .beginControlFlow("");
+            methodBuilder = handleElement(pProxyMethod, actualReturnType, methodBuilder, varType, varTypeName,
+              argNames.get(i) + " = ", "", "replyResult", String.valueOf(i));
+            methodBuilder = methodBuilder //
+              .endControlFlow();
+          }
+
+          /* Finish */
+
+          StringBuilder sb = new StringBuilder();
+          sb.append("result.complete($T.with(");
+          sb.append(String.join(", ", argNames));
+          sb.append("))");
+          methodBuilder = methodBuilder //
+            .addStatement(sb.toString(), ClassName.get(tupleClass));
+
         }
         else
           throw new UnsupportedOperationException("Unrecognized Return of ??<??> -> Method: |" + pProxyMethod.toString()
@@ -1328,6 +1299,177 @@ public class ProxyGenerator implements Generator {
       return builder.build();
     }
 
+  }
+
+  private MethodSpec.Builder handleElement(ProxyMethod pProxyMethod, BaseType actualReturnType,
+    MethodSpec.Builder methodBuilder, BaseType itemType, TypeName itemTypeName, String pPrefix, String pSuffix,
+    String pResultName, String pOffset) {
+    if (TypeName.BOOLEAN.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getBoolean(" + pOffset + ")" + pSuffix);
+    }
+    else if (TypeName.BOOLEAN.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder
+        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getBoolean(" + pOffset + "))" + pSuffix, Verify.class);
+    }
+    else if (TypeName.BYTE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("byte[] r_byte_array = " + pResultName + ".getBinary(" + pOffset + ")") //
+        .addStatement(pPrefix + "r_byte_array[0]" + pSuffix);
+    }
+    else if (TypeName.BYTE.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("byte[] r_byte_array = $T.notNull(" + pResultName + ".getBinary(" + pOffset + "))", Verify.class) //
+        .addStatement(pPrefix + "r_byte_array[0]" + pSuffix);
+    }
+    else if (TypeName.CHAR.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("String r_string = " + pResultName + ".getString(" + pOffset + ")") //
+        .addStatement(pPrefix + "r_string.charAt(0)" + pSuffix);
+    }
+    else if (TypeName.CHAR.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("String r_string = $T.notNull(" + pResultName + ".getString(" + pOffset + "))", Verify.class) //
+        .addStatement(pPrefix + "r_string.charAt(0)" + pSuffix);
+    }
+    else if (TypeName.DOUBLE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getDouble(" + pOffset + ")" + pSuffix);
+    }
+    else if (TypeName.DOUBLE.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder
+        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getDouble(" + pOffset + "))" + pSuffix, Verify.class);
+    }
+    else if (TypeName.FLOAT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getFloat(" + pOffset + ")" + pSuffix);
+    }
+    else if (TypeName.FLOAT.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder
+        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getFloat(" + pOffset + "))" + pSuffix, Verify.class);
+    }
+    else if (TypeName.INT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getInteger(" + pOffset + ")" + pSuffix);
+    }
+    else if (TypeName.INT.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder
+        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getInteger(" + pOffset + "))" + pSuffix, Verify.class);
+    }
+    else if (TypeName.LONG.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getLong(" + pOffset + ")" + pSuffix);
+    }
+    else if (TypeName.LONG.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder
+        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getLong(" + pOffset + "))" + pSuffix, Verify.class);
+    }
+    else if (TypeName.SHORT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("Integer r_int = " + pResultName + ".getInt(" + pOffset + ")") //
+        .addStatement(pPrefix + "r_int.shortValue()" + pSuffix);
+    }
+    else if (TypeName.SHORT.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("Integer r_int = $T.notNull(" + pResultName + ".getInt(" + pOffset + "))", Verify.class) //
+        .addStatement(pPrefix + "r_int.shortValue()" + pSuffix);
+    }
+
+    /* Handle string */
+
+    else if (ClassName.get(String.class).equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("$T r_obj = " + pResultName + ".getString(" + pOffset + ")", String.class) //
+        .beginControlFlow("if (r_obj == null)") //
+        .addStatement("throw new $T()", IllegalStateException.class) //
+        .endControlFlow() //
+        .addStatement(pPrefix + "r_obj" + pSuffix);
+    }
+    else if (ClassName.get(String.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+      .equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getString(" + pOffset + ")" + pSuffix);
+    }
+
+    /* Handle UUID */
+
+    else if (ClassName.get(UUID.class).equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("$T r_obj = " + pResultName + ".getString(" + pOffset + ")", String.class) //
+        .beginControlFlow("if (r_obj == null)") //
+        .addStatement("throw new $T()", IllegalStateException.class) //
+        .endControlFlow() //
+        .addStatement(pPrefix + "$T.fromString(r_obj)" + pSuffix, UUID.class);
+    }
+    else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      methodBuilder = methodBuilder //
+        .addStatement("$T r_obj = " + pResultName + ".getString(" + pOffset + ")", String.class) //
+        .addStatement(pPrefix + "r_obj == null ? null : $T.fromString(r_obj)" + pSuffix, UUID.class);
+    }
+
+    /* Handle list, set, collection */
+
+    else if (itemTypeName instanceof ParameterizedTypeName) {
+      String basicTypeName = itemType.getNonGenericNonAnnotatedTypeName();
+      if (("java.util.List".equals(basicTypeName) == true) || ("java.util.Collection".equals(basicTypeName) == true)
+        || ("java.util.Set".equals(basicTypeName) == true)) {
+
+        TypeName concreteTypeName;
+        if (("java.util.List".equals(basicTypeName) == true) || ("java.util.Collection".equals(basicTypeName) == true))
+          concreteTypeName = ClassName.get(ArrayList.class);
+        else
+          concreteTypeName = ClassName.get(HashSet.class);
+
+        BaseType collItemType = itemType.getParameterizedType(0);
+        TypeName collItemTypeName = collItemType.getTypeName();
+        if (itemType.isNullable() == true) {
+          methodBuilder = methodBuilder //
+            .addStatement("$T replyArray = " + pResultName + ".getJsonArray(" + pOffset + ")", JsonArray.class)
+            .addStatement("$T r_array = (replyArray == null ? null : new $T<>())", itemTypeName, concreteTypeName);
+        }
+        else {
+          methodBuilder = methodBuilder //
+            .addStatement("$T replyArray = $T.notNull(" + pResultName + ".getJsonArray(" + pOffset + "))",
+              JsonArray.class, Verify.class)
+            .addStatement("$T r_array = new $T<>()", itemTypeName, concreteTypeName);
+        }
+        if (itemType.isNullable())
+          methodBuilder = methodBuilder.beginControlFlow("if (replyArray != null)");
+        methodBuilder = methodBuilder.addStatement("int r_size = replyArray.size()");
+        methodBuilder = methodBuilder.beginControlFlow("if (r_size > 0)");
+        methodBuilder = methodBuilder.beginControlFlow("for (int i=0;i<r_size;i++)");
+
+        methodBuilder = handleElement(pProxyMethod, actualReturnType, methodBuilder, collItemType, collItemTypeName,
+          "r_array.add(", ")", "replyArray", "i");
+
+        methodBuilder = methodBuilder.endControlFlow();
+        methodBuilder = methodBuilder.endControlFlow();
+        if (itemType.isNullable())
+          methodBuilder = methodBuilder.endControlFlow();
+        methodBuilder = methodBuilder.addStatement(pPrefix + "r_array" + pSuffix);
+
+      }
+      else
+        throw new UnsupportedOperationException("Unrecognized Return of ??<??> -> Method: |" + pProxyMethod.toString()
+          + "| Return: |" + actualReturnType.toString() + "|");
+    }
+
+    else if (itemType.isConverterAvailable() == true) {
+      if (itemType.isNullable() == true) {
+        methodBuilder = methodBuilder //
+          .addStatement("$T r_obj = " + pResultName + ".getJsonObject(" + pOffset + ")", JsonObject.class) //
+          .addStatement(pPrefix + "r_obj == null ? null : mConverterManager.convert(r_obj, $T.class)" + pSuffix,
+            itemTypeName.withoutAnnotations());
+      }
+      else {
+        methodBuilder = methodBuilder //
+          .addStatement("$T r_obj = " + pResultName + ".getJsonObject(" + pOffset + ")", JsonObject.class) //
+          .beginControlFlow("if (r_obj == null)") //
+          .addStatement("throw new $T()", IllegalStateException.class) //
+          .endControlFlow() //
+          .addStatement(pPrefix + "mConverterManager.convert(" + pResultName + ", $T.class)" + pSuffix,
+            itemTypeName.withoutAnnotations());
+      }
+    }
+
+    else
+      throw new UnsupportedOperationException("Unrecognized Return of List<??> -> Method: |" + pProxyMethod.toString()
+        + "| Return: |" + actualReturnType.toString() + "|");
+    return methodBuilder;
   }
 
   /**

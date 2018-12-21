@@ -839,72 +839,8 @@ public class ImplGenerator implements Generator {
         else
           pBuilder = pBuilder.beginControlFlow("for ($T item : $T.notNull(r))", itemType.getTypeName(), Verify.class);
 
-        if (TypeName.BOOLEAN.box().equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder.addStatement("r_array.add(item)");
-        }
-        else if (TypeName.BYTE.box().equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder //
-            .addStatement("byte[] r_byte_array = new byte[1]") //
-            .addStatement("r_byte_array[0] = item") //
-            .addStatement("r_array.add(r_byte_array)");
-        }
-        else if (TypeName.CHAR.box().equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder //
-            .addStatement("String r_string = Character.toString(item)") //
-            .addStatement("r_array.add(r_string)");
-        }
-        else if (TypeName.DOUBLE.box().equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder.addStatement("r_array.add(item)");
-        }
-        else if (TypeName.FLOAT.box().equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder.addStatement("r_array.add(item)");
-        }
-        else if (TypeName.INT.box().equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder.addStatement("r_array.add(item)");
-        }
-        else if (TypeName.LONG.box().equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder.addStatement("r_array.add(item)");
-        }
-        else if (TypeName.SHORT.box().equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder //
-            .addStatement("int r_int = item") //
-            .addStatement("r_array.add(r_int)");
-        }
-
-        /* Handle string */
-
-        else if (ClassName.get(String.class).equals(itemTypeName.withoutAnnotations())) {
-          pBuilder = pBuilder.addStatement("r_array.add(item)");
-        }
-
-        /* Handle UUID */
-
-        else if (ClassName.get(UUID.class).equals(itemTypeName)) {
-          pBuilder = pBuilder.addStatement("r_array.add(item.toString())");
-        }
-        else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-          .equals(itemTypeName)) {
-          pBuilder = pBuilder.addStatement("r_array.add(item == null ? null : item.toString())");
-        }
-
-        else if (itemType.isConverterAvailable() == true) {
-          if (itemType.isNullable() == true) {
-            pBuilder = pBuilder
-              // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
-              .addStatement("@$T $T r_obj = (r == null ? null : mConverterManager.convert(item, $T.class))",
-                Nullable.class, JsonObject.class, JsonObject.class) //
-              .addStatement("r_array.add(r_obj)");
-          }
-          else {
-            pBuilder = pBuilder
-              // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
-              .addStatement("$T r_obj = mConverterManager.convert(item, $T.class)", JsonObject.class, JsonObject.class) //
-              .addStatement("r_array.add(r_obj)");
-          }
-        }
-        else
-          throw new UnsupportedOperationException("Unrecognized Return List<??> -> Method: |" + pProxyMethod.toString()
-            + "| Return: |" + pReturnType.toString() + "|");
+        pBuilder =
+          handleElement(pProxyMethod, pReturnType, pBuilder, itemType, itemTypeName, "r_array.add(", ")", "item");
         pBuilder = pBuilder.endControlFlow();
         if (pReturnType.isNullable())
           pBuilder = pBuilder.endControlFlow();
@@ -983,6 +919,23 @@ public class ImplGenerator implements Generator {
           // pMessage.reply(null);
           .addStatement("pMessage.reply(null)");
       }
+      else if (basicTypeName.startsWith("org.javatuples.")) {
+        pBuilder = pBuilder //
+          .addStatement("$T replyArray = new $T()", JsonArray.class, JsonArray.class)
+          .addStatement("r = $T.notNull(r)", Verify.class);
+        int typeCount = pReturnType.getParameterizedTypeSize();
+        for (int i = 0; i < typeCount; i++) {
+          BaseType varType = pReturnType.getParameterizedType(i);
+          TypeName varTypeName = varType.getTypeName();
+          pBuilder = pBuilder.beginControlFlow("") //
+            .addStatement("$T item = r.getValue" + String.valueOf(i) + "()", varTypeName);
+          pBuilder =
+            handleElement(pProxyMethod, pReturnType, pBuilder, varType, varTypeName, "replyArray.add(", ")", "item");
+          pBuilder = pBuilder.endControlFlow();
+        }
+        pBuilder = pBuilder //
+          .addStatement("pMessage.reply(replyArray)");
+      }
       else
         throw new UnsupportedOperationException("Unrecognized Return ??<??> -> Method: |" + pProxyMethod.toString()
           + "| Return: |" + pReturnType.toString() + "|");
@@ -1040,6 +993,111 @@ public class ImplGenerator implements Generator {
       throw new UnsupportedOperationException(
         "Unrecognized Return ?? -> Method: |" + pProxyMethod.toString() + "| Return: |" + pReturnType.toString() + "|");
 
+    return pBuilder;
+  }
+
+  private MethodSpec.Builder handleElement(ProxyMethod pProxyMethod, BaseType pReturnType, MethodSpec.Builder pBuilder,
+    BaseType itemType, TypeName itemTypeName, String pPrefix, String pSuffix, String pItemName) {
+    if (TypeName.BOOLEAN.box().equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder.addStatement(pPrefix + pItemName + pSuffix);
+    }
+    else if (TypeName.BYTE.box().equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder //
+        .addStatement("byte[] r_byte_array = new byte[1]") //
+        .addStatement("r_byte_array[0] = " + pItemName) //
+        .addStatement(pPrefix + "r_byte_array" + pSuffix);
+    }
+    else if (TypeName.CHAR.box().equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder //
+        .addStatement("String r_string = Character.toString(" + pItemName + ")") //
+        .addStatement(pPrefix + "r_string" + pSuffix);
+    }
+    else if (TypeName.DOUBLE.box().equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder.addStatement(pPrefix + pItemName + pSuffix);
+    }
+    else if (TypeName.FLOAT.box().equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder.addStatement(pPrefix + pItemName + pSuffix);
+    }
+    else if (TypeName.INT.box().equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder.addStatement(pPrefix + pItemName + pSuffix);
+    }
+    else if (TypeName.LONG.box().equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder.addStatement(pPrefix + pItemName + pSuffix);
+    }
+    else if (TypeName.SHORT.box().equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder //
+        .addStatement("int r_int = " + pItemName) //
+        .addStatement(pPrefix + "r_int" + pSuffix);
+    }
+
+    /* Handle string */
+
+    else if (ClassName.get(String.class).equals(itemTypeName.withoutAnnotations())) {
+      pBuilder = pBuilder.addStatement(pPrefix + pItemName + pSuffix);
+    }
+
+    /* Handle UUID */
+
+    else if (ClassName.get(UUID.class).equals(itemTypeName)) {
+      pBuilder = pBuilder.addStatement(pPrefix + pItemName + ".toString()" + pSuffix);
+    }
+    else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+      pBuilder =
+        pBuilder.addStatement(pPrefix + pItemName + " == null ? null : " + pItemName + ".toString()" + pSuffix);
+    }
+
+    else if (itemTypeName instanceof ParameterizedTypeName) {
+      String basicTypeName = itemType.getNonGenericNonAnnotatedTypeName();
+      if (("java.util.List".equals(basicTypeName) == true) || ("java.util.Collection".equals(basicTypeName) == true)
+        || ("java.util.Set".equals(basicTypeName) == true)) {
+        BaseType collItemType = itemType.getParameterizedType(0);
+        TypeName collItemTypeName = collItemType.getTypeName();
+        if (itemType.isNullable() == true)
+          pBuilder = pBuilder.addStatement("@$T $T r_array = (" + pItemName + " == null ? null : new $T())",
+            Nullable.class, JsonArray.class, JsonArray.class);
+        else
+          pBuilder = pBuilder.addStatement("$T r_array = new $T()", JsonArray.class, JsonArray.class);
+        if (itemType.isNullable()) {
+          pBuilder = pBuilder.beginControlFlow("if (" + pItemName + " != null)");
+          pBuilder = pBuilder.beginControlFlow("for ($T subItem : " + pItemName + ")", collItemType.getTypeName());
+        }
+        else
+          pBuilder = pBuilder.beginControlFlow("for ($T subItem : $T.notNull(" + pItemName + "))",
+            collItemType.getTypeName(), Verify.class);
+
+        pBuilder = handleElement(pProxyMethod, pReturnType, pBuilder, collItemType, collItemTypeName, "r_array.add(",
+          ")", "subItem");
+
+        pBuilder = pBuilder.endControlFlow();
+        if (pReturnType.isNullable())
+          pBuilder = pBuilder.endControlFlow();
+        pBuilder = pBuilder.addStatement(pPrefix + "r_array" + pSuffix);
+
+      }
+      else
+        throw new UnsupportedOperationException("Unrecognized Return of ??<??> -> Method: |" + pProxyMethod.toString()
+          + "| Return: |" + pReturnType.toString() + "|");
+    }
+
+    else if (itemType.isConverterAvailable() == true) {
+      if (itemType.isNullable() == true) {
+        pBuilder = pBuilder
+          // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
+          .addStatement("@$T $T r_obj = (r == null ? null : mConverterManager.convert(" + pItemName + ", $T.class))",
+            Nullable.class, JsonObject.class, JsonObject.class) //
+          .addStatement(pPrefix + "r_obj" + pSuffix);
+      }
+      else {
+        pBuilder = pBuilder
+          // JsonObject r_obj = mConverterManager.convert(r, JsonObject.class);
+          .addStatement("$T r_obj = mConverterManager.convert(" + pItemName + ", $T.class)", JsonObject.class,
+            JsonObject.class) //
+          .addStatement(pPrefix + "r_obj" + pSuffix);
+      }
+    }
+    else
+      throw new UnsupportedOperationException("Unrecognized Return List<??> -> Method: |" + pProxyMethod.toString()
+        + "| Return: |" + pReturnType.toString() + "|");
     return pBuilder;
   }
 

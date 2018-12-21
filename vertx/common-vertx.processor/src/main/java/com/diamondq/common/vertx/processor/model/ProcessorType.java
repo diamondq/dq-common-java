@@ -276,6 +276,10 @@ public abstract class ProcessorType<R extends ProcessorType<R>> {
     return mParameterizedTypeList.get(pIndex);
   }
 
+  public int getParameterizedTypeSize() {
+    return mParameterizedTypeList.size();
+  }
+
   public boolean isNullable() {
     return mIsNullable;
   }
