@@ -634,7 +634,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
       /* Revision */
 
-      buffer.putInt(1);
+      buffer.putShort((short) 1);
 
       /* mName */
       buffer.putInt(nameBytes.length);
