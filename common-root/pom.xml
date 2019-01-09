@@ -24,6 +24,7 @@
     <module>../injection/common-injection.cdi.weld</module>
     <module>../injection/common-injection.osgi</module>
     <module>../metrics/common-metrics.micrometer</module>
+    <module>../security/common-security.jcasbin</module>
     <module>../security/common-security.jwt</module>
     <module>../security/common-security.acme</module>
     <module>../security/common-security.acl</module>

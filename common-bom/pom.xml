@@ -80,6 +80,11 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
+        <artifactId>common-security.jcasbin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
         <artifactId>common-security.jwt</artifactId>
         <version>${project.version}</version>
       </dependency>
