@@ -791,6 +791,10 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
         }
       }
 
+      String limitKey = pQuery.getLimitKey();
+      if (limitKey != null) {
+        sb.append(" ").append(mDialect.getLimitKeyword()).append("?");
+      }
       String newQuerySQL = sb.toString();
       if ((querySQL = pInfo.querySQL.putIfAbsent(pQuery, newQuerySQL)) == null)
         querySQL = newQuerySQL;
@@ -812,7 +816,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
       sb.append("SELECT ");
 
       sb.append("COUNT(1)");
-      
+
       sb.append(" FROM ");
       if (pInfo.tableSchema != null)
         sb.append(pInfo.tableSchema).append('.');
@@ -895,5 +899,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
     }
 
     return querySQL;
+  }
+
+  public IJDBCDialect getDialect() {
+    return mDialect;
   }
 }

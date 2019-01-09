@@ -67,4 +67,12 @@ public class CombinedQuery implements ModelQuery {
     return mFirstQuery.getSortList();
   }
 
+  /**
+   * @see com.diamondq.common.storage.kv.Query#getLimitKey()
+   */
+  @Override
+  public @Nullable String getLimitKey() {
+    return mFirstQuery.getLimitKey();
+  }
+
 }

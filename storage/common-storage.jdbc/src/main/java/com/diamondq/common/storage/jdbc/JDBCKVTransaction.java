@@ -497,6 +497,15 @@ public class JDBCKVTransaction implements IKVTransaction {
               traceArgs.add(writtenValue);
             }
           }
+          String limitKey = pQuery.getLimitKey();
+          if (limitKey != null) {
+            Integer limitVal = (Integer) pParamValues.get(limitKey);
+            if (limitVal == null)
+              throw new IllegalArgumentException();
+            paramCount++;
+            mStore.getDialect().writeInteger(ps, paramCount, limitVal);
+            ps.setInt(paramCount, limitVal);
+          }
           if ((traceBuilder != null) && (traceArgs != null)) {
             @SuppressWarnings("null")
             @Nullable

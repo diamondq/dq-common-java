@@ -20,9 +20,9 @@ public class GenericModelQuery extends GenericQuery implements ModelQuery {
 
   public GenericModelQuery(StructureDefinition pStructureDefinition, String pQueryName,
     @Nullable List<WhereInfo> pWhereList, @Nullable String pParentParamKey,
-    @Nullable PropertyDefinition pParentPropertyDefinition, @Nullable List<Pair<String, Boolean>> pSortList) {
+    @Nullable PropertyDefinition pParentPropertyDefinition, @Nullable List<Pair<String, Boolean>> pSortList, @Nullable String pLimitKey) {
     super(pStructureDefinition.getName(), pQueryName, pWhereList, pParentParamKey,
-      (pParentPropertyDefinition == null ? null : pParentPropertyDefinition.getName()), pSortList);
+      (pParentPropertyDefinition == null ? null : pParentPropertyDefinition.getName()), pSortList, pLimitKey);
     mStructureDefinition = pStructureDefinition;
     mParentPropertyDefinition = pParentPropertyDefinition;
   }

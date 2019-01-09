@@ -25,4 +25,12 @@ public interface QueryBuilder {
    * @return the builder
    */
   public QueryBuilder orderBy(String pKey, boolean pIsAscending);
+
+  /**
+   * Limits the number of results to the integer value stored in the param key
+   * 
+   * @param pParamKey the param key
+   * @return the builder
+   */
+  public QueryBuilder limit(String pParamKey);
 }

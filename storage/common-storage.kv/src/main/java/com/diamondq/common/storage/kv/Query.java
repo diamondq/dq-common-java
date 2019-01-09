@@ -49,4 +49,11 @@ public interface Query {
    */
   public List<Pair<String, Boolean>> getSortList();
 
+  /**
+   * Returns the limit key (or null if there is no limit)
+   * 
+   * @return the limit key
+   */
+  public @Nullable String getLimitKey();
+
 }

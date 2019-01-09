@@ -23,14 +23,18 @@ public class GenericQuery implements Query {
 
   protected final ImmutableList<Pair<String, Boolean>> mSortList;
 
+  protected final @Nullable String                     mLimitKey;
+
   public GenericQuery(String pDefinitionName, String pQueryName, @Nullable List<WhereInfo> pWhereList,
-    @Nullable String pParentParamKey, @Nullable String pParentName, @Nullable List<Pair<String, Boolean>> pSortList) {
+    @Nullable String pParentParamKey, @Nullable String pParentName, @Nullable List<Pair<String, Boolean>> pSortList,
+    @Nullable String pLimitKey) {
     mDefinitionName = pDefinitionName;
     mQueryName = pQueryName;
     mWhereList = (pWhereList == null ? ImmutableList.of() : ImmutableList.copyOf(pWhereList));
     mParentParamKey = pParentParamKey;
     mParentName = pParentName;
     mSortList = (pSortList == null ? ImmutableList.of() : ImmutableList.copyOf(pSortList));
+    mLimitKey = pLimitKey;
   }
 
   /**
@@ -67,6 +71,14 @@ public class GenericQuery implements Query {
   }
 
   /**
+   * @see com.diamondq.common.storage.kv.Query#getLimitKey()
+   */
+  @Override
+  public @Nullable String getLimitKey() {
+    return mLimitKey;
+  }
+
+  /**
    * @see com.diamondq.common.storage.kv.Query#getDefinitionName()
    */
   @Override
@@ -89,7 +101,8 @@ public class GenericQuery implements Query {
       .add("parentParamKey", mParentParamKey) //
       .add("parentName", mParentName) //
       .add("whereList", mWhereList) //
-      .add("sortList", mSortList);
+      .add("sortList", mSortList) //
+      .add("limitKey", mLimitKey);
   }
 
   @Override

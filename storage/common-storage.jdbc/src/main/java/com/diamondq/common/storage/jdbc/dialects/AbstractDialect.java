@@ -38,4 +38,8 @@ public abstract class AbstractDialect implements IJDBCDialect {
     sSQL_2003_RESERVED_WORDS = builder.build();
   }
 
+  @Override
+  public String getLimitKeyword() {
+    return "LIMIT";
+  }
 }

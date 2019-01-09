@@ -529,7 +529,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
       mContextFactory.newContext(AbstractPersistenceLayer.class, this, pToolkit, pScope, pQueryBuilder)) {
       GenericQueryBuilder gqb = (GenericQueryBuilder) pQueryBuilder;
       return new GenericModelQuery(gqb.getStructureDefinition(), gqb.getQueryName(), gqb.getWhereList(),
-        gqb.getParentParamKey(), gqb.getParentPropertyDefinition(), gqb.getSortList());
+        gqb.getParentParamKey(), gqb.getParentPropertyDefinition(), gqb.getSortList(), gqb.getLimitKey());
     }
   }
 
@@ -744,7 +744,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
   @Override
   public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition,
     String pQueryName) {
-    return new GenericQueryBuilder(pStructureDefinition, pQueryName, null, null, null, null);
+    return new GenericQueryBuilder(pStructureDefinition, pQueryName, null, null, null, null, null);
   }
 
   /**

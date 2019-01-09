@@ -88,4 +88,6 @@ public interface IJDBCDialect {
 
   public String getAutoIncrement(KVColumnType pType, BigDecimal pAutoIncrementStart,
     @Nullable BigDecimal pAutoIncrementBy);
+  
+  public String getLimitKeyword();
 }
