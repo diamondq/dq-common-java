@@ -58,7 +58,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
     if (pCacheStructures == true) {
       CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
       if (pCacheStructuresSeconds > 0)
-        builder = builder.expireAfterWrite(pCacheStructuresSeconds, TimeUnit.SECONDS);
+        builder = builder.expireAfterAccess(pCacheStructuresSeconds, TimeUnit.SECONDS);
       mStructureCache = builder.build();
     }
     else
@@ -66,12 +66,12 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
     if (pCacheStructureDefinitions == true) {
       CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
       if (pCacheStructureDefinitionsSeconds > 0)
-        builder = builder.expireAfterWrite(pCacheStructureDefinitionsSeconds, TimeUnit.SECONDS);
+        builder = builder.expireAfterAccess(pCacheStructureDefinitionsSeconds, TimeUnit.SECONDS);
       mStructureDefinitionCache = builder.build();
 
       builder = CacheBuilder.newBuilder();
       if (pCacheStructureDefinitionsSeconds > 0)
-        builder = builder.expireAfterWrite(pCacheStructureDefinitionsSeconds, TimeUnit.SECONDS);
+        builder = builder.expireAfterAccess(pCacheStructureDefinitionsSeconds, TimeUnit.SECONDS);
       mStructureDefinitionRevisionCache = builder.build();
     }
     else {
@@ -81,7 +81,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
     if (pCacheEditorStructureDefinitions == true) {
       CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
       if (pCacheEditorStructureDefinitionsSeconds > 0)
-        builder = builder.expireAfterWrite(pCacheEditorStructureDefinitionsSeconds, TimeUnit.SECONDS);
+        builder = builder.expireAfterAccess(pCacheEditorStructureDefinitionsSeconds, TimeUnit.SECONDS);
       mEditorStructureDefinitionCacheByRef = builder.build();
     }
     else
@@ -89,7 +89,7 @@ public abstract class AbstractCachingPersistenceLayer extends AbstractPersistenc
     if (pCacheResources == true) {
       CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
       if (pCacheResourcesSeconds > 0)
-        builder = builder.expireAfterWrite(pCacheResourcesSeconds, TimeUnit.SECONDS);
+        builder = builder.expireAfterAccess(pCacheResourcesSeconds, TimeUnit.SECONDS);
       mResourceCache = builder.build();
     }
     else
