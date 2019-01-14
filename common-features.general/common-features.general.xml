@@ -3,14 +3,14 @@
   xmlns="http://karaf.apache.org/xmlns/features/v1.5.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.5.0 feature-1.5.0.xsd">
-  <feature name="aries-spifly" version="1.0.10" install="manual">
-    <bundle start-level="35">mvn:org.ow2.asm/asm/6.2</bundle>
-    <bundle start-level="35">mvn:org.ow2.asm/asm-analysis/6.2</bundle>
-    <bundle start-level="35">mvn:org.ow2.asm/asm-commons/6.2</bundle>
-    <bundle start-level="35">mvn:org.ow2.asm/asm-tree/6.2</bundle>
-    <bundle start-level="35">mvn:org.ow2.asm/asm-util/6.2</bundle>
+  <feature name="aries-spifly" version="1.2" install="manual">
+    <bundle start-level="35">mvn:org.ow2.asm/asm/7.0</bundle>
+    <bundle start-level="35">mvn:org.ow2.asm/asm-analysis/7.0</bundle>
+    <bundle start-level="35">mvn:org.ow2.asm/asm-commons/7.0</bundle>
+    <bundle start-level="35">mvn:org.ow2.asm/asm-tree/7.0</bundle>
+    <bundle start-level="35">mvn:org.ow2.asm/asm-util/7.0</bundle>
     <bundle start-level="35">mvn:org.apache.aries/org.apache.aries.util/1.1.3</bundle>
-    <bundle start-level="35">mvn:org.apache.aries.spifly/org.apache.aries.spifly.dynamic.bundle/1.0.10</bundle>
+    <bundle start-level="35">mvn:org.apache.aries.spifly/org.apache.aries.spifly.dynamic.bundle/1.2</bundle>
   </feature>
   <feature name="hk2" version="2.5.0-b61" install="manual">
     <bundle>mvn:javax.annotation/javax.annotation-api/1.2</bundle>
