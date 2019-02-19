@@ -24,8 +24,8 @@
       <artifactId>vertx-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-discovery</artifactId>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-thirdparty.vertx.service.discovery</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
