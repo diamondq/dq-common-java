@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils: Logback Fragment</name>
   <properties>
-    <osgi.import.packages>com.diamondq.common.utils.logback</osgi.import.packages>
+    <osgi.dynamicimport.package>*</osgi.dynamicimport.package>
     <osgi.export.packages>
       ch.qos.logback.core;version="1.2.2";uses:="ch.qos.logback.core.encoder,ch.qos.logback.core.filter,ch.qos.logback.core.helpers,ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi,ch.qos.logback.core.status,ch.qos.logback.core.util",
       ch.qos.logback.core.boolex;version="1.2.2";uses:="ch.qos.logback.core.spi",
