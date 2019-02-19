@@ -24,14 +24,8 @@
       <artifactId>jul-to-slf4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.casbin</groupId>
-      <artifactId>jcasbin</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-thirdparty.jcasbin</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
