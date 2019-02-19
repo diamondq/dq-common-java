@@ -21,6 +21,7 @@
         <groupId>com.diamondq.common</groupId>
         <artifactId>common-features.general</artifactId>
         <version>${project.version}</version>
+        <classifier>features</classifier>
         <type>xml</type>
       </dependency>
       <dependency>
