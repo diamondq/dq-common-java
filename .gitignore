@@ -30,6 +30,7 @@ target/
 .project
 .settings/
 .flattened-pom.xml
+.apt_generated_tests/
 bin/
 generated/
 
