@@ -22,6 +22,8 @@
     <module>../jaxrs/common-jaxrs.resteasy</module>
     <module>../injection/common-injection.cdi</module>
     <module>../injection/common-injection.cdi.weld</module>
+    <module>../injection/common-injection.common</module>
+    <module>../injection/common-injection.micronaut</module>
     <module>../injection/common-injection.osgi</module>
     <module>../metrics/common-metrics.micrometer</module>
     <module>../security/common-security.jcasbin</module>
@@ -49,6 +51,7 @@
     <module>../utils/common-utils.parsing</module>
     <module>../utils/common-utils.sync</module>
     <module>../vertx/common-vertx.common</module>
+    <module>../vertx/common-vertx.common.osgi</module>
     <module>../vertx/common-vertx.processor</module>
     <module>../vertx/common-vertx.processor.tests</module>
     <module>../xmpp/common-xmpp.standard</module>

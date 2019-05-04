@@ -22,7 +22,7 @@
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-vertx.common</artifactId>
+      <artifactId>common-vertx.common.osgi</artifactId>
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>

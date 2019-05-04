@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import javax.inject.Singleton;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.slf4j.MarkerFactory;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 
+@Singleton
 public class LoggingContextHandler implements ContextHandler {
 
   private ConcurrentMap<Class<?>, Logger> mLoggerMap               = new ConcurrentHashMap<>();

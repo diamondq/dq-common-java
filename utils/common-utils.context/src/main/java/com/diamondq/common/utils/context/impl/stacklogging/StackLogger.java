@@ -5,11 +5,19 @@ import com.diamondq.common.utils.context.spi.ContextHandler;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 import java.util.function.Function;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.osgi.service.component.ComponentContext;
+import javax.annotation.PostConstruct;
+import javax.inject.Singleton;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
+
+@Singleton
+@Requires(property = "dq.logging.stacklogger.file")
 public class StackLogger implements ContextHandler {
 
   private FileWriter mWriter;
@@ -18,8 +26,9 @@ public class StackLogger implements ContextHandler {
   public StackLogger() {
   }
 
-  public void onActivate(ComponentContext pContext) {
-    String fileName = (String) pContext.getProperties().get(".file");
+  @PostConstruct
+  public void onActivate(@Property(name = "dq.logging.stacklogger") Map<String, Object> pProperties) {
+    String fileName = (String) pProperties.get(".file");
     try {
       mWriter = new FileWriter(fileName);
     }

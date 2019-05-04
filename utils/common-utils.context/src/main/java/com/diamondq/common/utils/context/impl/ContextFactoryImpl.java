@@ -7,12 +7,18 @@ import com.diamondq.common.utils.context.spi.ContextClass;
 import com.diamondq.common.utils.context.spi.ContextHandler;
 import com.diamondq.common.utils.context.spi.SPIContextFactory;
 
+import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@Singleton
 public class ContextFactoryImpl implements SPIContextFactory {
 
   private static final Object                        sNULL_EXIT_VALUE     = new Object();
@@ -38,11 +44,18 @@ public class ContextFactoryImpl implements SPIContextFactory {
   /**
    * The onActivate is called when OSGi has finished initializing us.
    */
+  @PostConstruct
   public void onActivate() {
 
     /* Override the existing sINSTANCE with the fully configured one */
 
     sINSTANCE = this;
+  }
+
+  @Inject
+  public void setContextHandlers(List<ContextHandler> pHandlers) {
+    for (ContextHandler handler : pHandlers)
+      addContextHandler(handler);
   }
 
   public void addContextHandler(ContextHandler pHandler) {

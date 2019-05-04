@@ -36,6 +36,16 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
+        <artifactId>common-injection.common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-injection.micronaut</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
         <artifactId>common-injection.osgi</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -198,6 +208,11 @@
       <dependency>
         <groupId>com.diamondq.common</groupId>
         <artifactId>common-vertx.common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-vertx.common.osgi</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

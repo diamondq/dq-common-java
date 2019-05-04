@@ -1,0 +1,3 @@
+com.diamondq.common.injection.cdi.CachedEventExtension
+com.diamondq.common.injection.cdi.DebugExtension
+com.diamondq.common.injection.cdi.OSInjectionExtension

@@ -7,45 +7,21 @@
     <version>0.2.0-SNAPSHOT</version>
     <relativePath>../../common-parent</relativePath>
   </parent>
-  <artifactId>common-vertx.common</artifactId>
+  <artifactId>common-vertx.common.osgi</artifactId>
   <packaging>jar</packaging>
-  <name>DiamondQ Common: Vert.x: Common</name>
+  <name>DiamondQ Common: Vert.x: Common Osgi</name>
   <dependencies>
     <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-core</artifactId>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-vertx.common</artifactId>
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-thirdparty.vertx.service.discovery</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.javatuples</groupId>
-      <artifactId>javatuples</artifactId>
+      <artifactId>common-injection.osgi</artifactId>
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-security.acl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
-      <artifactId>common-utils.parsing</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
-      <artifactId>common-utils.misc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
-      <artifactId>common-utils.context</artifactId>
+      <artifactId>common-metrics.micrometer</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
