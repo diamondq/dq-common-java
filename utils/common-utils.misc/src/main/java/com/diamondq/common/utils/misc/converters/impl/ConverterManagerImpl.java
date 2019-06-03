@@ -6,14 +6,19 @@ import com.diamondq.common.utils.misc.converters.ConverterManager;
 import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@Singleton
 public class ConverterManagerImpl implements ConverterManager {
 
   private static class ClassPair {
@@ -52,15 +57,12 @@ public class ConverterManagerImpl implements ConverterManager {
 
   private final ConcurrentMap<ClassPair, ClassPair>       mShortcuts         = new ConcurrentHashMap<>();
 
-  public void addConverter(Converter<?, ?> pConverter) {
-    mConvertersByClass.put(new ClassPair(pConverter.getInputClass(), pConverter.getOutputClass()), pConverter);
+  @Inject
+  public void setConverters(List<Converter<?, ?>> pConverters) {
+    for (Converter<?, ?> pConverter : pConverters) {
+      mConvertersByClass.put(new ClassPair(pConverter.getInputClass(), pConverter.getOutputClass()), pConverter);
+    }
     mShortcuts.clear();
-  }
-
-  public void removeConverter(Converter<?, ?> pConverter) {
-    if (mConvertersByClass.remove(new ClassPair(pConverter.getInputClass(), pConverter.getOutputClass()),
-      pConverter) == true)
-      mShortcuts.clear();
   }
 
   private void recurseInterface(Class<?> pClass, Set<Class<?>> pSet) {

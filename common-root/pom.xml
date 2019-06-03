@@ -51,6 +51,7 @@
     <module>../utils/common-utils.parsing</module>
     <module>../utils/common-utils.sync</module>
     <module>../vertx/common-vertx.common</module>
+    <module>../vertx/common-vertx.common.micronaut</module>
     <module>../vertx/common-vertx.common.osgi</module>
     <module>../vertx/common-vertx.processor</module>
     <module>../vertx/common-vertx.processor.tests</module>

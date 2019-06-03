@@ -18,10 +18,18 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.osgi.framework.Constants;
-import org.osgi.service.component.ComponentContext;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import org.osgi.framework.Constants;
+
+import io.micronaut.context.annotation.Property;
+
+@Singleton
 public class SecurityContextManagerImpl implements SecurityContextManager {
+
+  private static final String PID = "security-context-manager";
 
   private ContextFactory                                   mContextFactory;
 
@@ -31,6 +39,7 @@ public class SecurityContextManagerImpl implements SecurityContextManager {
   public SecurityContextManagerImpl() {
   }
 
+  @Inject
   public void setContextFactory(ContextFactory pContextFactory) {
     ContextFactory.staticReportTrace(SecurityContextManagerImpl.class, this, pContextFactory);
     mContextFactory = pContextFactory;
@@ -46,8 +55,9 @@ public class SecurityContextManagerImpl implements SecurityContextManager {
     mSerializers.remove(pSerializer.getSerializerId(), pSerializer);
   }
 
-  public void onActivate(ComponentContext pContext) {
-    String pid = Verify.notNull((String) pContext.getProperties().get(Constants.SERVICE_PID));
+  @PostConstruct
+  public void onActivate(@Property(name = PID) Map<String, Object> pProperties) {
+    String pid = Verify.notNull((String) pProperties.getOrDefault(Constants.SERVICE_PID, PID));
     Verify.notNullArg(mContextFactory, MiscMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
   }
 
