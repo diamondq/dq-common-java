@@ -1,4 +1,4 @@
-package com.diamondq.common.vertx.impl;
+package com.diamondq.common.vertx;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.FutureUtils;
@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
+import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Value;
 import io.vertx.core.Vertx;
@@ -27,6 +28,7 @@ import io.vertx.core.logging.SLF4JLogDelegateFactory;
 @Factory
 public class VertxFactory {
 
+  @Bean(preDestroy = "close")
   public @Singleton Vertx getVertx(@Value("${vertx.blockedthreadcheckinternal:}") String pBlockedThreadCheckInterval,
     @Value("${vertx.blockedthreadcheckinternalunit:}") String pBlockedThreadCheckIntervalUnit,
     List<MessageCodecWrapper<Object, Object>> pCodecs) {

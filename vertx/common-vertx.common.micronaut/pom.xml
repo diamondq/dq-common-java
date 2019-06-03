@@ -7,9 +7,9 @@
     <version>0.2.0-SNAPSHOT</version>
     <relativePath>../../common-parent</relativePath>
   </parent>
-  <artifactId>common-vertx.common.osgi</artifactId>
+  <artifactId>common-vertx.common.micronaut</artifactId>
   <packaging>jar</packaging>
-  <name>DiamondQ Common: Vert.x: Common Osgi</name>
+  <name>DiamondQ Common: Vert.x: Common Micronaut</name>
   <dependencies>
     <dependency>
       <groupId>com.diamondq.common</groupId>
@@ -21,11 +21,15 @@
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-injection.osgi</artifactId>
+      <artifactId>common-injection.micronaut</artifactId>
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
       <artifactId>common-metrics.micrometer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-service-proxy</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -45,11 +49,6 @@
     <dependency>
       <groupId>org.codehaus.janino</groupId>
       <artifactId>janino</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.sling</groupId>
-      <artifactId>org.apache.sling.testing.osgi-mock.junit4</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

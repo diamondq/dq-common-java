@@ -67,19 +67,18 @@ public class VertxUtils {
     mDefaultVertx = pDefaultVertx;
   }
 
-  public static <V extends Verticle> Closeable deployMultiInstance(Vertx pVertx, V pVerticle,
-    @Nullable Consumer2<V, Context> pOnStarted) {
+  public static <V extends Verticle> ContextExtendedCompletionStage<Closeable> deployMultiInstance(Vertx pVertx, V pVerticle) {
     int deployCount = Runtime.getRuntime().availableProcessors() * 2;
-    return deployMultiInstance(pVertx, pVerticle, pOnStarted, deployCount);
+    return deployMultiInstance(pVertx, pVerticle, deployCount);
   }
 
-  public static <V extends Verticle> Closeable deployMultiInstance(Vertx pVertx, V pVerticle,
-    @Nullable Consumer2<V, Context> pOnStarted, int pDeployCount) {
+  public static <V extends Verticle> ContextExtendedCompletionStage<Closeable> deployMultiInstance(Vertx pVertx, V pVerticle,
+    int pDeployCount) {
 
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    try (Context ctx =
-      ContextFactory.getInstance().newContext(VertxUtils.class, null, pVertx, pVerticle, pOnStarted, pDeployCount)) {
+    try (
+      Context ctx = ContextFactory.getInstance().newContext(VertxUtils.class, null, pVertx, pVerticle, pDeployCount)) {
 
       @Nullable
       String[] deploymentIds = new @Nullable String[pDeployCount];
@@ -101,21 +100,7 @@ public class VertxUtils {
       ContextExtendedCompletableFuture<Object> holderFuture = FutureUtils.newCompletableFuture();
       ContextExtendedCompletionStage<@Nullable Void> deploymentFuture = holderFuture.relatedAllOf(futures);
 
-      deploymentFuture.thenAccept((v) -> {
-        if (pOnStarted != null) {
-          currentContext.prepareForAlternateThreads();
-          try (Context deployContext = currentContext.activateOnThread("")) {
-            pOnStarted.accept(pVerticle, deployContext);
-          }
-        }
-      }).handle((t, ex) -> {
-        if (ex != null)
-          ContextFactory.staticReportThrowable(VertxUtils.class, VertxUtils.class, ex);
-        try (Context handleContext = currentContext.activateOnThread("")) {
-        }
-        return t;
-      });
-      return new Undeployer(pVertx, deploymentIds);
+      return deploymentFuture.thenApply((v, ctx2) -> new Undeployer(pVertx, deploymentIds));
     }
   }
 

@@ -1,4 +1,4 @@
-package com.diamondq.common.vertx.impl;
+package com.diamondq.common.vertx;
 
 import com.diamondq.common.vertx.BaseMessageCodecWrapper;
 
