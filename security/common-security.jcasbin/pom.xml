@@ -47,5 +47,10 @@
       <artifactId>common-utils.logback</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-utils.context</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
