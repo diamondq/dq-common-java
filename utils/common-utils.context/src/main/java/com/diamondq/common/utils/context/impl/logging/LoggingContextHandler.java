@@ -358,7 +358,7 @@ public class LoggingContextHandler implements ContextHandler {
       /* Add the throwable back in */
 
       if (lastEntry instanceof Throwable)
-        expandedArgs[expandedArgs.length] = lastEntry;
+        expandedArgs[expandedArgs.length - 1] = lastEntry;
     }
     else
       filteredArgs = pArgs;
