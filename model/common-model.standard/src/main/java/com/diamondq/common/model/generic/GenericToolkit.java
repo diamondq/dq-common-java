@@ -12,12 +12,12 @@ import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.QueryBuilder;
 import com.diamondq.common.model.interfaces.Scope;
+import com.diamondq.common.model.interfaces.SettableToolkit;
 import com.diamondq.common.model.interfaces.StandardMigrations;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
-import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
 import com.google.common.collect.Maps;
 
@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
 
 @Vetoed
-public class GenericToolkit implements Toolkit {
+public class GenericToolkit implements SettableToolkit {
 
   private final ConcurrentMap<Scope, PersistenceLayer> mPersistence = Maps.newConcurrentMap();
 
@@ -99,6 +99,7 @@ public class GenericToolkit implements Toolkit {
    * @param pScope the scope
    * @param pLayer the persistence layer
    */
+  @Override
   public void setPersistenceLayer(Scope pScope, PersistenceLayer pLayer) {
     mPersistence.put(pScope, pLayer);
   }
@@ -110,6 +111,7 @@ public class GenericToolkit implements Toolkit {
    * @param pScope the scope
    * @return the persistence layer, never null.
    */
+  @Override
   public PersistenceLayer getPersistenceLayer(Scope pScope) {
     PersistenceLayer layer = mPersistence.get(pScope);
     if (layer == null)

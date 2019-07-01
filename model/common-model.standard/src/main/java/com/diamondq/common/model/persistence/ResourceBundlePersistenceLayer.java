@@ -81,7 +81,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
     super(pContextFactory, false, -1, false, -1, false, -1, true, -1);
     ContextFactory.staticReportTrace(ResourceBundlePersistenceLayer.class, this, pResourceBaseName, pClassLoader);
     mBaseName = pResourceBaseName;
-    mClassLoader = pClassLoader;
+    mClassLoader = (pClassLoader == null ? ResourceBundlePersistenceLayer.class.getClassLoader() : pClassLoader);
   }
 
   /**

@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -29,6 +30,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -196,13 +198,18 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     return mStructureBaseDir;
   }
 
-  protected @Nullable File getStructureFile(String pKey, boolean pCreateIfMissing) {
+  protected @Nullable File getStructureDefBaseDir() {
+    return mStructureDefBaseDir;
+  }
+
+  protected @Nullable File getStructureFile(String pKey, Supplier<@Nullable File> pParentFileSupplier,
+    boolean pCreateIfMissing) {
     try (Context context =
       mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pKey, pCreateIfMissing)) {
       @NonNull
       String[] parts = pKey.split("/");
       parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
-      File structureFile = getStructureBaseDir();
+      File structureFile = pParentFileSupplier.get();
       if (structureFile == null)
         throw new IllegalStateException("Constructor was called with a null structureFile");
       for (String p : parts)
@@ -241,7 +248,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     boolean pCreateIfMissing) {
     try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
       pDefName, pKey, pCreateIfMissing)) {
-      File structureFile = getStructureFile(pKey, pCreateIfMissing);
+      File structureFile = getStructureFile(pKey, this::getStructureBaseDir, pCreateIfMissing);
       if (structureFile == null)
         return context.exit(null);
 
@@ -476,7 +483,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     Properties pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
     try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
       pDefName, pKey, pConfig, pMustMatchOptimisticObj, pOptimisticObj)) {
-      File structureFile = getStructureFile(pKey, true);
+      File structureFile = getStructureFile(pKey, this::getStructureBaseDir, true);
 
       if (pMustMatchOptimisticObj == true) {
         @Nullable
@@ -519,6 +526,35 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   }
 
   /**
+   * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalWriteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
+   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   */
+  @Override
+  protected StructureDefinition internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope,
+    StructureDefinition pValue) {
+    if (mPersistStructureDefinitions == false)
+      return pValue;
+
+    byte[] bytes = pValue.saveToByteArray();
+    StringBuilder key = new StringBuilder();
+    key.append(pValue.getName());
+    key.append('-');
+    key.append(pValue.getRevision());
+    File defFile = getStructureFile(key.toString(), this::getStructureDefBaseDir, true);
+    Properties p = new Properties();
+    p.put("definition", Base64.getEncoder().encodeToString(bytes));
+    try {
+      try (FileWriter fw = new FileWriter(defFile)) {
+        p.store(fw, "");
+      }
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+    return pValue;
+  }
+
+  /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
    *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
    *      com.diamondq.common.model.interfaces.Structure)
@@ -528,7 +564,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     Structure pStructure) {
     try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
       pDefName, pKey, pStructure)) {
-      File structureFile = getStructureFile(pKey, false);
+      File structureFile = getStructureFile(pKey, this::getStructureBaseDir, false);
       if (structureFile == null)
         return context.exit(false);
 
