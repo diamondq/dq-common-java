@@ -7,6 +7,7 @@ import com.diamondq.common.lambda.interfaces.Consumer3;
 import com.diamondq.common.lambda.interfaces.Consumer4;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
+import com.diamondq.common.lambda.interfaces.Function4;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
@@ -67,13 +68,14 @@ public class VertxUtils {
     mDefaultVertx = pDefaultVertx;
   }
 
-  public static <V extends Verticle> ContextExtendedCompletionStage<Closeable> deployMultiInstance(Vertx pVertx, V pVerticle) {
+  public static <V extends Verticle> ContextExtendedCompletionStage<Closeable> deployMultiInstance(Vertx pVertx,
+    V pVerticle) {
     int deployCount = Runtime.getRuntime().availableProcessors() * 2;
     return deployMultiInstance(pVertx, pVerticle, deployCount);
   }
 
-  public static <V extends Verticle> ContextExtendedCompletionStage<Closeable> deployMultiInstance(Vertx pVertx, V pVerticle,
-    int pDeployCount) {
+  public static <V extends Verticle> ContextExtendedCompletionStage<Closeable> deployMultiInstance(Vertx pVertx,
+    V pVerticle, int pDeployCount) {
 
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
@@ -410,6 +412,94 @@ public class VertxUtils {
     Consumer4<A1, A2, A3, Handler<AsyncResult<R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
+        if (result == null)
+          future.completeExceptionally(new IllegalArgumentException());
+        else
+          future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <R, FR> ContextExtendedCompletionStage<R> callIgnoreReturn(
+    Function<Handler<AsyncResult<R>>, FR> pCallee) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.apply((ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
+        if (result == null)
+          future.completeExceptionally(new IllegalArgumentException());
+        else
+          future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <A1, R, FR> ContextExtendedCompletionStage<R> callIgnoreReturn(
+    Function2<A1, Handler<AsyncResult<R>>, FR> pCallee, A1 pArg1) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.apply(pArg1, (ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
+        if (result == null)
+          future.completeExceptionally(new IllegalArgumentException());
+        else
+          future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <A1, A2, R, FR> ContextExtendedCompletionStage<R> callIgnoreReturn(
+    Function3<A1, A2, Handler<AsyncResult<R>>, FR> pCallee, A1 pArg1, A2 pArg2) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.apply(pArg1, pArg2, (ar) -> {
+      if (ar.succeeded() == false) {
+        Throwable cause = ar.cause();
+        if (cause == null)
+          cause = new RuntimeException();
+        future.completeExceptionally(cause);
+      }
+      else {
+        @Nullable
+        R result = ar.result();
+        if (result == null)
+          future.completeExceptionally(new IllegalArgumentException());
+        else
+          future.complete(result);
+      }
+    });
+    return future;
+  }
+
+  public static <A1, A2, A3, R, FR> ContextExtendedCompletionStage<R> callIgnoreReturn(
+    Function4<A1, A2, A3, Handler<AsyncResult<R>>, FR> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
+    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+    pCallee.apply(pArg1, pArg2, pArg3, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
         if (cause == null)
