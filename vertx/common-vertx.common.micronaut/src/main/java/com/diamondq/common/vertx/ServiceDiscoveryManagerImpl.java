@@ -19,12 +19,10 @@ import javax.inject.Singleton;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import ch.qos.logback.core.util.TimeUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
-import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.Status;
 import io.vertx.serviceproxy.ServiceProxyBuilder;
 
@@ -74,7 +72,8 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
   }
 
   /**
-   * @see com.diamondq.common.vertx.ServiceDiscoveryManager#lookupService(io.vertx.core.Vertx, java.lang.Class, java.lang.String)
+   * @see com.diamondq.common.vertx.ServiceDiscoveryManager#lookupService(io.vertx.core.Vertx, java.lang.Class,
+   *      java.lang.String)
    */
   @Override
   public <T> ContextExtendedCompletionStage<T> lookupService(Vertx pVertx, Class<T> pClass, String pName) {
@@ -113,7 +112,7 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
             /* Now resolve the reference */
 
             String address = r.getLocation().getString("endpoint");
-            
+
             T result = new ServiceProxyBuilder(pVertx).setAddress(address).build(pClass);
             return result;
           })
