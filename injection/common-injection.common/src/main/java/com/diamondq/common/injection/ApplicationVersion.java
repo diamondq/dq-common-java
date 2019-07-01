@@ -1,4 +1,4 @@
-package com.diamondq.common.injection.osgi;
+package com.diamondq.common.injection;
 
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 
