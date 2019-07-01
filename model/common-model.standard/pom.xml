@@ -29,9 +29,14 @@
       <artifactId>common-storage.kv</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-      <optional>true</optional>
+      <groupId>javax</groupId>
+      <artifactId>javaee-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.sun.mail</groupId>
+          <artifactId>javax.mail</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.diamondq.common.config</groupId>
@@ -57,6 +62,7 @@
     <dependency>
       <groupId>com.diamondq.common</groupId>
       <artifactId>common-injection.osgi</artifactId>
+      <optional>true</optional>
     </dependency>
   </dependencies>
   <build>
