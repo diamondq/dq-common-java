@@ -31,6 +31,7 @@
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-api</artifactId>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <groupId>com.sun.mail</groupId>

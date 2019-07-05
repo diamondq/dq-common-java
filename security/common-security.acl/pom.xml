@@ -20,5 +20,10 @@
       <artifactId>javax.servlet-api</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-inject</artifactId>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 </project>

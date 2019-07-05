@@ -15,5 +15,9 @@
       <groupId>com.diamondq.common</groupId>
       <artifactId>common-utils.parsing</artifactId>
     </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
   </dependencies>
 </project>
