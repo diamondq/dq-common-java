@@ -11,16 +11,18 @@
     <artifactId>common-utils.scxml</artifactId>
     <packaging>jar</packaging>
     <name>DiamondQ Common: Utils: SCXML</name>
-    <repository>
-        <id>apache-snapshots</id>
-        <url>https://repository.apache.org/content/repositories/snapshots</url>
-        <releases>
-            <enabled>false</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
+    <repositories>
+        <repository>
+            <id>apache-snapshots</id>
+            <url>https://repository.apache.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.diamondq.common</groupId>
