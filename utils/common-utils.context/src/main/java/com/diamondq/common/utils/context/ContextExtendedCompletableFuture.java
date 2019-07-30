@@ -10,6 +10,7 @@ import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.utils.misc.Holder;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -32,6 +33,33 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
 
   public static <U> ContextExtendedCompletableFuture<U> completedFuture(U value) {
     return new ContextExtendedCompletableFuture<>(CompletableFuture.completedFuture(value));
+  }
+
+  public static <T> ContextExtendedCompletableFuture<T> completedFailure(Throwable pValue) {
+    ContextExtendedCompletableFuture<T> future = new ContextExtendedCompletableFuture<>();
+    future.completeExceptionally(pValue);
+    return future;
+  }
+
+  public static <T> ContextExtendedCompletableFuture<T> newCompletableFuture() {
+    return new ContextExtendedCompletableFuture<>();
+  }
+
+  public static <T> ContextExtendedCompletableFuture<List<T>> listOf(List<? extends ExtendedCompletionStage<T>> cfs) {
+    CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
+    int i = 0;
+    for (ExtendedCompletionStage<T> cf : cfs)
+      args[i++] = decomposeToCompletableFuture(cf);
+    return new ContextExtendedCompletableFuture<List<T>>(CompletableFuture.allOf(args).thenApply((v) -> {
+      List<T> results = new ArrayList<>();
+      for (ExtendedCompletionStage<T> stage : cfs) {
+        if (stage instanceof ExtendedCompletableFuture)
+          results.add(((ExtendedCompletableFuture<T>) stage).join());
+        else
+          throw new UnsupportedOperationException();
+      }
+      return results;
+    }));
   }
 
   /**
