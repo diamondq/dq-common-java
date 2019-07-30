@@ -102,8 +102,9 @@ public class AbstractInvoker implements Invoker {
   @Override
   public void cancel() throws InvokerException {
     mCancelled = true;
-    mExecutor
-      .addEvent(new EventBuilder("cancel.invoke." + mInvokeId, TriggerEvent.CANCEL_EVENT).invokeId(mInvokeId).build());
+    /* Sending a CANCEL_EVENT causes the entire event loop to end */
+    // mExecutor
+    // .addEvent(new EventBuilder("cancel.invoke." + mInvokeId, TriggerEvent.CANCEL_EVENT).invokeId(mInvokeId).build());
   }
 
 }

@@ -18,7 +18,6 @@ import org.apache.commons.scxml2.SCXMLExecutor;
 import org.apache.commons.scxml2.SCXMLSemantics;
 import org.apache.commons.scxml2.env.SimpleDispatcher;
 import org.apache.commons.scxml2.env.Tracer;
-import org.apache.commons.scxml2.env.jexl.JexlContext;
 import org.apache.commons.scxml2.invoke.Invoker;
 import org.apache.commons.scxml2.model.ModelException;
 import org.apache.commons.scxml2.model.SCXML;
@@ -45,7 +44,7 @@ public class SCXMLExecutorFactoryImpl implements SCXMLExecutorFactory {
 
     Evaluator evaluator = EvaluatorFactory.getEvaluator(pSCXML);
 
-    Context context = new JexlContext();
+    Context context = new DQJexlContext();
     EventDispatcher eventDispatcher = new SimpleDispatcher();
     ErrorReporter errorReporter = new Tracer();
     SCXMLSemantics semantics = new DQSCXMLSemanticsImpl();
