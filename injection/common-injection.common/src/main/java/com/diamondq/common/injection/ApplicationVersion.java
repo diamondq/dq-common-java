@@ -1,7 +1,5 @@
 package com.diamondq.common.injection;
 
-import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
-
 import java.util.Map;
 
 public class ApplicationVersion {
@@ -14,7 +12,14 @@ public class ApplicationVersion {
 
   public void onActivate(Map<String, Object> pProps) {
 
-    mVersion = PropertiesParsing.getNonNullString(pProps, ".application-version", "0.1.0-FALLBACK");
+    Object propObj = pProps.get(".application-version");
+    String val;
+    if (propObj == null)
+      val = "0.1.0-FALLBACK";
+    else
+      val = propObj.toString();
+    mVersion = val;
+
   }
 
   public String getVersion() {
