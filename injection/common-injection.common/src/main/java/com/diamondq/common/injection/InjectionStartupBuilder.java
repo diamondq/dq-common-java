@@ -2,6 +2,8 @@ package com.diamondq.common.injection;
 
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 public interface InjectionStartupBuilder
 {
 
@@ -22,6 +24,14 @@ public interface InjectionStartupBuilder
 	 * @return the builder for fluent use
 	 */
 	public InjectionStartupBuilder addPropertyMap(Map<String, Object> pProperties);
+
+	/**
+	 * Adds singletons to the injection engine
+	 *
+	 * @param pSingletons
+	 * @return the builder for fluent use
+	 */
+	public InjectionStartupBuilder singletons(@NonNull Object... pSingletons);
 
 	/**
 	 * Build the Injection engine and start it
