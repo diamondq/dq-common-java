@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer.SpanBuilder;
+import io.opentracing.util.GlobalTracer;
 import rocks.xmpp.core.session.XmppSession;
 import rocks.xmpp.core.session.debug.XmppDebugger;
 import rocks.xmpp.core.stanza.model.IQ;
@@ -31,8 +33,12 @@ public class LoggerDebugger implements XmppDebugger {
       if (id != null) {
         SpanBuilder builder = OpenTracingExtender.processID(id);
         if (builder != null) {
-          try (Scope scope = builder.startActive(true)) {
+          Span span = builder.start();
+          try (Scope scope = GlobalTracer.get().scopeManager().activate(span)) {
             sLogger.debug("OUT: {}", xml);
+          }
+          finally {
+            span.finish();
           }
           return;
         }
@@ -49,8 +55,12 @@ public class LoggerDebugger implements XmppDebugger {
       if (id != null) {
         SpanBuilder builder = OpenTracingExtender.processID(id);
         if (builder != null) {
-          try (Scope scope = builder.startActive(true)) {
+          Span span = builder.start();
+          try (Scope scope = GlobalTracer.get().activateSpan(span)) {
             sLogger.debug("IN: {}", xml);
+          }
+          finally {
+            span.finish();
           }
           return;
         }

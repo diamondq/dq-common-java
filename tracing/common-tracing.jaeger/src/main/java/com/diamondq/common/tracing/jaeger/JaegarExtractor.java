@@ -20,10 +20,9 @@ public class JaegarExtractor implements TraceIdExtractor {
     if (pSpan == null)
       return null;
     SpanContext context = pSpan.context();
-    if ((context instanceof com.uber.jaeger.SpanContext) == false)
+    if ((context instanceof io.jaegertracing.internal.JaegerSpanContext) == false)
       return null;
-    long traceId = ((com.uber.jaeger.SpanContext) context).getTraceId();
-    return String.format("%x", traceId);
+    return ((io.jaegertracing.internal.JaegerSpanContext) context).getTraceId();
   }
 
 }

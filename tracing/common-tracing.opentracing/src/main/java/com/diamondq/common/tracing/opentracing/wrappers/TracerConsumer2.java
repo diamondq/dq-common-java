@@ -38,7 +38,7 @@ public class TracerConsumer2<A, B> extends AbstractTracerWrapper implements Cons
         mDelegate.accept(pA, pB);
         return;
       }
-      try (Scope scope = mScopeManager.activate(mSpan, false)) {
+      try (Scope scope = mScopeManager.activate(mSpan)) {
         inAccept = true;
         mDelegate.accept(pA, pB);
         inAccept = false;

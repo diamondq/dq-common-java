@@ -39,7 +39,7 @@ public class TracerFunction2<A, B, C> extends AbstractTracerWrapper
         inApply = true;
         return mDelegate.apply(pA, pB);
       }
-      try (Scope scope = mScopeManager.activate(mSpan, false)) {
+      try (Scope scope = mScopeManager.activate(mSpan)) {
         inApply = true;
         C result = mDelegate.apply(pA, pB);
         inApply = false;

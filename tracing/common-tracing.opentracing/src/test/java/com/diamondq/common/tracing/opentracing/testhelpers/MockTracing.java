@@ -11,7 +11,8 @@ public class MockTracing {
   public static MockTracer before() {
     MockTracer mockTracker = new MockTracer(new ThreadLocalScopeManager());
     CleanupGlobalTracer.cleanup();
-    GlobalTracer.register(mockTracker);
+    if (GlobalTracer.registerIfAbsent(mockTracker) == false)
+      throw new IllegalStateException("Unable to register replacement GlobalTracer");
     return mockTracker;
   }
 

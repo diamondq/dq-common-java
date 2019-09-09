@@ -38,7 +38,7 @@ public class TracerRunnable extends AbstractTracerWrapper
         mDelegate.run();
         return;
       }
-      try (Scope scope = mScopeManager.activate(mSpan, false)) {
+      try (Scope scope = mScopeManager.activate(mSpan)) {
         inRun = true;
         mDelegate.run();
         inRun = false;

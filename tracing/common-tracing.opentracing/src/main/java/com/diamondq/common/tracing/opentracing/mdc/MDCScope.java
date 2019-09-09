@@ -5,7 +5,6 @@ import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 import org.slf4j.MDC;
 
 import io.opentracing.Scope;
-import io.opentracing.Span;
 
 public class MDCScope implements Scope {
 
@@ -23,14 +22,6 @@ public class MDCScope implements Scope {
 
   public void cleanup() {
     MDC.remove("traceId");
-  }
-
-  /**
-   * @see io.opentracing.Scope#span()
-   */
-  @Override
-  public Span span() {
-    return mDelegate.span();
   }
 
 }

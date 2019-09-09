@@ -9,6 +9,7 @@ import org.slf4j.MDC;
 
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
+import io.opentracing.tag.Tag;
 
 public class MDCSpan implements Span {
 
@@ -93,6 +94,11 @@ public class MDCSpan implements Span {
   @Override
   public void finish(long pFinishMicros) {
     mDelegate.finish(pFinishMicros);
+  }
+
+  @Override
+  public <T> Span setTag(Tag<T> pTag, T pValue) {
+    return mDelegate.setTag(pTag, pValue);
   }
 
 }

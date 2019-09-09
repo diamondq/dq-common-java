@@ -10,6 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.opentracing.Scope;
 import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
@@ -27,6 +28,7 @@ public class NoopTracer implements Tracer {
 
   private Tracer              mDelegate;
 
+  @SuppressWarnings("deprecation")
   @Inject
   public NoopTracer() {
     mDelegate = NoopTracerFactory.create();
@@ -75,5 +77,15 @@ public class NoopTracer implements Tracer {
   @Override
   public <C> SpanContext extract(Format<C> pFormat, @NonNull C pCarrier) {
     return mDelegate.extract(pFormat, pCarrier);
+  }
+
+  @Override
+  public Scope activateSpan(Span pSpan) {
+    return mDelegate.activateSpan(pSpan);
+  }
+
+  @Override
+  public void close() {
+    mDelegate.close();
   }
 }

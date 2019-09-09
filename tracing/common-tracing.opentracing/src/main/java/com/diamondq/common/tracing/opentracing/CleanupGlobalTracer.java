@@ -26,6 +26,10 @@ public class CleanupGlobalTracer {
       Field field = GlobalTracer.class.getDeclaredField("tracer");
       field.setAccessible(true);
       field.set(null, NoopTracerFactory.create());
+      
+      Field registeredField = GlobalTracer.class.getDeclaredField("isRegistered");
+      registeredField.setAccessible(true);
+      registeredField.set(null, false);
     }
     catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
       throw new RuntimeException(ex);

@@ -15,8 +15,7 @@ public abstract class AbstractTracerWrapper implements AbortableContinuation {
 
   public AbstractTracerWrapper(Tracer pTracer) {
     mScopeManager = pTracer.scopeManager();
-    Scope scope = pTracer.scopeManager().active();
-    mSpan = scope != null ? scope.span() : null;
+    mSpan = mScopeManager.activeSpan();
   }
 
   /**
@@ -25,6 +24,6 @@ public abstract class AbstractTracerWrapper implements AbortableContinuation {
   @Override
   public void abortContinuation() {
     if (mSpan != null)
-      mScopeManager.activate(mSpan, true).close();
+      mScopeManager.activate(mSpan).close();
   }
 }

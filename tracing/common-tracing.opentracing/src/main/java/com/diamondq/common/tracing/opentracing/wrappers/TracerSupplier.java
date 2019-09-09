@@ -39,7 +39,7 @@ public class TracerSupplier<A> extends AbstractTracerWrapper
         inGet = true;
         return mDelegate.get();
       }
-      try (Scope scope = mScopeManager.activate(mSpan, false)) {
+      try (Scope scope = mScopeManager.activate(mSpan)) {
         inGet = true;
         A result = mDelegate.get();
         inGet = false;

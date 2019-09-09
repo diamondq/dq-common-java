@@ -1,11 +1,5 @@
 package com.diamondq.common.tracing.jaeger;
 
-import com.uber.jaeger.propagation.b3.B3TextMapCodec;
-import com.uber.jaeger.reporters.CompositeReporter;
-import com.uber.jaeger.reporters.Reporter;
-import com.uber.jaeger.samplers.ConstSampler;
-import com.uber.jaeger.samplers.Sampler;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +15,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jaegertracing.Configuration;
+import io.jaegertracing.internal.propagation.B3TextMapCodec;
+import io.jaegertracing.internal.reporters.CompositeReporter;
+import io.jaegertracing.internal.samplers.ConstSampler;
+import io.jaegertracing.spi.Reporter;
+import io.jaegertracing.spi.Sampler;
+import io.opentracing.Scope;
 import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
@@ -33,14 +34,13 @@ import io.opentracing.util.GlobalTracer;
 @Priority(100)
 public class JaegerTracer implements Tracer {
 
-  private static final Logger    sLogger = LoggerFactory.getLogger(JaegerTracer.class);
+  private static final Logger                    sLogger = LoggerFactory.getLogger(JaegerTracer.class);
 
-  @SuppressWarnings("deprecation")
-  private com.uber.jaeger.Tracer mDelegate;
+  private io.jaegertracing.internal.JaegerTracer mDelegate;
 
   @SuppressWarnings("deprecation")
   public JaegerTracer() {
-    mDelegate = new com.uber.jaeger.Tracer.Builder("placeholder", null, null).build();
+    mDelegate = Configuration.fromEnv().getTracer();
   }
 
   @SuppressWarnings("deprecation")
@@ -51,7 +51,7 @@ public class JaegerTracer implements Tracer {
     reporters.add(new Reporter() {
 
       @Override
-      public void report(com.uber.jaeger.Span pSpan) {
+      public void report(io.jaegertracing.internal.JaegerSpan pSpan) {
         sLogger.trace("Span reported: {}", pSpan);
       }
 
@@ -72,9 +72,9 @@ public class JaegerTracer implements Tracer {
     String appName = System.getProperty("application.name");
     if (appName == null)
       appName = "Unknown_Application_Name";
-    mDelegate = new com.uber.jaeger.Tracer.Builder(appName, remoteReporter, sampler)
-      .registerInjector(Format.Builtin.HTTP_HEADERS, b3Codec).registerExtractor(Format.Builtin.HTTP_HEADERS, b3Codec)
-      .build();
+    mDelegate = new io.jaegertracing.internal.JaegerTracer.Builder(appName).withReporter(remoteReporter)
+      .withSampler(sampler).registerInjector(Format.Builtin.HTTP_HEADERS, b3Codec)
+      .registerExtractor(Format.Builtin.HTTP_HEADERS, b3Codec).build();
     GlobalTracer.register(this);
   }
 
@@ -123,4 +123,17 @@ public class JaegerTracer implements Tracer {
     return mDelegate.extract(pFormat, pCarrier);
   }
 
+  @Override
+  public Scope activateSpan(Span pSpan) {
+    return mDelegate.activateSpan(pSpan);
+  }
+
+  /**
+   * @see io.opentracing.Tracer#close()
+   */
+  @SuppressWarnings("deprecation")
+  @Override
+  public void close() {
+    mDelegate.close();
+  }
 }

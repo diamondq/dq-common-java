@@ -1,12 +1,6 @@
 package com.diamondq.common.tracing.jaeger;
 
 import com.diamondq.common.config.Config;
-import com.uber.jaeger.metrics.Metrics;
-import com.uber.jaeger.metrics.NullStatsReporter;
-import com.uber.jaeger.metrics.StatsFactoryImpl;
-import com.uber.jaeger.reporters.RemoteReporter;
-import com.uber.jaeger.reporters.Reporter;
-import com.uber.jaeger.senders.zipkin.ZipkinSender;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
@@ -15,7 +9,10 @@ import javax.enterprise.inject.Produces;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@SuppressWarnings("deprecation")
+import io.jaegertracing.internal.reporters.RemoteReporter;
+import io.jaegertracing.spi.Reporter;
+import io.jaegertracing.zipkin.ZipkinSender;
+
 @ApplicationScoped
 public class ZipkinReporterProvider {
 
@@ -28,7 +25,9 @@ public class ZipkinReporterProvider {
     String zipkinURL = config.bind("tracing.zipkin.url", String.class);
     if (zipkinURL == null)
       return null;
-    Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
-    return new RemoteReporter(ZipkinSender.create(zipkinURL), 1000, 100, metrics);
+    // Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
+    return new RemoteReporter.Builder().withSender(ZipkinSender.create(zipkinURL))
+      // .withMetrics(metrics)
+      .build();
   }
 }

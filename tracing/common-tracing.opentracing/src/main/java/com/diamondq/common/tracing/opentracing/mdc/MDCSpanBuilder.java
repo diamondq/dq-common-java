@@ -4,10 +4,10 @@ import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer.SpanBuilder;
+import io.opentracing.tag.Tag;
 
 public class MDCSpanBuilder implements SpanBuilder {
 
@@ -97,6 +97,14 @@ public class MDCSpanBuilder implements SpanBuilder {
     return new MDCSpanBuilder(result, mExtractor);
   }
 
+  @Override
+  public <T> SpanBuilder withTag(Tag<T> pTag, T pValue) {
+    SpanBuilder result = mDelegate.withTag(pTag, pValue);
+    if (result == mDelegate)
+      return this;
+    return new MDCSpanBuilder(result, mExtractor);
+  };
+
   /**
    * @see io.opentracing.Tracer.SpanBuilder#withStartTimestamp(long)
    */
@@ -109,29 +117,12 @@ public class MDCSpanBuilder implements SpanBuilder {
   }
 
   /**
-   * @see io.opentracing.Tracer.SpanBuilder#startActive(boolean)
-   */
-  @Override
-  public Scope startActive(boolean pFinishSpanOnClose) {
-    return new MDCScope(mDelegate.startActive(pFinishSpanOnClose), mExtractor);
-  }
-
-  /**
-   * @see io.opentracing.Tracer.SpanBuilder#startManual()
-   */
-  @SuppressWarnings({"deprecation", "javadoc"})
-  @Override
-  public Span startManual() {
-    return new MDCSpan(mDelegate.startManual(), mExtractor);
-  }
-
-  /**
    * @see io.opentracing.Tracer.SpanBuilder#start()
    */
   @Deprecated
   @Override
   public Span start() {
     return new MDCSpan(mDelegate.start(), mExtractor);
-  };
+  }
 
 }

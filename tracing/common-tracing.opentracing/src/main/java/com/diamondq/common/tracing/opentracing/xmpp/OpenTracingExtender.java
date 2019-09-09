@@ -14,7 +14,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer.SpanBuilder;
@@ -55,7 +54,8 @@ public class OpenTracingExtender {
       if ((type == Type.GET) || (type == Type.SET)) {
         try {
           Map<@NonNull String, @NonNull String> map = new HashMap<>();
-          GlobalTracer.get().inject(activeSpan.context(), Format.Builtin.TEXT_MAP, new TextMapInjectAdapter(map));
+          GlobalTracer.get().inject(activeSpan.context(), Format.Builtin.TEXT_MAP_INJECT,
+            new TextMapInjectAdapter(map));
           StringBuilder sb = new StringBuilder();
           sb.append(iq.getId());
           sb.append(sKEYWORD);
@@ -128,7 +128,8 @@ public class OpenTracingExtender {
           map.put(key, value);
         }
 
-        SpanContext spanContext = GlobalTracer.get().extract(Format.Builtin.TEXT_MAP, new TextMapExtractAdapter(map));
+        SpanContext spanContext =
+          GlobalTracer.get().extract(Format.Builtin.TEXT_MAP_EXTRACT, new TextMapExtractAdapter(map));
         return GlobalTracer.get().buildSpan("").asChildOf(spanContext);
       }
     }
@@ -162,8 +163,12 @@ public class OpenTracingExtender {
       SpanBuilder spanBuilder = processID(id);
       if (spanBuilder == null)
         return mDelegate.handleRequest(pIQ);
-      try (Scope scope = spanBuilder.startActive(true)) {
+      Span span = spanBuilder.start();
+      try {
         return mDelegate.handleRequest(pIQ);
+      }
+      finally {
+        span.finish();
       }
 
     }
