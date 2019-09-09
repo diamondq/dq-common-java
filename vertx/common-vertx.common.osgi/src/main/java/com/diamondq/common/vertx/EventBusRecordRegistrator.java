@@ -18,8 +18,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
@@ -152,10 +152,11 @@ public class EventBusRecordRegistrator implements ServiceExporter {
 
   /**
    * @see io.vertx.servicediscovery.spi.ServiceExporter#init(io.vertx.core.Vertx,
-   *      io.vertx.servicediscovery.spi.ServicePublisher, io.vertx.core.json.JsonObject, io.vertx.core.Future)
+   *      io.vertx.servicediscovery.spi.ServicePublisher, io.vertx.core.json.JsonObject, io.vertx.core.Promise)
    */
   @Override
-  public void init(Vertx pVertx, ServicePublisher pPublisher, JsonObject pConfiguration, Future<Void> pFuture) {
+  public void init(Vertx pVertx, ServicePublisher pPublisher, JsonObject pConfiguration,
+    Promise<@Nullable Void> pFuture) {
     try (Context ctx =
       mContextFactory.newContext(EventBusRecordRegistrator.class, this, pVertx, pPublisher, pConfiguration, pFuture)) {
       /* Get all the existing records and process them before marking us as active */
