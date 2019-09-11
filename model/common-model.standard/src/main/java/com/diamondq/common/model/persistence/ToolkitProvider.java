@@ -11,18 +11,24 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Singleton;
+
+import io.micronaut.context.annotation.Factory;
 
 @ApplicationScoped
+@Factory
 public class ToolkitProvider {
 
   @Produces
   @ApplicationScoped
-  public Toolkit createToolkit(Config pConfig, ContextFactory pContextFactory, BeanManager pManager) {
+  @Singleton
+  public Toolkit createToolkit(Config pConfig, ContextFactory pContextFactory) {
     ToolkitFactory factory = ToolkitFactory.newInstance();
     Toolkit toolkit = factory.newToolkit();
     GenericToolkit gt = (GenericToolkit) toolkit;
@@ -35,16 +41,19 @@ public class ToolkitProvider {
 
         /* Now attempt to get the list of structures */
 
+        Map<String, Object> context = new HashMap<>();
+        context.put("scope", scope);
+        context.put("contextFactory", pContextFactory);
         @SuppressWarnings("unchecked")
-        List<PersistenceLayer> structureLayers = pConfig.bind("persistence.scope-" + scopeName + ".structures",
-          List.class, Collections.singletonMap("scope", scope));
+        List<PersistenceLayer> structureLayers =
+          pConfig.bind("persistence.scope-" + scopeName + ".structures", List.class, context);
         if ((structureLayers == null) || (structureLayers.isEmpty() == true))
           throw new IllegalArgumentException(
             "The config key persistence.scope-" + scopeName + ".structures requires at least one definition");
 
         @SuppressWarnings("unchecked")
-        List<PersistenceLayer> resourceLayers = pConfig.bind("persistence.scope-" + scopeName + ".resources",
-          List.class, Collections.singletonMap("scope", scope));
+        List<PersistenceLayer> resourceLayers =
+          pConfig.bind("persistence.scope-" + scopeName + ".resources", List.class, context);
         if ((resourceLayers == null) || (resourceLayers.isEmpty() == true))
           throw new IllegalArgumentException(
             "The config key persistence.scope-" + scopeName + ".resources requires at least one definition");
