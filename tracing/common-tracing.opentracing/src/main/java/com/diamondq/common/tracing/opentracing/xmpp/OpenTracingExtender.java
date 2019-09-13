@@ -123,9 +123,11 @@ public class OpenTracingExtender {
         String[] parts = data.split("\\&");
         for (String part : parts) {
           int breakOffset = part.indexOf('=');
-          String key = URLDecoder.decode(part.substring(0, breakOffset), "UTF-8");
-          String value = URLDecoder.decode(part.substring(breakOffset + 1), "UTF-8");
-          map.put(key, value);
+          if (breakOffset != -1) {
+            String key = URLDecoder.decode(part.substring(0, breakOffset), "UTF-8");
+            String value = URLDecoder.decode(part.substring(breakOffset + 1), "UTF-8");
+            map.put(key, value);
+          }
         }
 
         SpanContext spanContext =
