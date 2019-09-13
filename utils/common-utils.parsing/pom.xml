@@ -11,6 +11,9 @@
   <artifactId>common-utils.parsing</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils: Parsing</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.utils.parsing.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.enterprise</groupId>

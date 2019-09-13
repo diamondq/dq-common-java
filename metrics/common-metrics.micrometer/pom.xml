@@ -10,6 +10,9 @@
   <artifactId>common-metrics.micrometer</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Metrics: Micrometer</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.metrics.micrometer</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

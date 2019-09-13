@@ -12,6 +12,7 @@
   <name>DiamondQ Common: Storage: JDBC</name>
   <properties>
     <osgi.extra.import.packages>com.diamondq.common.injection.osgi;resolution:=mandatory,</osgi.extra.import.packages>
+    <osgi.export.base.package>com.diamondq.common.storage.jdbc.*</osgi.export.base.package>
   </properties>
   <dependencies>
     <dependency>

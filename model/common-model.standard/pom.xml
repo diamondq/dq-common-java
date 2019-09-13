@@ -10,6 +10,9 @@
   <artifactId>common-model.standard</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Model: Standard</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.model.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>

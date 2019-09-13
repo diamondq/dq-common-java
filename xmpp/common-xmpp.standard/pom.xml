@@ -11,6 +11,9 @@
   <artifactId>common-xmpp.standard</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: XMPP: Standard</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.xmpp.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>

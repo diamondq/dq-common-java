@@ -10,6 +10,9 @@
   <artifactId>common-servers.paxweb.jersey</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Servers: PAX Web + Jersey</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.servers.paxweb.jersey</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>

@@ -11,6 +11,9 @@
   <artifactId>common-storage.kv</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Storage: KV: API</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.storage.kv.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.diamondq.common</groupId>

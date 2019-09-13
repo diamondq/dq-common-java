@@ -10,4 +10,7 @@
   <artifactId>common-utils.misc</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils: Misc</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.utils.misc.*</osgi.export.base.package>
+  </properties>
 </project>

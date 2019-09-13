@@ -10,6 +10,9 @@
   <artifactId>common-security.jcasbin</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Security: jCASBin</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.security.jcasbin</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

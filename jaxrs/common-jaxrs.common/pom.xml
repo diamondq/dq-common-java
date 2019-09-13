@@ -10,6 +10,9 @@
   <artifactId>common-jaxrs.common</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: JAXRS: Common</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.jaxrs.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.immutables</groupId>

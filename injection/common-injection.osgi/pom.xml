@@ -10,6 +10,9 @@
   <artifactId>common-injection.osgi</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Injection: OSGi</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.injection.osgi.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

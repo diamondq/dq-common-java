@@ -10,6 +10,9 @@
   <artifactId>common-utils.log4j2</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils: Log4j2</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.utils.log4j2</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

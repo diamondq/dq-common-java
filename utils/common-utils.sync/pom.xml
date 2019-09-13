@@ -11,6 +11,9 @@
   <artifactId>common-utils.sync</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils: Sync</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.utils.sync.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.inject</groupId>

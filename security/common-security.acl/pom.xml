@@ -10,6 +10,9 @@
   <artifactId>common-security.acl</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Security: ACL</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.security.acl.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.diamondq.common</groupId>

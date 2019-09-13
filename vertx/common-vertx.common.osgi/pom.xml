@@ -10,6 +10,9 @@
   <artifactId>common-vertx.common.osgi</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Vert.x: Common Osgi</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.vertx</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.diamondq.common</groupId>

@@ -11,6 +11,9 @@
   <artifactId>common-tracing.opentracing</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Tracing: OpenTracing</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.tracing.opentracing.*</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

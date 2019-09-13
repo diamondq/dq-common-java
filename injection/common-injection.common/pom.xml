@@ -10,6 +10,9 @@
   <artifactId>common-injection.common</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Injection: Common</name>
+  <properties>
+    <osgi.export.base.package>com.diamondq.common.injection</osgi.export.base.package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.inject</groupId>
