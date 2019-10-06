@@ -34,6 +34,17 @@ public interface InjectionStartupBuilder
 	public InjectionStartupBuilder singletons(@NonNull Object... pSingletons);
 
 	/**
+	 * Adds a singleton to the injection engine with the given name
+	 * 
+	 * @param pSingleton
+	 *            the singleton
+	 * @param pName
+	 *            the name
+	 * @return the builder for fluent use
+	 */
+	public InjectionStartupBuilder singleton(Object pSingleton, String pName);
+
+	/**
 	 * Build the Injection engine and start it
 	 *
 	 * @return the InjectionStartup
