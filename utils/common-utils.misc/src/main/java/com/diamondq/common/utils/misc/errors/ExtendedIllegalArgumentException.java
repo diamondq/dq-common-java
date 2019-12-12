@@ -38,6 +38,10 @@ public class ExtendedIllegalArgumentException extends IllegalArgumentException {
     return mCode;
   }
 
+  public @Nullable Object[] getParams() {
+	return mParams;
+  }
+  
   /**
    * @see java.lang.Throwable#getMessage()
    */
