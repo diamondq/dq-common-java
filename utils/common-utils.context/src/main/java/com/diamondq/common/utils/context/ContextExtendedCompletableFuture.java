@@ -8,6 +8,7 @@ import com.diamondq.common.lambda.interfaces.Consumer3;
 import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
+import com.diamondq.common.lambda.interfaces.Predicate2;
 import com.diamondq.common.utils.misc.Holder;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
+import java.util.function.Predicate;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -36,7 +38,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   public static <T> ContextExtendedCompletableFuture<T> completedFailure(Throwable pValue) {
-    ContextExtendedCompletableFuture<T> future = new ContextExtendedCompletableFuture<>();
+    final ContextExtendedCompletableFuture<T> future = new ContextExtendedCompletableFuture<>();
     future.completeExceptionally(pValue);
     return future;
   }
@@ -46,18 +48,17 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   }
 
   public static <T> ContextExtendedCompletableFuture<List<T>> listOf(List<? extends ExtendedCompletionStage<T>> cfs) {
-    CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
+    final CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
     int i = 0;
-    for (ExtendedCompletionStage<T> cf : cfs)
+    for (final ExtendedCompletionStage<T> cf : cfs)
       args[i++] = decomposeToCompletableFuture(cf);
-    return new ContextExtendedCompletableFuture<List<T>>(CompletableFuture.allOf(args).thenApply((v) -> {
-      List<T> results = new ArrayList<>();
-      for (ExtendedCompletionStage<T> stage : cfs) {
+    return new ContextExtendedCompletableFuture<>(CompletableFuture.allOf(args).thenApply((v) -> {
+      final List<T> results = new ArrayList<>();
+      for (final ExtendedCompletionStage<T> stage : cfs)
         if (stage instanceof ExtendedCompletableFuture)
           results.add(((ExtendedCompletableFuture<T>) stage).join());
         else
           throw new UnsupportedOperationException();
-      }
       return results;
     }));
   }
@@ -75,7 +76,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> relatedCompletedFuture(U pValue) {
-    ContextExtendedCompletableFuture<U> result =
+    final ContextExtendedCompletableFuture<U> result =
       (ContextExtendedCompletableFuture<U>) super.relatedCompletedFuture(pValue);
     return result;
   }
@@ -93,13 +94,13 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> relatedOf(CompletableFuture<U> pFuture) {
-    return new ContextExtendedCompletableFuture<U>(pFuture);
+    return new ContextExtendedCompletableFuture<>(pFuture);
   }
 
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(
     Collection<? extends ExtendedCompletionStage<?>> pCfs) {
-    ContextExtendedCompletionStage<@Nullable Void> result =
+    final ContextExtendedCompletionStage<@Nullable Void> result =
       (ContextExtendedCompletionStage<@Nullable Void>) super.relatedAllOf(pCfs);
     return result;
   }
@@ -107,7 +108,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(
     @NonNull ExtendedCompletionStage<?> @NonNull... pCfs) {
-    ContextExtendedCompletionStage<@Nullable Void> result =
+    final ContextExtendedCompletionStage<@Nullable Void> result =
       (ContextExtendedCompletionStage<@Nullable Void>) super.relatedAllOf(pCfs);
     return result;
   }
@@ -115,7 +116,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletionStage<@Nullable Object> relatedAnyOf(
     @NonNull ExtendedCompletionStage<?> @NonNull... pCfs) {
-    ContextExtendedCompletionStage<@Nullable Object> result =
+    final ContextExtendedCompletionStage<@Nullable Object> result =
       (ContextExtendedCompletionStage<@Nullable Object>) super.relatedAnyOf(pCfs);
     return result;
   }
@@ -123,7 +124,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U> ContextExtendedCompletionStage<List<U>> relatedListOf(
     Collection<? extends ExtendedCompletionStage<U>> pCfs) {
-    ContextExtendedCompletionStage<List<U>> result =
+    final ContextExtendedCompletionStage<List<U>> result =
       (ContextExtendedCompletionStage<List<U>>) super.relatedListOf(pCfs);
     return result;
   }
@@ -135,10 +136,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenApply(Function1<T, U> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.thenApply((t) -> {
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.thenApply((t) -> {
       isComplete.object = true;
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t);
@@ -152,10 +153,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenApply(Function2<T, Context, U> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<U> result = ((ContextExtendedCompletableFuture<U>) super.thenApply((t) -> {
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<U> result = ((ContextExtendedCompletableFuture<U>) super.thenApply((t) -> {
       isComplete.object = true;
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ctx);
@@ -169,15 +170,16 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
-      isComplete.object = true;
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t);
-      }
-    })).internalExceptionally(currentContext, isComplete);
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t);
+        }
+      })).internalExceptionally(currentContext, isComplete);
     return result;
   }
 
@@ -186,15 +188,16 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<T, Context, U> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<U> result = ((ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
-      isComplete.object = true;
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t, ctx);
-      }
-    })).internalExceptionally(currentContext, isComplete);
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t, ctx);
+        }
+      })).internalExceptionally(currentContext, isComplete);
     return result;
   }
 
@@ -204,15 +207,16 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn, Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
-      isComplete.object = true;
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t);
-      }
-    }, pExecutor)).internalExceptionally(currentContext, isComplete);
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t);
+        }
+      }, pExecutor)).internalExceptionally(currentContext, isComplete);
     return result;
   }
 
@@ -222,15 +226,16 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenApplyAsync(Function2<T, Context, U> pFn, Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<U> result = ((ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
-      isComplete.object = true;
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t, ctx);
-      }
-    }, pExecutor)).internalExceptionally(currentContext, isComplete);
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.thenApplyAsync((t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t, ctx);
+        }
+      }, pExecutor)).internalExceptionally(currentContext, isComplete);
     return result;
   }
 
@@ -241,10 +246,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer1<T> pAction) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<@Nullable Void> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<@Nullable Void> result =
       ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAccept((t) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -259,10 +264,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<T, Context> pAction) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<@Nullable Void> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<@Nullable Void> result =
       ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAccept((t) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -277,10 +282,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<@Nullable Void> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<@Nullable Void> result =
       ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAcceptAsync((t) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -295,10 +300,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<@Nullable Void> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<@Nullable Void> result =
       ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAcceptAsync((t) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -314,10 +319,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<@Nullable Void> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<@Nullable Void> result =
       ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAcceptAsync((t) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -334,10 +339,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> completeHolder = new Holder<>(false);
-    ContextExtendedCompletionStage<@Nullable Void> result =
+    final Holder<Boolean> completeHolder = new Holder<>(false);
+    final ContextExtendedCompletionStage<@Nullable Void> result =
       ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAcceptAsync((t) -> {
         completeHolder.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -356,10 +361,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U, V> ContextExtendedCompletableFuture<V> thenCombine(ExtendedCompletionStage<U> pOther,
     Function2<T, U, V> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<V> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<V> result =
       ((ContextExtendedCompletableFuture<V>) super.thenCombine(pOther, (t, u) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -376,10 +381,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U, V> ContextExtendedCompletionStage<V> thenCombine(ExtendedCompletionStage<U> pOther,
     Function3<T, U, Context, V> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<V> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<V> result =
       ((ContextExtendedCompletableFuture<V>) super.thenCombine(pOther, (t, u) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -396,10 +401,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
     Function2<T, U, V> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<V> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<V> result =
       ((ContextExtendedCompletableFuture<V>) super.thenCombineAsync(pOther, (t, u) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -416,10 +421,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
     Function3<T, U, Context, V> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<V> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<V> result =
       ((ContextExtendedCompletableFuture<V>) super.thenCombineAsync(pOther, (t, u) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -436,10 +441,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
     Function2<T, U, V> pFn, Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<V> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<V> result =
       ((ContextExtendedCompletableFuture<V>) super.thenCombineAsync(pOther, (t, u) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -456,10 +461,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
     Function3<T, U, Context, V> pFn, Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<V> result =
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<V> result =
       ((ContextExtendedCompletableFuture<V>) super.thenCombineAsync(pOther, (t, u) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
@@ -469,6 +474,116 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     return result;
   }
 
+  /* ********** SPLIT ********** */
+
+  /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#splitCompose(java.util.function.Predicate,
+   *      com.diamondq.common.lambda.interfaces.Function1, com.diamondq.common.lambda.interfaces.Function1)
+   */
+  @Override
+  public <U> ContextExtendedCompletableFuture<U> splitCompose(Predicate<T> pBoolFunc,
+    Function1<T, @NonNull ExtendedCompletionStage<U>> pTrueFunc,
+    Function1<T, @NonNull ExtendedCompletionStage<U>> pFalseFunc) {
+    final Context currentContext = ContextFactory.currentContext();
+    currentContext.prepareForAlternateThreads();
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.splitCompose(pBoolFunc, (t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pTrueFunc.apply(t);
+        }
+      }, (t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFalseFunc.apply(t);
+        }
+      })).internalExceptionally(currentContext, isComplete);
+    return result;
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#splitCompose(com.diamondq.common.lambda.interfaces.Predicate2,
+   *      com.diamondq.common.lambda.interfaces.Function2, com.diamondq.common.lambda.interfaces.Function2)
+   */
+  @Override
+  public <U> ContextExtendedCompletionStage<U> splitCompose(Predicate2<T, Context> pBoolFunc,
+    Function2<T, Context, @NonNull ExtendedCompletionStage<U>> pTrueFunc,
+    Function2<T, Context, @NonNull ExtendedCompletionStage<U>> pFalseFunc) {
+    final Context currentContext = ContextFactory.currentContext();
+    currentContext.prepareForAlternateThreads();
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.splitCompose((t) -> {
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pBoolFunc.test(t, ctx);
+        }
+      }, (t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pTrueFunc.apply(t, ctx);
+        }
+      }, (t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFalseFunc.apply(t, ctx);
+        }
+      })).internalExceptionally(currentContext, isComplete);
+    return result;
+  }
+
+  /**
+   * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#splitApply(java.util.function.Predicate,
+   *      com.diamondq.common.lambda.interfaces.Function1, com.diamondq.common.lambda.interfaces.Function1)
+   */
+  @Override
+  public <U> ContextExtendedCompletableFuture<U> splitApply(Predicate<T> pBoolFunc, Function1<T, U> pTrueFunc,
+    Function1<T, U> pFalseFunc) {
+    final Context currentContext = ContextFactory.currentContext();
+    currentContext.prepareForAlternateThreads();
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.splitApply(pBoolFunc, (t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pTrueFunc.apply(t);
+        }
+      }, (t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFalseFunc.apply(t);
+        }
+      })).internalExceptionally(currentContext, isComplete);
+    return result;
+  }
+
+  /**
+   * @see com.diamondq.common.utils.context.ContextExtendedCompletionStage#splitApply(com.diamondq.common.lambda.interfaces.Predicate2,
+   *      com.diamondq.common.lambda.interfaces.Function2, com.diamondq.common.lambda.interfaces.Function2)
+   */
+  @Override
+  public <U> ContextExtendedCompletionStage<U> splitApply(Predicate2<T, Context> pBoolFunc,
+    Function2<T, Context, U> pTrueFunc, Function2<T, Context, U> pFalseFunc) {
+    final Context currentContext = ContextFactory.currentContext();
+    currentContext.prepareForAlternateThreads();
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.splitApply((t) -> {
+      try (Context ctx = currentContext.activateOnThread("")) {
+        return pBoolFunc.test(t, ctx);
+      }
+    }, (t) -> {
+      isComplete.object = true;
+      try (Context ctx = currentContext.activateOnThread("")) {
+        return pTrueFunc.apply(t, ctx);
+      }
+    }, (t) -> {
+      isComplete.object = true;
+      try (Context ctx = currentContext.activateOnThread("")) {
+        return pFalseFunc.apply(t, ctx);
+      }
+    })).internalExceptionally(currentContext, isComplete);
+    return result;
+  }
   /* ********** COMPOSE ********** */
 
   /**
@@ -476,10 +591,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenCompose(Function1<T, ExtendedCompletionStage<U>> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.thenCompose((t) -> {
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.thenCompose((t) -> {
       isComplete.object = true;
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t);
@@ -493,10 +608,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenCompose(Function2<T, Context, ExtendedCompletionStage<U>> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<U> result = ((ContextExtendedCompletableFuture<U>) super.thenCompose((t) -> {
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<U> result = ((ContextExtendedCompletableFuture<U>) super.thenCompose((t) -> {
       isComplete.object = true;
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ctx);
@@ -510,15 +625,16 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
-      isComplete.object = true;
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t);
-      }
-    })).internalExceptionally(currentContext, isComplete);
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t);
+        }
+      })).internalExceptionally(currentContext, isComplete);
     return result;
   }
 
@@ -527,15 +643,16 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> thenComposeAsync(Function2<T, Context, ExtendedCompletionStage<U>> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<U> result = ((ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
-      isComplete.object = true;
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t, ctx);
-      }
-    })).internalExceptionally(currentContext, isComplete);
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t, ctx);
+        }
+      })).internalExceptionally(currentContext, isComplete);
     return result;
   }
 
@@ -546,15 +663,16 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U> ContextExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletableFuture<U> result = ((ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
-      isComplete.object = true;
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t);
-      }
-    }, pExecutor)).internalExceptionally(currentContext, isComplete);
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletableFuture<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t);
+        }
+      }, pExecutor)).internalExceptionally(currentContext, isComplete);
     return result;
   }
 
@@ -565,15 +683,16 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U> ContextExtendedCompletionStage<U> thenComposeAsync(Function2<T, Context, ExtendedCompletionStage<U>> pFn,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    Holder<Boolean> isComplete = new Holder<>(false);
-    ContextExtendedCompletionStage<U> result = ((ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
-      isComplete.object = true;
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t, ctx);
-      }
-    }, pExecutor)).internalExceptionally(currentContext, isComplete);
+    final Holder<Boolean> isComplete = new Holder<>(false);
+    final ContextExtendedCompletionStage<U> result =
+      ((ContextExtendedCompletableFuture<U>) super.thenComposeAsync((t) -> {
+        isComplete.object = true;
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t, ctx);
+        }
+      }, pExecutor)).internalExceptionally(currentContext, isComplete);
     return result;
   }
 
@@ -581,13 +700,12 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
 
   private ContextExtendedCompletableFuture<T> internalExceptionally(Context pContext, Holder<Boolean> pIsComplete) {
     return (ContextExtendedCompletableFuture<T>) super.exceptionally((ex) -> {
-      if (pIsComplete.object == false) {
+      if (pIsComplete.object == false)
         try (Context ctx = pContext.activateOnThread("")) {
           if (ex instanceof RuntimeException)
             throw (RuntimeException) ex;
           throw new RuntimeException(ex);
         }
-      }
       else {
         if (ex instanceof RuntimeException)
           throw (RuntimeException) ex;
@@ -601,13 +719,13 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<T> exceptionally(Function1<Throwable, T> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
      * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
      * context count regardless, thus the use of handle
      */
-    ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handle((t, ex) -> {
+    final ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         if (ex != null)
           return pFn.apply(ex);
@@ -622,14 +740,14 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletionStage<T> exceptionally(Function2<Throwable, Context, T> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
      * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
      * context count regardless, thus the use of handle
      */
     @SuppressWarnings("unchecked")
-    ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.handle((t, ex) -> {
+    final ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         if (ex != null)
           return pFn.apply(ex, ctx);
@@ -647,17 +765,17 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletableFuture<T> exceptionallyCompose(
     Function1<Throwable, ExtendedCompletionStage<T>> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
      * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
      * context count regardless, thus the use of handle
      */
-    ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handle((t, ex) -> {
+    final ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         if (ex == null) {
           @SuppressWarnings("null")
-          T unconstraintedT = t;
+          final T unconstraintedT = t;
           return relatedCompletedFuture(unconstraintedT);
         }
         return pFn.apply(ex);
@@ -674,18 +792,18 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletionStage<T> exceptionallyCompose(
     Function2<Throwable, Context, ExtendedCompletionStage<T>> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
      * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
      * context count regardless, thus the use of handle
      */
     @SuppressWarnings("unchecked")
-    ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.handle((t, ex) -> {
+    final ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         if (ex == null) {
           @SuppressWarnings("null")
-          T unconstraintedT = t;
+          final T unconstraintedT = t;
           return relatedCompletedFuture(unconstraintedT);
         }
         return pFn.apply(ex, currentContext);
@@ -703,24 +821,25 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletableFuture<T> exceptionallyCompose(Function1<Throwable, ExtendedCompletionStage<T>> pFn,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
      * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
      * context count regardless, thus the use of handle
      */
-    ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handleAsync((t, ex) -> {
-      try (Context ctx = currentContext.activateOnThread("")) {
-        if (ex == null) {
-          @SuppressWarnings("null")
-          T unconstraintedT = t;
-          return relatedCompletedFuture(unconstraintedT);
+    final ContextExtendedCompletableFuture<T> result =
+      (ContextExtendedCompletableFuture<T>) super.handleAsync((t, ex) -> {
+        try (Context ctx = currentContext.activateOnThread("")) {
+          if (ex == null) {
+            @SuppressWarnings("null")
+            final T unconstraintedT = t;
+            return relatedCompletedFuture(unconstraintedT);
+          }
+          return pFn.apply(ex);
         }
-        return pFn.apply(ex);
-      }
-    }, pExecutor).thenComposeAsync((x) -> {
-      return x;
-    }, pExecutor);
+      }, pExecutor).thenComposeAsync((x) -> {
+        return x;
+      }, pExecutor);
     return result;
   }
 
@@ -731,24 +850,25 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletionStage<T> exceptionallyCompose(
     Function2<Throwable, Context, ExtendedCompletionStage<T>> pFn, Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     /*
      * Handle is needed, since exceptionally is only called if it actually fails. However, we need to 'close' the
      * context count regardless, thus the use of handle
      */
-    ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.handleAsync((t, ex) -> {
-      try (Context ctx = currentContext.activateOnThread("")) {
-        if (ex == null) {
-          @SuppressWarnings("null")
-          T unconstraintedT = t;
-          return relatedCompletedFuture(unconstraintedT);
+    final ContextExtendedCompletableFuture<T> result =
+      (ContextExtendedCompletableFuture<T>) super.handleAsync((t, ex) -> {
+        try (Context ctx = currentContext.activateOnThread("")) {
+          if (ex == null) {
+            @SuppressWarnings("null")
+            final T unconstraintedT = t;
+            return relatedCompletedFuture(unconstraintedT);
+          }
+          return pFn.apply(ex, currentContext);
         }
-        return pFn.apply(ex, currentContext);
-      }
-    }, pExecutor).thenComposeAsync((x) -> {
-      return x;
-    }, pExecutor);
+      }, pExecutor).thenComposeAsync((x) -> {
+        return x;
+      }, pExecutor);
     return result;
   }
 
@@ -759,13 +879,14 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<T> whenComplete(Consumer2<T, @Nullable Throwable> pAction) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<T> result = (ContextExtendedCompletableFuture<T>) super.whenComplete((t, ex) -> {
-      try (Context ctx = currentContext.activateOnThread("")) {
-        pAction.accept(t, ex);
-      }
-    });
+    final ContextExtendedCompletableFuture<T> result =
+      (ContextExtendedCompletableFuture<T>) super.whenComplete((t, ex) -> {
+        try (Context ctx = currentContext.activateOnThread("")) {
+          pAction.accept(t, ex);
+        }
+      });
     return result;
   }
 
@@ -774,10 +895,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletionStage<T> whenComplete(Consumer3<T, @Nullable Throwable, Context> pAction) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
-    ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.whenComplete((t, ex) -> {
+    final ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.whenComplete((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         pAction.accept(t, ex, ctx);
       }
@@ -790,9 +911,9 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<T> whenCompleteAsync(Consumer2<T, @Nullable Throwable> pAction) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<T> result =
+    final ContextExtendedCompletableFuture<T> result =
       (ContextExtendedCompletableFuture<T>) super.whenCompleteAsync((t, ex) -> {
         try (Context ctx = currentContext.activateOnThread("")) {
           pAction.accept(t, ex);
@@ -806,14 +927,15 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletionStage<T> whenCompleteAsync(Consumer3<T, @Nullable Throwable, Context> pAction) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
-    ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.whenCompleteAsync((t, ex) -> {
-      try (Context ctx = currentContext.activateOnThread("")) {
-        pAction.accept(t, ex, ctx);
-      }
-    });
+    final ContextExtendedCompletionStage<T> result =
+      (ContextExtendedCompletionStage<T>) super.whenCompleteAsync((t, ex) -> {
+        try (Context ctx = currentContext.activateOnThread("")) {
+          pAction.accept(t, ex, ctx);
+        }
+      });
     return result;
   }
 
@@ -824,9 +946,9 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletableFuture<T> whenCompleteAsync(Consumer2<T, @Nullable Throwable> pAction,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<T> result =
+    final ContextExtendedCompletableFuture<T> result =
       (ContextExtendedCompletableFuture<T>) super.whenCompleteAsync((t, ex) -> {
         try (Context ctx = currentContext.activateOnThread("")) {
           pAction.accept(t, ex);
@@ -842,14 +964,15 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletionStage<T> whenCompleteAsync(Consumer3<T, @Nullable Throwable, Context> pAction,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
-    ContextExtendedCompletionStage<T> result = (ContextExtendedCompletionStage<T>) super.whenCompleteAsync((t, ex) -> {
-      try (Context ctx = currentContext.activateOnThread("")) {
-        pAction.accept(t, ex, ctx);
-      }
-    }, pExecutor);
+    final ContextExtendedCompletionStage<T> result =
+      (ContextExtendedCompletionStage<T>) super.whenCompleteAsync((t, ex) -> {
+        try (Context ctx = currentContext.activateOnThread("")) {
+          pAction.accept(t, ex, ctx);
+        }
+      }, pExecutor);
     return result;
   }
 
@@ -860,9 +983,9 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> handle(Function2<@Nullable T, @Nullable Throwable, U> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.handle((t, ex) -> {
+    final ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ex);
       }
@@ -875,10 +998,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletionStage<U> handle(Function3<@Nullable T, @Nullable Throwable, Context, U> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
-    ContextExtendedCompletionStage<U> result = (ContextExtendedCompletionStage<U>) super.handle((t, ex) -> {
+    final ContextExtendedCompletionStage<U> result = (ContextExtendedCompletionStage<U>) super.handle((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ex, ctx);
       }
@@ -891,13 +1014,14 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public <U> ContextExtendedCompletableFuture<U> handleAsync(Function2<@Nullable T, @Nullable Throwable, U> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.handleAsync((t, ex) -> {
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t, ex);
-      }
-    });
+    final ContextExtendedCompletableFuture<U> result =
+      (ContextExtendedCompletableFuture<U>) super.handleAsync((t, ex) -> {
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t, ex);
+        }
+      });
     return result;
   }
 
@@ -907,10 +1031,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U> ContextExtendedCompletionStage<U> handleAsync(
     Function3<@Nullable T, @Nullable Throwable, Context, U> pFn) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
-    ContextExtendedCompletionStage<U> result = (ContextExtendedCompletionStage<U>) super.handleAsync((t, ex) -> {
+    final ContextExtendedCompletionStage<U> result = (ContextExtendedCompletionStage<U>) super.handleAsync((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ex, ctx);
       }
@@ -925,13 +1049,14 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U> ContextExtendedCompletableFuture<U> handleAsync(Function2<@Nullable T, @Nullable Throwable, U> pFn,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<U> result = (ContextExtendedCompletableFuture<U>) super.handleAsync((t, ex) -> {
-      try (Context ctx = currentContext.activateOnThread("")) {
-        return pFn.apply(t, ex);
-      }
-    }, pExecutor);
+    final ContextExtendedCompletableFuture<U> result =
+      (ContextExtendedCompletableFuture<U>) super.handleAsync((t, ex) -> {
+        try (Context ctx = currentContext.activateOnThread("")) {
+          return pFn.apply(t, ex);
+        }
+      }, pExecutor);
     return result;
   }
 
@@ -942,10 +1067,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public <U> ContextExtendedCompletionStage<U> handleAsync(Function3<@Nullable T, @Nullable Throwable, Context, U> pFn,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     @SuppressWarnings("unchecked")
-    ContextExtendedCompletionStage<U> result = (ContextExtendedCompletionStage<U>) super.handleAsync((t, ex) -> {
+    final ContextExtendedCompletionStage<U> result = (ContextExtendedCompletionStage<U>) super.handleAsync((t, ex) -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         return pFn.apply(t, ex, ctx);
       }
@@ -975,8 +1100,8 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     Function2<U, Context, ExtendedCompletionStage<V>> pPerformActionFunction,
     @Nullable Function2<V, Context, Boolean> pBreakFunction, @Nullable Executor pExecutor) {
 
-    ContextFactory contextFactory = ContextFactory.getInstance();
-    Context callerContext = contextFactory.getCurrentContext();
+    final ContextFactory contextFactory = ContextFactory.getInstance();
+    final Context callerContext = contextFactory.getCurrentContext();
 
     /* Increase the count an extra time to cover the entire forLoop span */
 
@@ -986,7 +1111,7 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
 
       /* Get the iterable */
 
-      ContextExtendedCompletionStage<List<V>> result = (ContextExtendedCompletionStage<List<V>>) super.forLoop(
+      final ContextExtendedCompletionStage<List<V>> result = (ContextExtendedCompletionStage<List<V>>) super.forLoop(
 
         /* Get the iterable within the context */
 
@@ -1033,9 +1158,9 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Runnable pRunnable) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<@Nullable Void> result =
+    final ContextExtendedCompletableFuture<@Nullable Void> result =
       (ContextExtendedCompletableFuture<@Nullable Void>) super.relatedRunAsync(() -> {
         try (Context ctx = currentContext.activateOnThread("")) {
           pRunnable.run();
@@ -1049,9 +1174,9 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Consumer1<Context> pRunnable) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<@Nullable Void> result =
+    final ContextExtendedCompletableFuture<@Nullable Void> result =
       (ContextExtendedCompletableFuture<@Nullable Void>) super.relatedRunAsync(() -> {
         try (Context ctx = currentContext.activateOnThread("")) {
           pRunnable.accept(ctx);
@@ -1066,9 +1191,9 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
    */
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<@Nullable Void> result =
+    final ContextExtendedCompletableFuture<@Nullable Void> result =
       (ContextExtendedCompletableFuture<@Nullable Void>) super.relatedRunAsync(() -> {
         try (Context ctx = currentContext.activateOnThread("")) {
           pRunnable.run();
@@ -1084,9 +1209,9 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
   @Override
   public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Consumer1<Context> pRunnable,
     Executor pExecutor) {
-    Context currentContext = ContextFactory.currentContext();
+    final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    ContextExtendedCompletableFuture<@Nullable Void> result =
+    final ContextExtendedCompletableFuture<@Nullable Void> result =
       (ContextExtendedCompletableFuture<@Nullable Void>) super.relatedRunAsync(() -> {
         try (Context ctx = currentContext.activateOnThread("")) {
           pRunnable.accept(ctx);
