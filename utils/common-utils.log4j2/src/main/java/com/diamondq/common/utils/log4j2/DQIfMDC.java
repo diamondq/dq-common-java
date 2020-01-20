@@ -16,13 +16,19 @@ import org.apache.logging.log4j.util.SortedArrayStringMap;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@Plugin(name = "DQMDCPatternConverter", category = PatternConverter.CATEGORY)
-@ConverterKeys({"dqmdc", "DQMDC"})
-public class DQMDC extends LogEventPatternConverter {
+@Plugin(name = "DQIfMDCPatternConverter", category = PatternConverter.CATEGORY)
+@ConverterKeys({"DQIfMDC"})
+public class DQIfMDC extends LogEventPatternConverter {
+  /**
+   * Singleton.
+   */
+  private static final DQIfMDC      INSTANCE       = new DQIfMDC(null);
 
   private final MdcPatternConverter mMDCPatternConverter;
 
   private final Set<String>         mOmit;
+
+  protected String                  mValue         = "";
 
   private static final String[]     sEMPTY_PATTERN = new String[] {"___NEVER_MATCHES___"};
 
@@ -31,8 +37,8 @@ public class DQMDC extends LogEventPatternConverter {
    *
    * @param options options, may be null.
    */
-  private DQMDC(final String @Nullable [] options) {
-    super((options != null) && (options.length > 0) ? "DQMDC{" + options[0] + '}' : "DQMDC", "dqmdc");
+  private DQIfMDC(final String @Nullable [] options) {
+    super("DQIfMDC", null);
     final Set<String> omits = new HashSet<>();
     if ((options != null) && (options.length > 0) && (options[0] != null)) {
       @NonNull
@@ -46,7 +52,7 @@ public class DQMDC extends LogEventPatternConverter {
         keys = new @NonNull String[] {opt};
       }
       final Set<String> keep = new HashSet<>();
-      for (int i = 0; i < keys.length; i++) {
+      for (int i = 0; i < (keys.length - 1); i++) {
         keys[i] = keys[i].trim();
         if (keys[i].startsWith("!"))
           omits.add(keys[i].substring(1));
@@ -57,6 +63,7 @@ public class DQMDC extends LogEventPatternConverter {
         mMDCPatternConverter = MdcPatternConverter.newInstance(sEMPTY_PATTERN);
       else
         mMDCPatternConverter = MdcPatternConverter.newInstance(new String[] {String.join(",", keep)});
+      mValue = keys[keys.length - 1].replaceAll("\\\\s", " ");
     }
     else
       mMDCPatternConverter = MdcPatternConverter.newInstance(sEMPTY_PATTERN);
@@ -69,8 +76,11 @@ public class DQMDC extends LogEventPatternConverter {
    * @param pOptions options, may be null.
    * @return instance of pattern converter.
    */
-  public static DQMDC newInstance(final String @Nullable [] pOptions) {
-    return new DQMDC(pOptions);
+  public static DQIfMDC newInstance(final String @Nullable [] pOptions) {
+    if ((pOptions == null) || (pOptions.length == 0))
+      return INSTANCE;
+
+    return new DQIfMDC(pOptions);
   }
 
   /**
@@ -79,16 +89,20 @@ public class DQMDC extends LogEventPatternConverter {
    */
   @Override
   public void format(LogEvent pEvent, StringBuilder pToAppendTo) {
+    final StringBuilder sb = new StringBuilder();
     final ReadOnlyStringMap contextData = pEvent.getContextData();
     if (contextData.isEmpty() == true)
-      mMDCPatternConverter.format(pEvent, pToAppendTo);
+      mMDCPatternConverter.format(pEvent, sb);
     else {
       final SortedArrayStringMap map = new SortedArrayStringMap(contextData);
       mOmit.forEach((k) -> map.remove(k));
       final MutableLogEvent updatedEvent = new MutableLogEvent();
       updatedEvent.initFrom(pEvent);
       updatedEvent.setContextData(map);
-      mMDCPatternConverter.format(updatedEvent, pToAppendTo);
+      mMDCPatternConverter.format(updatedEvent, sb);
     }
+    final String result = sb.toString();
+    if (result.isEmpty() == false)
+      pToAppendTo.append(mValue);
   }
 }
