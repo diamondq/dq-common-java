@@ -97,6 +97,27 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     return new ContextExtendedCompletableFuture<>(pFuture);
   }
 
+  public static ContextExtendedCompletableFuture<@Nullable Void> allOf(@NonNull ExtendedCompletionStage<?>... cfs) {
+    @NonNull
+    final CompletableFuture<?>[] args = new @NonNull CompletableFuture<?>[cfs.length];
+    for (int i = 0; i < cfs.length; i++)
+      args[i] = decomposeToCompletableFuture(cfs[i]);
+    return new ContextExtendedCompletableFuture<>(CompletableFuture.allOf(args));
+  }
+
+  public static ContextExtendedCompletableFuture<@Nullable Void> allOfCollection(
+    Collection<? extends ExtendedCompletionStage<?>> cfs) {
+    final int size = cfs.size();
+    @NonNull
+    final CompletableFuture<?>[] args = new @NonNull CompletableFuture<?>[size];
+    if (size > 0) {
+      int i = 0;
+      for (final ExtendedCompletionStage<?> obj : cfs)
+        args[i++] = decomposeToCompletableFuture(obj);
+    }
+    return new ContextExtendedCompletableFuture<>(CompletableFuture.allOf(args));
+  }
+
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(
     Collection<? extends ExtendedCompletionStage<?>> pCfs) {
