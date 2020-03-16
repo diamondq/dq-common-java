@@ -39,14 +39,14 @@ public class ExtendedIllegalArgumentException extends IllegalArgumentException {
   }
 
   public @Nullable Object[] getParams() {
-	return mParams;
+    return mParams;
   }
-  
+
   /**
    * @see java.lang.Throwable#getMessage()
    */
   @Override
-  public String getMessage() {
+  public @Nullable String getMessage() {
     return getLocalizedMessage(I18N.getDefaultLocale());
   }
 
@@ -54,7 +54,7 @@ public class ExtendedIllegalArgumentException extends IllegalArgumentException {
    * @see java.lang.Throwable#getLocalizedMessage()
    */
   @Override
-  public String getLocalizedMessage() {
+  public @Nullable String getLocalizedMessage() {
     return getLocalizedMessage(I18N.getDefaultLocale());
   }
 

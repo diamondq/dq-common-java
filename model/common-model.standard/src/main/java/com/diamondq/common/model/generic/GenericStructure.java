@@ -12,6 +12,7 @@ import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureRef;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
@@ -198,9 +199,11 @@ public class GenericStructure implements Structure, Revision<String> {
    */
   @Override
   public Structure updateProperty(Property<?> pValue) {
+    @SuppressWarnings("null")
+    @NonNull Predicate<String> equalTo = Predicates.equalTo(pValue.getDefinition().getName());
     return new GenericStructure(mScope, mDefinition,
       ImmutableMap.<String, Property<?>> builder()
-        .putAll(Maps.filterKeys(mProperties, Predicates.not(Predicates.equalTo(pValue.getDefinition().getName()))))
+        .putAll(Maps.filterKeys(mProperties, Predicates.not(equalTo)))
         .put(pValue.getDefinition().getName(), pValue).build());
   }
 

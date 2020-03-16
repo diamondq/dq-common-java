@@ -43,6 +43,7 @@ public class GenericModelQuery extends GenericQuery implements ModelQuery {
     return mParentPropertyDefinition;
   }
 
+  @SuppressWarnings("null")
   @Override
   protected ToStringHelper toStringHelper(ToStringHelper pHelper) {
     return super.toStringHelper(pHelper).add("structureDefinition", mStructureDefinition.getName())

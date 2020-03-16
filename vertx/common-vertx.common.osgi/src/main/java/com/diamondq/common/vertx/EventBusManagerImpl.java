@@ -23,15 +23,19 @@ import io.vertx.servicediscovery.ServiceDiscovery;
 
 public class EventBusManagerImpl implements EventBusManager {
 
+  @SuppressWarnings("unused")
   private static final int sDEFAULT_QUEUE_SIZE = 100;
 
   private static final int sDEFAULT_INFLIGHT   = Runtime.getRuntime().availableProcessors() * 2;
 
   private static class TransitMessage<I, R> {
+    @SuppressWarnings("unused")
     public final I                                                                   toSend;
 
+    @SuppressWarnings("unused")
     public final @Nullable DeliveryOptions                                           deliveryOptions;
 
+    @SuppressWarnings("unused")
     public final ContextExtendedCompletableFuture<ContextExtendedCompletionStage<R>> sendFuture;
 
     public TransitMessage(I pToSend, @Nullable DeliveryOptions pDeliveryOptions,
@@ -84,6 +88,7 @@ public class EventBusManagerImpl implements EventBusManager {
 
   private final ConcurrentMap<String, SendQueue> mSendQueues   = new ConcurrentHashMap<>();
 
+  @SuppressWarnings("unused")
   private final AtomicLong                       mMessagesSent = new AtomicLong();
 
   private ContextFactory                         mContextFactory;
@@ -188,6 +193,7 @@ public class EventBusManagerImpl implements EventBusManager {
     }
   }
 
+  @SuppressWarnings({"deprecation", "null"})
   private <I, R> ContextExtendedCompletionStage<R> sendOneMessage(SendQueue sendQueue, I pToSend,
     @Nullable DeliveryOptions pDeliveryOptions) {
     try (Context ctx = mContextFactory.newContext(EventBusManagerImpl.class, this, sendQueue)) {

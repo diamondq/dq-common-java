@@ -2,7 +2,6 @@ package com.diamondq.common.tracing.opentracing.wrappers;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import io.opentracing.Scope;
 import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.Tracer;

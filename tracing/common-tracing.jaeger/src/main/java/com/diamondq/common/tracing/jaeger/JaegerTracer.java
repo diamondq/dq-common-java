@@ -38,7 +38,6 @@ public class JaegerTracer implements Tracer {
 
   private io.jaegertracing.internal.JaegerTracer mDelegate;
 
-  @SuppressWarnings("deprecation")
   public JaegerTracer() {
     mDelegate = Configuration.fromEnv().getTracer();
   }
@@ -81,7 +80,6 @@ public class JaegerTracer implements Tracer {
   /**
    * @see io.opentracing.Tracer#scopeManager()
    */
-  @SuppressWarnings("deprecation")
   @Override
   public ScopeManager scopeManager() {
     return mDelegate.scopeManager();
@@ -90,7 +88,6 @@ public class JaegerTracer implements Tracer {
   /**
    * @see io.opentracing.Tracer#activeSpan()
    */
-  @SuppressWarnings("deprecation")
   @Override
   public @Nullable Span activeSpan() {
     return mDelegate.activeSpan();
@@ -99,7 +96,6 @@ public class JaegerTracer implements Tracer {
   /**
    * @see io.opentracing.Tracer#buildSpan(java.lang.String)
    */
-  @SuppressWarnings("deprecation")
   @Override
   public SpanBuilder buildSpan(String pOperationName) {
     return mDelegate.buildSpan(pOperationName);
@@ -108,7 +104,6 @@ public class JaegerTracer implements Tracer {
   /**
    * @see io.opentracing.Tracer#inject(io.opentracing.SpanContext, io.opentracing.propagation.Format, java.lang.Object)
    */
-  @SuppressWarnings("deprecation")
   @Override
   public <C> void inject(SpanContext pSpanContext, Format<C> pFormat, @NonNull C pCarrier) {
     mDelegate.inject(pSpanContext, pFormat, pCarrier);
@@ -117,7 +112,6 @@ public class JaegerTracer implements Tracer {
   /**
    * @see io.opentracing.Tracer#extract(io.opentracing.propagation.Format, java.lang.Object)
    */
-  @SuppressWarnings("deprecation")
   @Override
   public <C> SpanContext extract(Format<C> pFormat, @NonNull C pCarrier) {
     return mDelegate.extract(pFormat, pCarrier);
@@ -131,7 +125,6 @@ public class JaegerTracer implements Tracer {
   /**
    * @see io.opentracing.Tracer#close()
    */
-  @SuppressWarnings("deprecation")
   @Override
   public void close() {
     mDelegate.close();

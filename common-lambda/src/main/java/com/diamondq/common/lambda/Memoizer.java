@@ -33,7 +33,7 @@ public class Memoizer {
     /* Cast and return */
 
     @SuppressWarnings("unchecked")
-    T castedResult = (T) result.orElse(null);
+    T castedResult = (T) (result.isPresent() ? result.get() : null);
     return castedResult;
   }
 
@@ -58,7 +58,7 @@ public class Memoizer {
     /* Cast and return */
 
     @SuppressWarnings("unchecked")
-    T castedResult = (T) result.orElse(null);
+    T castedResult = (T) (result.isPresent() ? result.get() : null);
     return castedResult;
   }
 
@@ -86,7 +86,7 @@ public class Memoizer {
     /* Cast and return */
 
     @SuppressWarnings("unchecked")
-    T castedResult = (T) result.orElse(null);
+    T castedResult = (T) (result.isPresent() ? result.get() : null);
     return castedResult;
   }
 
@@ -118,7 +118,7 @@ public class Memoizer {
     /* Cast and return */
 
     @SuppressWarnings("unchecked")
-    T castedResult = (T) result.orElse(null);
+    T castedResult = (T) (result.isPresent() ? result.get() : null);
     return castedResult;
   }
 }

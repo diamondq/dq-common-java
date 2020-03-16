@@ -42,7 +42,7 @@ public class ExtendedIllegalStateException extends IllegalStateException {
    * @see java.lang.Throwable#getMessage()
    */
   @Override
-  public String getMessage() {
+  public @Nullable String getMessage() {
     return getLocalizedMessage(I18N.getDefaultLocale());
   }
 
@@ -50,7 +50,7 @@ public class ExtendedIllegalStateException extends IllegalStateException {
    * @see java.lang.Throwable#getLocalizedMessage()
    */
   @Override
-  public String getLocalizedMessage() {
+  public @Nullable String getLocalizedMessage() {
     return getLocalizedMessage(I18N.getDefaultLocale());
   }
 

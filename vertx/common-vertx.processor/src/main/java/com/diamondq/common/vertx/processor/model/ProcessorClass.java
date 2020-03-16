@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -108,7 +109,7 @@ public class ProcessorClass<R extends ProcessorType<R>, P extends ProcessorParam
           if (tm instanceof DeclaredType) {
             DeclaredType dt = (DeclaredType) tm;
             sLogger.trace("  Interface Type Args: {}", dt.getTypeArguments());
-            TypeElement asElement = (TypeElement) pProcessingEnv.getTypeUtils().asElement(dt);
+            TypeElement asElement = Objects.requireNonNull((TypeElement) pProcessingEnv.getTypeUtils().asElement(dt));
             List<TypeMirror> typeArgs = new ArrayList<>(dt.getTypeArguments());
             newBaseElements.add(Pair.with(asElement, typeArgs));
           }

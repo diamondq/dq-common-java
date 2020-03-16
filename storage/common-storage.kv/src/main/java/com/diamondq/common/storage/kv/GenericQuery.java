@@ -94,6 +94,7 @@ public class GenericQuery implements Query {
     return mParentName;
   }
 
+  @SuppressWarnings("null")
   protected ToStringHelper toStringHelper(ToStringHelper pHelper) {
     return pHelper //
       .add("definitionName", mDefinitionName) //

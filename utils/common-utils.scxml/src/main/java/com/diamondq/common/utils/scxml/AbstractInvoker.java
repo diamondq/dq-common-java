@@ -5,7 +5,6 @@ import com.diamondq.common.utils.scxml.impl.DQSCXMLExecutor;
 
 import java.util.Map;
 
-import org.apache.commons.scxml2.EventBuilder;
 import org.apache.commons.scxml2.SCXMLExecutor;
 import org.apache.commons.scxml2.SCXMLIOProcessor;
 import org.apache.commons.scxml2.TriggerEvent;

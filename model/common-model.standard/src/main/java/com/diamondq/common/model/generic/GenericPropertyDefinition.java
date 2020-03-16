@@ -11,6 +11,7 @@ import com.diamondq.common.model.interfaces.Script;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -31,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericPropertyDefinition implements PropertyDefinition {
@@ -372,9 +374,12 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition removeReferenceType(StructureDefinitionRef pValue) {
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<StructureDefinitionRef> equalTo = Predicates.equalTo(pValue);
     return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
       mValidationScript, mDefaultValue, mDefaultValueScript,
-      Sets.filter(mReferenceTypes, Predicates.not(Predicates.equalTo(pValue))), mMinValue, mMaxValue, mMaxLength,
+      Sets.filter(mReferenceTypes, Predicates.not(equalTo)), mMinValue, mMaxValue, mMaxLength,
       mFinal, mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
   }
 

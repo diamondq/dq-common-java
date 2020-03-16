@@ -6,6 +6,7 @@ import com.diamondq.common.model.interfaces.EmbedEditorDirection;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.Script;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericEditorPropertyDefinition extends GenericEditorComponentDefinition<EditorPropertyDefinition>
@@ -159,10 +161,14 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
    */
   @Override
   public EditorPropertyDefinition removeEnabledIfValueEquals(String pValue) {
+    Set<String> enabledIfValueEquals = mEnabledIfValueEquals;
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<String> equalTo = Predicates.equalTo(pValue);
     return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
       mVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty,
-      Sets.filter(mEnabledIfValueEquals == null ? Collections.emptySet() : mEnabledIfValueEquals,
-        Predicates.not(Predicates.equalTo(pValue))),
+      Sets.filter(enabledIfValueEquals == null ? Collections.emptySet() : enabledIfValueEquals,
+        Predicates.not(equalTo)),
       mIsMandatory, mMandatoryReason, mValueMapScript, mSimpleValueMap, mValueMapProperty, mTableDisplayProperties,
       mEmbedTableRowEditor, mDisplayRefImage, mCustomScript);
   }
@@ -238,12 +244,15 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
    */
   @Override
   public EditorPropertyDefinition putSimpleValueMapEntry(String pKey, TranslatableString pValue) {
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<String> equalTo = Predicates.equalTo(pKey);
     return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
       mVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty, mEnabledIfValueEquals, mIsMandatory,
       mMandatoryReason, mValueMapScript,
       ImmutableMap.<String, TranslatableString> builder()
-        .putAll(Maps.filterKeys(mSimpleValueMap == null ? Collections.emptyMap() : mSimpleValueMap,
-          Predicates.not(Predicates.equalTo(pKey))))
+        .putAll(
+          Maps.filterKeys(mSimpleValueMap == null ? Collections.emptyMap() : mSimpleValueMap, Predicates.not(equalTo)))
         .put(pKey, pValue).build(),
       mValueMapProperty, mTableDisplayProperties, mEmbedTableRowEditor, mDisplayRefImage, mCustomScript);
   }
@@ -253,11 +262,14 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
    */
   @Override
   public EditorPropertyDefinition removeSimpleValueMapEntry(String pKey) {
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<String> equalTo = Predicates.equalTo(pKey);
     return new GenericEditorPropertyDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
       mVisibleIfValueEquals, mName, mDisplayType, mEnabledIfProperty, mEnabledIfValueEquals, mIsMandatory,
       mMandatoryReason, mValueMapScript,
       Maps.filterKeys(mSimpleValueMap == null ? Collections.emptyMap() : mSimpleValueMap,
-        Predicates.not(Predicates.equalTo(pKey))),
+        Predicates.not(equalTo)),
       mValueMapProperty, mTableDisplayProperties, mEmbedTableRowEditor, mDisplayRefImage, mCustomScript);
   }
 

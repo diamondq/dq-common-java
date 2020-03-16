@@ -7,6 +7,7 @@ import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -111,7 +112,7 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
 
             /* Now resolve the reference */
 
-            String address = r.getLocation().getString("endpoint");
+            String address = Objects.requireNonNull(r.getLocation()).getString("endpoint");
 
             T result = new ServiceProxyBuilder(pVertx).setAddress(address).build(pClass);
             return result;

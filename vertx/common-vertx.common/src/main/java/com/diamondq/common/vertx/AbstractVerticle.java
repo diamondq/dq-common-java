@@ -24,6 +24,7 @@ public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
   /**
    * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
    */
+  @SuppressWarnings("deprecation")
   @Override
   public void start(Future<@Nullable Void> startFuture) throws Exception {
     start();
@@ -34,6 +35,7 @@ public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
   /**
    * @see io.vertx.core.AbstractVerticle#stop(io.vertx.core.Future)
    */
+  @SuppressWarnings("deprecation")
   @Override
   public void stop(Future<@Nullable Void> stopFuture) throws Exception {
     stop();

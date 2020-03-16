@@ -3,6 +3,7 @@ package com.diamondq.common.model.generic;
 import com.diamondq.common.model.interfaces.EditorComponentDefinition;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
@@ -13,6 +14,7 @@ import com.google.common.collect.Multimaps;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericEditorStructureDefinition implements EditorStructureDefinition {
@@ -64,17 +66,22 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
    */
   @Override
   public <T extends EditorComponentDefinition<T>> EditorStructureDefinition addComponent(T pValue) {
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
     return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef,
       ImmutableList.<EditorComponentDefinition<?>> builder()
-        .addAll(Iterables.filter(mComponents, Predicates.not(Predicates.equalTo(pValue)))).add(pValue).build(),
+        .addAll(Iterables.filter(mComponents, Predicates.not(equalTo))).add(pValue).build(),
       mKeywords);
   }
 
   @Override
   public <T extends EditorComponentDefinition<T>> EditorStructureDefinition removeComponent(T pValue) {
+    @SuppressWarnings("null")
+    @NonNull Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
     return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef,
       ImmutableList.<EditorComponentDefinition<?>> builder()
-        .addAll(Iterables.filter(mComponents, Predicates.not(Predicates.equalTo(pValue)))).build(),
+        .addAll(Iterables.filter(mComponents, Predicates.not(equalTo))).build(),
       mKeywords);
   }
 

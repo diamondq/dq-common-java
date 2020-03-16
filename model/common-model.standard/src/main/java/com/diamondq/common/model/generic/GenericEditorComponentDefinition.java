@@ -3,6 +3,7 @@ package com.diamondq.common.model.generic;
 import com.diamondq.common.model.interfaces.EditorComponentDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -10,6 +11,7 @@ import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class GenericEditorComponentDefinition<T extends EditorComponentDefinition<T>>
@@ -131,10 +133,13 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
    */
   @Override
   public T addVisibleIfValueEquals(String pValue) {
+    Set<String> visibleIfValueEquals = mVisibleIfValueEquals;
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<String> equalTo = Predicates.equalTo(pValue);
     return constructNew(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
-      ImmutableSet.<String> builder()
-        .addAll(Sets.filter(mVisibleIfValueEquals == null ? Collections.emptySet() : mVisibleIfValueEquals,
-          Predicates.not(Predicates.equalTo(pValue))))
+      ImmutableSet.<String> builder().addAll(Sets
+        .filter(visibleIfValueEquals == null ? Collections.emptySet() : visibleIfValueEquals, Predicates.not(equalTo)))
         .add(pValue).build());
   }
 
@@ -143,8 +148,11 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
    */
   @Override
   public T removeVisibleIfValueEquals(String pValue) {
-    return constructNew(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
-      Sets.filter(mVisibleIfValueEquals == null ? Collections.emptySet() : mVisibleIfValueEquals,
-        Predicates.not(Predicates.equalTo(pValue))));
+    Set<String> visibleIfValueEquals = mVisibleIfValueEquals;
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<String> equalTo = Predicates.equalTo(pValue);
+    return constructNew(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty, Sets
+      .filter(visibleIfValueEquals == null ? Collections.emptySet() : visibleIfValueEquals, Predicates.not(equalTo)));
   }
 }

@@ -644,7 +644,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
         refBuilder.append(typeName).append('/');
         int preNameOffset = refBuilder.length();
 
-        File[] listFiles = listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties"));
+        File[] listFiles = Objects.requireNonNull(listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties")));
         for (File f : listFiles) {
           String name = unescapeValue(f.getName().substring(0, f.getName().length() - ".properties".length()));
 

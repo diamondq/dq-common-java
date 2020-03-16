@@ -19,6 +19,7 @@ public class TestEnforcer {
   @Rule
   public OsgiContext        mContext = new OsgiContext();
 
+  @SuppressWarnings("null")
   public ContextFactoryImpl mContextFactory;
 
   @BeforeClass

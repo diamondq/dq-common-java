@@ -247,8 +247,9 @@ public class GenericStructureDefinition implements StructureDefinition {
    */
   @Override
   public StructureDefinition removePropertyDefinition(PropertyDefinition pValue) {
+    @SuppressWarnings("null")
     @NonNull
-    Predicate<@Nullable PropertyDefinition> equalTo = Predicates.equalTo(pValue);
+    Predicate<PropertyDefinition> equalTo = Predicates.equalTo(pValue);
     return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance,
       Maps.filterValues(mProperties, Predicates.not(equalTo)), mParentDefinitions, mKeywords);
   }
@@ -275,8 +276,11 @@ public class GenericStructureDefinition implements StructureDefinition {
    */
   @Override
   public StructureDefinition removeParentDefinition(StructureDefinitionRef pValue) {
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<StructureDefinitionRef> equalTo = Predicates.equalTo(pValue);
     return new GenericStructureDefinition(mScope, mName, mRevision, mLabel, mSingleInstance, mProperties,
-      Sets.filter(mParentDefinitions, Predicates.not(Predicates.equalTo(pValue))), mKeywords);
+      Sets.filter(mParentDefinitions, Predicates.not(equalTo)), mKeywords);
   }
 
   public Map<String, PropertyDefinition> internalGetAllProperties() {

@@ -5,6 +5,7 @@ import com.diamondq.common.model.interfaces.EditorComponentDirection;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericEditorGroupDefinition extends GenericEditorComponentDefinition<EditorGroupDefinition>
@@ -95,9 +97,12 @@ public class GenericEditorGroupDefinition extends GenericEditorComponentDefiniti
    */
   @Override
   public <T extends EditorComponentDefinition<T>> EditorGroupDefinition removeComponent(T pValue) {
+    @SuppressWarnings("null")
+    @NonNull
+    Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
     return new GenericEditorGroupDefinition(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
       mVisibleIfValueEquals, mDirection, mNumColumns,
-      ImmutableList.copyOf(Iterables.filter(mComponents, Predicates.not(Predicates.equalTo(pValue)))));
+      ImmutableList.copyOf(Iterables.filter(mComponents, Predicates.not(equalTo))));
   }
 
   /**

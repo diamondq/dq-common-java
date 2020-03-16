@@ -7,6 +7,7 @@ import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
@@ -24,8 +25,8 @@ public class TracingAppender extends AbstractAppender {
   private static final Charset sUTF8 = Charset.forName("UTF-8");
 
   public TracingAppender(String pName, @Nullable Filter pFilter, Layout<? extends Serializable> pLayout,
-    boolean pIgnoreExceptions) {
-    super(pName, pFilter, pLayout, pIgnoreExceptions);
+    boolean pIgnoreExceptions, final Property[] pProperties) {
+    super(pName, pFilter, pLayout, pIgnoreExceptions, pProperties);
   }
 
   @PluginFactory
@@ -44,7 +45,7 @@ public class TracingAppender extends AbstractAppender {
       Layout<@NonNull ? extends @NonNull Serializable> defaultLayout = PatternLayout.createDefaultLayout();
       layout = defaultLayout;
     }
-    return new TracingAppender(name, filter, layout, ignoreExceptions);
+    return new TracingAppender(name, filter, layout, ignoreExceptions, Property.EMPTY_ARRAY);
   }
 
   @Override

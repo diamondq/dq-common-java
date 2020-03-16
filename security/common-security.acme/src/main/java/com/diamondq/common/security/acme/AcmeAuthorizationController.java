@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -117,9 +118,9 @@ public class AcmeAuthorizationController {
     }
     else {
 
-      String configUserKeyPairStr = mConfig.getUserKeyPair().orElse(null);
-      if ((configUserKeyPairStr != null) && (configUserKeyPairStr.isEmpty() == false)) {
-        pState.savedState = savedState = savedState.setUserKeyPair(configUserKeyPairStr);
+      Optional<String> configUserKeyPairStr = mConfig.getUserKeyPair();
+      if ((configUserKeyPairStr.isPresent()) && (configUserKeyPairStr.get().isEmpty() == false)) {
+        pState.savedState = savedState = savedState.setUserKeyPair(configUserKeyPairStr.get());
         try (StringReader sr = new StringReader(savedState.getUserKeyPair())) {
           userKeyPair = KeyPairUtils.readKeyPair(sr);
         }

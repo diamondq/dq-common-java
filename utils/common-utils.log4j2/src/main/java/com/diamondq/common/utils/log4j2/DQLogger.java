@@ -5,6 +5,7 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
 import org.apache.logging.log4j.core.pattern.PatternConverter;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Plugin(name = "DQLoggerPatternConverter", category = PatternConverter.CATEGORY)
@@ -22,7 +23,7 @@ public class DQLogger extends LogEventPatternConverter {
    *
    * @param options options, may be null.
    */
-  private DQLogger(final String @Nullable [] options) {
+  private DQLogger(final @NonNull String @Nullable [] options) {
     super("DQLogger", null);
     if ((options == null) || (options.length == 0))
       mParts = 3;
@@ -36,7 +37,7 @@ public class DQLogger extends LogEventPatternConverter {
    * @param pOptions options, may be null.
    * @return instance of pattern converter.
    */
-  public static DQLogger newInstance(final String @Nullable [] pOptions) {
+  public static DQLogger newInstance(final @NonNull String @Nullable [] pOptions) {
     if ((pOptions == null) || (pOptions.length == 0)) {
       return INSTANCE;
     }
