@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 public class FutureUtils {
 
   private static volatile Method   newCompletableFutureMethod;
@@ -98,8 +100,8 @@ public class FutureUtils {
     }
   }
 
-  public static <T, U extends ExtendedCompletionStage<List<T>>> U listOf(
-    List<? extends ExtendedCompletionStage<T>> pList) {
+  public static <T, @NonNull U extends @NonNull ExtendedCompletionStage<@NonNull List<T>>> U listOf(
+    List<@NonNull ? extends @NonNull ExtendedCompletionStage<T>> pList) {
     try {
       Object resultObj = listOfFutureMethod.invoke(null, pList);
       @SuppressWarnings("unchecked")
