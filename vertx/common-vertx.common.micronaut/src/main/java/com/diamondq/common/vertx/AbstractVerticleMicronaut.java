@@ -1,13 +1,13 @@
 package com.diamondq.common.vertx;
 
+import com.diamondq.common.UtilMessages;
+import com.diamondq.common.converters.ConverterManager;
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.injection.Constants;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.MiscMessages;
-import com.diamondq.common.utils.misc.converters.ConverterManager;
-import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -93,12 +93,12 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
 
   protected void onActivate(Map<String, Object> pProperties, String pPid) {
     String pid = (String) pProperties.getOrDefault(Constants.SERVICE_PID, pPid);
-    Verify.notNullArg(mContextFactory, MiscMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
+    Verify.notNullArg(mContextFactory, UtilMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
     try (Context ctx = mContextFactory.newContext(AbstractVerticleMicronaut.class, this)) {
-      Verify.notNullArg(mConverterManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", pid);
-      Verify.notNullArg(mSecurityContextManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager", pid);
-      Verify.notNullArg(mServiceDiscovery, MiscMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", pid);
-      Verify.notNullArg(mVertx, MiscMessages.VERIFY_DEPENDENCY_MISSING, "vertx", pid);
+      Verify.notNullArg(mConverterManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", pid);
+      Verify.notNullArg(mSecurityContextManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager", pid);
+      Verify.notNullArg(mServiceDiscovery, UtilMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", pid);
+      Verify.notNullArg(mVertx, UtilMessages.VERIFY_DEPENDENCY_MISSING, "vertx", pid);
       try {
 
         @SuppressWarnings("null")

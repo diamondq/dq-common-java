@@ -1,5 +1,6 @@
 package com.diamondq.adventuretools.model;
 
+import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.Scope;
@@ -106,7 +107,7 @@ public abstract class AbstractStructureDefinitionTests implements StandardTest {
     toolkit.writeStructureDefinition(scope, newDef);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ExtendedIllegalArgumentException.class)
   public void testInvalidName() {
     Toolkit toolkit = mToolkit;
     Scope scope = mScope;

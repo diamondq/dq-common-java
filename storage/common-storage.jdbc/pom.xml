@@ -30,10 +30,6 @@
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-utils.misc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
       <artifactId>common-utils.parsing</artifactId>
     </dependency>
     <dependency>

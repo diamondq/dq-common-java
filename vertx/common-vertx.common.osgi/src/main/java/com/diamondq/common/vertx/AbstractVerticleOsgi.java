@@ -1,13 +1,13 @@
 package com.diamondq.common.vertx;
 
+import com.diamondq.common.UtilMessages;
+import com.diamondq.common.converters.ConverterManager;
+import com.diamondq.common.errors.ExtendedIllegalArgumentException;
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.MiscMessages;
-import com.diamondq.common.utils.misc.converters.ConverterManager;
-import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
-import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -83,7 +83,7 @@ public abstract class AbstractVerticleOsgi {
     ContextFactory.staticReportTrace(AbstractVerticleOsgi.class, this, pSecurityContextManager);
     mSecurityContextManager = pSecurityContextManager;
   }
-  
+
   public void setServiceDiscovery(ServiceDiscovery pServiceDiscovery) {
     ContextFactory.staticReportTrace(AbstractVerticleOsgi.class, this, pServiceDiscovery);
     mServiceDiscovery = pServiceDiscovery;
@@ -98,12 +98,12 @@ public abstract class AbstractVerticleOsgi {
 
   public void onActivate(ComponentContext pContext) {
     String pid = (String) pContext.getProperties().get(Constants.SERVICE_PID);
-    Verify.notNullArg(mContextFactory, MiscMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
+    Verify.notNullArg(mContextFactory, UtilMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
     try (Context ctx = mContextFactory.newContext(AbstractVerticleOsgi.class, this)) {
-      Verify.notNullArg(mConverterManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", pid);
-      Verify.notNullArg(mSecurityContextManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager", pid);
-      Verify.notNullArg(mServiceDiscovery, MiscMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", pid);
-      Verify.notNullArg(mVertx, MiscMessages.VERIFY_DEPENDENCY_MISSING, "vertx", pid);
+      Verify.notNullArg(mConverterManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", pid);
+      Verify.notNullArg(mSecurityContextManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager", pid);
+      Verify.notNullArg(mServiceDiscovery, UtilMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", pid);
+      Verify.notNullArg(mVertx, UtilMessages.VERIFY_DEPENDENCY_MISSING, "vertx", pid);
       try {
         Supplier<Verticle> supplier = getSupplier();
         @SuppressWarnings("unchecked")

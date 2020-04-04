@@ -1,5 +1,6 @@
 package com.diamondq.common.storage.jdbc;
 
+import com.diamondq.common.builders.IBuilder;
 import com.diamondq.common.storage.kv.IKVAsyncTransaction;
 import com.diamondq.common.storage.kv.IKVColumnDefinition;
 import com.diamondq.common.storage.kv.IKVIndexColumn;
@@ -18,7 +19,6 @@ import com.diamondq.common.storage.kv.SyncWrapperAsyncKVTransaction;
 import com.diamondq.common.storage.kv.WhereInfo;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.builders.IBuilder;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

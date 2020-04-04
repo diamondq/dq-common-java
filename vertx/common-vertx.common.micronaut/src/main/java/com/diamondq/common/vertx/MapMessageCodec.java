@@ -1,7 +1,5 @@
 package com.diamondq.common.vertx;
 
-import com.diamondq.common.vertx.BaseMessageCodecWrapper;
-
 import java.util.HashMap;
 import java.util.Map;
 

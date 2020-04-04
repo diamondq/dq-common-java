@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic.osgi;
 
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.model.interfaces.AsyncToolkit;
 import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
@@ -16,7 +17,6 @@ import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
-import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.util.Collection;
 import java.util.List;

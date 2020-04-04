@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0"
+  configuration-policy="optional" immediate="false"
+  name="com.diamondq.common.converters.impl.convertermanagerimpl">
+  <implementation
+    class="com.diamondq.common.converters.impl.ConverterManagerImpl" />
+  <service>
+     <provide interface="com.diamondq.common.converters.ConverterManager"/>
+  </service>
+  <reference bind="addConverter" cardinality="0..n" interface="com.diamondq.common.converters.Converter" name="Converter" policy="dynamic" unbind="removeConverter"/>
+</scr:component>

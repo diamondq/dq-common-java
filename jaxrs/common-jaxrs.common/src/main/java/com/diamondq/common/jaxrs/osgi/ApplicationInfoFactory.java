@@ -1,12 +1,12 @@
 package com.diamondq.common.jaxrs.osgi;
 
+import com.diamondq.common.errors.ExtendedIllegalArgumentException;
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.jaxrs.model.ApplicationInfo;
 import com.diamondq.common.jaxrs.model.ApplicationInfo.Builder;
 import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
-import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.net.URI;
 import java.net.URISyntaxException;

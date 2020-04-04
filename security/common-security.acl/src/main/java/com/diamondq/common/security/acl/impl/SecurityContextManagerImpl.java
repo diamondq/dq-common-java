@@ -1,14 +1,14 @@
 package com.diamondq.common.security.acl.impl;
 
+import com.diamondq.common.UtilMessages;
+import com.diamondq.common.errors.ExtendedIllegalStateException;
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.security.acl.ACLMessages;
 import com.diamondq.common.security.acl.api.SecurityContext;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.security.acl.spi.SecurityContextSerializer;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.MiscMessages;
-import com.diamondq.common.utils.misc.errors.ExtendedIllegalStateException;
-import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -58,7 +58,7 @@ public class SecurityContextManagerImpl implements SecurityContextManager {
   @PostConstruct
   public void onActivate(@Property(name = PID) Map<String, Object> pProperties) {
     String pid = Verify.notNull((String) pProperties.getOrDefault(Constants.SERVICE_PID, PID));
-    Verify.notNullArg(mContextFactory, MiscMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
+    Verify.notNullArg(mContextFactory, UtilMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", pid);
   }
 
   /**

@@ -1,5 +1,6 @@
 package com.diamondq.common.model.persistence;
 
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.Property;
@@ -17,7 +18,6 @@ import com.diamondq.common.storage.kv.IKVTransaction;
 import com.diamondq.common.storage.kv.KVColumnType;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.errors.Verify;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;

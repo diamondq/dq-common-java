@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="onActivate" configuration-policy="optional" immediate="false" name="com.diamondq.common.utils.misc.context.contextfactoryimpl">
-  <implementation
-    class="com.diamondq.common.utils.misc.context.impl.ContextFactoryImpl" />
-  <service>
-     <provide interface="com.diamondq.common.utils.misc.context.ContextFactory"/>
-  </service>
-  <reference bind="addContextHandler" cardinality="0..n" interface="com.diamondq.common.utils.misc.context.spi.ContextHandler" name="ContextHandler" policy="dynamic" unbind="removeContextHandler"/>
-</scr:component>

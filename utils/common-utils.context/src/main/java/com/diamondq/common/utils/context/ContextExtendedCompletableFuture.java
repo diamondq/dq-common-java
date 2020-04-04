@@ -1,5 +1,6 @@
 package com.diamondq.common.utils.context;
 
+import com.diamondq.common.Holder;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.interfaces.Consumer1;
@@ -9,7 +10,6 @@ import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.lambda.interfaces.Predicate2;
-import com.diamondq.common.utils.misc.Holder;
 
 import java.util.ArrayList;
 import java.util.Collection;

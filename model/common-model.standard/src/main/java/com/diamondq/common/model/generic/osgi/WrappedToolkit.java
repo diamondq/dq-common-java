@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic.osgi;
 
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.AsyncToolkit;
@@ -22,7 +23,6 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
 import com.diamondq.common.model.interfaces.TranslatableString;
-import com.diamondq.common.utils.misc.errors.Verify;
 
 import java.util.Collection;
 import java.util.List;

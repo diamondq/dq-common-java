@@ -1,5 +1,9 @@
 package com.diamondq.common.vertx.processor.generators;
 
+import com.diamondq.common.UtilMessages;
+import com.diamondq.common.converters.ConverterManager;
+import com.diamondq.common.errors.ExtendedIllegalStateException;
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.lambda.interfaces.Function2;
@@ -10,10 +14,6 @@ import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.MiscMessages;
-import com.diamondq.common.utils.misc.converters.ConverterManager;
-import com.diamondq.common.utils.misc.errors.ExtendedIllegalStateException;
-import com.diamondq.common.utils.misc.errors.Verify;
 import com.diamondq.common.vertx.VertxMessages;
 import com.diamondq.common.vertx.VertxUtils;
 import com.diamondq.common.vertx.annotations.ProxyGen;
@@ -301,12 +301,12 @@ public class ImplGenerator implements Generator {
         if (TypeName.BOOLEAN.equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("boolean $N = $T.notNullArg(body.getBoolean($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.BOOLEAN.box().equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("Boolean $N = $T.notNullArg(body.getBoolean($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.BOOLEAN.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
           methodBuilder = methodBuilder //
@@ -315,7 +315,7 @@ public class ImplGenerator implements Generator {
         else if (TypeName.BYTE.equals(typeName)) {
           methodBuilder = methodBuilder
             .addStatement("byte[] $N_array = $T.notNullArg(body.getBinary($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName()) //
+              param.getName(), Verify.class, param.getName(), UtilMessages.class, param.getName()) //
             .beginControlFlow("if ($N_array.length != 1)", param.getName())
             .addStatement("throw new IllegalArgumentException()") //
             .endControlFlow() //
@@ -324,7 +324,7 @@ public class ImplGenerator implements Generator {
         else if (TypeName.CHAR.equals(typeName)) {
           methodBuilder = methodBuilder
             .addStatement("String $N_string = $T.notNullArg(body.getString($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName()) //
+              param.getName(), Verify.class, param.getName(), UtilMessages.class, param.getName()) //
             .beginControlFlow("if ($N_string.size() != 1)", param.getName())
             .addStatement("throw new IllegalArgumentException()") //
             .endControlFlow() //
@@ -333,12 +333,12 @@ public class ImplGenerator implements Generator {
         else if (TypeName.DOUBLE.equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("double $N = $T.notNullArg(body.getDouble($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.DOUBLE.box().equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("Double $N = $T.notNullArg(body.getDouble($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.DOUBLE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
           methodBuilder = methodBuilder //
@@ -347,12 +347,12 @@ public class ImplGenerator implements Generator {
         else if (TypeName.FLOAT.equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("float $N = $T.notNullArg(body.getFloat($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.FLOAT.box().equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("Float $N = $T.notNullArg(body.getFloat($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.FLOAT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
           methodBuilder = methodBuilder //
@@ -361,12 +361,12 @@ public class ImplGenerator implements Generator {
         else if (TypeName.INT.equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("int $N = $T.notNullArg(body.getInteger($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.INT.box().equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("Integer $N = $T.notNullArg(body.getInteger($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.INT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
           methodBuilder = methodBuilder //
@@ -375,12 +375,12 @@ public class ImplGenerator implements Generator {
         else if (TypeName.LONG.equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("long $N = $T.notNullArg(body.getLong($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.LONG.box().equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("Long $N = $T.notNullArg(body.getLong($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName());
+              Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (TypeName.LONG.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
           methodBuilder = methodBuilder //
@@ -389,7 +389,7 @@ public class ImplGenerator implements Generator {
         else if (TypeName.SHORT.equals(typeName)) {
           methodBuilder = methodBuilder
             .addStatement("int $N_int = $T.notNullArg(body.getInteger($S), $T.VERIFY_PARAM_NULL, $S)", param.getName(),
-              Verify.class, param.getName(), MiscMessages.class, param.getName()) //
+              Verify.class, param.getName(), UtilMessages.class, param.getName()) //
             .beginControlFlow("if (($N_int > Short.MAX_VALUE) || ($N_int < Short.MIN_VALUE))", param.getName(),
               param.getName()) //
             .addStatement("throw new IllegalArgumentException()") //
@@ -399,7 +399,7 @@ public class ImplGenerator implements Generator {
         else if (TypeName.SHORT.box().equals(typeName)) {
           methodBuilder = methodBuilder
             .addStatement("Integer $N_int = $T.notNullArg(body.getInteger($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName()) //
+              param.getName(), Verify.class, param.getName(), UtilMessages.class, param.getName()) //
             .beginControlFlow("if (($N_int > Short.MAX_VALUE) || ($N_int < Short.MIN_VALUE))", param.getName(),
               param.getName()) //
             .addStatement("throw new IllegalArgumentException()") //
@@ -421,7 +421,7 @@ public class ImplGenerator implements Generator {
         else if (ArrayTypeName.of(TypeName.BYTE).equals(typeName)) {
           methodBuilder =
             methodBuilder.addStatement("byte[] $N = $T.notNullArg(body.getBinary($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+              param.getName(), Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
 
         /* Handle string */
@@ -429,7 +429,7 @@ public class ImplGenerator implements Generator {
         else if (ClassName.get(String.class).equals(typeName)) {
           methodBuilder =
             methodBuilder.addStatement("String $N = $T.notNullArg(body.getString($S), $T.VERIFY_PARAM_NULL, $S)",
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+              param.getName(), Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (ClassName.get(String.class).annotated(AnnotationSpec.builder(Nullable.class).build())
           .equals(typeName)) {
@@ -442,7 +442,7 @@ public class ImplGenerator implements Generator {
         else if (ClassName.get(UUID.class).equals(typeName)) {
           methodBuilder = methodBuilder.addStatement(
             "$T $N = $T.fromString($T.notNullArg(body.getString($S), $T.VERIFY_PARAM_NULL, $S))", UUID.class,
-            param.getName(), UUID.class, Verify.class, param.getName(), MiscMessages.class, param.getName());
+            param.getName(), UUID.class, Verify.class, param.getName(), UtilMessages.class, param.getName());
         }
         else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
           methodBuilder = methodBuilder
@@ -458,7 +458,7 @@ public class ImplGenerator implements Generator {
         else if (ClassName.get(Buffer.class).equals(typeName)) {
           methodBuilder = methodBuilder //
             .addStatement("$T $N = $T.buffer($T.notNullArg(body.getBinary($S), $T.VERIFY_PARAM_NULL, $S))",
-              Buffer.class, param.getName(), Buffer.class, Verify.class, param.getName(), MiscMessages.class,
+              Buffer.class, param.getName(), Buffer.class, Verify.class, param.getName(), UtilMessages.class,
               param.getName());
         }
         else if (ClassName.get(Buffer.class).annotated(AnnotationSpec.builder(Nullable.class).build())
@@ -488,7 +488,7 @@ public class ImplGenerator implements Generator {
               throw new UnsupportedOperationException();
             methodBuilder = methodBuilder.addStatement(
               "$T $N_jsonarray = $T.notNullArg(body.getJsonArray($S), $T.VERIFY_PARAM_NULL, $S)", JsonArray.class,
-              param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+              param.getName(), Verify.class, param.getName(), UtilMessages.class, param.getName());
             methodBuilder = methodBuilder.addStatement("$T $N = new $T()", typeName, param.getName(), listImplType);
             methodBuilder =
               methodBuilder.addStatement("int $N_size = $N_jsonarray.size()", param.getName(), param.getName());
@@ -573,7 +573,7 @@ public class ImplGenerator implements Generator {
                 methodBuilder = methodBuilder // .
                   .addStatement(
                     "$T $N_jsonobject = $T.notNullArg($N_jsonarray.getJsonObject(i), $T.VERIFY_PARAM_NULL, $S)",
-                    JsonObject.class, param.getName(), Verify.class, param.getName(), MiscMessages.class,
+                    JsonObject.class, param.getName(), Verify.class, param.getName(), UtilMessages.class,
                     param.getName())
                   // MyObject obj = mConverterManager.convert(obj_json, MyObject.class);
                   .addStatement("$T $N_obj = mConverterManager.convert($N_jsonobject, $T.class)", itemTypeName,
@@ -604,7 +604,7 @@ public class ImplGenerator implements Generator {
           ProxyClass proxyClass = new ProxyClass(declaredTypeElement, pImplClass.getProcessingEnv());
           methodBuilder = methodBuilder //
             .addStatement("$T $N_json = $T.notNullArg(body.getJsonObject($S), $T.VERIFY_PARAM_NULL, $S)",
-              JsonObject.class, param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName()) //
+              JsonObject.class, param.getName(), Verify.class, param.getName(), UtilMessages.class, param.getName()) //
             .addStatement("String $N_address = $T.notNull($N_json.getString($S))", param.getName(), Verify.class,
               param.getName(), "address") //
             .addStatement(proxyClass.isNeedsConverter() == true
@@ -625,7 +625,7 @@ public class ImplGenerator implements Generator {
           if (type.isNullable() == false) {
             methodBuilder =
               methodBuilder.addStatement("$T $N_json = $T.notNullArg(body.getJsonObject($S), $T.VERIFY_PARAM_NULL, $S)",
-                JsonObject.class, param.getName(), Verify.class, param.getName(), MiscMessages.class, param.getName());
+                JsonObject.class, param.getName(), Verify.class, param.getName(), UtilMessages.class, param.getName());
             // MyObject obj = mConverterManager.convert(obj_json, MyObject.class);
             methodBuilder = methodBuilder.addStatement("$T $N = mConverterManager.convert($N_json, $T.class)", typeName,
               param.getName(), param.getName(), typeName.withoutAnnotations());

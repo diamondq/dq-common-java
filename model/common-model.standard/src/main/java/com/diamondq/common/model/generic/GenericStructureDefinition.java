@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.lambda.Memoizer;
 import com.diamondq.common.model.Messages;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
@@ -9,7 +10,6 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.TranslatableString;
-import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;

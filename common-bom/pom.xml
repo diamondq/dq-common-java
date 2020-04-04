@@ -167,6 +167,11 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
+        <artifactId>common-utils</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
         <artifactId>common-utils.context</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -188,11 +193,6 @@
       <dependency>
         <groupId>com.diamondq.common</groupId>
         <artifactId>common-utils.logback.fragment</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
-        <artifactId>common-utils.misc</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

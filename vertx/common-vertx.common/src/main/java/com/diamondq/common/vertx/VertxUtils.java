@@ -1,5 +1,6 @@
 package com.diamondq.common.vertx;
 
+import com.diamondq.common.Holder;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.lambda.interfaces.Consumer2;
@@ -12,7 +13,6 @@ import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.Holder;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -518,9 +518,9 @@ public class VertxUtils {
     return future;
   }
 
-  public static <@Nullable R> ContextExtendedCompletionStage<R> callReturnsNullable(
-    Consumer<Handler<AsyncResult<R>>> pCallee) {
-    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+  public static <R> ContextExtendedCompletionStage<@Nullable R> callReturnsNullable(
+    Consumer<Handler<AsyncResult<@Nullable R>>> pCallee) {
+    ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
     pCallee.accept((ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -537,9 +537,9 @@ public class VertxUtils {
     return future;
   }
 
-  public static <A1, @Nullable R> ContextExtendedCompletionStage<R> callReturnsNullable(
-    Consumer2<A1, Handler<AsyncResult<R>>> pCallee, A1 pArg1) {
-    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+  public static <A1, R> ContextExtendedCompletionStage<@Nullable R> callReturnsNullable(
+    Consumer2<A1, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1) {
+    ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -556,9 +556,9 @@ public class VertxUtils {
     return future;
   }
 
-  public static <A1, A2, @Nullable R> ContextExtendedCompletionStage<R> callReturnsNullable(
-    Consumer3<A1, A2, Handler<AsyncResult<R>>> pCallee, A1 pArg1, A2 pArg2) {
-    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+  public static <A1, A2, R> ContextExtendedCompletionStage<@Nullable R> callReturnsNullable(
+    Consumer3<A1, A2, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2) {
+    ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
@@ -575,9 +575,9 @@ public class VertxUtils {
     return future;
   }
 
-  public static <A1, A2, A3, @Nullable R> ContextExtendedCompletionStage<R> callReturnsNullable(
-    Consumer4<A1, A2, A3, Handler<AsyncResult<R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
-    ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
+  public static <A1, A2, A3, R> ContextExtendedCompletionStage<@Nullable R> callReturnsNullable(
+    Consumer4<A1, A2, A3, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
+    ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();

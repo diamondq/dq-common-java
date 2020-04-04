@@ -1,8 +1,8 @@
 package com.diamondq.common.metrics.micrometer;
 
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.errors.Verify;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 
 import java.util.ArrayList;

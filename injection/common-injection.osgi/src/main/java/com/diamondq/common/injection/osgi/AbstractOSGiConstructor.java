@@ -1,11 +1,11 @@
 package com.diamondq.common.injection.osgi;
 
+import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
 import com.diamondq.common.injection.osgi.ConstructorInfo.SpecialTypes;
 import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 
 import java.io.File;

@@ -1,7 +1,7 @@
 package com.diamondq.common.vertx.processor.model;
 
-import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
-import com.diamondq.common.utils.misc.internationalization.MessagesEnum;
+import com.diamondq.common.errors.ExtendedIllegalArgumentException;
+import com.diamondq.common.i18n.MessagesEnum;
 
 import javax.lang.model.element.Element;
 

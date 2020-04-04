@@ -1,14 +1,14 @@
 package com.diamondq.common.vertx.processor.generators;
 
+import com.diamondq.common.UtilMessages;
+import com.diamondq.common.converters.ConverterManager;
+import com.diamondq.common.errors.Verify;
 import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.security.acl.api.SecurityContext;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.utils.context.Context;
 import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.misc.MiscMessages;
-import com.diamondq.common.utils.misc.converters.ConverterManager;
-import com.diamondq.common.utils.misc.errors.Verify;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.diamondq.common.vertx.annotations.ProxyGen;
 import com.diamondq.common.vertx.processor.Generator;
@@ -373,28 +373,28 @@ public class ProxyGenerator implements Generator {
       .addStatement("$T<String, Object> contextProperties = pContext.getProperties()", Dictionary.class)
       // Object servicePid = contextProperties.get(Constants.SERVICE_PID);
       .addStatement("Object servicePid = contextProperties.get($T.SERVICE_PID)", Constants.class)
-      // Verify.notNullArg(mContextFactory, MiscMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", servicePid);
+      // Verify.notNullArg(mContextFactory, UtilMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", servicePid);
       .addStatement("$T.notNullArg(mContextFactory, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
-        MiscMessages.class, "contextFactory")
+        UtilMessages.class, "contextFactory")
       // try (Context ctx = mContextFactory.newContext(EngineProxy.OsgiManager.class, this)) {
       .beginControlFlow("try ($T ctx = mContextFactory.newContext($N.OsgiManager.class, this))", Context.class,
         pProxyClass.getProxySimpleName());
     if (pProxyClass.isNeedsConverter())
       methodBuilder = methodBuilder //
-        // Verify.notNullArg(mConverterManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", servicePid);
+        // Verify.notNullArg(mConverterManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", servicePid);
         .addStatement("$T.notNullArg(mConverterManager, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
-          MiscMessages.class, "converterManager");
+          UtilMessages.class, "converterManager");
     methodBuilder = methodBuilder
-      // Verify.notNullArg(mVertx, MiscMessages.VERIFY_DEPENDENCY_MISSING, "vertx", servicePid);
+      // Verify.notNullArg(mVertx, UtilMessages.VERIFY_DEPENDENCY_MISSING, "vertx", servicePid);
       .addStatement("$T.notNullArg(mVertx, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
-        MiscMessages.class, "vertx")
-      // Verify.notNullArg(mServiceDiscovery, MiscMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", servicePid);
+        UtilMessages.class, "vertx")
+      // Verify.notNullArg(mServiceDiscovery, UtilMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", servicePid);
       .addStatement("$T.notNullArg(mServiceDiscovery, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
-        MiscMessages.class, "serviceDiscovery")
-      // Verify.notNullArg(mSecurityContextManager, MiscMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager",
+        UtilMessages.class, "serviceDiscovery")
+      // Verify.notNullArg(mSecurityContextManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager",
       // servicePid);
       .addStatement("$T.notNullArg(mSecurityContextManager, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)",
-        Verify.class, MiscMessages.class, "securityContextManager")
+        Verify.class, UtilMessages.class, "securityContextManager")
       //
       // /* Parse configuration properties */
       //

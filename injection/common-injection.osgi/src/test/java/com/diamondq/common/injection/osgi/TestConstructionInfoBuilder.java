@@ -1,10 +1,10 @@
 package com.diamondq.common.injection.osgi;
 
+import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.injection.osgi.testmodel.TestClassWithEmptyConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestClassWithObjConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestDep;
-import com.diamondq.common.utils.misc.errors.ExtendedIllegalArgumentException;
 
 import org.junit.Assert;
 import org.junit.Test;
