@@ -10,7 +10,10 @@
   <artifactId>common-utils</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils</name>
-  <properties>
-    <osgi.export.base.package>com.diamondq.common.utils.*</osgi.export.base.package>
-  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+  </dependencies>
 </project>

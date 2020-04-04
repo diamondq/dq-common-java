@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -35,6 +34,10 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-utils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>rocks.xmpp</groupId>
       <artifactId>xmpp-core-client</artifactId>
     </dependency>
@@ -52,10 +55,6 @@
       <groupId>io.opentracing</groupId>
       <artifactId>opentracing-noop</artifactId>
       <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
-      <artifactId>common-lambda</artifactId>
     </dependency>
     <dependency>
       <groupId>io.opentracing</groupId>
@@ -85,10 +84,8 @@
             <id>bundle-manifest</id>
             <configuration>
               <instructions>
-                <Require-Capability>osgi.extender;
-                  filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
-                <Provide-Capability>osgi.serviceloader;
-                  osgi.serviceloader=rocks.xmpp.core.session.Module</Provide-Capability>
+                <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
+                <Provide-Capability>osgi.serviceloader; osgi.serviceloader=rocks.xmpp.core.session.Module</Provide-Capability>
               </instructions>
             </configuration>
           </execution>

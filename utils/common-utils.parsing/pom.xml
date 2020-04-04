@@ -24,9 +24,5 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
-      <artifactId>common-lambda</artifactId>
-    </dependency>
   </dependencies>
 </project>

@@ -25,10 +25,6 @@
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-lambda</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
       <artifactId>common-storage.kv</artifactId>
     </dependency>
     <dependency>
