@@ -1,10 +1,10 @@
 package com.diamondq.common.injection.osgi;
 
+import com.diamondq.common.context.impl.ContextFactoryImpl;
+import com.diamondq.common.context.impl.logging.LoggingContextHandler;
 import com.diamondq.common.injection.osgi.testmodel.TestClassWithObjConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestDep;
-import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
-import com.diamondq.common.utils.context.impl.logging.LoggingContextHandler;
 
 import java.io.IOException;
 import java.util.Collection;

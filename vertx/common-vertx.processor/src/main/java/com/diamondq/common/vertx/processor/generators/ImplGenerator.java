@@ -1,6 +1,10 @@
 package com.diamondq.common.vertx.processor.generators;
 
 import com.diamondq.common.UtilMessages;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextExtendedCompletableFuture;
+import com.diamondq.common.context.ContextExtendedCompletionStage;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.errors.ExtendedIllegalStateException;
 import com.diamondq.common.errors.Verify;
@@ -10,10 +14,6 @@ import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.security.acl.api.SecurityContext;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.vertx.VertxMessages;
 import com.diamondq.common.vertx.VertxUtils;
 import com.diamondq.common.vertx.annotations.ProxyGen;
@@ -146,7 +146,7 @@ public class ImplGenerator implements Generator {
 
     /* **** ContextFactory */
 
-    ClassName contextFactoryName = ClassName.get("com.diamondq.common.utils.context", "ContextFactory");
+    ClassName contextFactoryName = ClassName.get("com.diamondq.common.context", "ContextFactory");
     builder = builder
       .addField(FieldSpec.builder(contextFactoryName, "mContextFactory", Modifier.PROTECTED, Modifier.FINAL).build());
 
@@ -589,7 +589,7 @@ public class ImplGenerator implements Generator {
             methodBuilder = methodBuilder.endControlFlow();
             methodBuilder = methodBuilder.endControlFlow();
           }
-          else if ("com.diamondq.common.utils.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+          else if ("com.diamondq.common.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
             methodBuilder = methodBuilder.addCode("\n/* CODE HERE 2 */\n\n");
           }
           else
@@ -847,7 +847,7 @@ public class ImplGenerator implements Generator {
         pBuilder = pBuilder.addStatement("pMessage.reply(r_array)");
 
       }
-      else if ("com.diamondq.common.utils.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+      else if ("com.diamondq.common.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
 
         BaseType actualReturnType = pReturnType.getParameterizedType(0);
         TypeName actualTypeName = actualReturnType.getTypeName();

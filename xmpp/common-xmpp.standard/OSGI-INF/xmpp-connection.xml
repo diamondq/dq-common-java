@@ -10,6 +10,6 @@
     <provide
       interface="com.diamondq.common.xmpp.osgi.XMPPConnectionImpl" />
   </service>
-  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.context.ContextFactory" name="ContextFactory" policy="static"/>
   <reference bind="setScheduledExecutorService" cardinality="1..1" interface="java.util.concurrent.ScheduledExecutorService" name="ScheduledExecutorService" policy="static"/>
 </scr:component>

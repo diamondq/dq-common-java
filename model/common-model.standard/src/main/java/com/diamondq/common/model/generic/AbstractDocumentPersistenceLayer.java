@@ -1,5 +1,7 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.CommonKeywordValues;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
@@ -15,8 +17,6 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;

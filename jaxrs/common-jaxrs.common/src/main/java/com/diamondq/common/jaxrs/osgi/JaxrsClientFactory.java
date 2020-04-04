@@ -1,8 +1,8 @@
 package com.diamondq.common.jaxrs.osgi;
 
+import com.diamondq.common.context.Context;
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
-import com.diamondq.common.utils.context.Context;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;

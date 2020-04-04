@@ -24,11 +24,6 @@
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-utils.context</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
       <artifactId>common-tracing.opentracing</artifactId>
       <optional>true</optional>
     </dependency>

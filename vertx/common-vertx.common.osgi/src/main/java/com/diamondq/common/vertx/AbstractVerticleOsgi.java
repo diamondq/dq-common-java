@@ -1,13 +1,13 @@
 package com.diamondq.common.vertx;
 
 import com.diamondq.common.UtilMessages;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextExtendedCompletionStage;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.errors.Verify;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

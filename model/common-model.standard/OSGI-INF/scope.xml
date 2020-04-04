@@ -9,7 +9,7 @@
     <provide
       interface="com.diamondq.common.model.interfaces.Scope" />
   </service>
-  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.context.ContextFactory" name="ContextFactory" policy="static"/>
   <reference bind="setToolkit" cardinality="1..1"
     interface="com.diamondq.common.model.interfaces.Toolkit"
     name="Toolkit" policy="static" />

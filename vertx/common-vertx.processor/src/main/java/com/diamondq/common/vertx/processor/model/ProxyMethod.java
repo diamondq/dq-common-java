@@ -51,7 +51,7 @@ public class ProxyMethod extends ProcessorMethod<BaseType, BaseParam> {
       }
     }
     else if (mReturnType.getNonGenericNonAnnotatedTypeName()
-      .equals("com.diamondq.common.utils.context.ContextExtendedCompletionStage") == true) {
+      .equals("com.diamondq.common.context.ContextExtendedCompletionStage") == true) {
       mHasReturn = true;
       mActualReturn = mReturnType.getParameterizedType(0);
     }

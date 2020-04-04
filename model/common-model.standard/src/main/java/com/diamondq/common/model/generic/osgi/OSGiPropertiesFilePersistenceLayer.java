@@ -1,10 +1,10 @@
 package com.diamondq.common.model.generic.osgi;
 
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.persistence.PropertiesFilePersistenceLayer;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import java.io.File;
 

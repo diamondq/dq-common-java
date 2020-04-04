@@ -6,6 +6,6 @@
     <provide
       interface="com.diamondq.common.injection.osgi.impl.ScheduledExecutorServiceProvider" />
   </service>
-  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.context.ContextFactory" name="ContextFactory" policy="static"/>
   <property name="type" type="String" value="shortjobs"/>
 </scr:component>

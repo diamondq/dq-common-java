@@ -1,11 +1,11 @@
 package com.diamondq.common.storage.jdbc.osgi;
 
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.storage.jdbc.IJDBCDialect;
 import com.diamondq.common.storage.jdbc.JDBCKVStore;
 import com.diamondq.common.storage.kv.IKVStore;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import javax.sql.DataSource;
 

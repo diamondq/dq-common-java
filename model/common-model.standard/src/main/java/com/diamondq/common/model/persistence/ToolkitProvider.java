@@ -1,12 +1,12 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.config.Config;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;

@@ -1,10 +1,10 @@
 package com.diamondq.common.model.generic.osgi;
 
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.persistence.ResourceBundlePersistenceLayer;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.wiring.BundleWiring;

@@ -1,14 +1,14 @@
 package com.diamondq.common.vertx.processor.generators;
 
 import com.diamondq.common.UtilMessages;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextExtendedCompletableFuture;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.errors.Verify;
 import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.security.acl.api.SecurityContext;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.diamondq.common.vertx.annotations.ProxyGen;
 import com.diamondq.common.vertx.processor.Generator;
@@ -469,7 +469,7 @@ public class ProxyGenerator implements Generator {
 
     /* **** ContextFactory */
 
-    ClassName contextFactoryName = ClassName.get("com.diamondq.common.utils.context", "ContextFactory");
+    ClassName contextFactoryName = ClassName.get("com.diamondq.common.context", "ContextFactory");
     builder = builder
       .addField(FieldSpec.builder(contextFactoryName, "mContextFactory", Modifier.PRIVATE, Modifier.FINAL).build());
 
@@ -758,10 +758,10 @@ public class ProxyGenerator implements Generator {
 
     BaseType returnType = pProxyMethod.getReturnType();
     if (returnType.getNonGenericNonAnnotatedTypeName()
-      .equals("com.diamondq.common.utils.context.ContextExtendedCompletionStage")) {
+      .equals("com.diamondq.common.context.ContextExtendedCompletionStage")) {
       BaseType paramType = returnType.getParameterizedType(0);
       if (paramType.getNonGenericNonAnnotatedTypeName()
-        .equals("com.diamondq.common.utils.context.ContextExtendedCompletionStage")) {
+        .equals("com.diamondq.common.context.ContextExtendedCompletionStage")) {
 
         BaseType actualReturnType = paramType.getParameterizedType(0);
         TypeName actualTypeName = actualReturnType.getTypeName();
@@ -906,7 +906,7 @@ public class ProxyGenerator implements Generator {
           || ("java.util.Set".equals(basicTypeName) == true)) {
           replyReturnType = TypeName.get(JsonArray.class);
         }
-        else if ("com.diamondq.common.utils.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+        else if ("com.diamondq.common.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
           replyReturnType = TypeName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build());
           isReturnTypeNullable = true;
           isReplyUsed = false;
@@ -1075,7 +1075,7 @@ public class ProxyGenerator implements Generator {
           methodBuilder = methodBuilder.addStatement("result.complete(r_array)");
 
         }
-        else if ("com.diamondq.common.utils.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+        else if ("com.diamondq.common.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
           methodBuilder = methodBuilder //
             // result.complete(finalResult);
             .addStatement("result.complete(finalResult)");

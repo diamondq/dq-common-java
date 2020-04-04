@@ -2,15 +2,15 @@ package com.diamondq.common.vertx;
 
 import static org.junit.Assert.assertNotNull;
 
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextFactory;
+import com.diamondq.common.context.impl.ContextFactoryImpl;
+import com.diamondq.common.context.impl.logging.LoggingContextHandler;
 import com.diamondq.common.injection.osgi.impl.ExecutorServiceProvider;
 import com.diamondq.common.injection.osgi.impl.ScheduledExecutorServiceProvider;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.metrics.micrometer.SLF4JReporter;
 import com.diamondq.common.metrics.micrometer.SimpleMeterRegistryProvider;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
-import com.diamondq.common.utils.context.impl.logging.LoggingContextHandler;
 
 import java.util.HashMap;
 import java.util.Map;

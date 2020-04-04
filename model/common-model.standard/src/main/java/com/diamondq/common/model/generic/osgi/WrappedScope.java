@@ -1,6 +1,8 @@
 package com.diamondq.common.model.generic.osgi;
 
 import com.diamondq.common.builders.IBuilder;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
 import com.diamondq.common.model.generic.UnknownScopeException;
@@ -8,8 +10,6 @@ import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.persistence.CombinedPersistenceLayer;
 import com.diamondq.common.model.persistence.NewMemoryPersistenceLayer;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

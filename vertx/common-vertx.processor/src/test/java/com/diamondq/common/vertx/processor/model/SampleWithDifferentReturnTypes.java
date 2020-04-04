@@ -1,6 +1,6 @@
 package com.diamondq.common.vertx.processor.model;
 
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
+import com.diamondq.common.context.ContextExtendedCompletionStage;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -64,7 +64,7 @@ public interface SampleWithDifferentReturnTypes {
   @ValueString("io.vertx.core.json.JsonArray")
   public JsonArray JsonArray();
 
-  @ValueString("com.diamondq.common.utils.context.ContextExtendedCompletionStage<java.lang.Boolean>")
+  @ValueString("com.diamondq.common.context.ContextExtendedCompletionStage<java.lang.Boolean>")
   public ContextExtendedCompletionStage<Boolean> CBoolean();
 
 }

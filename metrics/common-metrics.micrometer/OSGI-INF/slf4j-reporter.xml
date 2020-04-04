@@ -2,7 +2,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" configuration-policy="optional" deactivate="onDeactivate" immediate="false" name="com.diamondq.common.metrics.micrometer.slf4jreporter">
   <implementation
     class="com.diamondq.common.metrics.micrometer.SLF4JReporter" />
-  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.context.ContextFactory" name="ContextFactory" policy="static"/>
   <service>
      <provide interface="com.diamondq.common.metrics.micrometer.SLF4JReporter"/>
   </service>

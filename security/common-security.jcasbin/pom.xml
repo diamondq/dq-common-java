@@ -52,7 +52,7 @@
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-utils.context</artifactId>
+      <artifactId>common-utils</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

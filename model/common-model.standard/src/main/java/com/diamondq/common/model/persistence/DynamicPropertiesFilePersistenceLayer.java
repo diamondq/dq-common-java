@@ -1,7 +1,7 @@
 package com.diamondq.common.model.persistence;
 
 import com.diamondq.common.config.Config;
-import com.diamondq.common.utils.context.ContextFactory;
+import com.diamondq.common.context.ContextFactory;
 import com.google.common.collect.Maps;
 
 import java.io.File;

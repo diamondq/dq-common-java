@@ -1,10 +1,10 @@
 package com.diamondq.common.vertx;
 
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextExtendedCompletableFuture;
+import com.diamondq.common.context.ContextExtendedCompletionStage;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.lambda.future.FutureUtils;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import java.util.List;
 import java.util.Objects;

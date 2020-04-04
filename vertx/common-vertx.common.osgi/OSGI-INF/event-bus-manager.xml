@@ -2,7 +2,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="onActivate" configuration-policy="optional" immediate="false" name="com.diamondq.common.vertx.eventbusmanager">
   <implementation
     class="com.diamondq.common.vertx.EventBusManagerImpl" />
-  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.context.ContextFactory" name="ContextFactory" policy="static"/>
   <reference bind="setVertx" cardinality="1..1" interface="io.vertx.core.Vertx" name="Vertx" policy="static"/>
   <reference bind="setMeterRegistry" cardinality="1..1" interface="io.micrometer.core.instrument.MeterRegistry" name="MeterRegistry" policy="static"/>
   <reference bind="setServiceDiscovery" cardinality="1..1" interface="io.vertx.servicediscovery.ServiceDiscovery" name="ServiceDiscovery" policy="static"/>

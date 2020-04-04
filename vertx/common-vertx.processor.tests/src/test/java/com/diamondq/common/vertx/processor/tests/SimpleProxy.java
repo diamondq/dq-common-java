@@ -1,6 +1,6 @@
 package com.diamondq.common.vertx.processor.tests;
 
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
+import com.diamondq.common.context.ContextExtendedCompletionStage;
 import com.diamondq.common.vertx.annotations.ProxyGen;
 
 import org.checkerframework.checker.nullness.qual.Nullable;

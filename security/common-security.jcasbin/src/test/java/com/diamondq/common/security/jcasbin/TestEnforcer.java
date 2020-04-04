@@ -2,9 +2,9 @@ package com.diamondq.common.security.jcasbin;
 
 import static org.junit.Assert.fail;
 
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.impl.ContextFactoryImpl;
-import com.diamondq.common.utils.context.impl.logging.LoggingContextHandler;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.impl.ContextFactoryImpl;
+import com.diamondq.common.context.impl.logging.LoggingContextHandler;
 
 import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
 import org.casbin.jcasbin.main.Enforcer;

@@ -2,12 +2,12 @@ package com.diamondq.adventuretools.memory;
 
 import com.diamondq.adventuretools.model.BasicModelSetup;
 import com.diamondq.adventuretools.model.StandardTest;
+import com.diamondq.common.context.ContextFactory;
+import com.diamondq.common.context.impl.ContextFactorySetup;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
 import com.diamondq.common.model.persistence.MemoryPersistenceLayer;
-import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.context.impl.ContextFactorySetup;
 
 public interface MemoryTestSetup {
 

@@ -1,5 +1,6 @@
 package com.diamondq.common.model.persistence;
 
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.model.generic.AbstractPersistenceLayer;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.generic.PersistenceLayer;
@@ -11,7 +12,6 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Tombstone;
 import com.diamondq.common.model.interfaces.Toolkit;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

@@ -23,10 +23,6 @@
       <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.diamondq.common</groupId>
-      <artifactId>common-utils.context</artifactId>
-    </dependency>
-    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>

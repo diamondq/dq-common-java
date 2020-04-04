@@ -1,5 +1,6 @@
 package com.diamondq.common.model.persistence;
 
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
@@ -12,7 +13,6 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;

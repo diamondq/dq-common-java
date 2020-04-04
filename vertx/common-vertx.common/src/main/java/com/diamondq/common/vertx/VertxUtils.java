@@ -1,6 +1,10 @@
 package com.diamondq.common.vertx;
 
 import com.diamondq.common.Holder;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextExtendedCompletableFuture;
+import com.diamondq.common.context.ContextExtendedCompletionStage;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
 import com.diamondq.common.lambda.interfaces.Consumer2;
@@ -9,10 +13,6 @@ import com.diamondq.common.lambda.interfaces.Consumer4;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.lambda.interfaces.Function4;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import java.io.Closeable;
 import java.io.IOException;

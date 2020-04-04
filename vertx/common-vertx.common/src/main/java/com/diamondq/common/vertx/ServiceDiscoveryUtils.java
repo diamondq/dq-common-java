@@ -1,6 +1,6 @@
 package com.diamondq.common.vertx;
 
-import com.diamondq.common.utils.context.ContextFactory;
+import com.diamondq.common.context.ContextFactory;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;

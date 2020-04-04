@@ -1,5 +1,7 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.model.interfaces.CommonKeywordKeys;
 import com.diamondq.common.model.interfaces.EditorGroupDefinition;
 import com.diamondq.common.model.interfaces.EditorPropertyDefinition;
@@ -23,8 +25,6 @@ import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
 import com.diamondq.common.storage.kv.WhereInfo;
 import com.diamondq.common.storage.kv.WhereOperator;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextFactory;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

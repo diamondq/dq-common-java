@@ -53,10 +53,6 @@
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>
-      <artifactId>common-utils.context</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.diamondq.common</groupId>
       <artifactId>common-injection.osgi</artifactId>
       <optional>true</optional>
     </dependency>

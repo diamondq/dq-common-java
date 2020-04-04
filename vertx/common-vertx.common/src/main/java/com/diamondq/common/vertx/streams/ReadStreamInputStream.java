@@ -1,7 +1,7 @@
 package com.diamondq.common.vertx.streams;
 
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextFactory;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextFactory;
 
 import java.io.IOException;
 import java.io.InputStream;

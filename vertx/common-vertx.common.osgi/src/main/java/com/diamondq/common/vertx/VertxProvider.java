@@ -1,10 +1,10 @@
 package com.diamondq.common.vertx;
 
+import com.diamondq.common.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.FutureUtils;
-import com.diamondq.common.utils.context.ContextExtendedCompletableFuture;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;

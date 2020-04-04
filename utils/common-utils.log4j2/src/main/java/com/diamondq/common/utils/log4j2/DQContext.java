@@ -1,7 +1,7 @@
 package com.diamondq.common.utils.log4j2;
 
-import com.diamondq.common.utils.context.ContextFactory;
-import com.diamondq.common.utils.context.spi.ContextClass;
+import com.diamondq.common.context.ContextFactory;
+import com.diamondq.common.context.spi.ContextClass;
 
 import java.util.List;
 

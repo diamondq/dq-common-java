@@ -1,6 +1,6 @@
 package com.diamondq.common.model.interfaces;
 
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
+import com.diamondq.common.context.ContextExtendedCompletionStage;
 
 import java.util.Collection;
 import java.util.List;

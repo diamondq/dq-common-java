@@ -7,6 +7,6 @@
   <service>
      <provide interface="com.diamondq.common.security.acl.api.SecurityContextManager"/>
   </service>
-  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.context.ContextFactory" name="ContextFactory" policy="static"/>
   <reference bind="addSecurityContextSerializer" cardinality="0..n" interface="com.diamondq.common.security.acl.spi.SecurityContextSerializer" name="SecurityContextSerializer" policy="dynamic" unbind="removeSecurityContextSerializer"/>
 </scr:component>

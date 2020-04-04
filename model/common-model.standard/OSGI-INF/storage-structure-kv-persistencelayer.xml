@@ -6,7 +6,7 @@
   name="com.diamondq.common.model.storagestructurekvpersistencelayer">
   <implementation
     class="com.diamondq.common.model.generic.osgi.OSGiStorageStructureKVPersistenceLayer" />
-  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.utils.context.ContextFactory" name="ContextFactory" policy="static"/>
+  <reference bind="setContextFactory" cardinality="1..1" interface="com.diamondq.common.context.ContextFactory" name="ContextFactory" policy="static"/>
   <service>
      <provide interface="com.diamondq.common.model.generic.osgi.OSGiStorageStructureKVPersistenceLayer"/>
   </service>

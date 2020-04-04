@@ -1,5 +1,6 @@
 package com.diamondq.common.model.generic;
 
+import com.diamondq.common.context.ContextExtendedCompletionStage;
 import com.diamondq.common.model.interfaces.AsyncToolkit;
 import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.Property;
@@ -14,7 +15,6 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
-import com.diamondq.common.utils.context.ContextExtendedCompletionStage;
 
 import java.util.Collection;
 import java.util.List;

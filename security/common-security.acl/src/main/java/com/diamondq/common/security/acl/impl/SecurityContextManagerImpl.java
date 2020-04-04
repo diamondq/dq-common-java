@@ -1,14 +1,14 @@
 package com.diamondq.common.security.acl.impl;
 
 import com.diamondq.common.UtilMessages;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.errors.ExtendedIllegalStateException;
 import com.diamondq.common.errors.Verify;
 import com.diamondq.common.security.acl.ACLMessages;
 import com.diamondq.common.security.acl.api.SecurityContext;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.security.acl.spi.SecurityContextSerializer;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;

@@ -1,8 +1,8 @@
 package com.diamondq.common.vertx;
 
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.errors.Verify;
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;

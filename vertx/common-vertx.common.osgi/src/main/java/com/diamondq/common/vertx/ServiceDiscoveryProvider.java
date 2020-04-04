@@ -1,8 +1,8 @@
 package com.diamondq.common.vertx;
 
+import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
-import com.diamondq.common.utils.context.ContextFactory;
 
 import io.vertx.core.Vertx;
 import io.vertx.servicediscovery.ServiceDiscovery;

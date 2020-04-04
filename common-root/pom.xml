@@ -42,7 +42,6 @@
     <module>../tracing/common-tracing.opentracing</module>
     <module>../tracing/common-tracing.jaeger</module>
     <module>../utils/common-utils</module>
-    <module>../utils/common-utils.context</module>
     <module>../utils/common-utils.janino.fragment</module>
     <module>../utils/common-utils.log4j2</module>
     <module>../utils/common-utils.logback</module>

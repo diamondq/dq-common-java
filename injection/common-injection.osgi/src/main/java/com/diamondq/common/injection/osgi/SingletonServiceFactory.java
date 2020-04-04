@@ -1,7 +1,7 @@
 package com.diamondq.common.injection.osgi;
 
-import com.diamondq.common.utils.context.Context;
-import com.diamondq.common.utils.context.ContextFactory;
+import com.diamondq.common.context.Context;
+import com.diamondq.common.context.ContextFactory;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
