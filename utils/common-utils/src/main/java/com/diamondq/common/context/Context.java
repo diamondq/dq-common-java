@@ -1,5 +1,7 @@
 package com.diamondq.common.context;
 
+import com.diamondq.common.errors.I18NStringAndException;
+
 import java.util.function.Function;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -33,6 +35,8 @@ public interface Context extends AutoCloseable {
    * @return the exit value
    */
   public <T> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
+
+  public I18NStringAndException trace(I18NStringAndException pEx);
 
   public void trace(String pMessage, @Nullable Object @Nullable... pArgs);
 

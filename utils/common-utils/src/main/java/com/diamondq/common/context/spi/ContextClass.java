@@ -1,6 +1,8 @@
 package com.diamondq.common.context.spi;
 
 import com.diamondq.common.context.Context;
+import com.diamondq.common.errors.I18NStringAndException;
+import com.diamondq.common.i18n.I18NString;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +30,8 @@ public class ContextClass implements Context {
 
   public static final String                               sDURING_CONTEXT_CONTROL =
     sHANDLER_DATA_PREFIX + "CC_DURING_CONTEXT_CONTROL";
+
+  private static final String                              sI18NSTRING             = "{}";
 
   /**
    * All calls are routed to the factory for actual functioning
@@ -257,6 +261,22 @@ public class ContextClass implements Context {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.exit() called on an already closed Context", null);
     return mFactory.internalExitValueWithMeta(this, pResult, pFunc);
+  }
+
+  /**
+   * @see com.diamondq.common.context.Context#trace(com.diamondq.common.errors.I18NStringAndException)
+   */
+  @Override
+  public I18NStringAndException trace(I18NStringAndException pEx) {
+    if (mOpenCount.get() <= 0)
+      mFactory.internalReportWarn(this, "Context.trace() called on an already closed Context", null);
+    I18NString message = pEx.getMessage();
+    Throwable throwable = pEx.getThrowable();
+    if (throwable != null)
+      mFactory.internalReportTrace(this, sI18NSTRING, new @Nullable Object[] {message});
+    else
+      mFactory.internalReportTrace(this, sI18NSTRING, new @Nullable Object[] {message, pEx});
+    return pEx;
   }
 
   /**

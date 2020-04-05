@@ -80,6 +80,8 @@ public class ConverterManagerImpl implements ConverterManager {
    */
   @Override
   public <I, O> O convert(@NonNull I pInput, Class<O> pOutputClass) {
+    assert pInput != null;
+    assert pOutputClass != null;
     Class<?> rootClass = pInput.getClass();
     ClassPair inputClassPair = new ClassPair(rootClass, pOutputClass);
     ClassPair matchClass = mShortcuts.get(inputClassPair);

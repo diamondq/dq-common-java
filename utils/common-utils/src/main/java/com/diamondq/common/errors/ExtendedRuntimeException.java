@@ -17,6 +17,18 @@ public class ExtendedRuntimeException extends RuntimeException {
 
   protected final @Nullable Object[] mParams;
 
+  public ExtendedRuntimeException(I18NStringAndException pStrAndEx) {
+    super(pStrAndEx.getThrowable());
+    I18NString message = pStrAndEx.getMessage();
+    mCode = message.message;
+    @Nullable
+    Object @Nullable [] params = message.params;
+    if (params == null)
+      mParams = new String[0];
+    else
+      mParams = Arrays.copyOf(params, params.length);
+  }
+
   public ExtendedRuntimeException(I18NString pString) {
     super();
     mCode = pString.message;

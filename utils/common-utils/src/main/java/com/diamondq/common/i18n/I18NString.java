@@ -1,5 +1,7 @@
 package com.diamondq.common.i18n;
 
+import com.diamondq.common.errors.I18NStringAndException;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -14,6 +16,14 @@ public class I18NString {
   public I18NString(MessagesEnum pMessage, @Nullable Object @Nullable... pParams) {
     message = pMessage;
     params = pParams;
+  }
+
+  public I18NStringAndException and(Throwable ex) {
+    return new I18NStringAndException(this, ex);
+  }
+
+  public I18NStringAndException noException() {
+    return new I18NStringAndException(this, null);
   }
 
   /**
