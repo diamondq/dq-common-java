@@ -18,7 +18,7 @@ public class I18NString {
     params = pParams;
   }
 
-  public I18NStringAndException and(Throwable ex) {
+  public I18NStringAndException and(@Nullable Throwable ex) {
     return new I18NStringAndException(this, ex);
   }
 
