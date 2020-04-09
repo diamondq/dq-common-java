@@ -4,6 +4,7 @@ import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.MDC;
 
@@ -46,12 +47,12 @@ public class MDCSpan implements Span {
   }
 
   @Override
-  public Span log(@SuppressWarnings("null") Map<String, ?> pFields) {
+  public Span log(@Nullable Map<String, @NonNull ?> pFields) {
     return mDelegate.log(pFields);
   }
 
   @Override
-  public Span log(long pTimestampMicroseconds, @SuppressWarnings("null") Map<String, ?> pFields) {
+  public Span log(long pTimestampMicroseconds, @Nullable Map<String, @NonNull ?> pFields) {
     return mDelegate.log(pTimestampMicroseconds, pFields);
   }
 

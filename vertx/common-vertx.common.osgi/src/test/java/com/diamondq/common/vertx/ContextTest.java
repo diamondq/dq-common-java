@@ -31,6 +31,7 @@ public class ContextTest {
   public ContextTest() {
   }
 
+  @SuppressWarnings("null")
   @Before
   public void setup() {
     mContext = new OsgiContext();

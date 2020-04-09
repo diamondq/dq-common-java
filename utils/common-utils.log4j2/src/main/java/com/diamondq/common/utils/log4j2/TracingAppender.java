@@ -25,7 +25,7 @@ public class TracingAppender extends AbstractAppender {
   private static final Charset sUTF8 = Charset.forName("UTF-8");
 
   public TracingAppender(String pName, @Nullable Filter pFilter, Layout<? extends Serializable> pLayout,
-    boolean pIgnoreExceptions, final Property[] pProperties) {
+    boolean pIgnoreExceptions, final @NonNull Property[] pProperties) {
     super(pName, pFilter, pLayout, pIgnoreExceptions, pProperties);
   }
 

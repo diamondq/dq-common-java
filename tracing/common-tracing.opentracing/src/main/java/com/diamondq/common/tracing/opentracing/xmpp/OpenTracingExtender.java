@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
@@ -73,7 +74,7 @@ public class OpenTracingExtender {
 
           /* Remember this remap to fix the response when it comes back */
 
-          sPendingIDRemaps.put(newId, iq.getId());
+          sPendingIDRemaps.put(newId, Objects.requireNonNull(iq.getId()));
           iq.setId(newId);
         }
         catch (IllegalArgumentException | UnsupportedEncodingException ex) {
@@ -157,11 +158,13 @@ public class OpenTracingExtender {
      * @see rocks.xmpp.core.stanza.IQHandler#handleRequest(rocks.xmpp.core.stanza.model.IQ)
      */
     @Override
-    public IQ handleRequest(IQ pIQ) {
+    public @Nullable IQ handleRequest(IQ pIQ) {
 
       /* Let's see if there is a tracing block */
 
       String id = pIQ.getId();
+      if (id == null)
+        return mDelegate.handleRequest(pIQ);
       SpanBuilder spanBuilder = processID(id);
       if (spanBuilder == null)
         return mDelegate.handleRequest(pIQ);

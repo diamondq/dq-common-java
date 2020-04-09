@@ -76,6 +76,7 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
    * @see com.diamondq.common.vertx.ServiceDiscoveryManager#lookupService(io.vertx.core.Vertx, java.lang.Class,
    *      java.lang.String)
    */
+  @SuppressWarnings("null")
   @Override
   public <T> ContextExtendedCompletionStage<T> lookupService(Vertx pVertx, Class<T> pClass, String pName) {
     try (Context ctx = mContextFactory.newContext(ServiceDiscoveryManagerImpl.class, this, pClass, pName)) {
