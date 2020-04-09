@@ -467,8 +467,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
       mPropertyPattern,
       ImmutableMultimap.<String, String> builder()
         .putAll(Multimaps.filterEntries(mKeywords,
-          Predicates
-            .<Entry<String, String>> not((e) -> (e != null) && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
+          Predicates.<Entry<String, String>> not((e) -> (e != null) && pKey.equals(e.getKey())
+            && pValue.equals(e.getValue()))))
         .put(pKey, pValue).build(),
       mAutoIncrementStart, mAutoIncrementBy);
   }

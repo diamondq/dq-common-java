@@ -101,8 +101,8 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
     return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef, mComponents,
       ImmutableMultimap.<String, String> builder()
         .putAll(Multimaps.filterEntries(mKeywords,
-          Predicates
-            .<Entry<String, String>> not((e) -> (e != null) && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
+          Predicates.<Entry<String, String>> not(
+            (e) -> (e != null) && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
         .put(pKey, pValue).build());
   }
 
