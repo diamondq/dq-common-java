@@ -118,7 +118,6 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
     }
   }
 
-  @SuppressWarnings("unused")
   private final ContextFactory               mContextFactory;
 
   private final DataSource                   mDatabase;

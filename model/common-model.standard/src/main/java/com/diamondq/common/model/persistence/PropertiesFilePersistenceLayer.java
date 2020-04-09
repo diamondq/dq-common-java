@@ -127,7 +127,6 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   private final @Nullable File mStructureBaseDir;
 
-  @SuppressWarnings("unused")
   private final @Nullable File mStructureDefBaseDir;
 
   @SuppressWarnings("unused")
