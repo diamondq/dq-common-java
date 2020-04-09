@@ -162,7 +162,7 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
               .thenApply((v) -> {
                 ServiceBinder b = mServiceBinder;
                 if (b != null)
-                  b.unregister(mConsumer);
+                    b.unregister(mConsumer);
                 return null;
               })
 
