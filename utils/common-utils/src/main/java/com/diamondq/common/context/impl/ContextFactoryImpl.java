@@ -7,13 +7,11 @@ import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
 import com.diamondq.common.context.spi.SPIContextFactory;
 
-import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -50,12 +48,6 @@ public class ContextFactoryImpl implements SPIContextFactory {
     /* Override the existing sINSTANCE with the fully configured one */
 
     sINSTANCE = this;
-  }
-
-  @Inject
-  public void setContextHandlers(List<ContextHandler> pHandlers) {
-    for (ContextHandler handler : pHandlers)
-      addContextHandler(handler);
   }
 
   public void addContextHandler(ContextHandler pHandler) {
@@ -99,8 +91,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   }
 
   /**
-   * @see com.diamondq.common.context.ContextFactory#newContext(java.lang.Class, java.lang.Object,
-   *      java.lang.Object[])
+   * @see com.diamondq.common.context.ContextFactory#newContext(java.lang.Class, java.lang.Object, java.lang.Object[])
    */
   @Override
   public Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
@@ -268,8 +259,8 @@ public class ContextFactoryImpl implements SPIContextFactory {
   }
 
   /**
-   * @see com.diamondq.common.context.ContextFactory#reportTrace(java.lang.Class, java.lang.Object,
-   *      java.lang.String, java.lang.Object[])
+   * @see com.diamondq.common.context.ContextFactory#reportTrace(java.lang.Class, java.lang.Object, java.lang.String,
+   *      java.lang.Object[])
    */
   @Override
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
@@ -290,8 +281,8 @@ public class ContextFactoryImpl implements SPIContextFactory {
   }
 
   /**
-   * @see com.diamondq.common.context.ContextFactory#reportDebug(java.lang.Class, java.lang.Object,
-   *      java.lang.String, java.lang.Object[])
+   * @see com.diamondq.common.context.ContextFactory#reportDebug(java.lang.Class, java.lang.Object, java.lang.String,
+   *      java.lang.Object[])
    */
   @Override
   public void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
