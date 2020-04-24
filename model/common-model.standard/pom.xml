@@ -60,6 +60,35 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.jboss.jandex</groupId>
+        <artifactId>jandex-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>make-index</id>
+            <configuration>
+              <fileSets>
+                <fileSet>
+                  <directory>${project.build.directory}/classes</directory>
+                  <excludes>
+                    <exclude>com/diamondq/common/model/persistence/CombinedPersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/CombinedQuery*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/CombinedReadWritePersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/DynamicPropertiesFilePersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/MemoryPersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/NewMemoryPersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/PropertiesFilePersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/ResourceBundlePersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/StorageKVPersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/StorageStructureKVPersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/package-info.class</exclude>
+                  </excludes>
+                </fileSet>
+              </fileSets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <executions>
