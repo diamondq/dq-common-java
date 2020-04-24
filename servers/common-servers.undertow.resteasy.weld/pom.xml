@@ -15,14 +15,14 @@
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-bom</artifactId>
-        <version>3.6.1.Final</version>
+        <version>4.5.3.Final</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-cdi</artifactId>
-        <version>3.6.1.Final</version>
+        <version>4.5.3.Final</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
