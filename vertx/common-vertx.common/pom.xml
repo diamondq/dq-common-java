@@ -31,5 +31,9 @@
       <groupId>org.javatuples</groupId>
       <artifactId>javatuples</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-utils</artifactId>
+    </dependency>
   </dependencies>
 </project>
