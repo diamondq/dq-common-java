@@ -5,6 +5,7 @@ import com.diamondq.common.config.Config;
 import javax.ws.rs.core.Application;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jboss.resteasy.core.ResteasyDeploymentImpl;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 
@@ -46,7 +47,7 @@ public class UndertowRESTEasyWeldServer extends UndertowServer {
   }
 
   protected DeploymentInfo deployApplication(String appPath, Class<? extends Application> applicationClass) {
-    ResteasyDeployment deployment = new ResteasyDeployment();
+    ResteasyDeployment deployment = new ResteasyDeploymentImpl();
     deployment.setInjectorFactoryClass("org.jboss.resteasy.cdi.CdiInjectorFactory");
     deployment.setApplicationClass(applicationClass.getName());
     UndertowJaxrsServer server = mServer;
