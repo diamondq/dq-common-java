@@ -2,7 +2,10 @@ package com.diamondq.common.converters;
 
 import java.util.function.Function;
 
-public class LambdaConverter<I, O> extends AbstractConverter<I, O> {
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public class LambdaConverter<@NonNull I, O> extends AbstractConverter<I, O> {
 
   protected final Function<I, O> mConverter;
 
@@ -15,7 +18,11 @@ public class LambdaConverter<I, O> extends AbstractConverter<I, O> {
    * @see com.diamondq.common.converters.Converter#convert(java.lang.Object)
    */
   @Override
-  public O convert(I pInput) {
-    return mConverter.apply(pInput);
+  public @Nullable Object convert(Object pInput) {
+    if (mInputClass.isInstance(pInput) == false)
+      throw new IllegalArgumentException();
+    @SuppressWarnings("unchecked")
+    I input = (I) pInput;
+    return mConverter.apply(input);
   }
 }

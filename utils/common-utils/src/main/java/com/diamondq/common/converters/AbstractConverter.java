@@ -1,6 +1,6 @@
 package com.diamondq.common.converters;
 
-public abstract class AbstractConverter<I, O> implements Converter<I, O> {
+public abstract class AbstractConverter<I, O> implements Converter {
 
   protected final Class<I> mInputClass;
 
@@ -15,7 +15,7 @@ public abstract class AbstractConverter<I, O> implements Converter<I, O> {
    * @see com.diamondq.common.converters.Converter#getInputClass()
    */
   @Override
-  public Class<I> getInputClass() {
+  public Class<?> getInputClass() {
     return mInputClass;
   }
 
@@ -23,7 +23,7 @@ public abstract class AbstractConverter<I, O> implements Converter<I, O> {
    * @see com.diamondq.common.converters.Converter#getOutputClass()
    */
   @Override
-  public Class<O> getOutputClass() {
+  public Class<?> getOutputClass() {
     return mOutputClass;
   }
 }

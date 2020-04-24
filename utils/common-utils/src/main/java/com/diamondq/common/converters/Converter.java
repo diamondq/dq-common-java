@@ -1,10 +1,12 @@
 package com.diamondq.common.converters;
 
-public interface Converter<I, O> {
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-  public Class<I> getInputClass();
+public interface Converter {
 
-  public Class<O> getOutputClass();
+  public Class<?> getInputClass();
 
-  public O convert(I pInput);
+  public Class<?> getOutputClass();
+
+  public @Nullable Object convert(Object pInput);
 }

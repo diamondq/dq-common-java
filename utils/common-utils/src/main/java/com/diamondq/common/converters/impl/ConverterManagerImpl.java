@@ -53,13 +53,13 @@ public class ConverterManagerImpl implements ConverterManager {
     }
   }
 
-  private final ConcurrentMap<ClassPair, Converter<?, ?>> mConvertersByClass = new ConcurrentHashMap<>();
+  private final ConcurrentMap<ClassPair, Converter> mConvertersByClass = new ConcurrentHashMap<>();
 
-  private final ConcurrentMap<ClassPair, ClassPair>       mShortcuts         = new ConcurrentHashMap<>();
+  private final ConcurrentMap<ClassPair, ClassPair> mShortcuts         = new ConcurrentHashMap<>();
 
   @Inject
-  public void setConverters(List<Converter<?, ?>> pConverters) {
-    for (Converter<?, ?> pConverter : pConverters) {
+  public void setConverters(List<Converter> pConverters) {
+    for (Converter pConverter : pConverters) {
       mConvertersByClass.put(new ClassPair(pConverter.getInputClass(), pConverter.getOutputClass()), pConverter);
     }
     mShortcuts.clear();
@@ -110,12 +110,16 @@ public class ConverterManagerImpl implements ConverterManager {
         throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, rootClass.getName(),
           pOutputClass.getName());
     }
-    @SuppressWarnings("unchecked")
-    Converter<I, O> converter = (Converter<I, O>) mConvertersByClass.get(matchClass);
+    Converter converter = mConvertersByClass.get(matchClass);
     if (converter == null)
       throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, rootClass.getName(),
         pOutputClass.getName());
-    return converter.convert(pInput);
+    Object result = converter.convert(pInput);
+    if (pOutputClass.isInstance(result) == false)
+      throw new IllegalArgumentException();
+    @SuppressWarnings("unchecked")
+    O finalResult = (O) result;
+    return finalResult;
   }
 
 }
