@@ -60,22 +60,24 @@ public abstract class AbstractSameABTypeSyncInfo<T, T_KEY, T_FRAG>
     return pA;
   }
 
-  protected abstract T merge(T pA, T pB);
+  protected abstract T merge(T_KEY pAKey, T_FRAG pAFrag, T pA, T_KEY pBKey, T_FRAG pBFrag, T pB);
 
   /**
-   * @see com.diamondq.common.utils.sync.SyncInfo#mergeBIntoA(java.lang.Object, java.lang.Object)
+   * @see com.diamondq.common.utils.sync.SyncInfo#mergeBIntoA(java.lang.Object, java.lang.Object, java.lang.Object,
+   *      java.lang.Object, java.lang.Object, java.lang.Object)
    */
   @Override
-  public T mergeBIntoA(T pA, T pB) {
-    return merge(pA, pB);
+  public T mergeBIntoA(T_KEY pAKey, T_FRAG pAFrag, T pA, T_KEY pBKey, T_FRAG pBFrag, T pB) {
+    return merge(pAKey, pAFrag, pA, pBKey, pBFrag, pB);
   }
 
   /**
-   * @see com.diamondq.common.utils.sync.SyncInfo#mergeAIntoB(java.lang.Object, java.lang.Object)
+   * @see com.diamondq.common.utils.sync.SyncInfo#mergeAIntoB(java.lang.Object, java.lang.Object, java.lang.Object,
+   *      java.lang.Object, java.lang.Object, java.lang.Object)
    */
   @Override
-  public T mergeAIntoB(T pA, T pB) {
-    return merge(pA, pB);
+  public T mergeAIntoB(T_KEY pAKey, T_FRAG pAFrag, T pA, T_KEY pBKey, T_FRAG pBFrag, T pB) {
+    return merge(pAKey, pAFrag, pA, pBKey, pBFrag, pB);
   }
 
 }

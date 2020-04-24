@@ -85,10 +85,11 @@ public abstract class AbstractOneWaySyncSimpleSyncInfo<T, T_KEY>
   }
 
   /**
-   * @see com.diamondq.common.utils.sync.abstracts.AbstractSameABTypeSyncInfo#merge(java.lang.Object, java.lang.Object)
+   * @see com.diamondq.common.utils.sync.abstracts.AbstractSameABTypeSyncInfo#merge(java.lang.Object, java.lang.Object,
+   *      java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
    */
   @Override
-  protected T merge(T pA, T pB) {
+  protected T merge(T_KEY pAKey, T pAFrag, T pA, T_KEY pBKey, T pBFrag, T pB) {
     return pA;
   }
 

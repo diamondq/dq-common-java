@@ -145,20 +145,28 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
   /**
    * Merges the contents of the A into the B and returns the updated B
    * 
+   * @param pAKey the A key
+   * @param pAFrag the A fragment
    * @param pA the original A
+   * @param pBKey the B key
+   * @param pBFrag the B fragment
    * @param pB the original B
    * @return the updated B
    */
-  public B mergeAIntoB(A pA, B pB);
+  public B mergeAIntoB(A_KEY pAKey, A_FRAG pAFrag, A pA, B_KEY pBKey, B_FRAG pBFrag, B pB);
 
   /**
    * Merges the contents of the B into the A and returns the updated A
    * 
+   * @param pAKey the A key
+   * @param pAFrag the A fragment
    * @param pA the original A
+   * @param pBKey the B key
+   * @param pBFrag the B fragment
    * @param pB the original B
    * @return the updated A
    */
-  public A mergeBIntoA(A pA, B pB);
+  public A mergeBIntoA(A_KEY pAKey, A_FRAG pAFrag, A pA, B_KEY pBKey, B_FRAG pBFrag, B pB);
 
   /**
    * Creates a new set of A_KEY/A's

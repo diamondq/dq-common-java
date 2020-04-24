@@ -111,7 +111,7 @@ public class SyncEngine {
         A a = (aFragTypeComplete == true ? (A) aFrag : pSyncInfo.convertAFragToA(aKey, aFrag));
         @SuppressWarnings("unchecked")
         B b = (bFragTypeComplete == true ? (B) bFrag : pSyncInfo.convertBFragToB(bKey, bFrag));
-        A resultA = pSyncInfo.mergeBIntoA(a, b);
+        A resultA = pSyncInfo.mergeBIntoA(aKey, aFrag, a, bKey, bFrag, b);
         return Pair.with(aKey, resultA);
       }
     };
@@ -139,7 +139,7 @@ public class SyncEngine {
         A a = (aFragTypeComplete == true ? (A) aFrag : pSyncInfo.convertAFragToA(aKey, aFrag));
         @SuppressWarnings("unchecked")
         B b = (bFragTypeComplete == true ? (B) bFrag : pSyncInfo.convertBFragToB(bKey, bFrag));
-        B resultB = pSyncInfo.mergeAIntoB(a, b);
+        B resultB = pSyncInfo.mergeAIntoB(aKey, aFrag, a, bKey, bFrag, b);
         return Pair.with(bKey, resultB);
       }
     };
