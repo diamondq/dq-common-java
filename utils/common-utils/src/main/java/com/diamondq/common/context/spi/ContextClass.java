@@ -229,7 +229,18 @@ public class ContextClass implements Context {
           }
           else {
             String className = stackTrace[i].getClassName();
+			
+			/* There are a slew of 'internal' entries that we'll skip. This is mostly around CDI injection */
+			
             if (className.startsWith("com.diamondq.common.context.") == true)
+              continue;
+            if (className.startsWith("sun.reflect.") == true)
+              continue;
+            if (className.equals("java.lang.reflect.Method") == true)
+              continue;
+            if (className.startsWith("org.jboss.weld.bean.proxy.") == true)
+              continue;
+            if (className.contains("**$$_WeldClientProxy") == true)
               continue;
             mLatestStackMethod = stackTrace[i].getMethodName();
             break;
