@@ -27,7 +27,6 @@ public class ToolkitProvider {
 
   @Produces
   @ApplicationScoped
-  @Singleton
   public Toolkit createToolkit(Config pConfig, ContextFactory pContextFactory) {
     ToolkitFactory factory = ToolkitFactory.newInstance();
     Toolkit toolkit = factory.newToolkit();

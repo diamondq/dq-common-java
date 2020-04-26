@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
 
 import io.micronaut.context.annotation.Factory;
@@ -18,6 +20,7 @@ import io.micronaut.context.annotation.Factory;
 /**
  * This class is used for non-OSGi environments to get a ContextFactory
  */
+@ApplicationScoped
 @Factory
 public class ContextFactorySetup {
 
@@ -27,7 +30,7 @@ public class ContextFactorySetup {
     return new ContextFactorySetup().getContextFactory();
   }
 
-  public @Singleton ContextFactory getContextFactory() {
+  public @Produces @ApplicationScoped ContextFactory getContextFactory() {
     synchronized (ContextFactorySetup.class) {
       if (setup == false) {
 
