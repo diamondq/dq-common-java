@@ -12,8 +12,8 @@
   <name>DiamondQ Common: Lambda Test</name>
   <dependencies>
     <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.diamondq.common</groupId>

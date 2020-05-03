@@ -24,22 +24,8 @@
       <artifactId>micronaut-runtime</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.el</groupId>
-          <artifactId>javax.el-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.interceptor</groupId>
-          <artifactId>javax.interceptor-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.inject</groupId>
-          <artifactId>javax.inject</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
     </dependency>
   </dependencies>
 </project>
