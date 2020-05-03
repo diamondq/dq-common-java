@@ -20,8 +20,18 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-injection.common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.diamondq.common.config</groupId>
       <artifactId>config-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>io.micronaut</groupId>
+          <artifactId>micronaut-inject</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>
