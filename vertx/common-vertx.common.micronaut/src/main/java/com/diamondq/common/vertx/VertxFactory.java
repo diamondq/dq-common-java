@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
@@ -34,6 +35,8 @@ public class VertxFactory {
     /* Assign the Vertx future as the primary future */
 
     try {
+      Method ofFuture =
+        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("of", CompletableFuture.class);
       Method newCompletableFuture =
         VertxContextExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
       Method completedFuture =
@@ -45,7 +48,7 @@ public class VertxFactory {
       replacements.add(ContextExtendedCompletableFuture.class);
       replacements.add(ExtendedCompletableFuture.class);
 
-      FutureUtils.setMethods(newCompletableFuture, completedFuture, completedFailure, listOf,
+      FutureUtils.setMethods(ofFuture, newCompletableFuture, completedFuture, completedFailure, listOf,
         VertxContextExtendedCompletableFuture.class, replacements);
     }
     catch (NoSuchMethodException | SecurityException ex) {

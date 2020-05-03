@@ -62,6 +62,10 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
     return new VertxContextExtendedCompletableFuture<>();
   }
 
+  public static <U> VertxContextExtendedCompletableFuture<U> of(CompletableFuture<U> pFuture) {
+    return new VertxContextExtendedCompletableFuture<>(pFuture);
+  }
+
   public static <T> VertxContextExtendedCompletableFuture<T> completedFuture(T pValue) {
     VertxContextExtendedCompletableFuture<T> future = new VertxContextExtendedCompletableFuture<>();
     future.complete(pValue);

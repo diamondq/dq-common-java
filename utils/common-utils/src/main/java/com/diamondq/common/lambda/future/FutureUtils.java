@@ -4,10 +4,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class FutureUtils {
+
+  private static volatile Method   ofFutureMethod;
 
   private static volatile Method   newCompletableFutureMethod;
 
@@ -21,6 +25,7 @@ public class FutureUtils {
 
   static {
     try {
+      ofFutureMethod = ExtendedCompletableFuture.class.getDeclaredMethod("of", CompletableFuture.class);
       newCompletableFutureMethod = ExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
       completedFutureMethod = ExtendedCompletableFuture.class.getDeclaredMethod("completedFuture", Object.class);
       failedFutureMethod = ExtendedCompletableFuture.class.getDeclaredMethod("completedFailure", Throwable.class);
@@ -32,13 +37,14 @@ public class FutureUtils {
     }
   }
 
-  public static boolean setMethods(Method pNewCompletabledFutureMethod, Method pCompletedFutureMethod,
-    Method pCompletedFailureMethod, Method pListOfFutureMethod, Class<?> pCompletedClass,
+  public static boolean setMethods(Method pOfFutureMethod, Method pNewCompletabledFutureMethod,
+    Method pCompletedFutureMethod, Method pCompletedFailureMethod, Method pListOfFutureMethod, Class<?> pCompletedClass,
     Set<Class<?>> pValidReplacements) {
 
     synchronized (FutureUtils.class) {
       if (pValidReplacements.contains(completedClass) == false)
         return false;
+      ofFutureMethod = pOfFutureMethod;
       newCompletableFutureMethod = pNewCompletabledFutureMethod;
       completedFutureMethod = pCompletedFutureMethod;
       failedFutureMethod = pCompletedFailureMethod;
@@ -79,6 +85,31 @@ public class FutureUtils {
   public static <T, U extends ExtendedCompletableFuture<T>> U completedFailure(Throwable pValue) {
     try {
       Object resultObj = failedFutureMethod.invoke(null, pValue);
+      @SuppressWarnings("unchecked")
+      U result = (U) resultObj;
+      return result;
+    }
+    catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  /**
+   * Returns a completable future for the given CompletionStage. NOTE: This is the best class to wrap an existing
+   * CompletionStage/CompletableFuture since more enhanced versions can be inserted into the creation cycle.
+   * 
+   * @param <T> the type
+   * @param pFuture the existing future
+   * @return the extended future
+   */
+  public static <T, U extends ExtendedCompletableFuture<T>> U of(CompletionStage<T> pFuture) {
+    CompletableFuture<T> future;
+    if (pFuture instanceof CompletableFuture)
+      future = (CompletableFuture<T>) pFuture;
+    else
+      future = pFuture.toCompletableFuture();
+    try {
+      Object resultObj = ofFutureMethod.invoke(null, future);
       @SuppressWarnings("unchecked")
       U result = (U) resultObj;
       return result;

@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
@@ -36,6 +37,7 @@ public class ContextFactorySetup {
         /* Setup the lamba functionality */
 
         try {
+          Method ofFuture = ContextExtendedCompletableFuture.class.getDeclaredMethod("of", CompletableFuture.class);
           Method newCompletableFuture =
             ContextExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
           Method completedFuture =
@@ -46,7 +48,7 @@ public class ContextFactorySetup {
           Set<Class<?>> replacements = new HashSet<>();
           replacements.add(ExtendedCompletableFuture.class);
 
-          FutureUtils.setMethods(newCompletableFuture, completedFuture, completedFailure, listOf,
+          FutureUtils.setMethods(ofFuture, newCompletableFuture, completedFuture, completedFailure, listOf,
             ContextExtendedCompletableFuture.class, replacements);
         }
         catch (NoSuchMethodException | SecurityException ex) {

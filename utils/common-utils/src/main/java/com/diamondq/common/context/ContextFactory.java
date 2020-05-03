@@ -1,7 +1,14 @@
 package com.diamondq.common.context;
 
 import com.diamondq.common.context.impl.ContextFactoryImpl;
+import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+import com.diamondq.common.lambda.future.ExtendedCompletionStage;
+import com.diamondq.common.lambda.future.FutureUtils;
 
+import java.util.List;
+import java.util.concurrent.CompletionStage;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ContextFactory {
@@ -16,6 +23,27 @@ public interface ContextFactory {
 
   public static @Nullable Context nullableCurrentContext() {
     return getInstance().getNullableCurrentContext();
+  }
+
+  public static <T> ContextExtendedCompletableFuture<T> completedFuture(T pValue) {
+    return FutureUtils.completedFuture(pValue);
+  }
+
+  public static <T> ContextExtendedCompletableFuture<T> completedFailure(Throwable pValue) {
+    return FutureUtils.completedFailure(pValue);
+  }
+
+  public static <T> ContextExtendedCompletableFuture<T> of(CompletionStage<T> pFuture) {
+    return FutureUtils.of(pFuture);
+  }
+
+  public static <T> ContextExtendedCompletableFuture<T> newCompletableFuture() {
+    return FutureUtils.newCompletableFuture();
+  }
+
+  public static <T> ContextExtendedCompletableFuture<List<T>> listOf(
+    List<@NonNull ? extends @NonNull ExtendedCompletionStage<T>> pList) {
+    return FutureUtils.listOf(pList);
   }
 
   public static void staticReportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {

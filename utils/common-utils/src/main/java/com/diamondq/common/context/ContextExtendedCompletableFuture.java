@@ -97,6 +97,10 @@ public class ContextExtendedCompletableFuture<T> extends ExtendedCompletableFutu
     return new ContextExtendedCompletableFuture<>(pFuture);
   }
 
+  public static <U> ContextExtendedCompletableFuture<U> of(CompletableFuture<U> pFuture) {
+    return new ContextExtendedCompletableFuture<>(pFuture);
+  }
+
   public static ContextExtendedCompletableFuture<@Nullable Void> allOf(@NonNull ExtendedCompletionStage<?>... cfs) {
     @NonNull
     final CompletableFuture<?>[] args = new @NonNull CompletableFuture<?>[cfs.length];
