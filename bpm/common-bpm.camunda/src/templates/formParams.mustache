@@ -1,0 +1,1 @@
+{{#isFormParam}}{{^isFile}}@Part(value = "{{baseName}}")  {{{dataType}}} {{paramName}}{{/isFile}}{{#isFile}} @Part(value = "{{baseName}}") InputStream {{paramName}}InputStream{{/isFile}}{{/isFormParam}}
