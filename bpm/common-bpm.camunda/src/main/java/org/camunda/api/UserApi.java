@@ -1,8 +1,9 @@
 package org.camunda.api;
 
+import java.util.Optional;
+
 import org.camunda.model.UserCredentialDto;
 import org.camunda.model.UserProfileDto;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Get;
@@ -17,11 +18,10 @@ public interface UserApi {
   @Get(value = "/{id}/profile")
   @Consumes({"application/json"})
   @Produces({"application/json"})
-  @Nullable
-  UserProfileDto getProfile(@PathVariable("id") String pId);
+  Optional<UserProfileDto> getProfile(@PathVariable("id") String pId);
 
   @Post(value = "/create")
   @Consumes({"application/json"})
   @Produces({"application/json"})
-  void create(UserProfileDto profile, UserCredentialDto credentials);
+  Optional<Void> create(UserProfileDto profile, UserCredentialDto credentials);
 }

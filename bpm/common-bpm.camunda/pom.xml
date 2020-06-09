@@ -44,6 +44,11 @@
                 <modelPackage>org.camunda.model</modelPackage>
                 <useSwaggerAnnotations>false</useSwaggerAnnotations>
               </configOptions>
+              <!--
+              <environmentVariables>
+                <debugOperations>true</debugOperations>
+              </environmentVariables>
+              -->
             </configuration>
           </execution>
         </executions>
