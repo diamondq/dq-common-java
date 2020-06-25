@@ -41,8 +41,10 @@
     <module>../storage/common-storage.kv</module>
     <module>../storage/common-storage.hibernate.ogm</module>
     <module>../storage/common-storage.jdo.datanucleus</module>
-    <module>../tracing/common-tracing.opentracing</module>
     <module>../tracing/common-tracing.jaeger</module>
+    <module>../tracing/common-tracing.opentracing</module>
+    <module>../tracing/common-tracing.sentry</module>
+    <module>../tracing/common-tracing.sentry.logback</module>
     <module>../utils/common-utils</module>
     <module>../utils/common-utils.janino.fragment</module>
     <module>../utils/common-utils.log4j2</module>

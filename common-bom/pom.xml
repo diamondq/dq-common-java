@@ -167,6 +167,16 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
+        <artifactId>common-tracing.sentry</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
+        <artifactId>common-tracing.sentry.logback</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
         <artifactId>common-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
