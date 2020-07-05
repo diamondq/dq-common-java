@@ -18,7 +18,7 @@
     name="PersistenceLayer" policy="dynamic"
     unbind="removePersistenceLayer" />
   <reference bind="addBuilder" cardinality="0..n"
-    interface="com.diamondq.common.utils.misc.builders.IBuilder"
+    interface="com.diamondq.common.builders.IBuilder"
     name="IBuilder" policy="dynamic"
     target="(builder_for=com.diamondq.common.model.generic.PersistenceLayer)"
     unbind="removeBuilder" />
