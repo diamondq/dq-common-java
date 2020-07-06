@@ -1,6 +1,8 @@
 package com.diamondq.common.injection;
 
 import java.io.Closeable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -25,10 +27,12 @@ public interface InjectionContext extends Closeable {
         .append(".").append("impl").append(".").append("InjectionStartupBuilderImpl");
       @SuppressWarnings("unchecked")
       final Class<InjectionStartupBuilder> startupClass = (Class<InjectionStartupBuilder>) Class.forName(sb.toString());
-      final InjectionStartupBuilder instance = startupClass.newInstance();
+      Constructor<InjectionStartupBuilder> constructor = startupClass.getConstructor((Class<?>[]) null);
+      final InjectionStartupBuilder instance = constructor.newInstance((Object[]) null);
       return instance;
     }
-    catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+    catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+      | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
       throw new RuntimeException(ex);
     }
   }
