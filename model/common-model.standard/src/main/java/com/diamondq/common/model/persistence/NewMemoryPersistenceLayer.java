@@ -1,6 +1,11 @@
 package com.diamondq.common.model.persistence;
 
+import com.diamondq.common.builders.BuilderWithMapHelper;
+import com.diamondq.common.builders.IBuilder;
+import com.diamondq.common.builders.IBuilderFactory;
+import com.diamondq.common.builders.IBuilderWithMap;
 import com.diamondq.common.context.ContextFactory;
+import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
@@ -23,21 +28,67 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<Map<String, Object>, String> {
 
+  @Singleton
+  @Named("com.diamondq.common.model.persistence.NewMemoryPersistenceLayer")
+  public static class NewMemoryPersistenceLayerBuilderFactory implements IBuilderFactory<NewMemoryPersistenceLayer> {
+
+    protected final ContextFactory   mContextFactory;
+
+    protected final ConverterManager mConverterManager;
+
+    @Inject
+    public NewMemoryPersistenceLayerBuilderFactory(ContextFactory pContextFactory, ConverterManager pConverterManager) {
+      mContextFactory = pContextFactory;
+      mConverterManager = pConverterManager;
+    }
+
+    @Override
+    public IBuilder<NewMemoryPersistenceLayer> create() {
+      return new NewMemoryPersistenceLayerBuilder(mContextFactory, mConverterManager);
+    }
+  }
+
   /**
    * The builder (generally used for the Config system)
    */
-  public static class MemoryPersistenceLayerBuilder {
+  public static class NewMemoryPersistenceLayerBuilder
+    implements IBuilderWithMap<NewMemoryPersistenceLayerBuilder, NewMemoryPersistenceLayer> {
 
-    private @Nullable ContextFactory mContextFactory;
+    private ContextFactory                                       mContextFactory;
 
-    public MemoryPersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
+    private final ConverterManager                               mConverterManager;
+
+    private static final BuilderWithMapHelper.Mapping<?, ?, ?>[] sMappings;
+
+    private NewMemoryPersistenceLayerBuilder(ContextFactory pContextFactory, ConverterManager pConverterManager) {
+      mContextFactory = pContextFactory;
+      mConverterManager = pConverterManager;
+    }
+
+    public NewMemoryPersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
       mContextFactory = pContextFactory;
       return this;
+    }
+
+    static {
+      sMappings = new BuilderWithMapHelper.Mapping<?, ?, ?>[] {};
+    }
+
+    /**
+     * @see com.diamondq.common.builders.IBuilderWithMap#withMap(java.util.Map, java.lang.String)
+     */
+    @Override
+    public NewMemoryPersistenceLayerBuilder withMap(Map<String, Object> pConfig, @Nullable String pPrefix) {
+      return BuilderWithMapHelper.map(this, pConfig, pPrefix, sMappings, mConverterManager);
     }
 
     /**
@@ -45,10 +96,9 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
      *
      * @return the layer
      */
+    @Override
     public NewMemoryPersistenceLayer build() {
       ContextFactory contextFactory = mContextFactory;
-      if (contextFactory == null)
-        throw new IllegalArgumentException("The contextFactory is not set");
       return new NewMemoryPersistenceLayer(contextFactory);
     }
   }
@@ -338,8 +388,9 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
     return false;
   }
 
-  public static MemoryPersistenceLayerBuilder builder() {
-    return new MemoryPersistenceLayerBuilder();
+  public static NewMemoryPersistenceLayerBuilder builder(ContextFactory pContextFactory,
+    ConverterManager pConverterManager) {
+    return new NewMemoryPersistenceLayerBuilder(pContextFactory, pConverterManager);
   }
 
   /**

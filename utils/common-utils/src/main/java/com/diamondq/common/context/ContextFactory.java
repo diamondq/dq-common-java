@@ -1,7 +1,6 @@
 package com.diamondq.common.context;
 
 import com.diamondq.common.context.impl.ContextFactoryImpl;
-import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
 

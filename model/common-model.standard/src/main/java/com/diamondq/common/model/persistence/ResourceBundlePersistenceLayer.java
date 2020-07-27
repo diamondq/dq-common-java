@@ -1,6 +1,13 @@
 package com.diamondq.common.model.persistence;
 
+import static com.diamondq.common.builders.BuilderWithMapHelper.of;
+
+import com.diamondq.common.builders.BuilderWithMapHelper;
+import com.diamondq.common.builders.IBuilder;
+import com.diamondq.common.builders.IBuilderFactory;
+import com.diamondq.common.builders.IBuilderWithMap;
 import com.diamondq.common.context.ContextFactory;
+import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.model.generic.AbstractCachingPersistenceLayer;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.EditorStructureDefinition;
@@ -20,20 +27,69 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLayer {
 
+  @Singleton
+  @Named("com.diamondq.common.model.persistence.ResourceBundlePersistenceLayer")
+  public static class ResourceBundlePersistenceLayerBuilderFactory
+    implements IBuilderFactory<ResourceBundlePersistenceLayer> {
+
+    protected final ContextFactory   mContextFactory;
+
+    protected final ConverterManager mConverterManager;
+
+    @Inject
+    public ResourceBundlePersistenceLayerBuilderFactory(ContextFactory pContextFactory,
+      ConverterManager pConverterManager) {
+      mContextFactory = pContextFactory;
+      mConverterManager = pConverterManager;
+    }
+
+    @Override
+    public IBuilder<ResourceBundlePersistenceLayer> create() {
+      return new ResourceBundlePersistenceLayerBuilder(mContextFactory, mConverterManager);
+    }
+  }
+
   /**
    * The builder (generally used for the Config system)
    */
-  public static class ResourceBundlePersistenceLayerBuilder {
+  public static class ResourceBundlePersistenceLayerBuilder
+    implements IBuilderWithMap<ResourceBundlePersistenceLayerBuilder, ResourceBundlePersistenceLayer> {
 
-    private @Nullable String         mResourceBaseName;
+    private @Nullable String                                     mResourceBaseName;
 
-    private @Nullable ClassLoader    mClassLoader;
+    private @Nullable ClassLoader                                mClassLoader;
 
-    private @Nullable ContextFactory mContextFactory;
+    private ContextFactory                                       mContextFactory;
+
+    private final ConverterManager                               mConverterManager;
+
+    private static final BuilderWithMapHelper.Mapping<?, ?, ?>[] sMappings;
+
+    static {
+      sMappings = new BuilderWithMapHelper.Mapping<?, ?, ?>[] {
+          of(String.class, "resourceBaseName", ResourceBundlePersistenceLayerBuilder::resourceBaseName)};
+    }
+
+    private ResourceBundlePersistenceLayerBuilder(ContextFactory pContextFactory, ConverterManager pConverterManager) {
+      mContextFactory = pContextFactory;
+      mConverterManager = pConverterManager;
+    }
+
+    /**
+     * @see com.diamondq.common.builders.IBuilderWithMap#withMap(java.util.Map, java.lang.String)
+     */
+    @Override
+    public ResourceBundlePersistenceLayerBuilder withMap(Map<String, Object> pConfig, @Nullable String pPrefix) {
+      return BuilderWithMapHelper.map(this, pConfig, pPrefix, sMappings, mConverterManager);
+    }
 
     public ResourceBundlePersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
       mContextFactory = pContextFactory;
@@ -61,13 +117,12 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
      *
      * @return the layer
      */
+    @Override
     public ResourceBundlePersistenceLayer build() {
       String resourceBaseName = mResourceBaseName;
       if (resourceBaseName == null)
         throw new IllegalArgumentException("The mandatory field resourceBaseName was not set");
       ContextFactory contextFactory = mContextFactory;
-      if (contextFactory == null)
-        throw new IllegalArgumentException("The contextFactory is not set");
       return new ResourceBundlePersistenceLayer(contextFactory, resourceBaseName, mClassLoader);
     }
   }
@@ -250,8 +305,9 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
     throw new UnsupportedOperationException();
   }
 
-  public static ResourceBundlePersistenceLayerBuilder builder() {
-    return new ResourceBundlePersistenceLayerBuilder();
+  public static ResourceBundlePersistenceLayerBuilder builder(ContextFactory pContextFactory,
+    ConverterManager pConverterManager) {
+    return new ResourceBundlePersistenceLayerBuilder(pContextFactory, pConverterManager);
   }
 
   /**

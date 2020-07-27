@@ -1,7 +1,14 @@
 package com.diamondq.common.model.persistence;
 
+import static com.diamondq.common.builders.BuilderWithMapHelper.of;
+
+import com.diamondq.common.builders.BuilderWithMapHelper;
+import com.diamondq.common.builders.IBuilder;
+import com.diamondq.common.builders.IBuilderFactory;
+import com.diamondq.common.builders.IBuilderWithMap;
 import com.diamondq.common.context.Context;
 import com.diamondq.common.context.ContextFactory;
+import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer;
 import com.diamondq.common.model.generic.GenericToolkit;
 import com.diamondq.common.model.interfaces.Property;
@@ -27,10 +34,15 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.function.Supplier;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -44,24 +56,72 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   private static final Logger sLogger = LoggerFactory.getLogger(PropertiesFilePersistenceLayer.class);
 
+  @Singleton
+  @Named("com.diamondq.common.model.persistence.PropertiesFilePersistenceLayer")
+  public static class PropertiesFilePersistenceLayerBuilderFactory
+    implements IBuilderFactory<PropertiesFilePersistenceLayer> {
+
+    protected final ContextFactory   mContextFactory;
+
+    protected final ConverterManager mConverterManager;
+
+    @Inject
+    public PropertiesFilePersistenceLayerBuilderFactory(ContextFactory pContextFactory,
+      ConverterManager pConverterManager) {
+      mContextFactory = pContextFactory;
+      mConverterManager = pConverterManager;
+    }
+
+    @Override
+    public IBuilder<PropertiesFilePersistenceLayer> create() {
+      return new PropertiesFilePersistenceLayerBuilder(mContextFactory, mConverterManager);
+    }
+  }
+
   /**
    * The builder (generally used for the Config system)
    */
-  public static class PropertiesFilePersistenceLayerBuilder {
+  public static class PropertiesFilePersistenceLayerBuilder
+    implements IBuilderWithMap<PropertiesFilePersistenceLayerBuilder, PropertiesFilePersistenceLayer> {
 
-    private @Nullable File           mStructureDir;
+    private @Nullable File                                       mStructureDir;
 
-    private @Nullable Integer        mCacheStructuresSeconds;
+    private @Nullable Integer                                    mCacheStructuresSeconds;
 
-    private @Nullable File           mStructureDefDir;
+    private @Nullable File                                       mStructureDefDir;
 
-    private @Nullable File           mEditorStructureDefDir;
+    private @Nullable File                                       mEditorStructureDefDir;
 
-    private @Nullable ContextFactory mContextFactory;
+    private ContextFactory                                       mContextFactory;
+
+    private final ConverterManager                             mConverterManager;
+
+    private static final BuilderWithMapHelper.Mapping<?, ?, ?>[] sMappings;
+
+    private PropertiesFilePersistenceLayerBuilder(ContextFactory pContextFactory, ConverterManager pConverterManager) {
+      mContextFactory = pContextFactory;
+      mConverterManager = pConverterManager;
+    }
 
     public PropertiesFilePersistenceLayerBuilder contextFactory(ContextFactory pContextFactory) {
       mContextFactory = pContextFactory;
       return this;
+    }
+
+    static {
+      sMappings = new BuilderWithMapHelper.Mapping<?, ?, ?>[] {
+          of(String.class, "structureDir", PropertiesFilePersistenceLayerBuilder::structureDir),
+          of(Integer.class, "cacheStructuresSeconds", PropertiesFilePersistenceLayerBuilder::cacheStructuresSeconds),
+          of(String.class, "structureDefDir", PropertiesFilePersistenceLayerBuilder::structureDefDir),
+          of(String.class, "editorStructureDefDir", PropertiesFilePersistenceLayerBuilder::editorStructureDefDir)};
+    }
+
+    /**
+     * @see com.diamondq.common.builders.IBuilderWithMap#withMap(java.util.Map, java.lang.String)
+     */
+    @Override
+    public PropertiesFilePersistenceLayerBuilder withMap(Map<String, Object> pConfig, @Nullable String pPrefix) {
+      return BuilderWithMapHelper.map(this, pConfig, pPrefix, sMappings, mConverterManager);
     }
 
     /**
@@ -113,13 +173,12 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
      *
      * @return the layer
      */
+    @Override
     public PropertiesFilePersistenceLayer build() {
       Integer cacheStructuresSeconds = mCacheStructuresSeconds;
       if (cacheStructuresSeconds == null)
         cacheStructuresSeconds = -1;
       ContextFactory contextFactory = mContextFactory;
-      if (contextFactory == null)
-        throw new IllegalArgumentException("The contextFactory is not set");
       return new PropertiesFilePersistenceLayer(contextFactory, mStructureDir, cacheStructuresSeconds, mStructureDefDir,
         mEditorStructureDefDir);
     }
@@ -643,7 +702,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
         refBuilder.append(typeName).append('/');
         int preNameOffset = refBuilder.length();
 
-        File[] listFiles = Objects.requireNonNull(listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties")));
+        File[] listFiles =
+          Objects.requireNonNull(listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties")));
         for (File f : listFiles) {
           String name = unescapeValue(f.getName().substring(0, f.getName().length() - ".properties".length()));
 
@@ -657,8 +717,9 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     }
   }
 
-  public static PropertiesFilePersistenceLayerBuilder builder() {
-    return new PropertiesFilePersistenceLayerBuilder();
+  public static PropertiesFilePersistenceLayerBuilder builder(ContextFactory pContextFactory,
+    ConverterManager pConverterManager) {
+    return new PropertiesFilePersistenceLayerBuilder(pContextFactory, pConverterManager);
   }
 
   /**
