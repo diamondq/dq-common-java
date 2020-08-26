@@ -87,6 +87,14 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
   }
 
   /**
+   * @see com.diamondq.common.injection.InjectionStartupBuilder#parent(com.diamondq.common.injection.InjectionContext)
+   */
+  @Override
+  public InjectionStartupBuilder parent(InjectionContext pParent) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
    * @see com.diamondq.common.injection.InjectionStartupBuilder#buildAndStart()
    */
   @Override
