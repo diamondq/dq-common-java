@@ -95,6 +95,14 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
   }
 
   /**
+   * @see com.diamondq.common.injection.InjectionStartupBuilder#classLoader(java.lang.ClassLoader)
+   */
+  @Override
+  public InjectionStartupBuilder classLoader(ClassLoader pLoader) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
    * @see com.diamondq.common.injection.InjectionStartupBuilder#buildAndStart()
    */
   @Override

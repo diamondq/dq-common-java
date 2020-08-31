@@ -48,6 +48,15 @@ public interface InjectionStartupBuilder {
   public InjectionStartupBuilder parent(InjectionContext pParent);
 
   /**
+   * Defines an alternative classloader. If not provided, then the classloader that was used to load the
+   * InjectionStartupBuilder class is used.
+   * 
+   * @param pLoader the loader
+   * @return the builder for fluent use
+   */
+  public InjectionStartupBuilder classLoader(ClassLoader pLoader);
+
+  /**
    * Build the Injection engine and start it
    *
    * @return the InjectionStartup

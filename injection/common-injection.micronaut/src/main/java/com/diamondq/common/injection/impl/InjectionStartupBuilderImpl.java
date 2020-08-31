@@ -26,11 +26,14 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
 
   private final Map<Object, String>       mNamedSingletons;
 
+  private ClassLoader                     mClassLoader;
+
   public InjectionStartupBuilderImpl() {
     mEnvironmentTags = new HashSet<>();
     mPropertiesList = new ArrayList<Map<String, Object>>();
     mSingletons = new HashSet<>();
     mNamedSingletons = new HashMap<>();
+    mClassLoader = InjectionStartupBuilder.class.getClassLoader();
   }
 
   /**
@@ -88,12 +91,24 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
   }
 
   /**
+   * @see com.diamondq.common.injection.InjectionStartupBuilder#classLoader(java.lang.ClassLoader)
+   */
+  @Override
+  public InjectionStartupBuilder classLoader(ClassLoader pLoader) {
+    synchronized (this) {
+      mClassLoader = pLoader;
+    }
+    return this;
+  }
+
+  /**
    * @see com.diamondq.common.injection.InjectionStartupBuilder#buildAndStart()
    */
   @Override
   public InjectionContext buildAndStart() {
     synchronized (this) {
       ApplicationContextBuilder builder = ApplicationContext.build();
+      builder = builder.classLoader(mClassLoader);
       for (final String tag : mEnvironmentTags)
         builder = builder.environments(tag);
       for (final Map<String, Object> props : mPropertiesList)
