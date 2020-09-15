@@ -11,9 +11,9 @@
   <packaging>pom</packaging>
   <name>DiamondQ Common: Parent</name>
   <properties>
-    <datanucleus.version>5.1.6</datanucleus.version>
-    <datanucleus-query.version>5.0.4</datanucleus-query.version>
-    <weld.version>3.1.4.Final</weld.version>
+    <datanucleus.version>5.2.4</datanucleus.version>
+    <datanucleus-query.version>5.0.9</datanucleus-query.version>
+    <weld.version>3.1.5.SP1</weld.version>
     <openaz.version>0.0.1-SNAPSHOT</openaz.version>
     <rocks.xmpp.version>0.8.0-DQ-SNAPSHOT</rocks.xmpp.version>
     <rocks.precis.version>1.1.0-DQ-SNAPSHOT</rocks.precis.version>
@@ -37,7 +37,7 @@
       <dependency>
         <groupId>net.jodah</groupId>
         <artifactId>typetools</artifactId>
-        <version>0.5.0</version>
+        <version>0.6.2</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.weld</groupId>
@@ -54,12 +54,12 @@
       <dependency>
         <groupId>io.jaegertracing</groupId>
         <artifactId>jaeger-core</artifactId>
-        <version>1.0.0</version>
+        <version>1.4.0</version>
       </dependency>
       <dependency>
         <groupId>io.jaegertracing</groupId>
         <artifactId>jaeger-zipkin</artifactId>
-        <version>1.0.0</version>
+        <version>1.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.datanucleus</groupId>
@@ -91,7 +91,7 @@
       <dependency>
         <groupId>org.datanucleus</groupId>
         <artifactId>datanucleus-odf</artifactId>
-        <version>5.0.0-release</version>
+        <version>5.2.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -128,12 +128,12 @@
       <dependency>
         <groupId>org.eclipse.collections</groupId>
         <artifactId>eclipse-collections-api</artifactId>
-        <version>9.2.0</version>
+        <version>10.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.collections</groupId>
         <artifactId>eclipse-collections</artifactId>
-        <version>9.2.0</version>
+        <version>10.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.cfg4j</groupId>
