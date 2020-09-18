@@ -31,7 +31,7 @@ public class ContextFactorySetup {
     return new ContextFactorySetup().getContextFactory();
   }
 
-  public @Singleton @Produces @ApplicationScoped ContextFactory getContextFactory() {
+  public @Singleton @Produces ContextFactory getContextFactory() {
     synchronized (ContextFactorySetup.class) {
       if (setup == false) {
 
