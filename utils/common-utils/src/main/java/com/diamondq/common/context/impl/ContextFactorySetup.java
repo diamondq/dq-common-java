@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
+import javax.inject.Singleton;
 
 import io.micronaut.context.annotation.Factory;
 
@@ -30,7 +31,7 @@ public class ContextFactorySetup {
     return new ContextFactorySetup().getContextFactory();
   }
 
-  public @Produces @ApplicationScoped ContextFactory getContextFactory() {
+  public @Singleton @Produces @ApplicationScoped ContextFactory getContextFactory() {
     synchronized (ContextFactorySetup.class) {
       if (setup == false) {
 

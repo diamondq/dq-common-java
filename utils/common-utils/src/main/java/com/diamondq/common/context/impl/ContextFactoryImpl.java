@@ -12,11 +12,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Singleton;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@Singleton
+import io.micronaut.context.annotation.Secondary;
+
+@Secondary
 public class ContextFactoryImpl implements SPIContextFactory {
 
   private static final Object                        sNULL_EXIT_VALUE     = new Object();
