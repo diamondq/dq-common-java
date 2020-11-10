@@ -29,7 +29,7 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
   /**
    * Pre-release tags (potentially empty, but never null)
    */
-  public final String[] preRelase;
+  public final String[] preRelease;
 
   /**
    * Build meta data tags (potentially empty, but never null)
@@ -65,13 +65,13 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
     metaParts = new ArrayList<>(5);
     input = new char[0];
     buildMeta = new String[pBuildMeta.length];
-    preRelase = new String[pPreRelease.length];
+    preRelease = new String[pPreRelease.length];
     Pattern p = Pattern.compile("[0-9A-Za-z-]+");
     for (int i = 0; i < pPreRelease.length; i++) {
       if ((pPreRelease[i] == null) || !p.matcher(pPreRelease[i]).matches()) {
         throw new IllegalArgumentException("Pre Release tag: " + i);
       }
-      preRelase[i] = pPreRelease[i];
+      preRelease[i] = pPreRelease[i];
     }
     for (int i = 0; i < pBuildMeta.length; i++) {
       if ((pBuildMeta[i] == null) || !p.matcher(pBuildMeta[i]).matches()) {
@@ -125,7 +125,7 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
     major = vParts[0];
     minor = vParts[1];
     patch = vParts[2];
-    preRelase = preParts.toArray(new String[preParts.size()]);
+    preRelease = preParts.toArray(new String[preParts.size()]);
     buildMeta = metaParts.toArray(new String[metaParts.size()]);
   }
 
@@ -148,10 +148,10 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
    * Check if this version has a given pre release tag.
    *
    * @param tag the tag to check for
-   * @return true if the tag is found in {@link SemanticVersion#preRelase}.
+   * @return true if the tag is found in {@link SemanticVersion#preRelease}.
    */
   public boolean hasPreRelease(String tag) {
-    for (String s : preRelase) {
+    for (String s : preRelease) {
       if (s.equals(tag)) {
         return true;
       }
@@ -185,7 +185,7 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
    * @return true if the major version number is greater than zero and there are no pre release tags.
    */
   public boolean isStable() {
-    return (major > 0) && (preRelase.length == 0);
+    return (major > 0) && (preRelease.length == 0);
   }
 
   @Override
@@ -196,11 +196,11 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
     ret.append(minor);
     ret.append('.');
     ret.append(patch);
-    if (preRelase.length > 0) {
+    if (preRelease.length > 0) {
       ret.append('-');
-      for (int i = 0; i < preRelase.length; i++) {
-        ret.append(preRelase[i]);
-        if (i < (preRelase.length - 1)) {
+      for (int i = 0; i < preRelease.length; i++) {
+        ret.append(preRelease[i]);
+        if (i < (preRelease.length - 1)) {
           ret.append('.');
         }
       }
@@ -234,11 +234,11 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
     if ((ov.major != major) || (ov.minor != minor) || (ov.patch != patch)) {
       return false;
     }
-    if (ov.preRelase.length != preRelase.length) {
+    if (ov.preRelease.length != preRelease.length) {
       return false;
     }
-    for (int i = 0; i < preRelase.length; i++) {
-      if (!preRelase[i].equals(ov.preRelase[i])) {
+    for (int i = 0; i < preRelease.length; i++) {
+      if (!preRelease[i].equals(ov.preRelease[i])) {
         return false;
       }
     }
@@ -261,14 +261,14 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
       if (result == 0) { // Same minor
         result = patch - v.patch;
         if (result == 0) { // Same patch
-          if ((preRelase.length == 0) && (v.preRelase.length > 0)) {
+          if ((preRelease.length == 0) && (v.preRelease.length > 0)) {
             result = 1; // No pre release wins over pre release
           }
-          if ((v.preRelase.length == 0) && (preRelase.length > 0)) {
+          if ((v.preRelease.length == 0) && (preRelease.length > 0)) {
             result = -1; // No pre release wins over pre release
           }
-          if ((preRelase.length > 0) && (v.preRelase.length > 0)) {
-            int len = Math.min(preRelase.length, v.preRelase.length);
+          if ((preRelease.length > 0) && (v.preRelease.length > 0)) {
+            int len = Math.min(preRelease.length, v.preRelease.length);
             int count = 0;
             for (count = 0; count < len; count++) {
               result = comparePreReleaseTag(count, v);
@@ -277,7 +277,7 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
               }
             }
             if ((result == 0) && (count == len)) { // Longer version wins.
-              result = preRelase.length - v.preRelase.length;
+              result = preRelease.length - v.preRelease.length;
             }
           }
         }
@@ -291,12 +291,12 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
     Integer here = null;
     Integer there = null;
     try {
-      here = Integer.parseInt(preRelase[pos], 10);
+      here = Integer.parseInt(preRelease[pos], 10);
     }
     catch (NumberFormatException e) {
     }
     try {
-      there = Integer.parseInt(ov.preRelase[pos], 10);
+      there = Integer.parseInt(ov.preRelease[pos], 10);
     }
     catch (NumberFormatException e) {
     }
@@ -307,7 +307,7 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
       return 1; // Strings take precedence over numbers
     }
     if ((here == null) && (there == null)) {
-      return (preRelase[pos].compareTo(ov.preRelase[pos])); // ASCII compare
+      return (preRelease[pos].compareTo(ov.preRelease[pos])); // ASCII compare
     }
     return here.compareTo(there); // Number compare
   }
