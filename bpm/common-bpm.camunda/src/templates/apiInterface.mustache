@@ -1,3 +1,7 @@
+    /**
+     * {{notes}} {{#allParams}}
+     * @param {{paramName}} {{description}}{{/allParams}}
+     */    
     @{{#lambda.titlecase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.titlecase}}{{#subresourceOperation}}(value="{{{path}}}"){{/subresourceOperation}}{{#hasConsumes}}
     @Produces({ {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
     @Consumes({ {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}} }){{/hasProduces}}{{#useSwaggerAnnotations}}
