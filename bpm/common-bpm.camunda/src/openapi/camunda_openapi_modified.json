@@ -120,7 +120,467 @@
     }
   ],
   "paths": {
-    "/condition": {
+	"/authorization": {
+      "get": {
+	    "operationId": "getAuthorizations",
+        "tags": [
+          "Authorization"
+        ],
+        "description": "Queries for a list of authorizations using a list of parameters. The size of the result set can be retrieved by using the Get Authorization Count method.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the id of the authorization."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by authorization type. (0=global, 1=grant, 2=revoke). See the User Guide for more information about authorization types."
+          },
+          {
+            "name": "userIdIn",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by a comma-separated list of userIds."
+          },
+          {
+            "name": "groupIdIn",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by a comma-separated list of groupIds."
+          },
+          {
+            "name": "resourceType",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by an integer representation of the resource type. See the User Guide for a list of integer representations of resource types."
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by resource id."
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort the results lexicographically by a given criterion. Valid values are resourceType and resourceId. Must be used in conjunction with the sortOrder parameter."
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort the results in a given order. Values may be asc for ascending order or desc for descending order. Must be used in conjunction with the sortBy parameter."
+          },
+          {
+            "name": "firstResult",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pagination of results. Specifies the index of the first result to return."
+          },
+          {
+            "name": "maxResults",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pagination of results. Specifies the maximum number of results to return. Will return less results if there are no more results left."
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuthorizationDto"
+                  }
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "GET `/authorization?id\u003dabc`",
+                    "value": [
+                      {
+                        "id": "abc",
+                        "type": 2
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the query parameters are invalid, for example if a `sortOrder` parameter is supplied,\nbut no `sortBy`, or if an invalid operator for variable comparison is used. See the\n[Introduction](https://docs.camunda.org/manual/7.14/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+	},
+	"/authorization/{id}": {
+      "put": {
+        "operationId": "updateAuthorization",
+        "tags": [
+          "Authorization"
+        ],
+        "description": "Updates an authorization by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the authorization to be updated."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorizationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the properties in the request body are invalid, for example if a permission parameter is not valid for the provided resourceType. See the Introduction for the error response format."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "If the corresponding authorization cannot be found."
+          }
+        }
+      }	
+	},
+	"/authorization/create": {
+      "post": {
+	    "operationId": "createAuthorization",
+        "tags": [
+          "Authorization"
+        ],
+        "description": "Creates a new authorization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorizationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuthorizationDto"
+                  }
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "GET `/authorization?id\u003dabc`",
+                    "value": [
+                      {
+                        "id": "abc",
+                        "type": 2
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the query parameters are invalid, for example if a `sortOrder` parameter is supplied,\nbut no `sortBy`, or if an invalid operator for variable comparison is used. See the\n[Introduction](https://docs.camunda.org/manual/7.14/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+	},	
+    "/authorization/delete": {
+      "delete": {
+	    "operationId": "deleteAuthorization",
+        "tags": [
+          "Authorization"
+        ],
+        "description": "Deletes an authorization by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id of the authorization to be deleted."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the query parameters are invalid, for example if a `sortOrder` parameter is supplied,\nbut no `sortBy`, or if an invalid operator for variable comparison is used. See the\n[Introduction](https://docs.camunda.org/manual/7.14/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+	},
+	"/group": {
+      "get": {
+	    "operationId": "getGroups",
+        "tags": [
+          "Group"
+        ],
+        "description": "Queries for a list of groups using a list of parameters. The size of the result set can be retrieved by using the Get Group Count method.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the id of the group."
+          },
+          {
+            "name": "idIn",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by a comma-separated list of group ids."
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the name of the group."
+          },
+          {
+            "name": "nameLike",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the name that the parameter is a substring of."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the type of the group."
+          },
+          {
+            "name": "member",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only retrieve groups which the given user id is a member of."
+          },
+          {
+            "name": "memberOfTenant",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only retrieve groups which are members of the given tenant."
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort the results lexicographically by a given criterion. Valid values are id, name and type. Must be used in conjunction with the sortOrder parameter."
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort the results in a given order. Values may be asc for ascending order or desc for descending order. Must be used in conjunction with the sortBy parameter."
+          },
+          {
+            "name": "firstResult",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pagination of results. Specifies the index of the first result to return."
+          },
+          {
+            "name": "maxResults",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pagination of results. Specifies the maximum number of results to return. Will return less results if there are no more results left."
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupDto"
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the query parameters are invalid, for example if a `sortOrder` parameter is supplied,\nbut no `sortBy`, or if an invalid operator for variable comparison is used. See the\n[Introduction](https://docs.camunda.org/manual/7.14/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+	},
+	"/group/create": {
+      "post": {
+	    "operationId": "createGroup",
+        "tags": [
+          "Group"
+        ],
+        "description": "Creates a new group.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the query parameters are invalid, for example if a `sortOrder` parameter is supplied,\nbut no `sortBy`, or if an invalid operator for variable comparison is used. See the\n[Introduction](https://docs.camunda.org/manual/7.14/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+	},	
+    "/group/delete": {
+      "delete": {
+	    "operationId": "deleteGroup",
+        "tags": [
+          "Group"
+        ],
+        "description": "Deletes a group by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id of the group to be deleted."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the query parameters are invalid, for example if a `sortOrder` parameter is supplied,\nbut no `sortBy`, or if an invalid operator for variable comparison is used. See the\n[Introduction](https://docs.camunda.org/manual/7.14/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+	},	
+	"/condition": {
       "post": {
         "operationId": "evaluateCondition",
         "tags": [
@@ -19116,6 +19576,84 @@
   },
   "components": {
     "schemas": {
+      "AuthorizationDto": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The id of the authorization."
+              },
+              "type": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The type of the authorization. (0=global, 1=grant, 2=revoke)."
+              },
+              "permissions": {
+                "type": "array",
+                "items": {
+                   "type": "string"
+                },
+                "description": "An array of Strings holding the permissions provided by this authorization."
+              },
+              "userId": {
+                "type": "string",
+                "description": "The id of the user this authorization has been created for. The value \"*\" represents a global authorization ranging over all users."
+              },
+              "groupId": {
+                "type": "string",
+                "description": "The id of the group this authorization has been created for."
+              },
+              "resourceType": {
+                "type": "integer",
+                "format": "int32",
+                "description": "An integer representing the resource type. See the User Guide for a list of integer representations of resource types."
+              },
+              "resourceId": {
+                "type": "string",
+                "description": "The resource Id. The value \"*\" represents an authorization ranging over all instances of a resource."
+              },
+              "removalTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The removal time indicates the date a historic instance authorization is cleaned up. A removal time can only be assigned to a historic instance authorization. Can be null when not related to a historic instance resource or when the removal time strategy is end and the root process instance is not finished. Default format yyyy-MM-dd'T'HH:mm:ss.SSSZ."
+              },
+              "rootProcessInstanceId": {
+                "type": "string",
+                "description": "The process instance id of the root process instance the historic instance authorization is related to. Can be null if not related to a historic instance resource."
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/LinkableDto"
+          }
+        ]
+      },
+      "GroupDto": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The id of the group."
+              },
+              "name": {
+                "type": "string",
+                "description": "The name of the group."
+              },
+              "type": {
+                "type": "string",
+                "description": "The type of the group."
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/LinkableDto"
+          }
+        ]
+      },      
       "AbstractSetRemovalTimeDto": {
         "type": "object",
         "properties": {
