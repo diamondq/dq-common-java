@@ -15,6 +15,10 @@
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-http-client</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.diamondq.common</groupId>
+      <artifactId>common-injection.micronaut.utils</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -43,11 +47,7 @@
                 <modelPackage>org.camunda.model</modelPackage>
                 <useSwaggerAnnotations>false</useSwaggerAnnotations>
               </configOptions>
-              <!-- 
-              <environmentVariables>
-                <debugOperations>true</debugOperations>
-              </environmentVariables>
-               -->
+              <!-- <environmentVariables> <debugOperations>true</debugOperations> <debugModels>true</debugModels><debugOpenAPI>true</debugOpenAPI></environmentVariables> -->
             </configuration>
           </execution>
         </executions>

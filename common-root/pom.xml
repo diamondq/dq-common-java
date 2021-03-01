@@ -22,6 +22,7 @@
     <module>../injection/common-injection.cdi.weld</module>
     <module>../injection/common-injection.common</module>
     <module>../injection/common-injection.micronaut</module>
+    <module>../injection/common-injection.micronaut.utils</module>
     <module>../injection/common-injection.osgi</module>
     <module>../jaxrs/common-jaxrs.common</module>
     <module>../jaxrs/common-jaxrs.resteasy</module>

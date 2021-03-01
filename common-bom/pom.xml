@@ -51,6 +51,11 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
+        <artifactId>common-injection.micronaut.utils</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.diamondq.common</groupId>
         <artifactId>common-injection.osgi</artifactId>
         <version>${project.version}</version>
       </dependency>
