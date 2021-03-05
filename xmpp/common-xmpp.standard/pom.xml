@@ -13,6 +13,18 @@
   <properties>
     <osgi.export.base.package>com.diamondq.common.xmpp.*</osgi.export.base.package>
   </properties>
+  <repositories>
+    <repository>
+      <id>2-dq-release</id>
+      <url>https://nexus.diamondq.com/repository/maven-public/</url>
+      <releases>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
