@@ -23,7 +23,7 @@
       <dependency>
         <groupId>com.diamondq.common.config</groupId>
         <artifactId>config-bom</artifactId>
-        <version>0.3.76-277d872</version>
+        <version>0.3.77-3f00292</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
