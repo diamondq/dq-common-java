@@ -1287,7 +1287,7 @@ public class ProxyGenerator implements Generator {
         .addCode("\n/* Send the message */\n\n")
 
         // mVertx.eventBus().<String> send(mAddress, message, options,
-        .addStatement("$N.eventBus().<$T>send($N, $N, $N, $L)", "mVertx", replyReturnType, "mAddress", "message",
+        .addStatement("$N.eventBus().<$T>request($N, $N, $N, $L)", "mVertx", replyReturnType, "mAddress", "message",
           "options", handler)
 
         // return result;

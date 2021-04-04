@@ -18,6 +18,7 @@
     <dependency>
       <groupId>jakarta.enterprise</groupId>
       <artifactId>jakarta.enterprise.cdi-api</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -39,7 +40,7 @@
                 <fileSet>
                   <directory>${project.build.directory}/classes</directory>
                   <excludes>
-                    <exclude> com/diamondq/common/lambda/future/FutureUtils.class</exclude>
+                    <exclude>com/diamondq/common/lambda/future/FutureUtils.class</exclude>
                   </excludes>
                 </fileSet>
               </fileSets>

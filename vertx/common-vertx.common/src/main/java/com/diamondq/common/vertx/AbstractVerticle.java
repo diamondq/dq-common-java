@@ -5,7 +5,7 @@ import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 
 public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
 
@@ -22,22 +22,20 @@ public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
   }
 
   /**
-   * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
+   * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Promise)
    */
-  @SuppressWarnings("deprecation")
   @Override
-  public void start(Future<@Nullable Void> startFuture) throws Exception {
+  public void start(Promise<@Nullable Void> startFuture) throws Exception {
     start();
     setRunning(true);
     startFuture.complete();
   }
 
   /**
-   * @see io.vertx.core.AbstractVerticle#stop(io.vertx.core.Future)
+   * @see io.vertx.core.AbstractVerticle#stop(io.vertx.core.Promise)
    */
-  @SuppressWarnings("deprecation")
   @Override
-  public void stop(Future<@Nullable Void> stopFuture) throws Exception {
+  public void stop(Promise<@Nullable Void> stopFuture) throws Exception {
     stop();
     setRunning(false);
     stopFuture.complete();

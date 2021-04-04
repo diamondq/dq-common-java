@@ -53,8 +53,8 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
   private MessageConsumer<JsonObject>     mConsumer;
 
   @SuppressWarnings("null")
-  public AbstractVerticleMicronaut(int pInstanceCount, String pName, @Nullable String pAddress,
-    Class<INTERFACE> pInterfaceClass) {
+  public AbstractVerticleMicronaut(int pInstanceCount, String pName, @Nullable
+  String pAddress, Class<INTERFACE> pInterfaceClass) {
     mInstanceCount = pInstanceCount;
     mName = pName;
     mAddress = pAddress;
@@ -130,7 +130,7 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
 
             Record record = EventBusService.createRecord(mName, address, mInterfaceClass);
             ContextExtendedCompletionStage<Record> publishedRecord =
-              VertxUtils.call(mServiceDiscovery::publish, record);
+              VertxUtils.<Record, Record> call(mServiceDiscovery::publish, record);
             return publishedRecord;
           })
 
@@ -155,14 +155,14 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
         if (mPublishedRecord != null) {
           String registrationId = mPublishedRecord.getRegistration();
           if (registrationId != null) {
-            VertxUtils.callReturnsNullable(mServiceDiscovery::unpublish, registrationId)
+            VertxUtils.<String, Void> callReturnsNullable(mServiceDiscovery::unpublish, registrationId)
 
               /* Wait for it to complete */
 
               .thenApply((v) -> {
                 ServiceBinder b = mServiceBinder;
                 if (b != null)
-                    b.unregister(mConsumer);
+                  b.unregister(mConsumer);
                 return null;
               })
 

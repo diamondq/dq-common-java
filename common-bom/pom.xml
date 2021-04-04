@@ -106,11 +106,6 @@
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
-        <artifactId>common-security.openaz</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.diamondq.common</groupId>
         <artifactId>common-servers.paxweb.jersey</artifactId>
         <version>${project.version}</version>
       </dependency>

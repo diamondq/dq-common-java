@@ -65,6 +65,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -884,7 +885,7 @@ public class ImplGenerator implements Generator {
           // } else {
           .nextControlFlow("else")
           // vertx.eventBus().send(replyAddress, r2);
-          .addStatement("vertx.eventBus().send(replyAddress, r2)")
+          .addStatement("vertx.eventBus().request(replyAddress, r2)")
           // }
           .endControlFlow()
           // } catch (RuntimeException ex3) {
@@ -1151,7 +1152,7 @@ public class ImplGenerator implements Generator {
       .returns(TypeName.VOID) //
       .addParameter(
         ParameterSpec
-          .builder(ParameterizedTypeName.get(ClassName.get(Future.class),
+          .builder(ParameterizedTypeName.get(ClassName.get(Promise.class),
             ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())), "pStopFuture")
           .build()) //
       .addException(ClassName.get(Exception.class));
@@ -1232,7 +1233,7 @@ public class ImplGenerator implements Generator {
       .returns(TypeName.VOID) //
       .addParameter(
         ParameterSpec
-          .builder(ParameterizedTypeName.get(ClassName.get(Future.class),
+          .builder(ParameterizedTypeName.get(ClassName.get(Promise.class),
             ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())), "pStartFuture")
           .build()) //
       .addException(ClassName.get(Exception.class));

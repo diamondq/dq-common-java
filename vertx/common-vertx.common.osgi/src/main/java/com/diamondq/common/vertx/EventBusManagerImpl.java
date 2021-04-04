@@ -193,7 +193,7 @@ public class EventBusManagerImpl implements EventBusManager {
     }
   }
 
-  @SuppressWarnings({"deprecation", "null"})
+  @SuppressWarnings({"null"})
   private <I, R> ContextExtendedCompletionStage<R> sendOneMessage(SendQueue sendQueue, I pToSend,
     @Nullable DeliveryOptions pDeliveryOptions) {
     try (Context ctx = mContextFactory.newContext(EventBusManagerImpl.class, this, sendQueue)) {
@@ -218,11 +218,11 @@ public class EventBusManagerImpl implements EventBusManager {
       //
       /* Send the message */
 
-      VertxUtils.<String, I, DeliveryOptions, Message<R>> call(mVertx.eventBus()::send, sendQueue.address, pToSend,
+      VertxUtils.<String, I, DeliveryOptions, Message<R>> call(mVertx.eventBus()::request, sendQueue.address, pToSend,
         options);
 
       ctx.prepareForAlternateThreads();
-      mVertx.eventBus().<Boolean> send(sendQueue.address, pToSend, options, (ar) -> {
+      mVertx.eventBus().<Boolean> request(sendQueue.address, pToSend, options, (ar) -> {
         try (Context ctx2 = ctx.activateOnThread("after Vertx.send: {}", ar)) {
           synchronized (sendQueue) {
             sendQueue.inflight--;

@@ -23,6 +23,7 @@ import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.logging.SLF4JLogDelegateFactory;
 
+@SuppressWarnings("deprecation")
 @Factory
 public class VertxFactory {
 
