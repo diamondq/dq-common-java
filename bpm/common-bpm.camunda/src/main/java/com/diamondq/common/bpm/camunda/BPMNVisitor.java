@@ -105,208 +105,210 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaValue;
 
 public interface BPMNVisitor {
 
-  public void visitActivationCondition(ActivationCondition pActivationCondition);
+  public VisitorResult visitActivationCondition(ActivationCondition pActivationCondition);
 
-  public void visitActivity(Activity pActivity);
+  public VisitorResult visitActivity(Activity pActivity);
 
-  public void visitBaseElement(BaseElement pBaseElement);
+  public VisitorResult visitBaseElement(BaseElement pBaseElement);
 
-  public void visitBoundaryEvent(BoundaryEvent pBoundaryEvent);
+  public VisitorResult visitBoundaryEvent(BoundaryEvent pBoundaryEvent);
 
-  public void visitBusinessRuleTask(BusinessRuleTask pBusinessRuleTask);
+  public VisitorResult visitBusinessRuleTask(BusinessRuleTask pBusinessRuleTask);
 
-  public void visitCallActivity(CallActivity pCallActivity);
+  public VisitorResult visitCallActivity(CallActivity pCallActivity);
 
-  public void visitCallableElement(CallableElement pCallableElement);
+  public VisitorResult visitCallableElement(CallableElement pCallableElement);
 
-  public void visitCamundaConnector(CamundaConnector pCamundaConnector);
+  public VisitorResult visitCamundaConnector(CamundaConnector pCamundaConnector);
 
-  public void visitCamundaConnectorId(CamundaConnectorId pCamundaConnectorId);
+  public VisitorResult visitCamundaConnectorId(CamundaConnectorId pCamundaConnectorId);
 
-  public void visitCamundaConstraint(CamundaConstraint pCamundaConstraint);
+  public VisitorResult visitCamundaConstraint(CamundaConstraint pCamundaConstraint);
 
-  public void visitCamundaEntry(CamundaEntry pCamundaEntry);
+  public VisitorResult visitCamundaEntry(CamundaEntry pCamundaEntry);
 
-  public void visitCamundaExecutionListener(CamundaExecutionListener pCamundaExecutionListener);
+  public VisitorResult visitCamundaExecutionListener(CamundaExecutionListener pCamundaExecutionListener);
 
-  public void visitCamundaExpression(CamundaExpression pCamundaExpression);
+  public VisitorResult visitCamundaExpression(CamundaExpression pCamundaExpression);
 
-  public void visitCamundaFailedJobRetryTimeCycle(CamundaFailedJobRetryTimeCycle pCamundaFailedJobRetryTimeCycle);
+  public VisitorResult visitCamundaFailedJobRetryTimeCycle(
+    CamundaFailedJobRetryTimeCycle pCamundaFailedJobRetryTimeCycle);
 
-  public void visitCamundaField(CamundaField pCamundaField);
+  public VisitorResult visitCamundaField(CamundaField pCamundaField);
 
-  public void visitCamundaFormData(CamundaFormData pCamundaFormData);
+  public VisitorResult visitCamundaFormData(CamundaFormData pCamundaFormData);
 
-  public void visitCamundaFormField(CamundaFormField pCamundaFormField);
+  public VisitorResult visitCamundaFormField(CamundaFormField pCamundaFormField);
 
-  public void visitCamundaFormProperty(CamundaFormProperty pCamundaFormProperty);
+  public VisitorResult visitCamundaFormProperty(CamundaFormProperty pCamundaFormProperty);
 
-  public void visitCamundaIn(CamundaIn pCamundaIn);
+  public VisitorResult visitCamundaIn(CamundaIn pCamundaIn);
 
-  public void visitCamundaInputOutput(CamundaInputOutput pCamundaInputOutput);
+  public VisitorResult visitCamundaInputOutput(CamundaInputOutput pCamundaInputOutput);
 
-  public void visitCamundaInputParameter(CamundaInputParameter pCamundaInputParameter);
+  public VisitorResult visitCamundaInputParameter(CamundaInputParameter pCamundaInputParameter);
 
-  public void visitCamundaList(CamundaList pCamundaList);
+  public VisitorResult visitCamundaList(CamundaList pCamundaList);
 
-  public void visitCamundaMap(CamundaMap pCamundaMap);
+  public VisitorResult visitCamundaMap(CamundaMap pCamundaMap);
 
-  public void visitCamundaOut(CamundaOut pCamundaOut);
+  public VisitorResult visitCamundaOut(CamundaOut pCamundaOut);
 
-  public void visitCamundaOutputParameter(CamundaOutputParameter pCamundaOutputParameter);
+  public VisitorResult visitCamundaOutputParameter(CamundaOutputParameter pCamundaOutputParameter);
 
-  public void visitCamundaPotentialStarter(CamundaPotentialStarter pCamundaPotentialStarter);
+  public VisitorResult visitCamundaPotentialStarter(CamundaPotentialStarter pCamundaPotentialStarter);
 
-  public void visitCamundaProperties(CamundaProperties pCamundaProperties);
+  public VisitorResult visitCamundaProperties(CamundaProperties pCamundaProperties);
 
-  public void visitCamundaProperty(CamundaProperty pCamundaProperty);
+  public VisitorResult visitCamundaProperty(CamundaProperty pCamundaProperty);
 
-  public void visitCamundaScript(CamundaScript pCamundaScript);
+  public VisitorResult visitCamundaScript(CamundaScript pCamundaScript);
 
-  public void visitCamundaString(CamundaString pCamundaString);
+  public VisitorResult visitCamundaString(CamundaString pCamundaString);
 
-  public void visitCamundaTaskListener(CamundaTaskListener pCamundaTaskListener);
+  public VisitorResult visitCamundaTaskListener(CamundaTaskListener pCamundaTaskListener);
 
-  public void visitCamundaValidation(CamundaValidation pCamundaValidation);
+  public VisitorResult visitCamundaValidation(CamundaValidation pCamundaValidation);
 
-  public void visitCamundaValue(CamundaValue pCamundaValue);
+  public VisitorResult visitCamundaValue(CamundaValue pCamundaValue);
 
-  public void visitCancelEventDefinition(CancelEventDefinition pCancelEventDefinition);
+  public VisitorResult visitCancelEventDefinition(CancelEventDefinition pCancelEventDefinition);
 
-  public void visitCatchEvent(CatchEvent pCatchEvent);
+  public VisitorResult visitCatchEvent(CatchEvent pCatchEvent);
 
-  public void visitCategory(Category pCategory);
+  public VisitorResult visitCategory(Category pCategory);
 
-  public void visitCollaboration(Collaboration pCollaboration);
+  public VisitorResult visitCollaboration(Collaboration pCollaboration);
 
-  public void visitCompensateEventDefinition(CompensateEventDefinition pCompensateEventDefinition);
+  public VisitorResult visitCompensateEventDefinition(CompensateEventDefinition pCompensateEventDefinition);
 
-  public void visitCompletionCondition(CompletionCondition pCompletionCondition);
+  public VisitorResult visitCompletionCondition(CompletionCondition pCompletionCondition);
 
-  public void visitComplexGateway(ComplexGateway pComplexGateway);
+  public VisitorResult visitComplexGateway(ComplexGateway pComplexGateway);
 
-  public void visitCondition(Condition pCondition);
+  public VisitorResult visitCondition(Condition pCondition);
 
-  public void visitConditionalEventDefinition(ConditionalEventDefinition pConditionalEventDefinition);
+  public VisitorResult visitConditionalEventDefinition(ConditionalEventDefinition pConditionalEventDefinition);
 
-  public void visitConditionExpression(ConditionExpression pConditionExpression);
+  public VisitorResult visitConditionExpression(ConditionExpression pConditionExpression);
 
-  public void visitCorrelationProperty(CorrelationProperty pCorrelationProperty);
+  public VisitorResult visitCorrelationProperty(CorrelationProperty pCorrelationProperty);
 
-  public void visitDataAssociation(DataAssociation pDataAssociation);
+  public VisitorResult visitDataAssociation(DataAssociation pDataAssociation);
 
-  public void visitDataObject(DataObject pDataObject);
+  public VisitorResult visitDataObject(DataObject pDataObject);
 
-  public void visitDataObjectReference(DataObjectReference pDataObjectReference);
+  public VisitorResult visitDataObjectReference(DataObjectReference pDataObjectReference);
 
-  public void visitDataStoreReference(DataStoreReference pDataStoreReference);
+  public VisitorResult visitDataStoreReference(DataStoreReference pDataStoreReference);
 
-  public void visitDataStore(DataStore pDataStore);
+  public VisitorResult visitDataStore(DataStore pDataStore);
 
-  public void visitDefinitions(Definitions pDefinitions);
+  public VisitorResult visitDefinitions(Definitions pDefinitions);
 
-  public void visitEndEvent(EndEvent pEndEvent);
+  public VisitorResult visitEndEvent(EndEvent pEndEvent);
 
-  public void visitEndPoint(EndPoint pEndPoint);
+  public VisitorResult visitEndPoint(EndPoint pEndPoint);
 
-  public void visitError(Error pError);
+  public VisitorResult visitError(Error pError);
 
-  public void visitErrorEventDefinition(ErrorEventDefinition pErrorEventDefinition);
+  public VisitorResult visitErrorEventDefinition(ErrorEventDefinition pErrorEventDefinition);
 
-  public void visitEscalation(Escalation pEscalation);
+  public VisitorResult visitEscalation(Escalation pEscalation);
 
-  public void visitEscalationEventDefinition(EscalationEventDefinition pEscalationEventDefinition);
+  public VisitorResult visitEscalationEventDefinition(EscalationEventDefinition pEscalationEventDefinition);
 
-  public void visitEvent(Event pEvent);
+  public VisitorResult visitEvent(Event pEvent);
 
-  public void visitEventBasedGateway(EventBasedGateway pEventBasedGateway);
+  public VisitorResult visitEventBasedGateway(EventBasedGateway pEventBasedGateway);
 
-  public void visitEventDefinition(EventDefinition pEventDefinition);
+  public VisitorResult visitEventDefinition(EventDefinition pEventDefinition);
 
-  public void visitExclusiveGateway(ExclusiveGateway pExclusiveGateway);
+  public VisitorResult visitExclusiveGateway(ExclusiveGateway pExclusiveGateway);
 
-  public void visitExpression(Expression pExpression);
+  public VisitorResult visitExpression(Expression pExpression);
 
-  public void visitExtensionElements(ExtensionElements pExtensionElements);
+  public VisitorResult visitExtensionElements(ExtensionElements pExtensionElements);
 
-  public void visitFlowElement(FlowElement pFlowElement);
+  public VisitorResult visitFlowElement(FlowElement pFlowElement);
 
-  public void visitFlowNode(FlowNode pFlowNode);
+  public VisitorResult visitFlowNode(FlowNode pFlowNode);
 
-  public void visitFormalExpression(FormalExpression pFormalExpression);
+  public VisitorResult visitFormalExpression(FormalExpression pFormalExpression);
 
-  public void visitGateway(Gateway pGateway);
+  public VisitorResult visitGateway(Gateway pGateway);
 
-  public void visitGlobalConversation(GlobalConversation pGlobalConversation);
+  public VisitorResult visitGlobalConversation(GlobalConversation pGlobalConversation);
 
-  public void visitInclusiveGateway(InclusiveGateway pInclusiveGateway);
+  public VisitorResult visitInclusiveGateway(InclusiveGateway pInclusiveGateway);
 
-  public void visitInterface(Interface pInterface);
+  public VisitorResult visitInterface(Interface pInterface);
 
-  public void visitIntermediateCatchEvent(IntermediateCatchEvent pIntermediateCatchEvent);
+  public VisitorResult visitIntermediateCatchEvent(IntermediateCatchEvent pIntermediateCatchEvent);
 
-  public void visitIntermediateThrowEvent(IntermediateThrowEvent pIntermediateThrowEvent);
+  public VisitorResult visitIntermediateThrowEvent(IntermediateThrowEvent pIntermediateThrowEvent);
 
-  public void visitItemAwareElement(ItemAwareElement pItemAwareElement);
+  public VisitorResult visitItemAwareElement(ItemAwareElement pItemAwareElement);
 
-  public void visitItemDefinition(ItemDefinition pItemDefinition);
+  public VisitorResult visitItemDefinition(ItemDefinition pItemDefinition);
 
-  public void visitLinkEventDefinition(LinkEventDefinition pLinkEventDefinition);
+  public VisitorResult visitLinkEventDefinition(LinkEventDefinition pLinkEventDefinition);
 
-  public void visitLoopCardinality(LoopCardinality pLoopCardinality);
+  public VisitorResult visitLoopCardinality(LoopCardinality pLoopCardinality);
 
-  public void visitLoopCharacteristics(LoopCharacteristics pLoopCharacteristics);
+  public VisitorResult visitLoopCharacteristics(LoopCharacteristics pLoopCharacteristics);
 
-  public void visitManualTask(ManualTask pManualTask);
+  public VisitorResult visitManualTask(ManualTask pManualTask);
 
-  public void visitMessageEventDefinition(MessageEventDefinition pMessageEventDefinition);
+  public VisitorResult visitMessageEventDefinition(MessageEventDefinition pMessageEventDefinition);
 
-  public void visitMessage(Message pMessage);
+  public VisitorResult visitMessage(Message pMessage);
 
-  public void visitMultiInstanceLoopCharacteristics(MultiInstanceLoopCharacteristics pMultiInstanceLoopCharacteristics);
+  public VisitorResult visitMultiInstanceLoopCharacteristics(
+    MultiInstanceLoopCharacteristics pMultiInstanceLoopCharacteristics);
 
-  public void visitParallelGateway(ParallelGateway pParallelGateway);
+  public VisitorResult visitParallelGateway(ParallelGateway pParallelGateway);
 
-  public void visitProcess(Process pProcess);
+  public VisitorResult visitProcess(Process pProcess);
 
-  public void visitReceiveTask(ReceiveTask pReceiveTask);
+  public VisitorResult visitReceiveTask(ReceiveTask pReceiveTask);
 
-  public void visitResource(Resource pResource);
+  public VisitorResult visitResource(Resource pResource);
 
-  public void visitRootElement(RootElement pRootElement);
+  public VisitorResult visitRootElement(RootElement pRootElement);
 
-  public void visitScriptTask(ScriptTask pScriptTask);
+  public VisitorResult visitScriptTask(ScriptTask pScriptTask);
 
-  public void visitSendTask(SendTask pSendTask);
+  public VisitorResult visitSendTask(SendTask pSendTask);
 
-  public void visitSequenceFlow(SequenceFlow pSequenceFlow);
+  public VisitorResult visitSequenceFlow(SequenceFlow pSequenceFlow);
 
-  public void visitServiceTask(ServiceTask pServiceTask);
+  public VisitorResult visitServiceTask(ServiceTask pServiceTask);
 
-  public void visitSignal(Signal pSignal);
+  public VisitorResult visitSignal(Signal pSignal);
 
-  public void visitSignalEventDefinition(SignalEventDefinition pSignalEventDefinition);
+  public VisitorResult visitSignalEventDefinition(SignalEventDefinition pSignalEventDefinition);
 
-  public void visitStartEvent(StartEvent pStartEvent);
+  public VisitorResult visitStartEvent(StartEvent pStartEvent);
 
-  public void visitSubProcess(SubProcess pSubProcess);
+  public VisitorResult visitSubProcess(SubProcess pSubProcess);
 
-  public void visitTask(Task pTask);
+  public VisitorResult visitTask(Task pTask);
 
-  public void visitTerminateEventDefinition(TerminateEventDefinition pTerminateEventDefinition);
+  public VisitorResult visitTerminateEventDefinition(TerminateEventDefinition pTerminateEventDefinition);
 
-  public void visitThrowEvent(ThrowEvent pThrowEvent);
+  public VisitorResult visitThrowEvent(ThrowEvent pThrowEvent);
 
-  public void visitTimeCycle(TimeCycle pTimeCycle);
+  public VisitorResult visitTimeCycle(TimeCycle pTimeCycle);
 
-  public void visitTimeDate(TimeDate pTimeDate);
+  public VisitorResult visitTimeDate(TimeDate pTimeDate);
 
-  public void visitTimeDuration(TimeDuration pTimeDuration);
+  public VisitorResult visitTimeDuration(TimeDuration pTimeDuration);
 
-  public void visitTimerEventDefinition(TimerEventDefinition pTimerEventDefinition);
+  public VisitorResult visitTimerEventDefinition(TimerEventDefinition pTimerEventDefinition);
 
-  public void visitTransaction(Transaction pTransaction);
+  public VisitorResult visitTransaction(Transaction pTransaction);
 
-  public void visitUserTask(UserTask pUserTask);
+  public VisitorResult visitUserTask(UserTask pUserTask);
 
 }
