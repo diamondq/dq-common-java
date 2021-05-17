@@ -44,7 +44,7 @@ public class TestBasicConverter {
   private static class ListLongConverter extends AbstractConverter<List<Long>, String> {
 
     public ListLongConverter() {
-      super(Types.LIST_LONG, Long.class);
+      super(Types.LIST_LONG, String.class);
     }
 
     @Override
