@@ -1,12 +1,28 @@
 package com.diamondq.common.converters;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.lang.reflect.Type;
 
-public interface Converter {
+public interface Converter<I, O> {
 
-  public Class<?> getInputClass();
+  /**
+   * Returns the type (Class, ParameterizedType, etc) that this convert takes as an input
+   * 
+   * @return the input type
+   */
+  public Type getInputType();
 
-  public Class<?> getOutputClass();
+  /**
+   * Returns the type (Class, ParameterizedType, etc) that this convert returns as an output
+   * 
+   * @return the output type
+   */
+  public Type getOutputType();
 
-  public @Nullable Object convert(Object pInput);
+  /**
+   * Converts an input to an output
+   * 
+   * @param pInput the input
+   * @return the output
+   */
+  public O convert(I pInput);
 }

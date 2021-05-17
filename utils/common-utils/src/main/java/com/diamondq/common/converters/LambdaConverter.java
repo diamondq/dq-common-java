@@ -1,11 +1,9 @@
 package com.diamondq.common.converters;
 
+import java.lang.reflect.Type;
 import java.util.function.Function;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-public class LambdaConverter<@NonNull I, O> extends AbstractConverter<I, O> {
+public class LambdaConverter<I, O> extends AbstractConverter<I, O> {
 
   protected final Function<I, O> mConverter;
 
@@ -14,15 +12,21 @@ public class LambdaConverter<@NonNull I, O> extends AbstractConverter<I, O> {
     mConverter = pConverter;
   }
 
+  public LambdaConverter(Type pInputClass, Type pOutputClass, Function<I, O> pConverter) {
+    super(pInputClass, pOutputClass);
+    mConverter = pConverter;
+  }
+
   /**
    * @see com.diamondq.common.converters.Converter#convert(java.lang.Object)
    */
   @Override
-  public @Nullable Object convert(Object pInput) {
-    if (mInputClass.isInstance(pInput) == false)
-      throw new IllegalArgumentException();
-    @SuppressWarnings("unchecked")
-    I input = (I) pInput;
-    return mConverter.apply(input);
+  public O convert(I pInput) {
+    if (mInputType instanceof Class)
+      if (((Class<?>) mInputType).isInstance(pInput) == false)
+        throw new IllegalArgumentException(
+          "The input which is a " + (pInput == null ? "(null)" : pInput.getClass().toString())
+            + " was expected to be a " + mInputType.toString());
+    return mConverter.apply(pInput);
   }
 }

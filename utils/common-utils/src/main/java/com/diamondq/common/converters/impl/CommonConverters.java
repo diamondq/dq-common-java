@@ -14,7 +14,7 @@ import io.micronaut.context.annotation.Factory;
 public class CommonConverters {
 
   @Singleton
-  public Converter getStringToPathConverter() {
+  public Converter<?, ?> getStringToPathConverter() {
     return new LambdaConverter<>(String.class, Path.class, (path) -> Paths.get(path));
   }
 }

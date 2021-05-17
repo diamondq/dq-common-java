@@ -14,12 +14,14 @@ import javax.enterprise.inject.spi.BeanManager;
 public class CDIConverterInjector {
 
   @Produces
-  public List<Converter> getProducers(BeanManager pBeanManager) {
+  public List<Converter<?, ?>> getProducers(BeanManager pBeanManager) {
     // @SuppressWarnings({"cast", "rawtypes", "unchecked"})
     // Set<Bean<Converter<?, ?>>> beans = (Set<Bean<Converter<?, ?>>>) (Set) pBeanManager.getBeans(Converter.class);
-    List<Converter> result = new ArrayList<>();
-    Instance<Converter> instance = pBeanManager.createInstance().select(Converter.class);
-    for (Converter converter : instance)
+    List<Converter<?, ?>> result = new ArrayList<>();
+    @SuppressWarnings({"cast", "unchecked", "rawtypes"})
+    Instance<Converter<?, ?>> instance =
+      (Instance<Converter<?, ?>>) (Instance) pBeanManager.createInstance().select(Converter.class);
+    for (Converter<?, ?> converter : instance)
       result.add(converter);
     // for (Bean<Converter<?, ?>> bean : beans) {
     // Converter<?,?> c = bean.create(creationalContext);
