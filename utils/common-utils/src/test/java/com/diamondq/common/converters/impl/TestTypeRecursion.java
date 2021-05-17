@@ -46,7 +46,8 @@ public class TestTypeRecursion {
 
     set = new LinkedHashSet<>();
     converterManager.calculateTypes(Types.MAP_STRING_TO_STRING, set);
-    assertArrayEquals(new String[] {"java.util.Map<java.lang.String, java.lang.String>", "java.util.Map<?, ?>"}, setToArray(set));
+    assertArrayEquals(new String[] {"java.util.Map<java.lang.String, java.lang.String>", "java.util.Map<?, ?>"},
+      setToArray(set));
   }
 
   @Test
@@ -54,9 +55,8 @@ public class TestTypeRecursion {
     LinkedHashSet<Type> set = new LinkedHashSet<>();
     converterManager.calculateTypes(new TypeReference<StringMap>() {
     }.getType(), set);
-    printSet(set);
     assertArrayEquals(new String[] {"com.diamondq.common.converters.impl.StringMap",
-        "java.util.Map<java.lang.String, java.lang.String>"},
+        "java.util.Map<java.lang.String, java.lang.String>", "java.util.Map<?, ?>"},
       setToArray(set));
   }
 
@@ -65,8 +65,10 @@ public class TestTypeRecursion {
     LinkedHashSet<Type> set = new LinkedHashSet<>();
     converterManager.calculateTypes(new TypeReference<WildcardMap<String, O>>() {
     }.getType(), set);
-    assertArrayEquals(new String[] {"com.diamondq.common.converters.impl.WildcardMap<java.lang.String, O>",
-        "java.util.Map<java.lang.String, O>"},
+    printSet(set);
+    assertArrayEquals(new String[] {"com.diamondq.common.converters.impl.WildcardMap<java.lang.String, ?>",
+        "java.util.Map<java.lang.String, ?>", "com.diamondq.common.converters.impl.WildcardMap<?, ?>",
+        "java.util.Map<?, ?>"},
       setToArray(set));
   }
 
@@ -74,9 +76,7 @@ public class TestTypeRecursion {
   public <O> void testNonGeneric() {
     LinkedHashSet<Type> set = new LinkedHashSet<>();
     converterManager.calculateTypes(List.class, set);
-    // printSet(set);
-    // assertArrayEquals(new String[] {"com.diamondq.common.converters.impl.WildcardMap<java.lang.String, O>",
-    // "java.util.Map<java.lang.String, O>"},
-    // setToArray(set));
+    assertArrayEquals(new String[] {"java.util.List<?>", "java.util.Collection<?>", "java.lang.Iterable<?>"},
+      setToArray(set));
   }
 }

@@ -5,9 +5,11 @@ import com.diamondq.common.converters.Converter;
 import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.googlecode.gentyref.GenericTypeReflector;
+import com.googlecode.gentyref.TypeFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -120,6 +122,54 @@ public class ConverterManagerImpl implements ConverterManager {
   }
 
   void calculateTypes(Type pType, LinkedHashSet<Type> pSet) {
+
+    /* If we start off with a Class, then see if it's a raw class, and if so, add the wildcard parameters */
+
+    if (pType instanceof Class)
+      pType = Objects.requireNonNull(GenericTypeReflector.addWildcardParameters((Class<?>) pType));
+
+    /* If we have a ParameterizedType, see if any are TypeVariables */
+
+    if (pType instanceof ParameterizedType) {
+      ParameterizedType pt = (ParameterizedType) pType;
+      Type rawType = pt.getRawType();
+      if (rawType instanceof Class) {
+
+        @NonNull
+        Type[] typeArgs = pt.getActualTypeArguments();
+        int typeArgsLen = typeArgs.length;
+        boolean changed = false;
+        if (typeArgsLen > 0)
+          for (int i = 0; i < typeArgsLen; i++) {
+            if (typeArgs[i] instanceof TypeVariable) {
+              TypeVariable<?> tv = (TypeVariable<?>) typeArgs[i];
+              Type[] bounds = tv.getBounds();
+
+              /*
+               * NOTE: There's currently a limitation in the Gentyref code that doesn't have a public accessor to create
+               * Wildcards that extend multiple bounds
+               */
+
+              if (bounds.length > 1)
+                throw new UnsupportedOperationException();
+
+              for (Type bound : bounds) {
+                if (bound.equals(Object.class) == false) {
+                  changed = true;
+                  typeArgs[i] = TypeFactory.wildcardExtends(bound);
+                }
+                else {
+                  changed = true;
+                  typeArgs[i] = TypeFactory.unboundWildcard();
+                }
+              }
+            }
+          }
+        if (changed == true)
+          pType = TypeFactory.parameterizedClass((Class<?>) rawType, typeArgs);
+      }
+    }
+
     LinkedHashSet<Class<?>> rawTypes = new LinkedHashSet<>();
     recurseType(pType, pSet, rawTypes);
 
@@ -127,15 +177,13 @@ public class ConverterManagerImpl implements ConverterManager {
 
     LinkedHashSet<Class<?>> ignored = new LinkedHashSet<>();
     for (Class<?> rawClass : rawTypes) {
-      Type wildRawType = Objects.requireNonNull(GenericTypeReflector.addWildcardParameters(rawClass));
+      Type wildRawType = GenericTypeReflector.addWildcardParameters(rawClass);
       if (pSet.contains(wildRawType) == false)
         recurseType(wildRawType, pSet, ignored);
     }
   }
 
   private void recurseType(Type pType, LinkedHashSet<Type> pSet, LinkedHashSet<Class<?>> pRawTypes) {
-    if (pType instanceof Class)
-      pType = Objects.requireNonNull(GenericTypeReflector.addWildcardParameters((Class<?>) pType));
     pSet.add(pType);
     if (pType instanceof Class) {
       Class<?> clazz = (Class<?>) pType;
