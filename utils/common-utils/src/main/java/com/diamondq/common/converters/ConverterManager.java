@@ -3,13 +3,18 @@ package com.diamondq.common.converters;
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ConverterManager {
-  
+
   public void addConverter(Converter<?, ?> pConverter);
+
+  public Collection<Converter<?, ?>> getConvertersByOutput(Type pOutputType);
+
+  public Collection<Converter<?, ?>> getConvertersByInput(Type pInputType);
 
   /**
    * Converts an output from an input type to an output type
@@ -27,4 +32,9 @@ public interface ConverterManager {
   public <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType);
 
   public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pInputType, Type pOutputType);
+
+  public <@NonNull I, @NonNull O> O convert(I pInput, Type pOutputType);
+
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pOutputType);
+
 }

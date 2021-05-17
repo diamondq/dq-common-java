@@ -206,6 +206,11 @@
         <version>2.2.7</version>
       </dependency>
       <dependency>
+        <groupId>com.googlecode.gentyref</groupId>
+        <artifactId>gentyref</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <dependency>
         <groupId>com.diamondq.common</groupId>
         <artifactId>common-bom</artifactId>
         <version>${project.version}</version>
