@@ -1,8 +1,8 @@
 package com.diamondq.common.converters;
 
+import com.diamondq.common.TypeReference;
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -12,9 +12,9 @@ public interface ConverterManager {
 
   public void addConverter(Converter<?, ?> pConverter);
 
-  public Collection<Converter<?, ?>> getConvertersByOutput(Type pOutputType);
+  public <O> Collection<Converter<?, O>> getConvertersByOutput(TypeReference<O> pOutputType);
 
-  public Collection<Converter<?, ?>> getConvertersByInput(Type pInputType);
+  public <I> Collection<Converter<I, ?>> getConvertersByInput(TypeReference<I> pInputType);
 
   /**
    * Converts an output from an input type to an output type
@@ -29,12 +29,13 @@ public interface ConverterManager {
 
   public <@Nullable I, @Nullable O> O convertNullable(I pInput, Class<O> pOutputClass);
 
-  public <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType);
+  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType);
 
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pInputType, Type pOutputType);
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<I> pInputType,
+    TypeReference<O> pOutputType);
 
-  public <@NonNull I, @NonNull O> O convert(I pInput, Type pOutputType);
+  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<O> pOutputType);
 
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pOutputType);
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<O> pOutputType);
 
 }

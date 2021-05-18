@@ -24,7 +24,11 @@ import java.lang.reflect.Type;
  * @param <T> the type to capture
  */
 public abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
-  protected final Type _type;
+  protected final Type mType;
+
+  protected TypeReference(Type pType) {
+    mType = pType;
+  }
 
   protected TypeReference() {
     Type superClass = getClass().getGenericSuperclass();
@@ -39,11 +43,21 @@ public abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
      * specific case when we know an actual use case, and thereby suitable workarounds for valid case(s) and/or error to
      * throw on invalid one(s).
      */
-    _type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
+    mType = ((ParameterizedType) superClass).getActualTypeArguments()[0];
   }
 
   public Type getType() {
-    return _type;
+    return mType;
+  }
+
+  private static class SimpleTypeReference<C> extends TypeReference<C> {
+    public SimpleTypeReference(Class<C> pClass) {
+      super(pClass);
+    }
+  }
+
+  public static <C> TypeReference<C> of(Class<C> pClass) {
+    return new SimpleTypeReference<C>(pClass);
   }
 
   /**

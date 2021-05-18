@@ -1,6 +1,7 @@
 package com.diamondq.common.converters;
 
-import java.lang.reflect.Type;
+import com.diamondq.common.TypeReference;
+
 import java.util.function.Function;
 
 public class LambdaConverter<I, O> extends AbstractConverter<I, O> {
@@ -12,7 +13,7 @@ public class LambdaConverter<I, O> extends AbstractConverter<I, O> {
     mConverter = pConverter;
   }
 
-  public LambdaConverter(Type pInputClass, Type pOutputClass, Function<I, O> pConverter) {
+  public LambdaConverter(TypeReference<I> pInputClass, TypeReference<O> pOutputClass, Function<I, O> pConverter) {
     super(pInputClass, pOutputClass);
     mConverter = pConverter;
   }

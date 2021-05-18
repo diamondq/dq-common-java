@@ -1,5 +1,7 @@
 package com.diamondq.common.converters;
 
+import com.diamondq.common.TypeReference;
+
 import java.lang.reflect.Type;
 
 public abstract class AbstractConverter<I, O> implements Converter<I, O> {
@@ -13,9 +15,9 @@ public abstract class AbstractConverter<I, O> implements Converter<I, O> {
     mOutputType = pOutputClass;
   }
 
-  protected AbstractConverter(Type pInputType, Type pOutputType) {
-    mInputType = pInputType;
-    mOutputType = pOutputType;
+  protected AbstractConverter(TypeReference<I> pInputType, TypeReference<O> pOutputType) {
+    mInputType = pInputType.getType();
+    mOutputType = pOutputType.getType();
   }
 
   /**

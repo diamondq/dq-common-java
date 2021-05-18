@@ -1,5 +1,6 @@
 package com.diamondq.common.converters.impl;
 
+import com.diamondq.common.TypeReference;
 import com.diamondq.common.UtilMessages;
 import com.diamondq.common.converters.Converter;
 import com.diamondq.common.converters.ConverterManager;
@@ -94,29 +95,37 @@ public class ConverterManagerImpl implements ConverterManager {
   }
 
   /**
-   * @see com.diamondq.common.converters.ConverterManager#getConvertersByInput(java.lang.reflect.Type)
+   * @see com.diamondq.common.converters.ConverterManager#getConvertersByInput(com.diamondq.common.TypeReference)
    */
   @Override
-  public Collection<Converter<?, ?>> getConvertersByInput(Type pInputType) {
-    List<Converter<?, ?>> result = new ArrayList<>();
+  public <I> Collection<Converter<I, ?>> getConvertersByInput(TypeReference<I> pInputType) {
+    List<Converter<I, ?>> result = new ArrayList<>();
+    Type testType = pInputType.getType();
     for (Map.Entry<TypePair, Converter<?, ?>> pair : mConvertersByType.entrySet()) {
       TypePair key = pair.getKey();
-      if (key.inputType.equals(pInputType))
-        result.add(pair.getValue());
+      if (key.inputType.equals(testType)) {
+        @SuppressWarnings("unchecked")
+        Converter<I, ?> c = (Converter<I, ?>) pair.getValue();
+        result.add(c);
+      }
     }
     return result;
   }
 
   /**
-   * @see com.diamondq.common.converters.ConverterManager#getConvertersByOutput(java.lang.reflect.Type)
+   * @see com.diamondq.common.converters.ConverterManager#getConvertersByOutput(com.diamondq.common.TypeReference)
    */
   @Override
-  public Collection<Converter<?, ?>> getConvertersByOutput(Type pOutputType) {
-    List<Converter<?, ?>> result = new ArrayList<>();
+  public <O> Collection<Converter<?, O>> getConvertersByOutput(TypeReference<O> pOutputType) {
+    List<Converter<?, O>> result = new ArrayList<>();
+    Type testType = pOutputType.getType();
     for (Map.Entry<TypePair, Converter<?, ?>> pair : mConvertersByType.entrySet()) {
       TypePair key = pair.getKey();
-      if (key.outputType.equals(pOutputType))
-        result.add(pair.getValue());
+      if (key.outputType.equals(testType)) {
+        @SuppressWarnings("unchecked")
+        Converter<?, O> c = (Converter<?, O>) pair.getValue();
+        result.add(c);
+      }
     }
     return result;
   }
@@ -246,40 +255,46 @@ public class ConverterManagerImpl implements ConverterManager {
   }
 
   /**
-   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object, java.lang.reflect.Type,
-   *      java.lang.reflect.Type)
+   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object,
+   *      com.diamondq.common.TypeReference, com.diamondq.common.TypeReference)
    */
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pInputType, Type pOutputType) {
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<I> pInputType,
+    TypeReference<O> pOutputType) {
     if (pInput == null)
       return null;
-    return convert(pInput, pInputType, pOutputType);
+    return convert(pInput, pInputType.getType(), pOutputType.getType());
   }
 
   /**
-   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, java.lang.reflect.Type)
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, com.diamondq.common.TypeReference)
    */
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, Type pOutputType) {
-    return convert(pInput, pInput.getClass(), pOutputType);
+  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<O> pOutputType) {
+    return convert(pInput, pInput.getClass(), pOutputType.getType());
   }
 
   /**
-   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object, java.lang.reflect.Type)
+   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object,
+   *      com.diamondq.common.TypeReference)
    */
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pOutputType) {
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<O> pOutputType) {
     if (pInput == null)
       return null;
-    return convert(pInput, pInput.getClass(), pOutputType);
+    return convert(pInput, pInput.getClass(), pOutputType.getType());
   }
 
   /**
-   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, java.lang.reflect.Type,
-   *      java.lang.reflect.Type)
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, com.diamondq.common.TypeReference,
+   *      com.diamondq.common.TypeReference)
    */
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType) {
+  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType) {
+    return convert(pInput, pInputType.getType(), pOutputType.getType());
+  }
+
+  private <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType) {
     assert pInput != null;
     assert pInputType != null;
     assert pOutputType != null;

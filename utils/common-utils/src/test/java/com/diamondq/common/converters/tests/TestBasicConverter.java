@@ -32,7 +32,7 @@ public class TestBasicConverter {
   private static class ListStringConverter extends AbstractConverter<List<String>, String> {
 
     public ListStringConverter() {
-      super(Types.LIST_STRING, String.class);
+      super(Types.LIST_STRING, Types.STRING);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TestBasicConverter {
   private static class ListLongConverter extends AbstractConverter<List<Long>, String> {
 
     public ListLongConverter() {
-      super(Types.LIST_LONG, String.class);
+      super(Types.LIST_LONG, Types.STRING);
     }
 
     @Override
@@ -66,9 +66,9 @@ public class TestBasicConverter {
     ll.add(1L);
     ll.add(2L);
     ll.add(3L);
-    String str1 = converterManager.convert(ls, Types.LIST_STRING, String.class);
+    String str1 = converterManager.convert(ls, Types.LIST_STRING, Types.STRING);
     assertEquals("a,b,c", str1);
-    String str2 = converterManager.convert(ll, Types.LIST_LONG, String.class);
+    String str2 = converterManager.convert(ll, Types.LIST_LONG, Types.STRING);
     assertEquals("1,2,3", str2);
   }
 
