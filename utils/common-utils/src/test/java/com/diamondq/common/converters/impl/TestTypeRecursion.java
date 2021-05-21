@@ -38,14 +38,14 @@ public class TestTypeRecursion {
   @Test
   public void testSimple() {
     LinkedHashSet<Type> set = new LinkedHashSet<>();
-    converterManager.calculateTypes(Types.LIST_STRING.getType(), set);
+    converterManager.calculateTypes(Types.LIST_OF_STRING.getType(), set);
     assertArrayEquals(new String[] {"java.util.List<java.lang.String>", "java.util.Collection<java.lang.String>",
         "java.lang.Iterable<java.lang.String>", "java.util.List<?>", "java.util.Collection<?>",
         "java.lang.Iterable<?>"},
       setToArray(set));
 
     set = new LinkedHashSet<>();
-    converterManager.calculateTypes(Types.MAP_STRING_TO_STRING.getType(), set);
+    converterManager.calculateTypes(Types.MAP_OF_STRING_TO_STRING.getType(), set);
     assertArrayEquals(new String[] {"java.util.Map<java.lang.String, java.lang.String>", "java.util.Map<?, ?>"},
       setToArray(set));
   }
