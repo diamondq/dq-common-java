@@ -30,11 +30,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class ConverterManagerImpl implements ConverterManager {
 
   private static class TypePair {
-    public final Type inputType;
+    public final @Nullable String groupName;
 
-    public final Type outputType;
+    public final Type             inputType;
 
-    public TypePair(Type pInputType, Type pOutputType) {
+    public final Type             outputType;
+
+    public TypePair(@Nullable String pGroupName, Type pInputType, Type pOutputType) {
+      groupName = pGroupName;
       inputType = pInputType;
       outputType = pOutputType;
     }
@@ -44,7 +47,7 @@ public class ConverterManagerImpl implements ConverterManager {
      */
     @Override
     public int hashCode() {
-      return Objects.hash(inputType, outputType);
+      return Objects.hash(groupName, inputType, outputType);
     }
 
     /**
@@ -59,6 +62,8 @@ public class ConverterManagerImpl implements ConverterManager {
       if (getClass() != pObj.getClass())
         return false;
       TypePair pOther = (TypePair) pObj;
+      if (Objects.equals(groupName, pOther.groupName) == false)
+        return false;
       if (Objects.equals(inputType, pOther.inputType) == false)
         return false;
       if (Objects.equals(outputType, pOther.outputType) == false)
@@ -83,14 +88,16 @@ public class ConverterManagerImpl implements ConverterManager {
   @Inject
   public ConverterManagerImpl(List<Converter<?, ?>> pConverters) {
     for (Converter<?, ?> pConverter : pConverters) {
-      mConvertersByType.put(new TypePair(pConverter.getInputType(), pConverter.getOutputType()), pConverter);
+      mConvertersByType.put(
+        new TypePair(pConverter.getGroupName(), pConverter.getInputType(), pConverter.getOutputType()), pConverter);
     }
     mShortcuts.clear();
   }
 
   @Override
   public void addConverter(Converter<?, ?> pConverter) {
-    mConvertersByType.put(new TypePair(pConverter.getInputType(), pConverter.getOutputType()), pConverter);
+    mConvertersByType
+      .put(new TypePair(pConverter.getGroupName(), pConverter.getInputType(), pConverter.getOutputType()), pConverter);
     mShortcuts.clear();
   }
 
@@ -242,7 +249,18 @@ public class ConverterManagerImpl implements ConverterManager {
   public <@Nullable I, @Nullable O> O convertNullable(I pInput, Class<O> pOutputClass) {
     if (pInput == null)
       return null;
-    return convert(pInput, pInput.getClass(), pOutputClass);
+    return convert(pInput, pInput.getClass(), pOutputClass, null);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object, java.lang.Class,
+   *      java.lang.String)
+   */
+  @Override
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Class<O> pOutputClass, @Nullable String pGroupName) {
+    if (pInput == null)
+      return null;
+    return convert(pInput, pInput.getClass(), pOutputClass, pGroupName);
   }
 
   /**
@@ -251,7 +269,16 @@ public class ConverterManagerImpl implements ConverterManager {
   @Override
   public <@NonNull I, @NonNull O> O convert(I pInput, Class<O> pOutputClass) {
     assert pInput != null;
-    return convert(pInput, pInput.getClass(), pOutputClass);
+    return convert(pInput, pInput.getClass(), pOutputClass, null);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, java.lang.Class, java.lang.String)
+   */
+  @Override
+  public <@NonNull I, @NonNull O> O convert(I pInput, Class<O> pOutputClass, @Nullable String pGroupName) {
+    assert pInput != null;
+    return convert(pInput, pInput.getClass(), pOutputClass, pGroupName);
   }
 
   /**
@@ -263,7 +290,19 @@ public class ConverterManagerImpl implements ConverterManager {
     TypeReference<O> pOutputType) {
     if (pInput == null)
       return null;
-    return convert(pInput, pInputType.getType(), pOutputType.getType());
+    return convert(pInput, pInputType.getType(), pOutputType.getType(), null);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object,
+   *      com.diamondq.common.TypeReference, com.diamondq.common.TypeReference, java.lang.String)
+   */
+  @Override
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<I> pInputType,
+    TypeReference<O> pOutputType, @Nullable String pGroupName) {
+    if (pInput == null)
+      return null;
+    return convert(pInput, pInputType.getType(), pOutputType.getType(), pGroupName);
   }
 
   /**
@@ -271,7 +310,17 @@ public class ConverterManagerImpl implements ConverterManager {
    */
   @Override
   public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<O> pOutputType) {
-    return convert(pInput, pInput.getClass(), pOutputType.getType());
+    return convert(pInput, pInput.getClass(), pOutputType.getType(), null);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, com.diamondq.common.TypeReference,
+   *      com.diamondq.common.TypeReference, java.lang.String)
+   */
+  @Override
+  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<I> pInputType,
+    TypeReference<@NonNull O> pOutputType, @Nullable String pGroupName) {
+    return convert(pInput, pInput.getClass(), pOutputType.getType(), pGroupName);
   }
 
   /**
@@ -282,7 +331,24 @@ public class ConverterManagerImpl implements ConverterManager {
   public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<O> pOutputType) {
     if (pInput == null)
       return null;
-    return convert(pInput, pInput.getClass(), pOutputType.getType());
+    return convert(pInput, pInput.getClass(), pOutputType.getType(), null);
+  }
+
+  @Override
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<O> pOutputType,
+    @Nullable String pGroupName) {
+    if (pInput == null)
+      return null;
+    return convert(pInput, pInput.getClass(), pOutputType.getType(), pGroupName);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, com.diamondq.common.TypeReference,
+   *      java.lang.String)
+   */
+  @Override
+  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<O> pOutputType, @Nullable String pGroupName) {
+    return convert(pInput, pInput.getClass(), pOutputType.getType(), pGroupName);
   }
 
   /**
@@ -291,14 +357,14 @@ public class ConverterManagerImpl implements ConverterManager {
    */
   @Override
   public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType) {
-    return convert(pInput, pInputType.getType(), pOutputType.getType());
+    return convert(pInput, pInputType.getType(), pOutputType.getType(), null);
   }
 
-  private <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType) {
+  private <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType, @Nullable String pGroupName) {
     assert pInput != null;
     assert pInputType != null;
     assert pOutputType != null;
-    TypePair inputTypePair = new TypePair(pInputType, pOutputType);
+    TypePair inputTypePair = new TypePair(pGroupName, pInputType, pOutputType);
     TypePair matchClass = mShortcuts.get(inputTypePair);
     if (matchClass == null) {
 
@@ -310,22 +376,32 @@ public class ConverterManagerImpl implements ConverterManager {
       /* Now test each class in order, to find the first matching converter */
 
       for (Type testType2 : testClasses) {
-        TypePair testPair = new TypePair(testType2, pOutputType);
+        TypePair testPair = new TypePair(pGroupName, testType2, pOutputType);
         if (mConvertersByType.containsKey(testPair) == true) {
           matchClass = testPair;
           mShortcuts.put(inputTypePair, testPair);
           break;
         }
       }
-      if (matchClass == null)
-        throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, pInputType.getTypeName(),
-          pOutputType.getTypeName());
+      if (matchClass == null) {
+        if (pGroupName != null)
+          throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH_WITH_GROUP,
+            pInputType.getTypeName(), pOutputType.getTypeName(), pGroupName);
+        else
+          throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, pInputType.getTypeName(),
+            pOutputType.getTypeName());
+      }
     }
     @SuppressWarnings("unchecked")
     Converter<I, O> converter = (Converter<I, O>) mConvertersByType.get(matchClass);
-    if (converter == null)
-      throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, pInputType.getTypeName(),
-        pOutputType.getTypeName());
+    if (converter == null) {
+      if (pGroupName != null)
+        throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH_WITH_GROUP,
+          pInputType.getTypeName(), pOutputType.getTypeName(), pGroupName);
+      else
+        throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, pInputType.getTypeName(),
+          pOutputType.getTypeName());
+    }
     O result = converter.convert(pInput);
     if (pOutputType instanceof Class) {
       if (((Class<?>) pOutputType).isInstance(result) == false)

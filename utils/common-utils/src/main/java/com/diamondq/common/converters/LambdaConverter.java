@@ -9,12 +9,12 @@ public class LambdaConverter<I, O> extends AbstractConverter<I, O> {
   protected final Function<I, O> mConverter;
 
   public LambdaConverter(Class<I> pInputClass, Class<O> pOutputClass, Function<I, O> pConverter) {
-    super(pInputClass, pOutputClass);
+    super(pInputClass, pOutputClass, null);
     mConverter = pConverter;
   }
 
   public LambdaConverter(TypeReference<I> pInputClass, TypeReference<O> pOutputClass, Function<I, O> pConverter) {
-    super(pInputClass, pOutputClass);
+    super(pInputClass, pOutputClass, null);
     mConverter = pConverter;
   }
 

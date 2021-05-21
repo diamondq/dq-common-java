@@ -27,15 +27,30 @@ public interface ConverterManager {
    */
   public <@NonNull I, @NonNull O> @NonNull O convert(I pInput, Class<O> pOutputClass);
 
+  public <@NonNull I, @NonNull O> @NonNull O convert(I pInput, Class<O> pOutputClass, @Nullable String pGroupName);
+
   public <@Nullable I, @Nullable O> O convertNullable(I pInput, Class<O> pOutputClass);
 
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Class<O> pOutputClass, @Nullable String pGroupName);
+
   public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType);
+
+  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType,
+    @Nullable String pGroupName);
 
   public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<I> pInputType,
     TypeReference<O> pOutputType);
 
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<I> pInputType,
+    TypeReference<O> pOutputType, @Nullable String pGroupName);
+
   public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<O> pOutputType);
 
+  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<O> pOutputType, @Nullable String pGroupName);
+
   public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<O> pOutputType);
+
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<O> pOutputType,
+    @Nullable String pGroupName);
 
 }
