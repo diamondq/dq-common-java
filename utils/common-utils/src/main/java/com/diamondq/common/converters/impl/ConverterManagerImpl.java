@@ -370,13 +370,13 @@ public class ConverterManagerImpl implements ConverterManager {
 
       /* Build the full set of possible classes */
 
-      LinkedHashSet<Type> testClasses = new LinkedHashSet<>();
-      calculateTypes(pInputType, testClasses);
+      LinkedHashSet<Type> testInputClasses = new LinkedHashSet<>();
+      calculateTypes(pInputType, testInputClasses);
 
       /* Now test each class in order, to find the first matching converter */
 
-      for (Type testType2 : testClasses) {
-        TypePair testPair = new TypePair(pGroupName, testType2, pOutputType);
+      for (Type testInputType : testInputClasses) {
+        TypePair testPair = new TypePair(pGroupName, testInputType, pOutputType);
         if (mConvertersByType.containsKey(testPair) == true) {
           matchClass = testPair;
           mShortcuts.put(inputTypePair, testPair);
@@ -384,12 +384,32 @@ public class ConverterManagerImpl implements ConverterManager {
         }
       }
       if (matchClass == null) {
-        if (pGroupName != null)
-          throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH_WITH_GROUP,
-            pInputType.getTypeName(), pOutputType.getTypeName(), pGroupName);
-        else
-          throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, pInputType.getTypeName(),
-            pOutputType.getTypeName());
+
+        /* Attempt a second expansion of the output */
+
+        LinkedHashSet<Type> testOutputClasses = new LinkedHashSet<>();
+        calculateTypes(pOutputType, testOutputClasses);
+
+        /* Now test each class in order, to find the first matching converter */
+
+        OUTERTEST: for (Type testInputType : testInputClasses) {
+          for (Type testOutputType : testOutputClasses) {
+            TypePair testPair = new TypePair(pGroupName, testInputType, testOutputType);
+            if (mConvertersByType.containsKey(testPair) == true) {
+              matchClass = testPair;
+              mShortcuts.put(inputTypePair, testPair);
+              break OUTERTEST;
+            }
+          }
+        }
+        if (matchClass == null) {
+          if (pGroupName != null)
+            throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH_WITH_GROUP,
+              pInputType.getTypeName(), pOutputType.getTypeName(), pGroupName);
+          else
+            throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, pInputType.getTypeName(),
+              pOutputType.getTypeName());
+        }
       }
     }
     @SuppressWarnings("unchecked")
