@@ -246,6 +246,7 @@ public class HistoricalVariableDto {
     rootProcessInstanceId = pRootProcessInstanceId;
   }
 
+  @JsonCreator
   public HistoricalVariableDto(@JsonProperty("id")
   @Nullable Object pId,
     @JsonProperty("name")
@@ -309,18 +310,6 @@ public class HistoricalVariableDto {
     createTime = pCreateTime;
     removalTime = pRemovalTime;
     rootProcessInstanceId = pRootProcessInstanceId;
-  }
-
-  @JsonCreator
-  public HistoricalVariableDto(@JsonProperty("value")
-  @Nullable Object pValue,
-    @JsonProperty("type")
-    @Nullable String pType,
-    @JsonProperty("valueInfo")
-    @Nullable Map<String, Object> pValueInfo) {
-    value = pValue;
-    type = pType;
-    valueInfo = pValueInfo;
   }
 
   @Override
