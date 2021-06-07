@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 {{#useBeanValidation}}import javax.validation.constraints.*;
 import javax.validation.Valid;
-import javax.annotation.Nullable;{{/useBeanValidation}}
+import io.micronaut.core.annotation.Nullable;{{/useBeanValidation}}
 import com.diamondq.common.injection.micronaut.auth.AuthInfo;
 
 @Client(id="{{serviceDiscoveryId}}", path="{{contextPath}}/{{{baseName}}}"){{#useSwaggerAnnotations}}

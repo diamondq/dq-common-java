@@ -25835,7 +25835,8 @@
 						"description": "The process instance id of the root process instance the historic instance authorization is related to. Can be null if not related to a historic instance resource.",
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"GroupDto_allOf": {
 				"properties": {
@@ -25851,7 +25852,8 @@
 						"description": "The type of the group.",
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"AttachmentDto_allOf": {
 				"properties": {
@@ -25894,7 +25896,8 @@
 						"description": "The process instance id of the root process instance that initiated the process containing the task.",
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"AuthorizationExceptionDto_allOf": {
 				"properties": {
@@ -25908,7 +25911,8 @@
 						},
 						"type": "array"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"CommentDto_allOf": {
 				"properties": {
@@ -25943,7 +25947,8 @@
 						"description": "The process instance id of the root process instance that initiated the process\ncontaining the task.",
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"DeploymentDto_allOf": {
 				"properties": {
@@ -25968,7 +25973,8 @@
 						"description": "The name of the deployment.",
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"DeploymentWithDefinitionsDto_allOf": {
 				"properties": {
@@ -26000,7 +26006,8 @@
 						"description": "A JSON Object containing a property for each of the case definitions,\nwhich are successfully deployed with that deployment.\nThe key is the case definition id, the value is a JSON Object corresponding to the case definition.",
 						"type": "object"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"EventSubscriptionQueryDto_sorting": {
 				"properties": {
@@ -26020,7 +26027,8 @@
 						],
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"ExternalTaskBpmnError_allOf": {
 				"properties": {
@@ -26028,7 +26036,8 @@
 						"description": "The id of the worker that reports the failure. Must match the id of the worker who has most recently\nlocked the task.",
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"ExternalTaskQueryDto_sorting": {
 				"properties": {
@@ -26053,7 +26062,8 @@
 						],
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"HistoricActivityInstanceQueryDto_sorting": {
 				"properties": {
@@ -26083,7 +26093,8 @@
 						],
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"HistoricProcessInstanceQueryDto_sorting": {
 				"properties": {
@@ -26111,7 +26122,8 @@
 						],
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"ParseExceptionDto_allOf": {
 				"properties": {
@@ -26122,7 +26134,8 @@
 						"description": "A JSON Object containing list of errors and warnings occurred during deployment.",
 						"type": "object"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"ProcessInstanceDto_allOf": {
 				"properties": {
@@ -26155,7 +26168,8 @@
 						"description": "The tenant id of the process instance.",
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"ProcessInstanceQueryDto_sorting": {
 				"properties": {
@@ -26178,7 +26192,8 @@
 						],
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"ProcessInstanceWithVariablesDto_allOf": {
 				"properties": {
@@ -26189,7 +26204,8 @@
 						"description": "The id of the process instance.",
 						"type": "object"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"SchemaLogQueryDto_sorting": {
 				"properties": {
@@ -26208,7 +26224,8 @@
 						],
 						"type": "string"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"SetRemovalTimeToHistoricProcessInstancesDto_allOf": {
 				"properties": {
@@ -26227,7 +26244,8 @@
 						"nullable": true,
 						"type": "boolean"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"TaskQueryDto_sorting": {
 				"properties": {
@@ -26265,7 +26283,8 @@
 					"parameters": {
 						"$ref": "#/components/schemas/SortTaskQueryParametersDto"
 					}
-				}
+				},
+				"type": "object"
 			},
 			"TriggerVariableValueDto_allOf": {
 				"properties": {
@@ -26274,7 +26293,8 @@
 						"nullable": true,
 						"type": "boolean"
 					}
-				}
+				},
+				"type": "object"
 			}
 		}
 	}

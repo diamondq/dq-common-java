@@ -1,1 +1,1 @@
-Optional<{{#returnContainer}}{{returnContainer}}<{{#isMapContainer}}@NonNull String, @NonNull {{{returnBaseType}}}{{/isMapContainer}}{{#isListContainer}}@NonNull {{{returnBaseType}}}{{/isListContainer}}>{{/returnContainer}}{{^returnContainer}}{{{returnBaseType}}}{{/returnContainer}}>
+Optional<{{#returnContainer}}{{returnContainer}}<{{#isMap}}@NonNull String, @NonNull {{{returnBaseType}}}{{/isMap}}{{#isArray}}@NonNull {{{returnBaseType}}}{{/isArray}}>{{/returnContainer}}{{^returnContainer}}{{{returnBaseType}}}{{/returnContainer}}>

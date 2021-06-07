@@ -5,7 +5,7 @@ import com.diamondq.common.injection.micronaut.auth.AuthInfo;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import io.micronaut.core.annotation.Nullable;
 
 import org.camunda.model.HistoricalVariableDto;
 import org.checkerframework.checker.nullness.qual.NonNull;
