@@ -107,7 +107,7 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
   @Override
   public InjectionContext buildAndStart() {
     synchronized (this) {
-      ApplicationContextBuilder builder = ApplicationContext.build();
+      ApplicationContextBuilder builder = ApplicationContext.builder();
       builder = builder.classLoader(mClassLoader);
       for (final String tag : mEnvironmentTags)
         builder = builder.environments(tag);
