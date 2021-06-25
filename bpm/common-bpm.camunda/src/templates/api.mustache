@@ -12,6 +12,7 @@ import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Options;
+import io.micronaut.http.annotation.Patch;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.http.annotation.Delete;
@@ -30,11 +31,15 @@ import javax.validation.Valid;
 import io.micronaut.core.annotation.Nullable;{{/useBeanValidation}}
 import com.diamondq.common.injection.micronaut.auth.AuthInfo;
 
-@Client(id="{{serviceDiscoveryId}}", path="{{contextPath}}/{{{baseName}}}"){{#useSwaggerAnnotations}}
+{{#appDescriptionWithNewLines}}/**
+* {{appDescriptionWithNewLines}}
+*/{{/appDescriptionWithNewLines}}
+@Client(id="{{serviceDiscoveryId}}", path="{{contextPath}}"){{#useSwaggerAnnotations}}
 @Api(description = "the {{{baseName}}} API"){{/useSwaggerAnnotations}}{{#hasConsumes}}
 @Consumes({ {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
 @Produces({ {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}} }){{/hasProduces}}
-{{>generatedAnnotation}}public {{#interfaceOnly}}interface{{/interfaceOnly}}{{^interfaceOnly}}class{{/interfaceOnly}} {{classname}} {
+{{>generatedAnnotation}}
+public {{#interfaceOnly}}interface{{/interfaceOnly}}{{^interfaceOnly}}class{{/interfaceOnly}} {{classname}} {
 {{#operations}}
 {{#operation}}
 

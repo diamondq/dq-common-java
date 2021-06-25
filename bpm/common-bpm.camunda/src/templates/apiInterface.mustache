@@ -1,8 +1,9 @@
     /**
+     * {{summary}}
      * {{notes}} {{#allParams}}
      * @param {{paramName}} {{description}}{{/allParams}}
      */    
-    @{{#lambda.titlecase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.titlecase}}{{#subresourceOperation}}(value="{{{path}}}"){{/subresourceOperation}}{{#hasConsumes}}
+    @{{#lambda.titlecase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.titlecase}}(value="{{{commonPath}}}{{{path}}}"){{#hasConsumes}}
     @Produces({ {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
     @Consumes({ {{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}} }){{/hasProduces}}{{#useSwaggerAnnotations}}
     @ApiOperation(value = "{{{summary}}}", notes = "{{{notes}}}"{{#hasAuthMethods}}, authorizations = {

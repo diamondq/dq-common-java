@@ -52,7 +52,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
   {{/vars}}
 
   {{#generateBuilders}}@JsonCreator
-  public {{classname}}({{#vars}}@JsonProperty("{{name}}") {{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}{{^-last}}, {{/-last}}{{/vars}}) {
+  public {{classname}}({{#vars}}@JsonProperty("{{baseName}}") {{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}{{^-last}}, {{/-last}}{{/vars}}) {
     {{#vars}}
     {{name}} = p{{nameInCamelCase}};
     {{/vars}}
