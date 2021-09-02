@@ -360,7 +360,82 @@ public class ConverterManagerImpl implements ConverterManager {
     return convert(pInput, pInputType.getType(), pOutputType.getType(), null);
   }
 
-  private <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType, @Nullable String pGroupName) {
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, java.lang.reflect.Type)
+   */
+  @Override
+  public <@NonNull I, @NonNull O> O convert(I pInput, Type pOutputType) {
+    return convert(pInput, pInput.getClass(), pOutputType, null);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, java.lang.reflect.Type,
+   *      java.lang.String)
+   */
+  @Override
+  public <@NonNull I, @NonNull O> @NonNull O convert(I pInput, Type pOutputType, @Nullable String pGroupName) {
+    return convert(pInput, pInput.getClass(), pOutputType, pGroupName);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, java.lang.reflect.Type,
+   *      java.lang.reflect.Type)
+   */
+  @Override
+  public <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType) {
+    return convert(pInput, pInputType, pOutputType, null);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object, java.lang.reflect.Type,
+   *      java.lang.reflect.Type)
+   */
+  @Override
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pInputType, Type pOutputType) {
+    if (pInput == null)
+      return null;
+    return convert(pInput, pInputType, pOutputType, null);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object, java.lang.reflect.Type,
+   *      java.lang.reflect.Type, java.lang.String)
+   */
+  @Override
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pInputType, Type pOutputType,
+    @Nullable String pGroupName) {
+    if (pInput == null)
+      return null;
+    return convert(pInput, pInputType, pOutputType, pGroupName);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object, java.lang.reflect.Type)
+   */
+  @Override
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pOutputType) {
+    if (pInput == null)
+      return null;
+    return convert(pInput, pInput.getClass(), pOutputType, null);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convertNullable(java.lang.Object, java.lang.reflect.Type,
+   *      java.lang.String)
+   */
+  @Override
+  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pOutputType, @Nullable String pGroupName) {
+    if (pInput == null)
+      return null;
+    return convert(pInput, pInput.getClass(), pOutputType, pGroupName);
+  }
+
+  /**
+   * @see com.diamondq.common.converters.ConverterManager#convert(java.lang.Object, java.lang.reflect.Type,
+   *      java.lang.reflect.Type, java.lang.String)
+   */
+  @Override
+  public <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType, @Nullable String pGroupName) {
     assert pInput != null;
     assert pInputType != null;
     assert pOutputType != null;
