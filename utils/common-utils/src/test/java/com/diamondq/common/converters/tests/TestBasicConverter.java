@@ -72,4 +72,16 @@ public class TestBasicConverter {
     assertEquals("1,2,3", str2);
   }
 
+  @Test
+  public void equalsConverter() {
+    ConverterManager converterManager = new ConverterManagerImpl(Collections.emptyList());
+    converterManager.addConverter(new ListStringConverter());
+    converterManager.addConverter(new ListLongConverter());
+    List<String> ls = new ArrayList<>();
+    ls.add("a");
+    ls.add("b");
+    ls.add("c");
+    List<String> result = converterManager.convert(ls, Types.LIST_OF_STRING);
+    assertEquals(result, ls);
+  }
 }

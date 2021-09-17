@@ -11,6 +11,7 @@ import com.googlecode.gentyref.TypeFactory;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -81,9 +82,11 @@ public class ConverterManagerImpl implements ConverterManager {
     }
   }
 
-  private final ConcurrentMap<TypePair, Converter<?, ?>> mConvertersByType = new ConcurrentHashMap<>();
+  private static final Converter<?, ?>                   sIdentityConverter = new IdentityConverter();
 
-  private final ConcurrentMap<TypePair, TypePair>        mShortcuts        = new ConcurrentHashMap<>();
+  private final ConcurrentMap<TypePair, Converter<?, ?>> mConvertersByType  = new ConcurrentHashMap<>();
+
+  private final ConcurrentMap<TypePair, Converter<?, ?>> mShortcuts         = new ConcurrentHashMap<>();
 
   @Inject
   public ConverterManagerImpl(List<Converter<?, ?>> pConverters) {
@@ -439,9 +442,24 @@ public class ConverterManagerImpl implements ConverterManager {
     assert pInput != null;
     assert pInputType != null;
     assert pOutputType != null;
-    TypePair inputTypePair = new TypePair(pGroupName, pInputType, pOutputType);
-    TypePair matchClass = mShortcuts.get(inputTypePair);
-    if (matchClass == null) {
+
+    /* Quick check for matching classes */
+
+    if ((pOutputType instanceof Class) && (pInputType instanceof Class)) {
+      Class<?> outputClass = (Class<?>) pOutputType;
+      Class<?> inputClass = (Class<?>) pInputType;
+      if (outputClass.isAssignableFrom(inputClass) == true) {
+        @SuppressWarnings("unchecked")
+        O output = (O) pInput;
+        return output;
+      }
+    }
+
+    /* Attempt to look for a shortcut */
+
+    @NonNull TypePair inputTypePair = new TypePair(pGroupName, pInputType, pOutputType);
+    Converter<?, ?> matchConverter = mShortcuts.get(inputTypePair);
+    if (matchConverter == null) {
 
       /* Build the full set of possible classes */
 
@@ -452,13 +470,12 @@ public class ConverterManagerImpl implements ConverterManager {
 
       for (Type testInputType : testInputClasses) {
         TypePair testPair = new TypePair(pGroupName, testInputType, pOutputType);
-        if (mConvertersByType.containsKey(testPair) == true) {
-          matchClass = testPair;
-          mShortcuts.put(inputTypePair, testPair);
+        if ((matchConverter = mConvertersByType.get(testPair)) != null) {
+          mShortcuts.put(inputTypePair, matchConverter);
           break;
         }
       }
-      if (matchClass == null) {
+      if (matchConverter == null) {
 
         /* Attempt a second expansion of the output */
 
@@ -470,34 +487,78 @@ public class ConverterManagerImpl implements ConverterManager {
         OUTERTEST: for (Type testInputType : testInputClasses) {
           for (Type testOutputType : testOutputClasses) {
             TypePair testPair = new TypePair(pGroupName, testInputType, testOutputType);
-            if (mConvertersByType.containsKey(testPair) == true) {
-              matchClass = testPair;
-              mShortcuts.put(inputTypePair, testPair);
+            if ((matchConverter = mConvertersByType.get(testPair)) != null) {
+              mShortcuts.put(inputTypePair, matchConverter);
               break OUTERTEST;
             }
           }
         }
-        if (matchClass == null) {
-          if (pGroupName != null)
-            throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH_WITH_GROUP,
-              pInputType.getTypeName(), pOutputType.getTypeName(), pGroupName);
-          else
-            throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, pInputType.getTypeName(),
-              pOutputType.getTypeName());
+        if (matchConverter == null) {
+
+          /* Next see if we can basically assume these are the same */
+
+          if (pOutputType instanceof ParameterizedType) {
+            ParameterizedType outputPT = (ParameterizedType) pOutputType;
+            Type outputBaseType = outputPT.getRawType();
+            Type[] outputActualTypes = outputPT.getActualTypeArguments();
+            SAME_INPUT_LOOP: for (Type testInputType : testInputClasses) {
+              if (testInputType instanceof ParameterizedType) {
+                ParameterizedType inputPT = (ParameterizedType) testInputType;
+
+                Type inputBaseType = inputPT.getRawType();
+                if ((inputBaseType instanceof Class) && (outputBaseType instanceof Class)) {
+                  Class<?> outputBaseClass = (Class<?>) outputBaseType;
+                  Class<?> inputBaseClass = (Class<?>) inputBaseType;
+                  if (outputBaseClass.isAssignableFrom(inputBaseClass)) {
+
+                    /* The base classes are equivalent. Check the param types */
+
+                    Type[] inputActualTypes = inputPT.getActualTypeArguments();
+                    if (inputActualTypes.length == outputActualTypes.length) {
+                      int len = inputActualTypes.length;
+                      for (int i = 0; i < len; i++) {
+
+                        /* Are the types the same? */
+
+                        if (inputActualTypes[i].equals(outputActualTypes[i]) == false) {
+
+                          /* Is the input type a wildcard */
+
+                          if ((inputActualTypes[i] instanceof WildcardType) == false) {
+                            continue SAME_INPUT_LOOP;
+                          }
+                        }
+                      }
+
+                      /* We've found a match */
+
+                      matchConverter = sIdentityConverter;
+                      mShortcuts.put(inputTypePair, matchConverter);
+                      break SAME_INPUT_LOOP;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          if (matchConverter == null) {
+            if (pGroupName != null)
+              throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH_WITH_GROUP,
+                pInputType.getTypeName(), pOutputType.getTypeName(), pGroupName);
+            else
+              throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH,
+                pInputType.getTypeName(), pOutputType.getTypeName());
+          }
         }
       }
     }
     @SuppressWarnings("unchecked")
-    Converter<I, O> converter = (Converter<I, O>) mConvertersByType.get(matchClass);
-    if (converter == null) {
-      if (pGroupName != null)
-        throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH_WITH_GROUP,
-          pInputType.getTypeName(), pOutputType.getTypeName(), pGroupName);
-      else
-        throw new ExtendedIllegalArgumentException(UtilMessages.CONVERTERMANAGER_NO_MATCH, pInputType.getTypeName(),
-          pOutputType.getTypeName());
-    }
+    Converter<I, O> converter = (Converter<I, O>) matchConverter;
     O result = converter.convert(pInput);
+
+    /* Verify the result matches */
+
     if (pOutputType instanceof Class) {
       if (((Class<?>) pOutputType).isInstance(result) == false)
         throw new IllegalArgumentException();
