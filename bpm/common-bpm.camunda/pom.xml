@@ -12,6 +12,10 @@
   <name>DiamondQ Common: BPM: Camunda</name>
   <dependencies>
     <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>jackson-databind-nullable</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-http-client</artifactId>
     </dependency>
@@ -63,13 +67,8 @@
                 <modelPackage>org.camunda.model</modelPackage>
                 <useSwaggerAnnotations>false</useSwaggerAnnotations>
               </configOptions>
-              <!-- 
-              <environmentVariables>
-                <debugOperations>true</debugOperations>
-                <debugModels>true</debugModels>
-                <debugOpenAPI>true</debugOpenAPI>
-              </environmentVariables>
-               -->
+              <!-- <environmentVariables> <debugOperations>true</debugOperations> <debugModels>true</debugModels> <debugOpenAPI>true</debugOpenAPI> 
+                </environmentVariables> -->
             </configuration>
           </execution>
         </executions>

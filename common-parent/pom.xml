@@ -30,7 +30,7 @@
       <dependency>
         <groupId>jakarta.platform</groupId>
         <artifactId>jakarta.jakartaee-bom</artifactId>
-        <version>9.1.0</version>
+        <version>8.0.0</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -209,6 +209,11 @@
         <groupId>com.googlecode.gentyref</groupId>
         <artifactId>gentyref</artifactId>
         <version>1.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openapitools</groupId>
+        <artifactId>jackson-databind-nullable</artifactId>
+        <version>0.2.2</version>
       </dependency>
       <dependency>
         <groupId>com.diamondq.common</groupId>
