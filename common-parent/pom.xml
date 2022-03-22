@@ -224,4 +224,12 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <dependencies>
+    <!-- Temporary add of the javax.inject only as a compile dependency as we migrate to jakarta.inject -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 </project>
