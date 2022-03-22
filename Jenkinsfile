@@ -14,7 +14,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'cd common-root; MAVEN_OPTS=-Duser.home=/var/maven mvn "-Djenkins=true" "-Drevision=0.3.${BUILD_NUMBER}" "-Dchangelist=" "-Dsha1=-${GIT_COMMIT_SHORT}" clean deploy'
+        sh 'MAVEN_OPTS=-Duser.home=/var/maven mvn "-Djenkins=true" "-Drevision=0.4.${BUILD_NUMBER}" "-Dchangelist=" "-Dsha1=-${GIT_COMMIT_SHORT}" clean deploy'
       }
     }
   }
