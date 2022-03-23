@@ -11,8 +11,8 @@ pipeline {
 		returnStdout: true
 	)
 	NEW_VERSION = sh(
-	    script: "jx-release-version -fetch-tags -previous-version=0.4 -next-version=increment:patch -tag"
-	    returnStdout: true
+	    script: "jx-release-version -fetch-tags -previous-version=0.4 -next-version=increment:patch -tag",
+		returnStdout: true
 	)
   }
   stages {
