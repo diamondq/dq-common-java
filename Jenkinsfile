@@ -19,7 +19,6 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        gitPush()
         sh 'MAVEN_OPTS=-Duser.home=/var/maven mvn "-Djenkins=true" "-Drevision=${NEW_VERSION}" "-Dchangelist=" "-Dsha1=-${GIT_COMMIT_SHORT}" clean deploy'
       }
     }
