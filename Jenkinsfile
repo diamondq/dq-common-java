@@ -12,7 +12,7 @@ pipeline {
 		returnStdout: true
 	)
 	NEW_VERSION = sh(
-	    script: "jx-release-version -previous-version=from-tag:0.4 -next-version=increment:patch -tag -push-tag=false -git-user=diamondq -git-email=mike@diamondq.com",
+	    script: "jx-release-version -previous-version=from-tag:v0.4 -next-version=increment:patch -tag -push-tag=false -git-user=diamondq -git-email=mike@diamondq.com -tag-prefix=v",
 		returnStdout: true
 	)
   }
