@@ -18827,6 +18827,879 @@
         }
       }
     },
+    "/tenant": {
+      "get": {
+        "operationId": "queryTenants",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Get Tenants",
+        "description": "Query for a list of tenants using a list of parameters. The size of the result set\ncan be retrieved by using the [Get Tenant\nCount](https://docs.camunda.org/manual/7.17/reference/rest/tenant/get-query-count/) method.",
+        "parameters": [
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "id",
+                "name"
+              ],
+              "type": "string"
+            },
+            "description": "Sort the results lexicographically by a given criterion.\nMust be used in conjunction with the sortOrder parameter."
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            },
+            "description": "Sort the results in a given order. Values may be asc for ascending order or desc for descending order.\nMust be used in conjunction with the sortBy parameter."
+          },
+          {
+            "name": "firstResult",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pagination of results. Specifies the index of the first result to return."
+          },
+          {
+            "name": "maxResults",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pagination of results. Specifies the maximum number of results to return.\nWill return less results if there are no more results left."
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the id of the tenant."
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the name of the tenant."
+          },
+          {
+            "name": "nameLike",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the name that the parameter is a substring of."
+          },
+          {
+            "name": "userMember",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Select only tenants where the given user is a member of."
+          },
+          {
+            "name": "groupMember",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Select only tenants where the given group is a member of."
+          },
+          {
+            "name": "includingGroupsOfUser",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Select only tenants where the user or one of his groups is a member of.\nCan only be used in combination with the `userMember` parameter. Value may only be `true`,\nas `false` is the default behavior."
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TenantDto"
+                  }
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "Status 200.",
+                    "description": "GET `/tenant?name\u003dtenantOne`",
+                    "value": [
+                      {
+                        "id": "tenantOne",
+                        "name": "Tenant One"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the query parameters are invalid, for example if a `sortOrder`\nparameter is supplied, but no `sortBy` is specified. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      },
+      "options": {
+        "operationId": "availableTenantResourceOperations",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Tenant Resource Options",
+        "description": "The `/tenant` resource supports two custom OPTIONS requests, this one for the resource\nas such and one for individual tenant instances. The OPTIONS request\nallows checking for the set of available operations that the currently\nauthenticated user can perform on the `/tenant` resource. If the user\ncan perform an operation or not may depend on various things,\nincluding the users authorizations to interact with this resource and\nthe internal configuration of the process engine.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOptionsDto"
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "Status 200.",
+                    "description": "OPTIONS `/tenant`",
+                    "value": {
+                      "links": [
+                        {
+                          "method": "GET",
+                          "href": "http://localhost:8080/engine-rest/tenant",
+                          "rel": "list"
+                        },
+                        {
+                          "method": "GET",
+                          "href": "http://localhost:8080/engine-rest/tenant/count",
+                          "rel": "count"
+                        },
+                        {
+                          "method": "POST",
+                          "href": "http://localhost:8080/engine-rest/tenant/create",
+                          "rel": "create"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          }
+        }
+      }
+    },
+    "/tenant/count": {
+      "get": {
+        "operationId": "getTenantCount",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Get Tenant Count",
+        "description": "Query for tenants using a list of parameters and retrieves the count.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the id of the tenant."
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the name of the tenant."
+          },
+          {
+            "name": "nameLike",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by the name that the parameter is a substring of."
+          },
+          {
+            "name": "userMember",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Select only tenants where the given user is a member of."
+          },
+          {
+            "name": "groupMember",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Select only tenants where the given group is a member of."
+          },
+          {
+            "name": "includingGroupsOfUser",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Select only tenants where the user or one of his groups is a member of.\nCan only be used in combination with the `userMember` parameter. Value may only be `true`,\nas `false` is the default behavior."
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountResultDto"
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "Status 200.",
+                    "description": "GET `/tenant/count?name\u003dtenantOne`",
+                    "value": {
+                      "count": 1
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Returned if some of the query parameters are invalid. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+    },
+    "/tenant/create": {
+      "post": {
+        "operationId": "createTenant",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Create Tenant",
+        "description": "Create a new tenant.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantDto"
+              },
+              "examples": {
+                "example-1": {
+                  "summary": "POST `/tenant/create`",
+                  "value": {
+                    "id": "tenantOne",
+                    "name": "Tenant One"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Request successful. This method returns no content."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Identity service is read-only."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "The tenant could not be created due to an internal server error. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+    },
+    "/tenant/{id}": {
+      "delete": {
+        "operationId": "deleteTenant",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Delete Tenant",
+        "description": "Deletes a tenant by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant to be deleted."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Request successful. This method returns no content."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Identity service is read-only."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Tenant cannot be found. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      },
+      "get": {
+        "operationId": "getTenant",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Get Tenant",
+        "description": "Retrieves a tenant.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant to be retrieved."
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "Status 200.",
+                    "description": "GET `/tenant/tenantOne`",
+                    "value": {
+                      "id": "tenantOne",
+                      "name": "Tenant One"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Tenant with given id does not exist. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      },
+      "options": {
+        "operationId": "availableTenantInstanceOperations",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Tenant Resource Options",
+        "description": "The `/tenant` resource supports two custom OPTIONS requests, one for the resource as such and this one for\nindividual tenant instances. The OPTIONS request allows checking for the set of available operations that\nthe currently authenticated user can perform on the `/tenant/{id}` resource. If the user can perform an\noperation or not may depend on various things, including the users authorizations to interact with this\nresource and the internal configuration of the process engine.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOptionsDto"
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "Status 200.",
+                    "description": "OPTIONS `/tenant/tenantOne`",
+                    "value": {
+                      "links": [
+                        {
+                          "method": "GET",
+                          "href": "http://localhost:8080/engine-rest/tenant/tenantOne",
+                          "rel": "self"
+                        },
+                        {
+                          "method": "DELETE",
+                          "href": "http://localhost:8080/engine-rest/tenant/tenantOne",
+                          "rel": "delete"
+                        },
+                        {
+                          "method": "PUT",
+                          "href": "http://localhost:8080/engine-rest/tenant/tenantOne",
+                          "rel": "update"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateTenant",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Update Tenant",
+        "description": "Updates a given tenant.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantDto"
+              },
+              "examples": {
+                "example-1": {
+                  "summary": "PUT `/tenant/tenantOne`",
+                  "value": {
+                    "id": "tenantOne",
+                    "name": "Tenant One"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Request successful."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Identity service is read-only."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "If the tenant with the requested Id cannot be found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "The tenant could not be updated due to an internal server error. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+    },
+    "/tenant/{id}/group-members": {
+      "options": {
+        "operationId": "availableTenantGroupMembersOperations",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Tenant Group Membership Resource Options",
+        "description": "The OPTIONS request allows checking for the set of available operations that the\ncurrently authenticated user can perform on the resource. If the user\ncan perform an operation or not may depend on various things,\nincluding the users authorizations to interact with this resource and\nthe internal configuration of the process engine.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOptionsDto"
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "Status 200.",
+                    "description": "OPTIONS `/tenant/tenantOne/group-members`",
+                    "value": {
+                      "links": [
+                        {
+                          "method": "DELETE",
+                          "href": "http://localhost:8080/engine-rest/tenant/tenantOne/group-members",
+                          "rel": "delete"
+                        },
+                        {
+                          "method": "PUT",
+                          "href": "http://localhost:8080/engine-rest/tenant/tenantOne/group-members",
+                          "rel": "create"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          }
+        }
+      }
+    },
+    "/tenant/{id}/group-members/{groupId}": {
+      "delete": {
+        "operationId": "deleteGroupMembership",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Create Tenant Group Membership",
+        "description": "Creates a membership between a tenant and a group.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant."
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the group."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Request successful. This method returns no content."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Identity service is read-only."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "In case an internal error occurs. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      },
+      "put": {
+        "operationId": "createGroupMembership",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Create Tenant Group Membership",
+        "description": "Creates a membership between a tenant and a group.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant."
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the group."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Request successful. This method returns no content."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Identity service is read-only."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "In case an internal error occurs. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+    },
+    "/tenant/{id}/user-members": {
+      "options": {
+        "operationId": "availableTenantUserMembersOperations",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Tenant User Membership Resource Options",
+        "description": "The OPTIONS request allows checking for the set of available operations that the\ncurrently authenticated user can perform on the resource. If the user\ncan perform an operation or not may depend on various things,\nincluding the users authorizations to interact with this resource and\nthe internal configuration of the process engine.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOptionsDto"
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "Status 200.",
+                    "description": "OPTIONS `/tenant/tenantOne/user-members`",
+                    "value": {
+                      "links": [
+                        {
+                          "method": "DELETE",
+                          "href": "http://localhost:8080/engine-rest/tenant/tenantOne/user-members",
+                          "rel": "delete"
+                        },
+                        {
+                          "method": "PUT",
+                          "href": "http://localhost:8080/engine-rest/tenant/tenantOne/user-members",
+                          "rel": "create"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Request successful."
+          }
+        }
+      }
+    },
+    "/tenant/{id}/user-members/{userId}": {
+      "delete": {
+        "operationId": "deleteUserMembership",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Delete a Tenant User Membership",
+        "description": "Deletes a membership between a tenant and an user.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant."
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the user."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Request successful. This method returns no content."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Identity service is read-only."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "In case an error occurs. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      },
+      "put": {
+        "operationId": "createUserMembership",
+        "tags": [
+          "Tenant"
+        ],
+        "summary": "Create Tenant User Membership",
+        "description": "Creates a membership between a tenant and an user.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the tenant."
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The id of the user."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Request successful. This method returns no content."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "Identity service is read-only."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionDto"
+                }
+              }
+            },
+            "description": "In case an internal error occurs. See the\n[Introduction](https://docs.camunda.org/manual/7.17/reference/rest/overview/#error-handling)\nfor the error response format."
+          }
+        }
+      }
+    },
     "/user": {
       "get": {
         "operationId": "getUsers",
@@ -23650,6 +24523,21 @@
             "type": "boolean",
             "nullable": true,
             "description": "Specifies if the telemetry data should be sent or not."
+          }
+        }
+      },
+      "TenantDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true,
+            "description": "The id of the tenant."
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the tenant."
           }
         }
       },
