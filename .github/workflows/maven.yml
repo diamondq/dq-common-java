@@ -1,0 +1,70 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the source code
+      - uses: actions/checkout@v3
+      # Make sure that we have a Java 8 environment
+      - name: Set up JDK 8
+        id: setupJava
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'corretto'
+          cache: maven
+      - uses: cactuslab/maven-toolchains-xml-action@v1
+        with:
+          toolchains: |
+            [
+              {"jdkVersion": "8", "jdkHome": "${{ steps.setupJava.outputs.path }}"}
+            ]
+      # Get the short revision number
+      - name: Set Outputs
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      # Get the build number
+      - name: Build Number Generator
+        id: buildnumber
+        uses: einaregilsson/build-number@v3
+        with:
+          token: ${{ secrets.github_token }}
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Setup Repository
+        id: setup_repo
+        uses: s4u/maven-settings-action@v2.6.0
+        with:
+          servers: |
+            [{
+              "id": "dq-snap",
+              "username": "${{ secrets.DQ_REPO_USERNAME }}",
+              "password": "${{ secrets.DQ_REPO_PASSWORD }}"
+            },
+            {
+              "id": "dq-release",
+              "username": "${{ secrets.DQ_REPO_USERNAME }}",
+              "password": "${{ secrets.DQ_REPO_PASSWORD }}"
+            },
+            {
+              "id": "1-dq-snapshot",
+              "username": "${{ secrets.DQ_REPO_USERNAME }}",
+              "password": "${{ secrets.DQ_REPO_PASSWORD }}"
+            },
+            {
+              "id": "2-dq-release",
+              "username": "${{ secrets.DQ_REPO_USERNAME }}",
+              "password": "${{ secrets.DQ_REPO_PASSWORD }}"
+            }]
+      - name: Build with Maven
+        run: mvn -Djenkins=true -Drevision=0.4.${{ steps.buildnumber.outputs.build_number }} -Dchangelist= -Dsha1=-${{ steps.vars.outputs.sha_short }} --file pom.xml clean deploy
