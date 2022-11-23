@@ -1,26 +1,30 @@
 package com.diamondq.common.errors;
 
 import com.diamondq.common.i18n.I18NString;
+import com.diamondq.common.i18n.MessagesEnum;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-public class I18NStringAndException {
-
-  private final I18NString          mMessage;
+public class I18NStringAndException extends I18NString {
 
   private final @Nullable Throwable mThrowable;
 
   public I18NStringAndException(I18NString pString, @Nullable Throwable pEx) {
-    mMessage = pString;
+    super(pString.message, pString.params);
     mThrowable = pEx;
   }
 
+  public I18NStringAndException(MessagesEnum pMessage, @Nullable Throwable pThrowable,
+    @Nullable Object @Nullable ... pParams) {
+    super(pMessage, pParams);
+    mThrowable = pThrowable;
+  }
+
   public I18NString getMessage() {
-    return mMessage;
+    return this;
   }
 
   public @Nullable Throwable getThrowable() {
@@ -33,16 +37,16 @@ public class I18NStringAndException {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(mMessage.toString());
+    sb.append(super.toString());
     if (mThrowable != null) {
       try (StringWriter sw = new StringWriter()) {
         try (PrintWriter pw = new PrintWriter(sw)) {
           mThrowable.printStackTrace(pw);
         }
         sw.flush();
-        sb.append("\n").append(sw.toString());
+        sb.append("\n").append(sw);
       }
-      catch (IOException ex) {
+      catch (IOException ignored) {
       }
 
     }
