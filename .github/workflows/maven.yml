@@ -16,16 +16,11 @@ jobs:
         id: setupJava
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: |
+            8
+            11
           distribution: 'corretto'
           cache: maven
-      - uses: cactuslab/maven-toolchains-xml-action@v1
-        with:
-          toolchains: |
-            [
-              {"jdkVersion": "8", "jdkHome": "${{ steps.setupJava.outputs.path }}"},
-              {"jdkVersion": "11", "jdkHome": "${{ steps.setupJava.outputs.path }}"}
-            ]
       # Get the short revision number
       - name: Set Outputs
         id: vars
