@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.diamondq.common</groupId>
@@ -40,6 +40,10 @@
     <dependency>
       <groupId>rocks.xmpp</groupId>
       <artifactId>xmpp-core-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
     </dependency>
     <dependency>
       <groupId>io.opentracing</groupId>
@@ -84,8 +88,10 @@
             <id>bundle-manifest</id>
             <configuration>
               <instructions>
-                <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
-                <Provide-Capability>osgi.serviceloader; osgi.serviceloader=rocks.xmpp.core.session.Module</Provide-Capability>
+                <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
+                </Require-Capability>
+                <Provide-Capability>osgi.serviceloader; osgi.serviceloader=rocks.xmpp.core.session.Module
+                </Provide-Capability>
               </instructions>
             </configuration>
           </execution>
