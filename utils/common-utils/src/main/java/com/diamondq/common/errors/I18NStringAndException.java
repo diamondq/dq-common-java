@@ -7,6 +7,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Objects;
 
 public class I18NStringAndException extends I18NString {
 
@@ -31,9 +32,6 @@ public class I18NStringAndException extends I18NString {
     return mThrowable;
   }
 
-  /**
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
@@ -48,8 +46,21 @@ public class I18NStringAndException extends I18NString {
       }
       catch (IOException ignored) {
       }
-
     }
     return sb.toString();
+  }
+
+  @Override
+  public boolean equals(@Nullable Object pO) {
+    if (this == pO) return true;
+    if (pO == null || getClass() != pO.getClass()) return false;
+    if (!super.equals(pO)) return false;
+    final I18NStringAndException that = (I18NStringAndException) pO;
+    return Objects.equals(mThrowable, that.mThrowable);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), mThrowable);
   }
 }
