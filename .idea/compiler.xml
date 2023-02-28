@@ -205,8 +205,8 @@
         </processorPath>
         <module name="common-model.standard" />
         <module name="common-bpm.camunda" />
-        <module name="common-injection.micronaut" />
         <module name="common-security.acl" />
+        <module name="common-injection.micronaut" />
         <module name="common-injection.micronaut.utils" />
         <module name="common-utils" />
         <module name="common-utils.scxml" />
