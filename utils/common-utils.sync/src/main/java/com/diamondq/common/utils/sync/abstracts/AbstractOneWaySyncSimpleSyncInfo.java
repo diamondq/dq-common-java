@@ -1,11 +1,10 @@
 package com.diamondq.common.utils.sync.abstracts;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
-
-import java.util.stream.Stream;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
+
+import java.util.stream.Stream;
 
 /**
  * This abstract class represents a type that only syncs from a->b.
@@ -48,8 +47,7 @@ public abstract class AbstractOneWaySyncSimpleSyncInfo<T, T_KEY>
 
     /* If there is a difference, then we'll always say that B needs to be updated */
 
-    if (result > 0)
-      result = -1;
+    if (result > 0) result = -1;
 
     return result;
   }
@@ -59,8 +57,7 @@ public abstract class AbstractOneWaySyncSimpleSyncInfo<T, T_KEY>
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> createA(Stream<Pair<T_KEY, T>> pStream) {
-    if (pStream.count() != 0)
-      throw new IllegalStateException();
+    if (pStream.findAny().isPresent()) throw new IllegalStateException();
     return ExtendedCompletableFuture.completedFuture(null);
   }
 
@@ -69,8 +66,7 @@ public abstract class AbstractOneWaySyncSimpleSyncInfo<T, T_KEY>
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> deleteA(Stream<Pair<T_KEY, T>> pStream) {
-    if (pStream.count() != 0)
-      throw new IllegalStateException();
+    if (pStream.findAny().isPresent()) throw new IllegalStateException();
     return ExtendedCompletableFuture.completedFuture(null);
   }
 
@@ -79,14 +75,13 @@ public abstract class AbstractOneWaySyncSimpleSyncInfo<T, T_KEY>
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> modifyA(Stream<Pair<T_KEY, T>> pStream) {
-    if (pStream.count() != 0)
-      throw new IllegalStateException();
+    if (pStream.findAny().isPresent()) throw new IllegalStateException();
     return ExtendedCompletableFuture.completedFuture(null);
   }
 
   /**
    * @see com.diamondq.common.utils.sync.abstracts.AbstractSameABTypeSyncInfo#merge(java.lang.Object, java.lang.Object,
-   *      java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
+   *   java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
    */
   @Override
   protected T merge(T_KEY pAKey, T pAFrag, T pA, T_KEY pBKey, T pBFrag, T pB) {

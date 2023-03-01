@@ -1,13 +1,12 @@
 package com.diamondq.common.utils.sync.abstracts;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.javatuples.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
 
 public abstract class AbstractRecordChangesSimpleSyncInfo<T, T_KEY> extends AbstractOneWaySyncSimpleSyncInfo<T, T_KEY> {
 
@@ -20,10 +19,7 @@ public abstract class AbstractRecordChangesSimpleSyncInfo<T, T_KEY> extends Abst
   @Override
   public ExtendedCompletableFuture<@Nullable Void> createB(Stream<Pair<T_KEY, T>> pStream) {
     synchronized (this) {
-      pStream.map((p) -> {
-        mBToCreate.add(p);
-        return null;
-      });
+      pStream.forEach((p) -> mBToCreate.add(p));
       return ExtendedCompletableFuture.completedFuture(null);
     }
   }
@@ -31,10 +27,7 @@ public abstract class AbstractRecordChangesSimpleSyncInfo<T, T_KEY> extends Abst
   @Override
   public ExtendedCompletableFuture<@Nullable Void> deleteB(Stream<Pair<T_KEY, T>> pStream) {
     synchronized (this) {
-      pStream.map((p) -> {
-        mBToDelete.add(p);
-        return null;
-      });
+      pStream.forEach((p) -> mBToDelete.add(p));
       return ExtendedCompletableFuture.completedFuture(null);
     }
   }
@@ -42,10 +35,7 @@ public abstract class AbstractRecordChangesSimpleSyncInfo<T, T_KEY> extends Abst
   @Override
   public ExtendedCompletableFuture<@Nullable Void> modifyB(Stream<Pair<T_KEY, T>> pStream) {
     synchronized (this) {
-      pStream.map((p) -> {
-        mBToModify.add(p);
-        return null;
-      });
+      pStream.forEach((p) -> mBToModify.add(p));
       return ExtendedCompletableFuture.completedFuture(null);
     }
   }
