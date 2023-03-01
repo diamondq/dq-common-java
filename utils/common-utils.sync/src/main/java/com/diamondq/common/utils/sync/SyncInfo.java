@@ -59,8 +59,8 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    *
    * @return the optional A Hash
    */
-  default ExtendedCompletableFuture<Optional<String>> getAHash() {
-    return ExtendedCompletableFuture.completedFuture(Optional.empty());
+  default Optional<String> getAHash() {
+    return Optional.empty();
   }
 
   /**
@@ -76,8 +76,8 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    *
    * @return the optional B Hash
    */
-  default ExtendedCompletableFuture<Optional<String>> getBHash() {
-    return ExtendedCompletableFuture.completedFuture(Optional.empty());
+  default Optional<String> getBHash() {
+    return Optional.empty();
   }
 
   /**
