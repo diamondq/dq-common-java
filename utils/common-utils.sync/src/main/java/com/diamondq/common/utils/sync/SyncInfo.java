@@ -236,4 +236,10 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    */
   ExtendedCompletableFuture<@Nullable Void> modifyB(Stream<Pair<B_KEY, B>> pStream);
 
+  /**
+   * Called after all the creation/modify/deletes are complete.
+   *
+   * @return future to indicate success or failure
+   */
+  ExtendedCompletableFuture<@Nullable Void> complete();
 }

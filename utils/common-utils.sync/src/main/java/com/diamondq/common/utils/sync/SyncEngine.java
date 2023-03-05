@@ -129,7 +129,7 @@ public class SyncEngine {
     SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> pInfo) {
 
     /* First, let's check if there is a hash to shortcut this */
-    
+
     Optional<String> aHashOpt = pInfo.getAHash();
     if (aHashOpt.isPresent()) {
       Optional<String> bHashOpt = pInfo.getBHash();
@@ -281,6 +281,6 @@ public class SyncEngine {
       /* Now set up a future for all these */
 
       return ExtendedCompletableFuture.allOf(futures);
-    });
+    }).thenCompose((ignored) -> pInfo.complete());
   }
 }

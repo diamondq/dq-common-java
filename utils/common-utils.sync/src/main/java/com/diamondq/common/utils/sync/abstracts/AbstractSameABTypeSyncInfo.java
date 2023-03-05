@@ -1,6 +1,8 @@
 package com.diamondq.common.utils.sync.abstracts;
 
+import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.utils.sync.SyncInfo;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This abstract simplifies the SyncInfo since both A & B are the same types
@@ -64,7 +66,7 @@ public abstract class AbstractSameABTypeSyncInfo<T, T_KEY, T_FRAG>
 
   /**
    * @see com.diamondq.common.utils.sync.SyncInfo#mergeBIntoA(java.lang.Object, java.lang.Object, java.lang.Object,
-   *      java.lang.Object, java.lang.Object, java.lang.Object)
+   *   java.lang.Object, java.lang.Object, java.lang.Object)
    */
   @Override
   public T mergeBIntoA(T_KEY pAKey, T_FRAG pAFrag, T pA, T_KEY pBKey, T_FRAG pBFrag, T pB) {
@@ -73,11 +75,15 @@ public abstract class AbstractSameABTypeSyncInfo<T, T_KEY, T_FRAG>
 
   /**
    * @see com.diamondq.common.utils.sync.SyncInfo#mergeAIntoB(java.lang.Object, java.lang.Object, java.lang.Object,
-   *      java.lang.Object, java.lang.Object, java.lang.Object)
+   *   java.lang.Object, java.lang.Object, java.lang.Object)
    */
   @Override
   public T mergeAIntoB(T_KEY pAKey, T_FRAG pAFrag, T pA, T_KEY pBKey, T_FRAG pBFrag, T pB) {
     return merge(pAKey, pAFrag, pA, pBKey, pBFrag, pB);
   }
 
+  @Override
+  public ExtendedCompletableFuture<@Nullable Void> complete() {
+    return ExtendedCompletableFuture.completedFuture(null);
+  }
 }
