@@ -163,6 +163,9 @@ public class SyncEngine {
       Set<Pair<A_KEY, A_FRAG>> bToBeCreated = new HashSet<>();
       Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = new HashSet<>();
 
+      boolean aModSupported = pInfo.isAModificationSupported();
+      boolean bModSupported = pInfo.isBModificationSupported();
+
       for (Map.Entry<A_KEY, A_FRAG> aPair : aMap.entrySet()) {
 
         A_KEY aKey = aPair.getKey();
@@ -200,13 +203,21 @@ public class SyncEngine {
 
             /* A is newer */
 
-            bToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
+            if (bModSupported) bToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
+            else {
+              bToBeDeleted.add(Pair.with(bKey, bItem));
+              bToBeCreated.add(Pair.with(aKey, aPair.getValue()));
+            }
 
           } else {
 
             /* B is newer */
 
-            aToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
+            if (aModSupported) aToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
+            else {
+              aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
+              aToBeCreated.add(Pair.with(bKey, bItem));
+            }
 
           }
 
@@ -250,28 +261,61 @@ public class SyncEngine {
 
       /* Now start processing the changes */
 
-      /* Add A records */
+      if (pInfo.isADeleteBeforeCreate()) {
 
-      futures.add(pInfo.createA(aToBeCreated.stream()
-        .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual))));
+        /* Delete A records */
 
-      /* Delete A records */
+        futures.add(pInfo.deleteA(aToBeDeleted.stream()).thenCompose((unused) -> {
 
-      futures.add(pInfo.deleteA(aToBeDeleted.stream()));
+          /* Add A records */
+
+          return pInfo.createA(aToBeCreated.stream()
+            .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual)));
+
+        }));
+
+      } else {
+
+        /* Add A records */
+
+        futures.add(pInfo.createA(aToBeCreated.stream()
+          .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual))));
+
+        /* Delete A records */
+
+        futures.add(pInfo.deleteA(aToBeDeleted.stream()));
+      }
 
       /* Modify A records */
 
       futures.add(pInfo.modifyA(aToBeModified.stream()
         .map(SyncEngine.modifyA(pInfo, aFragTypeComplete, bFragTypeComplete))));
 
-      /* Add B records */
+      if (pInfo.isBDeleteBeforeCreate()) {
 
-      futures.add(pInfo.createB(bToBeCreated.stream()
-        .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual))));
+        /* Delete B records */
 
-      /* Delete B records */
+        futures.add(pInfo.deleteB(bToBeDeleted.stream()).thenCompose((unused) -> {
 
-      futures.add(pInfo.deleteB(bToBeDeleted.stream()));
+          /* Add B records */
+
+          return pInfo.createB(bToBeCreated.stream()
+            .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual)));
+
+        }));
+
+      } else {
+
+        /* Add B records */
+
+        futures.add(pInfo.createB(bToBeCreated.stream()
+          .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual))));
+
+        /* Delete B records */
+
+        futures.add(pInfo.deleteB(bToBeDeleted.stream()));
+
+      }
 
       /* Modify B records */
 

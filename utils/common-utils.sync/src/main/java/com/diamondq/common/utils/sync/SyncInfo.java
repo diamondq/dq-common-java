@@ -54,6 +54,46 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
   boolean isTypesEqual();
 
   /**
+   * Returns true if an A can be modified with changes from B. If false, then the A will be deleted and a new A
+   * created.
+   *
+   * @return true or false
+   */
+  default boolean isAModificationSupported() {
+    return true;
+  }
+
+  /**
+   * Returns true if an B can be modified with changes from A. If false, then the B will be deleted and a new B
+   * created.
+   *
+   * @return true or false
+   */
+  default boolean isBModificationSupported() {
+    return true;
+  }
+
+  /**
+   * Returns true if Delete operations must be performed for Create operations. False if the order doesn't matter. This
+   * is mainly used if we are not supporting modification, and the ids are the same.
+   *
+   * @return true or false
+   */
+  default boolean isADeleteBeforeCreate() {
+    return false;
+  }
+
+  /**
+   * Returns true if Delete operations must be performed for Create operations. False if the order doesn't matter. This
+   * is mainly used if we are not supporting modification, and the ids are the same.
+   *
+   * @return true or false
+   */
+  default boolean isBDeleteBeforeCreate() {
+    return false;
+  }
+
+  /**
    * Returns an optional hash representing the A source data. If it's present, and the B hash is present, they can be
    * compared to decide if we're all in sync. This then skips all the synchronization.
    *
