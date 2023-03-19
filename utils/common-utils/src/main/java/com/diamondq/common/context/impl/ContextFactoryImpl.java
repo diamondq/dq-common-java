@@ -6,32 +6,28 @@ import com.diamondq.common.context.impl.logging.LoggingContextHandler;
 import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
 import com.diamondq.common.context.spi.SPIContextFactory;
+import io.micronaut.context.annotation.Secondary;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import javax.annotation.PostConstruct;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
-import javax.annotation.PostConstruct;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.micronaut.context.annotation.Secondary;
-
 @Secondary
 public class ContextFactoryImpl implements SPIContextFactory {
 
-  private static final Object                        sNULL_EXIT_VALUE     = new Object();
+  private static final Object sNULL_EXIT_VALUE = new Object();
 
-  public static volatile ContextFactory              sINSTANCE            = new ContextFactoryImpl();
+  public static volatile ContextFactory sINSTANCE = new ContextFactoryImpl();
 
-  private final CopyOnWriteArrayList<ContextHandler> mHandlers            = new CopyOnWriteArrayList<>();
+  private final CopyOnWriteArrayList<ContextHandler> mHandlers = new CopyOnWriteArrayList<>();
 
-  private volatile LoggingContextHandler             mLoggingHandler;
+  private volatile LoggingContextHandler mLoggingHandler;
 
-  private final ThreadLocal<Stack<ContextClass>>     mThreadLocalContexts =
-    ThreadLocal.withInitial(() -> new Stack<>());
+  private final ThreadLocal<Stack<ContextClass>> mThreadLocalContexts = ThreadLocal.withInitial(Stack::new);
 
-  private final ContextClass                         mNOOP_CONTEXT;
+  private final ContextClass mNOOP_CONTEXT;
 
   @SuppressWarnings("null")
   public ContextFactoryImpl() {
@@ -52,9 +48,8 @@ public class ContextFactoryImpl implements SPIContextFactory {
   }
 
   public void addContextHandler(ContextHandler pHandler) {
-    if (mHandlers.addIfAbsent(pHandler) == true)
-      if (pHandler instanceof LoggingContextHandler)
-        mLoggingHandler = (LoggingContextHandler) pHandler;
+    if (mHandlers.addIfAbsent(pHandler))
+      if (pHandler instanceof LoggingContextHandler) mLoggingHandler = (LoggingContextHandler) pHandler;
   }
 
   public void removeContextHandler(ContextHandler pHandler) {
@@ -63,17 +58,15 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   /**
    * @see com.diamondq.common.context.ContextFactory#newContextWithMeta(java.lang.Class, java.lang.Object,
-   *      java.lang.Object[])
+   *   java.lang.Object[])
    */
   @Override
-  public Context newContextWithMeta(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
+  public Context newContextWithMeta(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
 
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    ContextClass parentContext;
-    if (contextStack.isEmpty() == true)
-      parentContext = null;
-    else
-      parentContext = contextStack.peek();
+    @Nullable ContextClass parentContext;
+    if (contextStack.isEmpty()) parentContext = null;
+    else parentContext = contextStack.peek();
 
     /* Create a new context */
 
@@ -95,14 +88,12 @@ public class ContextFactoryImpl implements SPIContextFactory {
    * @see com.diamondq.common.context.ContextFactory#newContext(java.lang.Class, java.lang.Object, java.lang.Object[])
    */
   @Override
-  public Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
+  public Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
 
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    ContextClass parentContext;
-    if (contextStack.isEmpty() == true)
-      parentContext = null;
-    else
-      parentContext = contextStack.peek();
+    @Nullable ContextClass parentContext;
+    if (contextStack.isEmpty()) parentContext = null;
+    else parentContext = contextStack.peek();
 
     /* Create a new context */
 
@@ -126,25 +117,19 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void closeContext(ContextClass pContext) {
     boolean exitSet = false;
-    Object exitValue = pContext.getHandlerData(ContextHandler.sEXIT_VALUE, false, Object.class);
+    @Nullable Object exitValue = pContext.getHandlerData(ContextHandler.sEXIT_VALUE, false, Object.class);
     if (exitValue == sNULL_EXIT_VALUE) {
       exitValue = null;
       exitSet = true;
-    }
-    else if (exitValue != null)
-      exitSet = true;
-    Function<@Nullable Object, @Nullable Object> exitFunc;
-    Object exitFuncObj = pContext.getHandlerData(ContextHandler.sEXIT_FUNC, false, Object.class);
-    if (exitFuncObj == sNULL_EXIT_VALUE)
-      exitFunc = null;
+    } else if (exitValue != null) exitSet = true;
+    @Nullable Function<@Nullable Object, @Nullable Object> exitFunc;
+    @Nullable Object exitFuncObj = pContext.getHandlerData(ContextHandler.sEXIT_FUNC, false, Object.class);
+    if (exitFuncObj == sNULL_EXIT_VALUE) exitFunc = null;
     else if (exitFuncObj != null) {
-      @SuppressWarnings("unchecked")
-      Function<@Nullable Object, @Nullable Object> convertExitFunc =
-        (Function<@Nullable Object, @Nullable Object>) exitFuncObj;
+      @SuppressWarnings(
+        "unchecked") Function<@Nullable Object, @Nullable Object> convertExitFunc = (Function<@Nullable Object, @Nullable Object>) exitFuncObj;
       exitFunc = convertExitFunc;
-    }
-    else
-      exitFunc = null;
+    } else exitFunc = null;
 
     pContext.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, true);
 
@@ -154,15 +139,12 @@ public class ContextFactoryImpl implements SPIContextFactory {
     pContext.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, null);
 
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    ContextClass oldContext;
-    if (contextStack.isEmpty())
-      oldContext = null;
-    else
-      oldContext = contextStack.peek();
-    if (pContext.equals(oldContext) == true) {
+    @Nullable ContextClass oldContext;
+    if (contextStack.isEmpty()) oldContext = null;
+    else oldContext = contextStack.peek();
+    if (pContext.equals(oldContext)) {
       contextStack.pop();
-    }
-    else {
+    } else {
       internalReportError(pContext, "Incorrect context found on stack", (Throwable) null);
       throw new IllegalStateException();
     }
@@ -177,15 +159,12 @@ public class ContextFactoryImpl implements SPIContextFactory {
     for (ContextHandler handler : mHandlers)
       handler.executeOnDetachContextToThread(pContext);
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    ContextClass oldContext;
-    if (contextStack.isEmpty())
-      oldContext = null;
-    else
-      oldContext = contextStack.peek();
-    if (pContext.equals(oldContext) == true) {
+    @Nullable ContextClass oldContext;
+    if (contextStack.isEmpty()) oldContext = null;
+    else oldContext = contextStack.peek();
+    if (pContext.equals(oldContext)) {
       contextStack.pop();
-    }
-    else {
+    } else {
       internalReportError(pContext, "Incorrect context found on stack", (Throwable) null);
       throw new IllegalStateException();
     }
@@ -208,31 +187,27 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public Context getCurrentContext() {
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    if (contextStack.isEmpty() == false)
-      return contextStack.peek();
+    if (!contextStack.isEmpty()) return contextStack.peek();
     return mNOOP_CONTEXT;
   }
 
   @Override
   public @Nullable Context getNullableCurrentContext() {
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    if (contextStack.isEmpty() == false)
-      return contextStack.peek();
+    if (!contextStack.isEmpty()) return contextStack.peek();
     return null;
   }
 
   /**
    * @see com.diamondq.common.context.ContextFactory#reportThrowable(java.lang.Class, java.lang.Object,
-   *      java.lang.Throwable)
+   *   java.lang.Throwable)
    */
   @Override
   public RuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    ContextClass parentContext;
-    if (contextStack.isEmpty() == true)
-      parentContext = null;
-    else
-      parentContext = contextStack.peek();
+    @Nullable ContextClass parentContext;
+    if (contextStack.isEmpty()) parentContext = null;
+    else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
       contextStack.add(context);
       context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
@@ -243,13 +218,11 @@ public class ContextFactoryImpl implements SPIContextFactory {
   }
 
   @Override
-  public void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
+  public void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    ContextClass parentContext;
-    if (contextStack.isEmpty() == true)
-      parentContext = null;
-    else
-      parentContext = contextStack.peek();
+    @Nullable ContextClass parentContext;
+    if (contextStack.isEmpty()) parentContext = null;
+    else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
       contextStack.add(context);
       context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
@@ -261,17 +234,15 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   /**
    * @see com.diamondq.common.context.ContextFactory#reportTrace(java.lang.Class, java.lang.Object, java.lang.String,
-   *      java.lang.Object[])
+   *   java.lang.Object[])
    */
   @Override
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
-    @Nullable Object @Nullable... pArgs) {
+    @Nullable Object @Nullable ... pArgs) {
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    ContextClass parentContext;
-    if (contextStack.isEmpty() == true)
-      parentContext = null;
-    else
-      parentContext = contextStack.peek();
+    @Nullable ContextClass parentContext;
+    if (contextStack.isEmpty()) parentContext = null;
+    else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
       contextStack.add(context);
       context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
@@ -283,17 +254,15 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   /**
    * @see com.diamondq.common.context.ContextFactory#reportDebug(java.lang.Class, java.lang.Object, java.lang.String,
-   *      java.lang.Object[])
+   *   java.lang.Object[])
    */
   @Override
   public void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
-    @Nullable Object @Nullable... pArgs) {
+    @Nullable Object @Nullable ... pArgs) {
     Stack<ContextClass> contextStack = mThreadLocalContexts.get();
-    ContextClass parentContext;
-    if (contextStack.isEmpty() == true)
-      parentContext = null;
-    else
-      parentContext = contextStack.peek();
+    @Nullable ContextClass parentContext;
+    if (contextStack.isEmpty()) parentContext = null;
+    else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
       contextStack.add(context);
       context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
@@ -303,13 +272,44 @@ public class ContextFactoryImpl implements SPIContextFactory {
     }
   }
 
+  @Override
+  public void reportInfo(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    @Nullable ContextClass parentContext;
+    if (contextStack.isEmpty()) parentContext = null;
+    else parentContext = contextStack.peek();
+    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
+      contextStack.add(context);
+      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
+      for (ContextHandler handler : mHandlers)
+        handler.executeOnContextStart(context);
+      context.info(pMessage, pArgs);
+    }
+  }
+
+  @Override
+  public void reportWarn(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    @Nullable ContextClass parentContext;
+    if (contextStack.isEmpty()) parentContext = null;
+    else parentContext = contextStack.peek();
+    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
+      contextStack.add(context);
+      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
+      for (ContextHandler handler : mHandlers)
+        handler.executeOnContextStart(context);
+      context.warn(pMessage, pArgs);
+    }
+  }
   /* ************************************************************ */
   /* ContextFactoryImpl methods */
   /* ************************************************************ */
 
   /**
    * @see com.diamondq.common.context.spi.SPIContextFactory#internalExitValue(com.diamondq.common.context.spi.ContextClass,
-   *      java.lang.Object)
+   *   java.lang.Object)
    */
   @Override
   public <T> T internalExitValue(ContextClass pContext, T pResult) {
@@ -320,7 +320,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   /**
    * @see com.diamondq.common.context.spi.SPIContextFactory#internalExitValueWithMeta(com.diamondq.common.context.spi.ContextClass,
-   *      java.lang.Object, java.util.function.Function)
+   *   java.lang.Object, java.util.function.Function)
    */
   @Override
   public <T> T internalExitValueWithMeta(ContextClass pContext, T pResult,
@@ -332,7 +332,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   /**
    * @see com.diamondq.common.context.spi.SPIContextFactory#internalReportTrace(com.diamondq.common.context.spi.ContextClass,
-   *      java.lang.Object[])
+   *   java.lang.Object[])
    */
   @Override
   public void internalReportTrace(ContextClass pContext, @Nullable Object @Nullable [] pArgs) {
@@ -343,7 +343,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   /**
    * @see com.diamondq.common.context.spi.SPIContextFactory#internalReportTrace(com.diamondq.common.context.spi.ContextClass,
-   *      java.lang.String, java.lang.Object[])
+   *   java.lang.String, java.lang.Object[])
    */
   @Override
   public void internalReportTrace(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs) {
@@ -417,10 +417,8 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void internalReportError(ContextClass pContext, String pMessage, @Nullable Throwable pThrowable) {
     for (ContextHandler handler : mHandlers) {
-      if (pThrowable == null)
-        handler.executeOnContextReportError(pContext, pMessage, (Object[]) null);
-      else
-        handler.executeOnContextReportError(pContext, pMessage, pThrowable);
+      if (pThrowable == null) handler.executeOnContextReportError(pContext, pMessage, (Object[]) null);
+      else handler.executeOnContextReportError(pContext, pMessage, pThrowable);
     }
   }
 
@@ -434,8 +432,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
     for (ContextHandler handler : mHandlers) {
       handler.executeOnContextExplicitThrowable(pContext, pThrowable);
     }
-    if (pThrowable instanceof RuntimeException)
-      return (RuntimeException) pThrowable;
+    if (pThrowable instanceof RuntimeException) return (RuntimeException) pThrowable;
     return new RuntimeException(pThrowable);
   }
 

@@ -1,56 +1,55 @@
 package com.diamondq.common.context.spi;
 
 import com.diamondq.common.context.ContextFactory;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Function;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 /**
- * This extended ContextFactory interface defines additional methods that can be used by consumers of the SPI (ie.
+ * This extended ContextFactory interface defines additional methods that can be used by consumers of the SPI (i.e.
  * ContextHandler's)
  */
 public interface SPIContextFactory extends ContextFactory {
 
-  public void attachContextToThread(ContextClass pContext);
+  void attachContextToThread(ContextClass pContext);
 
-  public void closeContext(ContextClass pContext);
+  void closeContext(ContextClass pContext);
 
-  public void detachContextFromThread(ContextClass pContext);
+  void detachContextFromThread(ContextClass pContext);
 
-  public <T> T internalExitValue(ContextClass pContext, T pResult);
+  <T> T internalExitValue(ContextClass pContext, T pResult);
 
-  public <T> T internalExitValueWithMeta(ContextClass pContext, T pResult,
+  <T> T internalExitValueWithMeta(ContextClass pContext, T pResult,
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
 
-  public void internalReportTrace(ContextClass pContext, @Nullable Object @Nullable [] pArgs);
+  void internalReportTrace(ContextClass pContext, @Nullable Object @Nullable [] pArgs);
 
-  public void internalReportTrace(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
+  void internalReportTrace(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
 
-  public void internalReportTraceWithMeta(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
+  void internalReportTraceWithMeta(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
 
-  public boolean internalIsTraceEnabled(ContextClass pContext);
+  boolean internalIsTraceEnabled(ContextClass pContext);
 
-  public void internalReportDebug(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
+  void internalReportDebug(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
 
-  public void internalReportDebugWithMeta(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
+  void internalReportDebugWithMeta(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
 
-  public boolean internalIsDebugEnabled(ContextClass pContext);
+  boolean internalIsDebugEnabled(ContextClass pContext);
 
-  public void internalReportInfo(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
+  void internalReportInfo(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
 
-  public boolean internalIsInfoEnabled(ContextClass pContext);
+  boolean internalIsInfoEnabled(ContextClass pContext);
 
-  public void internalReportWarn(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
+  void internalReportWarn(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
 
-  public boolean internalIsWarnEnabled(ContextClass pContext);
+  boolean internalIsWarnEnabled(ContextClass pContext);
 
-  public void internalReportError(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
+  void internalReportError(ContextClass pContext, String pMessage, @Nullable Object @Nullable [] pArgs);
 
-  public void internalReportError(ContextClass pContext, String pMessage, @Nullable Throwable pThrowable);
+  void internalReportError(ContextClass pContext, String pMessage, @Nullable Throwable pThrowable);
 
-  public boolean internalIsErrorEnabled(ContextClass pContext);
+  boolean internalIsErrorEnabled(ContextClass pContext);
 
-  public RuntimeException internalReportThrowable(ContextClass pContext, Throwable pThrowable);
+  RuntimeException internalReportThrowable(ContextClass pContext, Throwable pThrowable);
 
 }

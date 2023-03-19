@@ -1,11 +1,11 @@
 package com.diamondq.common.context;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.function.Function;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ContextPrinters {
 
@@ -29,49 +29,29 @@ public class ContextPrinters {
       if (i instanceof byte[]) {
         byte[] d = (byte[]) i;
         return "%HASH[" + Base64.getEncoder().encodeToString(d) + "]";
-      }
-      else
-        return i;
+      } else return i;
     };
     sBytesType = (i) -> {
       if (i instanceof byte[]) {
         byte[] d = (byte[]) i;
-        if (d.length < 5)
-          return d;
-        return "%BYTES[" + String.valueOf(d.length) + "]";
-      }
-      else
-        return i;
+        if (d.length < 5) return d;
+        return "%BYTES[" + d.length + "]";
+      } else return i;
     };
     sX509CertificateType = (i) -> {
       if (i instanceof X509Certificate) {
         X509Certificate cert = (X509Certificate) i;
-        StringBuilder sb = new StringBuilder();
-        sb.append("X509Certificate[");
-        sb.append("Version=").append(cert.getVersion());
-        sb.append(", Subject=").append(cert.getSubjectDN().toString());
-        sb.append(", Signature Algorithm=").append(cert.getSigAlgName());
-        sb.append(", Issuer=").append(cert.getIssuerDN().toString());
-        sb.append(", Serial Number=").append(cert.getSerialNumber().toString());
-        sb.append(", Validity=[From=").append(cert.getNotBefore());
-        sb.append(", To=").append(cert.getNotAfter()).append("]");
-        sb.append("]");
-        return sb.toString();
-      }
-      else
-        return i;
+        return "X509Certificate[" + "Version=" + cert.getVersion() + ", Subject=" + cert.getSubjectDN().toString()
+          + ", Signature Algorithm=" + cert.getSigAlgName() + ", Issuer=" + cert.getIssuerDN().toString()
+          + ", Serial Number=" + cert.getSerialNumber().toString() + ", Validity=[From=" + cert.getNotBefore() + ", To="
+          + cert.getNotAfter() + "]" + "]";
+      } else return i;
     };
     sKeyPairType = (i) -> {
       if (i instanceof KeyPair) {
         KeyPair keyPair = (KeyPair) i;
-        StringBuilder sb = new StringBuilder();
-        sb.append("%KEYPAIR[public=");
-        sb.append(keyPair.getPublic());
-        sb.append("]");
-        return sb.toString();
-      }
-      else
-        return i;
+        return "%KEYPAIR[public=" + keyPair.getPublic() + "]";
+      } else return i;
     };
   }
 }

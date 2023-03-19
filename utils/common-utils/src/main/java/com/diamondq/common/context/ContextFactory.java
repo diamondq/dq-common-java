@@ -3,58 +3,57 @@ package com.diamondq.common.context;
 import com.diamondq.common.context.impl.ContextFactoryImpl;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public interface ContextFactory {
 
-  public static ContextFactory getInstance() {
+  static ContextFactory getInstance() {
     return ContextFactoryImpl.sINSTANCE;
   }
 
-  public static Context currentContext() {
+  static Context currentContext() {
     return getInstance().getCurrentContext();
   }
 
-  public static @Nullable Context nullableCurrentContext() {
+  static @Nullable Context nullableCurrentContext() {
     return getInstance().getNullableCurrentContext();
   }
 
-  public static <T> ContextExtendedCompletableFuture<T> completedFuture(T pValue) {
+  static <T> ContextExtendedCompletableFuture<T> completedFuture(T pValue) {
     return FutureUtils.completedFuture(pValue);
   }
 
-  public static <T> ContextExtendedCompletableFuture<T> completedFailure(Throwable pValue) {
+  static <T> ContextExtendedCompletableFuture<T> completedFailure(Throwable pValue) {
     return FutureUtils.completedFailure(pValue);
   }
 
-  public static <T> ContextExtendedCompletableFuture<T> of(CompletionStage<T> pFuture) {
+  static <T> ContextExtendedCompletableFuture<T> of(CompletionStage<T> pFuture) {
     return FutureUtils.of(pFuture);
   }
 
-  public static <T> ContextExtendedCompletableFuture<T> newCompletableFuture() {
+  static <T> ContextExtendedCompletableFuture<T> newCompletableFuture() {
     return FutureUtils.newCompletableFuture();
   }
 
-  public static <T> ContextExtendedCompletableFuture<List<T>> listOf(
+  static <T> ContextExtendedCompletableFuture<List<T>> listOf(
     List<@NonNull ? extends @NonNull ExtendedCompletionStage<T>> pList) {
     return FutureUtils.listOf(pList);
   }
 
-  public static void staticReportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs) {
+  static void staticReportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
     getInstance().reportTrace(pClass, pThis, pArgs);
   }
 
-  public static void staticReportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
-    @Nullable Object @Nullable... pArgs) {
+  static void staticReportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
     getInstance().reportTrace(pClass, pThis, pMessage, pArgs);
   }
 
-  public static RuntimeException staticReportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
+  static RuntimeException staticReportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
     return getInstance().reportThrowable(pClass, pThis, pThrowable);
   }
 
@@ -71,7 +70,7 @@ public interface ContextFactory {
    * @param pArgs any arguments to display
    * @return the context
    */
-  public Context newContextWithMeta(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs);
+  Context newContextWithMeta(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs);
 
   /**
    * This represents the ENTRY of a context. It MUST be matched with a corresponding EXIT (even under Exceptions).
@@ -81,65 +80,85 @@ public interface ContextFactory {
    * @param pArgs any arguments to display
    * @return the new context
    */
-  public Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs);
+  Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs);
 
   /**
    * Returns the current context within the current thread. If there is no context, then a NoopContext is returned
-   * 
+   *
    * @return the context
    */
-  public Context getCurrentContext();
+  Context getCurrentContext();
 
   /**
    * Returns the current context within the current thread. If there is no context, then null is returned.
-   * 
+   *
    * @return the context
    */
-  public @Nullable Context getNullableCurrentContext();
+  @Nullable Context getNullableCurrentContext();
 
   /**
-   * Report an exception outside of a context. It will automatically create a context, report the exception and then end
+   * Report an exception outside a context. It will automatically create a context, report the exception and then end
    * the context.
-   * 
+   *
    * @param pClass the class
-   * @param pThis the this object
+   * @param pThis the caller object
    * @param pThrowable the exception
    * @return a RuntimeException that can be immediately thrown
    */
-  public RuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable);
+  RuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable);
 
   /**
-   * Report an exception outside of a context. It will automatically create a context, report the exception and then end
+   * Report an exception outside a context. It will automatically create a context, report the exception and then end
    * the context.
-   * 
+   *
    * @param pClass the class
-   * @param pThis the this object
+   * @param pThis the caller object
    * @param pArgs the arguments
    */
-  public void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable... pArgs);
+  void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs);
 
   /**
-   * Report an exception outside of a context. It will automatically create a context, report the exception and then end
+   * Report an exception outside a context. It will automatically create a context, report the exception and then end
    * the context.
-   * 
+   *
    * @param pClass the class
-   * @param pThis the this object
+   * @param pThis the caller object
    * @param pMessage the message
    * @param pArgs the arguments
    */
-  public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
-    @Nullable Object @Nullable... pArgs);
+  void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
-   * Report an debug outside of a context. It will automatically create a context, report the debug and then end the
+   * Report a debug outside a context. It will automatically create a context, report the debug and then end the
    * context.
-   * 
+   *
    * @param pClass the class
-   * @param pThis the this object
+   * @param pThis the caller object
    * @param pMessage the message
    * @param pArgs the arguments
    */
-  public void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
-    @Nullable Object @Nullable... pArgs);
+  void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
+
+  /**
+   * Report an info outside a context. It will automatically create a context, report the info and then end the
+   * context.
+   *
+   * @param pClass the class
+   * @param pThis the caller object
+   * @param pMessage the message
+   * @param pArgs the arguments
+   */
+  void reportInfo(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
+
+  /**
+   * Report a "warn" outside a context. It will automatically create a context, report the "warn" and then end the
+   * context.
+   *
+   * @param pClass the class
+   * @param pThis the caller object
+   * @param pMessage the message
+   * @param pArgs the arguments
+   */
+  void reportWarn(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
 
 }
