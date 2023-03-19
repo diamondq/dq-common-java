@@ -125,26 +125,50 @@ public class SyncEngine {
    * @param pInfo the SyncInfo
    * @return the future
    */
-  public <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> ExtendedCompletableFuture<@Nullable Void> performSync(
+  public <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> ExtendedCompletableFuture<SyncResult> performSync(
     SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> pInfo) {
+
+    SyncResult result = new SyncResult();
+
+    long startTimer = System.currentTimeMillis();
 
     /* First, let's check if there is a hash to shortcut this */
 
+    long aHashStartTimer = System.currentTimeMillis();
     Optional<String> aHashOpt = pInfo.getAHash();
+    result.aHashElapsedTime = System.currentTimeMillis() - aHashStartTimer;
+
     if (aHashOpt.isPresent()) {
+
+      long bHashStartTimer = System.currentTimeMillis();
       Optional<String> bHashOpt = pInfo.getBHash();
+      result.bHashElapsedTime = System.currentTimeMillis() - bHashStartTimer;
+
       if (bHashOpt.isPresent()) {
 
         /* If the hashes match, then we're done */
 
-        if (aHashOpt.get().equals(bHashOpt.get())) return ExtendedCompletableFuture.completedFuture(null);
+        if (aHashOpt.get().equals(bHashOpt.get())) {
+          result.totalElapsedTime = System.currentTimeMillis() - startTimer;
+          return ExtendedCompletableFuture.completedFuture(result);
+        }
       }
     }
 
     /* Stream the data into a set of data */
 
-    ExtendedCompletableFuture<@NonNull Map<@NonNull A_KEY, @NonNull A_FRAG>> aSourceFuture = pInfo.getASource();
-    ExtendedCompletableFuture<@NonNull Map<@NonNull B_KEY, @NonNull B_FRAG>> bSourceFuture = pInfo.getBSource();
+    long aSourceStartTimer = System.currentTimeMillis();
+    ExtendedCompletableFuture<@NonNull Map<@NonNull A_KEY, @NonNull A_FRAG>> aSourceFuture = pInfo.getASource()
+      .thenApply((source) -> {
+        result.aSourceLoadElapsedTime = System.currentTimeMillis() - aSourceStartTimer;
+        return source;
+      });
+    long bSourceStartTimer = System.currentTimeMillis();
+    ExtendedCompletableFuture<@NonNull Map<@NonNull B_KEY, @NonNull B_FRAG>> bSourceFuture = pInfo.getBSource()
+      .thenApply((source) -> {
+        result.bSourceLoadElapsedTime = System.currentTimeMillis() - bSourceStartTimer;
+        return source;
+      });
 
     boolean keyTypesEqual = pInfo.isKeyTypesEqual();
     boolean aFragTypeComplete = pInfo.isAFragTypeComplete();
@@ -153,6 +177,11 @@ public class SyncEngine {
 
     return aSourceFuture.thenCombine(bSourceFuture, (origAMap, origBMap) -> {
 
+      long categorizationStartTimer = System.currentTimeMillis();
+
+      result.aSourceCount = origAMap.size();
+      result.bSourceCount = origBMap.size();
+      
       Map<A_KEY, A_FRAG> aMap = new HashMap<>(origAMap);
       Map<B_KEY, B_FRAG> bMap = new HashMap<>(origBMap);
       Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = new HashSet<>();
@@ -246,6 +275,8 @@ public class SyncEngine {
 
       }
 
+      result.categorizationElapsedTime = System.currentTimeMillis() - categorizationStartTimer;
+
       return Sextet.with(aToBeCreated, aToBeDeleted, aToBeModified, bToBeCreated, bToBeDeleted, bToBeModified);
     }).thenCompose((sextet) -> {
 
@@ -257,6 +288,13 @@ public class SyncEngine {
       Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = sextet.getValue4();
       Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = sextet.getValue5();
 
+      result.aToBeCreatedCount = aToBeCreated.size();
+      result.aToBeDeletedCount = aToBeDeleted.size();
+      result.aToBeModifiedCount = aToBeModified.size();
+      result.bToBeCreatedCount = bToBeCreated.size();
+      result.bToBeDeletedCount = bToBeDeleted.size();
+      result.bToBeModifiedCount = bToBeModified.size();
+
       Collection<ExtendedCompletableFuture<?>> futures = new ArrayList<>();
 
       /* Now start processing the changes */
@@ -265,12 +303,19 @@ public class SyncEngine {
 
         /* Delete A records */
 
+        long aDeletedStartTimer = System.currentTimeMillis();
         futures.add(pInfo.deleteA(aToBeDeleted.stream()).thenCompose((unused) -> {
+
+          result.aToBeDeletedElapsedTime = System.currentTimeMillis() - aDeletedStartTimer;
 
           /* Add A records */
 
+          long aCreatedStartTimer = System.currentTimeMillis();
           return pInfo.createA(aToBeCreated.stream()
-            .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual)));
+            .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual))).thenApply((ignored) -> {
+            result.aToBeCreatedElapsedTime = System.currentTimeMillis() - aCreatedStartTimer;
+            return null;
+          });
 
         }));
 
@@ -278,29 +323,49 @@ public class SyncEngine {
 
         /* Add A records */
 
+        long aCreatedStartTimer = System.currentTimeMillis();
         futures.add(pInfo.createA(aToBeCreated.stream()
-          .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual))));
+          .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual))).thenApply((ignored) -> {
+          result.aToBeCreatedElapsedTime = System.currentTimeMillis() - aCreatedStartTimer;
+          return null;
+        }));
 
         /* Delete A records */
 
-        futures.add(pInfo.deleteA(aToBeDeleted.stream()));
+        long aDeletedStartTimer = System.currentTimeMillis();
+        futures.add(pInfo.deleteA(aToBeDeleted.stream()).thenApply((ignored) -> {
+          result.aToBeDeletedElapsedTime = System.currentTimeMillis() - aDeletedStartTimer;
+          return null;
+        }));
       }
 
       /* Modify A records */
 
+      long aModifiedStartTimer = System.currentTimeMillis();
       futures.add(pInfo.modifyA(aToBeModified.stream()
-        .map(SyncEngine.modifyA(pInfo, aFragTypeComplete, bFragTypeComplete))));
+        .map(SyncEngine.modifyA(pInfo, aFragTypeComplete, bFragTypeComplete))).thenApply((ignored) -> {
+        result.aToBeModifiedElapsedTime = System.currentTimeMillis() - aModifiedStartTimer;
+        return null;
+      }));
 
       if (pInfo.isBDeleteBeforeCreate()) {
 
         /* Delete B records */
 
+        long bDeletedStartTimer = System.currentTimeMillis();
         futures.add(pInfo.deleteB(bToBeDeleted.stream()).thenCompose((unused) -> {
+
+          result.bToBeDeletedElapsedTime = System.currentTimeMillis() - bDeletedStartTimer;
 
           /* Add B records */
 
+          long bCreatedStartTimer = System.currentTimeMillis();
+
           return pInfo.createB(bToBeCreated.stream()
-            .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual)));
+            .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual))).thenApply((ignored) -> {
+            result.bToBeCreatedElapsedTime = System.currentTimeMillis() - bCreatedStartTimer;
+            return null;
+          });
 
         }));
 
@@ -308,23 +373,38 @@ public class SyncEngine {
 
         /* Add B records */
 
+        long bCreatedStartTimer = System.currentTimeMillis();
         futures.add(pInfo.createB(bToBeCreated.stream()
-          .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual))));
+          .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual))).thenApply((ignored) -> {
+          result.bToBeCreatedElapsedTime = System.currentTimeMillis() - bCreatedStartTimer;
+          return null;
+        }));
 
         /* Delete B records */
 
-        futures.add(pInfo.deleteB(bToBeDeleted.stream()));
+        long bDeletedStartTimer = System.currentTimeMillis();
+        futures.add(pInfo.deleteB(bToBeDeleted.stream()).thenApply((ignored) -> {
+          result.bToBeDeletedElapsedTime = System.currentTimeMillis() - bDeletedStartTimer;
+          return null;
+        }));
 
       }
 
       /* Modify B records */
 
+      long bModifiedStartTimer = System.currentTimeMillis();
       futures.add(pInfo.modifyB(bToBeModified.stream()
-        .map(SyncEngine.modifyB(pInfo, aFragTypeComplete, bFragTypeComplete))));
+        .map(SyncEngine.modifyB(pInfo, aFragTypeComplete, bFragTypeComplete))).thenApply((ignored) -> {
+        result.bToBeModifiedElapsedTime = System.currentTimeMillis() - bModifiedStartTimer;
+        return null;
+      }));
 
       /* Now set up a future for all these */
 
       return ExtendedCompletableFuture.allOf(futures);
-    }).thenCompose((ignored) -> pInfo.complete());
+    }).thenCompose((ignored) -> pInfo.complete()).thenApply((ignored) -> {
+      result.totalElapsedTime = System.currentTimeMillis() - startTimer;
+      return result;
+    });
   }
 }
