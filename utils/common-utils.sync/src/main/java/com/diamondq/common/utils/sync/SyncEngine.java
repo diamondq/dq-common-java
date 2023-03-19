@@ -150,7 +150,7 @@ public class SyncEngine {
 
         if (aHashOpt.get().equals(bHashOpt.get())) {
           result.totalElapsedTime = System.currentTimeMillis() - startTimer;
-          return ExtendedCompletableFuture.completedFuture(result);
+          return pInfo.complete().thenApply((ignored) -> result);
         }
       }
     }
@@ -181,7 +181,7 @@ public class SyncEngine {
 
       result.aSourceCount = origAMap.size();
       result.bSourceCount = origBMap.size();
-      
+
       Map<A_KEY, A_FRAG> aMap = new HashMap<>(origAMap);
       Map<B_KEY, B_FRAG> bMap = new HashMap<>(origBMap);
       Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = new HashSet<>();
