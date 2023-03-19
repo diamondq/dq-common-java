@@ -129,13 +129,14 @@ public class SyncResult {
       sb.append("U: ").append(bToBeModifiedCount).append(" [").append(time(bToBeModifiedElapsedTime)).append("] ");
       sb.append("D: ").append(bToBeDeletedCount).append(" [").append(time(bToBeDeletedElapsedTime)).append("] ");
     }
+    sb.append("}");
 
     return sb.toString();
   }
 
   private String time(long pTime) {
     if (pTime < 1000) return pTime + "ms";
-    if (pTime < 60000) return (pTime / 1000.0) + "ms";
+    if (pTime < 60000) return (pTime / 1000.0) + "s";
     return Duration.ofMillis(pTime).toString();
   }
 }
