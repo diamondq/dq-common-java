@@ -24,7 +24,7 @@ public interface Context extends AutoCloseable {
    * @param pResult the exit value
    * @return the exit value
    */
-  <T> @Nullable T exit(@Nullable T pResult);
+  <T> T exit(T pResult);
 
   /**
    * Reports an explicit exit value with a conversion function for the context
@@ -33,7 +33,7 @@ public interface Context extends AutoCloseable {
    * @param pFunc the conversion function
    * @return the exit value
    */
-  <T> @Nullable T exit(@Nullable T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
+  <T> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
 
   I18NStringAndException trace(I18NStringAndException pEx);
 
