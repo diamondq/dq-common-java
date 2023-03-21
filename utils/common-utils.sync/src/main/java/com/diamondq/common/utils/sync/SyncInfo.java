@@ -1,6 +1,6 @@
 package com.diamondq.common.utils.sync;
 
-import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
@@ -108,7 +108,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    *
    * @return the future Map of key/frag for the A source
    */
-  ExtendedCompletableFuture<@NonNull Map<@NonNull A_KEY, @NonNull A_FRAG>> getASource();
+  ExtendedCompletionStage<@NonNull Map<@NonNull A_KEY, @NonNull A_FRAG>> getASource();
 
   /**
    * Returns an optional hash representing the B source data. If it's present, and the A hash is present, they can be
@@ -125,7 +125,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    *
    * @return the future Map of key/frag for the B source
    */
-  ExtendedCompletableFuture<@NonNull Map<@NonNull B_KEY, @NonNull B_FRAG>> getBSource();
+  ExtendedCompletionStage<@NonNull Map<@NonNull B_KEY, @NonNull B_FRAG>> getBSource();
 
   /**
    * Return's the deleted status for a key
@@ -234,7 +234,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of A_KEY/A's to create
    * @return future to indicate success or failure
    */
-  ExtendedCompletableFuture<@Nullable Void> createA(Stream<Pair<A_KEY, A>> pStream);
+  ExtendedCompletionStage<@Nullable Void> createA(Stream<Pair<A_KEY, A>> pStream);
 
   /**
    * Deletes a set of A_KEY/A_FRAG's
@@ -242,7 +242,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of A_KEY/A_FRAG's to delete
    * @return future to indicate success or failure
    */
-  ExtendedCompletableFuture<@Nullable Void> deleteA(Stream<Pair<A_KEY, A_FRAG>> pStream);
+  ExtendedCompletionStage<@Nullable Void> deleteA(Stream<Pair<A_KEY, A_FRAG>> pStream);
 
   /**
    * Updates a set of A_KEY/A's
@@ -250,7 +250,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of A_KEY's/A's to update
    * @return future to indicate success or failure
    */
-  ExtendedCompletableFuture<@Nullable Void> modifyA(Stream<Pair<A_KEY, A>> pStream);
+  ExtendedCompletionStage<@Nullable Void> modifyA(Stream<Pair<A_KEY, A>> pStream);
 
   /**
    * Creates a new set of B_KEY/B's
@@ -258,7 +258,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of B_KEY/B's to create
    * @return future to indicate success or failure
    */
-  ExtendedCompletableFuture<@Nullable Void> createB(Stream<Pair<B_KEY, B>> pStream);
+  ExtendedCompletionStage<@Nullable Void> createB(Stream<Pair<B_KEY, B>> pStream);
 
   /**
    * Deletes a set of B_KEY/B_FRAG's
@@ -266,7 +266,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of B_KEY/B_FRAG's to delete
    * @return future to indicate success or failure
    */
-  ExtendedCompletableFuture<@Nullable Void> deleteB(Stream<Pair<B_KEY, B_FRAG>> pStream);
+  ExtendedCompletionStage<@Nullable Void> deleteB(Stream<Pair<B_KEY, B_FRAG>> pStream);
 
   /**
    * Updates a set of B_KEY/B's
@@ -274,12 +274,12 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of B_KEY's/B's to update
    * @return future to indicate success or failure
    */
-  ExtendedCompletableFuture<@Nullable Void> modifyB(Stream<Pair<B_KEY, B>> pStream);
+  ExtendedCompletionStage<@Nullable Void> modifyB(Stream<Pair<B_KEY, B>> pStream);
 
   /**
    * Called after all the creation/modify/deletes are complete.
    *
    * @return future to indicate success or failure
    */
-  ExtendedCompletableFuture<@Nullable Void> complete();
+  ExtendedCompletionStage<@Nullable Void> complete();
 }
