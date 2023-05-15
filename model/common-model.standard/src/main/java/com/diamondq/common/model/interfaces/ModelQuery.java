@@ -1,8 +1,7 @@
 package com.diamondq.common.model.interfaces;
 
 import com.diamondq.common.storage.kv.Query;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface ModelQuery extends Query {
   public StructureDefinition getStructureDefinition();

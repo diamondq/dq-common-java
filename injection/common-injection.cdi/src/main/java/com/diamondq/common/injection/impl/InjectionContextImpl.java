@@ -1,7 +1,11 @@
 package com.diamondq.common.injection.impl;
 
 import com.diamondq.common.injection.InjectionContext;
+import org.jetbrains.annotations.Nullable;
 
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.literal.NamedLiteral;
+import javax.enterprise.inject.se.SeContainer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,12 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.literal.NamedLiteral;
-import javax.enterprise.inject.se.SeContainer;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class InjectionContextImpl implements InjectionContext {
 
@@ -34,12 +32,9 @@ public class InjectionContextImpl implements InjectionContext {
   @Override
   public <T> Optional<T> findBean(Class<T> pBeanType, @Nullable String pName) {
     Instance<T> instance;
-    if (pName != null)
-      instance = Objects.requireNonNull(mAppContext).select(pBeanType, NamedLiteral.of(pName));
-    else
-      instance = Objects.requireNonNull(mAppContext).select(pBeanType);
-    if (instance.isResolvable() == false)
-      return Optional.empty();
+    if (pName != null) instance = Objects.requireNonNull(mAppContext).select(pBeanType, NamedLiteral.of(pName));
+    else instance = Objects.requireNonNull(mAppContext).select(pBeanType);
+    if (instance.isResolvable() == false) return Optional.empty();
     return Optional.of(instance.get());
   }
 
@@ -50,11 +45,9 @@ public class InjectionContextImpl implements InjectionContext {
   public <T> Collection<T> getBeansOfType(Class<T> pBeanType, @Nullable String pName) {
     List<T> list = new ArrayList<>();
     Instance<T> instance;
-    if (pName != null)
-      instance = Objects.requireNonNull(mAppContext).select(pBeanType, NamedLiteral.of(pName));
-    else
-      instance = Objects.requireNonNull(mAppContext).select(pBeanType);
-    for (Iterator<T> i = instance.iterator(); i.hasNext();)
+    if (pName != null) instance = Objects.requireNonNull(mAppContext).select(pBeanType, NamedLiteral.of(pName));
+    else instance = Objects.requireNonNull(mAppContext).select(pBeanType);
+    for (Iterator<T> i = instance.iterator(); i.hasNext(); )
       list.add(i.next());
     return list;
   }

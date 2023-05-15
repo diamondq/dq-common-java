@@ -1,8 +1,8 @@
 package com.diamondq.common.model.interfaces;
 
-import java.util.Locale;
+import org.jetbrains.annotations.Nullable;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.Locale;
 
 public interface LookupStringDataService {
 

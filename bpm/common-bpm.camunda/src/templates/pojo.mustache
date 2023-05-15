@@ -1,136 +1,136 @@
 {{#useSwaggerAnnotations}}
-import io.swagger.annotations.*;
+  import io.swagger.annotations.*;
 {{/useSwaggerAnnotations}}
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.micronaut.core.annotation.Introspected;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 {{#discriminator}}{{>typeInfoAnnotation}}{{/discriminator}}{{#description}}/**
- * {{description}}
- **/{{/description}}
+* {{description}}
+**/{{/description}}
 @Introspected
 {{#useSwaggerAnnotations}}{{#description}}@ApiModel(description = "{{{description}}}"){{/description}}{{/useSwaggerAnnotations}}
 {{>generatedAnnotation}}{{>additionalModelTypeAnnotations}}public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}} {{#serializableModel}}implements Serializable{{/serializableModel}} {
-  {{#vars}}{{#isEnum}}{{^isContainer}}
+{{#vars}}{{#isEnum}}{{^isContainer}}
 
-{{>enumClass}}{{/isContainer}}{{#isContainer}}{{#mostInnerItems}}
- 
-{{>enumClass}}{{/mostInnerItems}}{{/isContainer}}{{/isEnum}}
-  private {{#useBeanValidation}}@Valid {{/useBeanValidation}}{{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};{{/vars}}
+  {{>enumClass}}{{/isContainer}}{{#isContainer}}{{#mostInnerItems}}
 
-  {{#vars}}/**
-   {{#description}}
-   * {{description}}
-   {{/description}}
-   {{#minimum}}
-   * minimum: {{minimum}}
-   {{/minimum}}
-   {{#maximum}}
-   * maximum: {{maximum}}
-   {{/maximum}}
-   * @param p{{nameInCamelCase}} {{description}} 
-   * @return this
-   **/
-  public {{classname}} {{name}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
-    {{name}} = p{{nameInCamelCase}};
-    return this;
-  }
+  {{>enumClass}}{{/mostInnerItems}}{{/isContainer}}{{/isEnum}}
+private {{#useBeanValidation}}@Valid {{/useBeanValidation}}{{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};{{/vars}}
 
-  {{#vendorExtensions.x-extra-annotation}}{{{vendorExtensions.x-extra-annotation}}}{{/vendorExtensions.x-extra-annotation}}{{#useSwaggerAnnotations}}
+{{#vars}}/**
+{{#description}}
+  * {{description}}
+{{/description}}
+{{#minimum}}
+  * minimum: {{minimum}}
+{{/minimum}}
+{{#maximum}}
+  * maximum: {{maximum}}
+{{/maximum}}
+* @param p{{nameInCamelCase}} {{description}}
+* @return this
+**/
+public {{classname}} {{name}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
+{{name}} = p{{nameInCamelCase}};
+return this;
+}
+
+{{#vendorExtensions.x-extra-annotation}}{{{vendorExtensions.x-extra-annotation}}}{{/vendorExtensions.x-extra-annotation}}{{#useSwaggerAnnotations}}
   @ApiModelProperty({{#example}}example = "{{{example}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}value = "{{{description}}}"){{/useSwaggerAnnotations}}
-  @JsonProperty("{{baseName}}")
+@JsonProperty("{{baseName}}")
 {{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}} public {{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} {{getter}}() {
-    return {{name}};
-  }
+return {{name}};
+}
 
-  public void {{setter}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
-    {{name}} = p{{nameInCamelCase}};
-  }
-  {{/vars}}
+public void {{setter}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
+{{name}} = p{{nameInCamelCase}};
+}
+{{/vars}}
 
-  {{#generateBuilders}}@JsonCreator
-  public {{classname}}({{#vars}}@JsonProperty("{{baseName}}") {{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}{{^-last}}, {{/-last}}{{/vars}}) {
-    {{#vars}}
-    {{name}} = p{{nameInCamelCase}};
-    {{/vars}}
-  }{{/generateBuilders}}
+{{#generateBuilders}}@JsonCreator
+public {{classname}}({{#vars}}@JsonProperty("{{baseName}}") {{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}{{^-last}}, {{/-last}}{{/vars}}) {
+{{#vars}}
+  {{name}} = p{{nameInCamelCase}};
+{{/vars}}
+}{{/generateBuilders}}
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }{{#hasVars}}
-    {{classname}} {{classVarName}} = ({{classname}}) o;
-    return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{^-last}} &&
-        {{/-last}}{{/vars}}{{#parent}} &&
-        super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
-    return {{#parent}}super.equals(o){{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
-  }
+@Override
+public boolean equals(Object o) {
+if (this == o) {
+return true;
+}
+if (o == null || getClass() != o.getClass()) {
+return false;
+}{{#hasVars}}
+  {{classname}} {{classVarName}} = ({{classname}}) o;
+  return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{^-last}} &&
+  {{/-last}}{{/vars}}{{#parent}} &&
+  super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
+  return {{#parent}}super.equals(o){{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
+}
 
-  @Override
-  public int hashCode() {
-    return Objects.hash({{#vars}}{{name}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
-  }
+@Override
+public int hashCode() {
+return Objects.hash({{#vars}}{{name}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
+}
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class {{classname}} {\n");
-    {{#parent}}sb.append("    ").append(toIndentedString(super.toString())).append("\n");{{/parent}}
-    {{#vars}}sb.append("    {{name}}: ").append(toIndentedString({{name}})).append("\n");
-    {{/vars}}sb.append("}");
-    return sb.toString();
-  }
+@Override
+public String toString() {
+StringBuilder sb = new StringBuilder();
+sb.append("class {{classname}} {\n");
+{{#parent}}sb.append("    ").append(toIndentedString(super.toString())).append("\n");{{/parent}}
+{{#vars}}sb.append("    {{name}}: ").append(toIndentedString({{name}})).append("\n");
+{{/vars}}sb.append("}");
+return sb.toString();
+}
 
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
+/**
+* Convert the given object to string with each line indented by 4 spaces
+* (except the first line).
+*/
+private String toIndentedString(Object o) {
+if (o == null) {
+return "null";
+}
+return o.toString().replace("\n", "\n    ");
+}
 
-  {{#generateBuilders}}
+{{#generateBuilders}}
   public static Builder builder() {
-    return new Builder();
+  return new Builder();
   }
 
   public static class Builder {
-    {{#vars}}
+  {{#vars}}
     private {{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
-    {{/vars}}
+  {{/vars}}
 
-    {{#vars}}
+  {{#vars}}
     /**
-      {{#description}}
+    {{#description}}
       * {{description}}
-      {{/description}}
-      {{#minimum}}
+    {{/description}}
+    {{#minimum}}
       * minimum: {{minimum}}
-      {{/minimum}}
-      {{#maximum}}
+    {{/minimum}}
+    {{#maximum}}
       * maximum: {{maximum}}
-      {{/maximum}}
-      * @param p{{nameInCamelCase}} {{description}}
-      * @return the builder
-      **/
+    {{/maximum}}
+    * @param p{{nameInCamelCase}} {{description}}
+    * @return the builder
+    **/
     public Builder {{name}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
-      {{name}} = p{{nameInCamelCase}};
-      return this;
+    {{name}} = p{{nameInCamelCase}};
+    return this;
     }
-    {{/vars}}
+  {{/vars}}
 
-    public {{classname}} build() {
-      return new {{classname}}({{#vars}}{{name}}{{^-last}}, {{/-last}}{{/vars}});
-    }
+  public {{classname}} build() {
+  return new {{classname}}({{#vars}}{{name}}{{^-last}}, {{/-last}}{{/vars}});
+  }
   }{{/generateBuilders}}
 }

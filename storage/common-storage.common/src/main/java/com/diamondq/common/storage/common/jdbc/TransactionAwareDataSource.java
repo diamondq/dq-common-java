@@ -10,25 +10,24 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A DataSource where the actual connections are wrapped up in ThreadLocal storage.
  */
 public class TransactionAwareDataSource implements DataSource {
 
-  private final DataSource                                                                  mDelegate;
+  private final DataSource mDelegate;
 
-  private final ThreadLocal<@Nullable DelegatingConnection>                                 mThreadLocal       =
-    new ThreadLocal<>();
+  private final ThreadLocal<@Nullable DelegatingConnection> mThreadLocal = new ThreadLocal<>();
 
-  private final ThreadLocal<@Nullable Map<@NonNull String, @Nullable DelegatingConnection>> mThreadUserPWLocal =
-    new ThreadLocal<>();
+  private final ThreadLocal<@Nullable Map<@NotNull String, @Nullable DelegatingConnection>> mThreadUserPWLocal = new ThreadLocal<>();
 
   /**
    * Constructor
-   * 
+   *
    * @param pDataSource the DataSource to actually use to retrieve Connections
    */
   public TransactionAwareDataSource(DataSource pDataSource) {
@@ -78,17 +77,14 @@ public class TransactionAwareDataSource implements DataSource {
       childConnection.setAutoCommit(false);
       connection = new DelegatingConnection(childConnection, (w, d) -> closeConnection(w, d));
       mThreadLocal.set(connection);
-    }
-    else
-      connection.increaseRefCount();
+    } else connection.increaseRefCount();
     return connection;
   }
 
   @Override
   public Connection getConnection(@Nullable String pUsername, @Nullable String pPassword) throws SQLException {
-    if (pUsername == null)
-      throw new IllegalArgumentException();
-    Map<@NonNull String, @Nullable DelegatingConnection> map = mThreadUserPWLocal.get();
+    if (pUsername == null) throw new IllegalArgumentException();
+    Map<@NotNull String, @Nullable DelegatingConnection> map = mThreadUserPWLocal.get();
     if (map == null) {
       map = new HashMap<>();
       mThreadUserPWLocal.set(map);
@@ -99,9 +95,7 @@ public class TransactionAwareDataSource implements DataSource {
       childConnection.setAutoCommit(false);
       connection = new DelegatingConnection(childConnection, (w, d) -> closeUserPWConnection(w, d, pUsername));
       map.put(pUsername, connection);
-    }
-    else
-      connection.increaseRefCount();
+    } else connection.increaseRefCount();
     return connection;
   }
 
@@ -110,11 +104,10 @@ public class TransactionAwareDataSource implements DataSource {
   }
 
   private void closeUserPWConnection(Connection pWrapper, Connection pDelegate, @Nullable String pUserName) {
-    Map<@NonNull String, @Nullable DelegatingConnection> map = mThreadUserPWLocal.get();
+    Map<@NotNull String, @Nullable DelegatingConnection> map = mThreadUserPWLocal.get();
     if (map != null) {
       map.remove(pUserName);
-      if (map.isEmpty() == true)
-        mThreadUserPWLocal.remove();
+      if (map.isEmpty() == true) mThreadUserPWLocal.remove();
     }
   }
 

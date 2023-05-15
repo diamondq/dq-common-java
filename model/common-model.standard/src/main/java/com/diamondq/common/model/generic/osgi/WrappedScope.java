@@ -14,6 +14,17 @@ import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import org.javatuples.Octet;
+import org.javatuples.Pair;
+import org.javatuples.Quartet;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,45 +33,28 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Octet;
-import org.javatuples.Pair;
-import org.javatuples.Quartet;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class WrappedScope implements Scope {
-  private static final Logger                                                    sLogger        =
-    LoggerFactory.getLogger(WrappedScope.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(WrappedScope.class);
 
-  protected Scope                                                                mScope;
+  protected Scope mScope;
 
-  protected Toolkit                                                              mToolkit;
+  protected Toolkit mToolkit;
 
-  protected ContextFactory                                                       mContextFactory;
+  protected ContextFactory mContextFactory;
 
-  protected @Nullable String                                                     mName;
+  protected @Nullable String mName;
 
-  protected final ConcurrentMap<PersistenceLayer, Map<String, Object>>           mLayers        =
-    new ConcurrentHashMap<>();
+  protected final ConcurrentMap<PersistenceLayer, Map<String, Object>> mLayers = new ConcurrentHashMap<>();
 
-  protected final ConcurrentMap<IBuilder<PersistenceLayer>, Map<String, Object>> mBuilderLayers =
-    new ConcurrentHashMap<>();
+  protected final ConcurrentMap<IBuilder<PersistenceLayer>, Map<String, Object>> mBuilderLayers = new ConcurrentHashMap<>();
 
-  protected @Nullable Filter[]                                                   mFilters;
+  protected @Nullable Filter[] mFilters;
 
-  protected volatile boolean                                                     mInitialized   = false;
+  protected volatile boolean mInitialized = false;
 
-  protected boolean[]                                                            mDefaultLayers;
+  protected boolean[] mDefaultLayers;
 
-  private static final @NonNull String[]                                         sFILTER_KEYS   =
-    new @NonNull String[] {".structure_filter", ".structure_definition_filter", ".editor_structure_definition_filter",
-        ".resource_filter"};
+  private static final @NotNull String[] sFILTER_KEYS = new @NotNull String[] { ".structure_filter", ".structure_definition_filter", ".editor_structure_definition_filter", ".resource_filter" };
 
   @SuppressWarnings("null")
   public WrappedScope() {
@@ -142,9 +136,7 @@ public class WrappedScope implements Scope {
           catch (InvalidSyntaxException ex) {
             throw new RuntimeException(ex);
           }
-        }
-        else
-          mFilters[i] = null;
+        } else mFilters[i] = null;
       }
 
       mInitialized = true;
@@ -163,14 +155,12 @@ public class WrappedScope implements Scope {
       catch (UnknownScopeException ex) {
         return null;
       }
-    }
-    else
-      throw new UnsupportedOperationException();
+    } else throw new UnsupportedOperationException();
   }
 
   /**
    * Adds the PersistenceLayer if the filter matches the properties
-   * 
+   *
    * @param pLayer
    * @param pProps
    */
@@ -195,50 +185,38 @@ public class WrappedScope implements Scope {
             existingLayer = null;
           }
           modificationState = ((WrappedToolkit) mToolkit).getModificationState();
-        }
-        else
-          throw new UnsupportedOperationException();
-        @SuppressWarnings("unchecked")
-        List<PersistenceLayer>[] existingLayers = new List[sFILTER_KEYS.length];
+        } else throw new UnsupportedOperationException();
+        @SuppressWarnings("unchecked") List<PersistenceLayer>[] existingLayers = new List[sFILTER_KEYS.length];
         if (existingLayer == null) {
           for (int i = 0; i < sFILTER_KEYS.length; i++)
             existingLayers[i] = new ArrayList<>();
-        }
-        else {
-          if ((existingLayer instanceof CombinedPersistenceLayer) == false)
-            throw new UnsupportedOperationException();
-          Quartet<List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>> existingLayerQuartet =
-            ((CombinedPersistenceLayer) existingLayer).getPersistenceLayers();
-          if (sFILTER_KEYS.length != 4)
-            throw new UnsupportedOperationException();
+        } else {
+          if ((existingLayer instanceof CombinedPersistenceLayer) == false) throw new UnsupportedOperationException();
+          Quartet<List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>> existingLayerQuartet = ((CombinedPersistenceLayer) existingLayer).getPersistenceLayers();
+          if (sFILTER_KEYS.length != 4) throw new UnsupportedOperationException();
           existingLayers[0] = existingLayerQuartet.getValue0();
           existingLayers[1] = existingLayerQuartet.getValue1();
           existingLayers[2] = existingLayerQuartet.getValue2();
           existingLayers[3] = existingLayerQuartet.getValue3();
         }
 
-        @SuppressWarnings("unchecked")
-        List<Pair<Integer, PersistenceLayer>>[] layers = new List[sFILTER_KEYS.length];
+        @SuppressWarnings("unchecked") List<Pair<Integer, PersistenceLayer>>[] layers = new List[sFILTER_KEYS.length];
         for (int o = 0; o < sFILTER_KEYS.length; o++)
           layers[o] = Lists.newArrayList();
 
         for (Map.Entry<PersistenceLayer, Map<String, Object>> pair : mLayers.entrySet()) {
           for (int i = 0; i < sFILTER_KEYS.length; i++) {
             Filter filter = mFilters[i];
-            if (filter == null)
-              continue;
+            if (filter == null) continue;
 
             Map<String, Object> props = pair.getValue();
             if (filter.matches(props) == true) {
 
               Object rankingObj = props.get(Constants.SERVICE_RANKING);
               int ranking;
-              if (rankingObj == null)
-                ranking = Integer.MAX_VALUE;
-              else if (rankingObj instanceof Integer)
-                ranking = ((Integer) rankingObj);
-              else
-                ranking = Integer.parseInt(rankingObj.toString());
+              if (rankingObj == null) ranking = Integer.MAX_VALUE;
+              else if (rankingObj instanceof Integer) ranking = ((Integer) rankingObj);
+              else ranking = Integer.parseInt(rankingObj.toString());
 
               layers[i].add(Pair.with(ranking, pair.getKey()));
             }
@@ -248,20 +226,16 @@ public class WrappedScope implements Scope {
         for (Map.Entry<IBuilder<PersistenceLayer>, Map<String, Object>> pair : mBuilderLayers.entrySet()) {
           for (int i = 0; i < sFILTER_KEYS.length; i++) {
             Filter filter = mFilters[i];
-            if (filter == null)
-              continue;
+            if (filter == null) continue;
 
             Map<String, Object> props = pair.getValue();
             if (filter.matches(props) == true) {
 
               Object rankingObj = props.get(Constants.SERVICE_RANKING);
               int ranking;
-              if (rankingObj == null)
-                ranking = Integer.MAX_VALUE;
-              else if (rankingObj instanceof Integer)
-                ranking = ((Integer) rankingObj);
-              else
-                ranking = Integer.parseInt(rankingObj.toString());
+              if (rankingObj == null) ranking = Integer.MAX_VALUE;
+              else if (rankingObj instanceof Integer) ranking = ((Integer) rankingObj);
+              else ranking = Integer.parseInt(rankingObj.toString());
 
               layers[i].add(Pair.with(ranking, pair.getKey().build()));
             }
@@ -277,28 +251,24 @@ public class WrappedScope implements Scope {
                 sLogger.info("Filter {} didn't resolve. Using a Memory PersistenceLayer for now", mFilters[i]);
               layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer(mContextFactory)));
               mDefaultLayers[i] = true;
-            }
-            else {
+            } else {
               if (mDefaultLayers[i] == true) {
                 for (PersistenceLayer pl : existingLayers[i])
                   layers[i].add(Pair.with(Integer.MAX_VALUE, pl));
-              }
-              else {
+              } else {
                 if (mFilters[i] != null)
                   sLogger.info("Filter {} didn't resolve. Using a Memory PersistenceLayer for now", mFilters[i]);
                 layers[i].add(Pair.with(Integer.MAX_VALUE, new NewMemoryPersistenceLayer(mContextFactory)));
                 mDefaultLayers[i] = true;
               }
             }
-          }
-          else
-            mDefaultLayers[i] = false;
+          } else mDefaultLayers[i] = false;
         }
 
         /* Now sort the lists */
 
-        @SuppressWarnings("unchecked")
-        ImmutableList.Builder<PersistenceLayer>[] sortedLayers = new ImmutableList.Builder[sFILTER_KEYS.length];
+        @SuppressWarnings(
+          "unchecked") ImmutableList.Builder<PersistenceLayer>[] sortedLayers = new ImmutableList.Builder[sFILTER_KEYS.length];
         for (int i = 0; i < sFILTER_KEYS.length; i++) {
           final int o = i;
           Collections.sort(layers[o], (a, b) -> {
@@ -310,20 +280,17 @@ public class WrappedScope implements Scope {
           });
         }
 
-        @SuppressWarnings("unchecked")
-        @NonNull
-        List<PersistenceLayer>[] finalLayers = new @NonNull List[sFILTER_KEYS.length];
+        @SuppressWarnings(
+          "unchecked") @NotNull List<PersistenceLayer>[] finalLayers = new @NotNull List[sFILTER_KEYS.length];
         for (int i = 0; i < sFILTER_KEYS.length; i++)
           finalLayers[i] = sortedLayers[i].build();
 
         /* Now check if there are any failures due to modifications */
 
-        if (sFILTER_KEYS.length != 4)
-          throw new UnsupportedOperationException();
+        if (sFILTER_KEYS.length != 4) throw new UnsupportedOperationException();
         for (int i = 0; i < 4; i++) {
           boolean isDifferent = false;
-          if (finalLayers[i].size() != existingLayers[i].size())
-            isDifferent = true;
+          if (finalLayers[i].size() != existingLayers[i].size()) isDifferent = true;
           else {
             for (int o = 0; o < finalLayers[i].size(); o++) {
               if (finalLayers[i].get(o) != existingLayers[i].get(o)) {
@@ -334,44 +301,40 @@ public class WrappedScope implements Scope {
           }
           if (isDifferent == true) {
             switch (i) {
-            case 0:
-              if (modificationState.getValue0() == true)
-                throw new UnsupportedOperationException(
+              case 0:
+                if (modificationState.getValue0() == true) throw new UnsupportedOperationException(
                   "The structure persistence layer has updated something before the scope was updated. Not yet supported.");
-              if (modificationState.getValue4() == true)
-                throw new UnsupportedOperationException(
+                if (modificationState.getValue4() == true) throw new UnsupportedOperationException(
                   "The structure persistence layer has deleted something before the scope was updated. Not yet supported.");
-              break;
-            case 1:
-              if (modificationState.getValue1() == true)
-                throw new UnsupportedOperationException(
+                break;
+              case 1:
+                if (modificationState.getValue1() == true) throw new UnsupportedOperationException(
                   "The structure definition persistence layer has updated something before the scope was updated. Not yet supported.");
-              if (modificationState.getValue5() == true)
-                throw new UnsupportedOperationException(
+                if (modificationState.getValue5() == true) throw new UnsupportedOperationException(
                   "The structure definition persistence layer has deleted something before the scope was updated. Not yet supported.");
-              break;
-            case 2:
-              if (modificationState.getValue2() == true)
-                throw new UnsupportedOperationException(
+                break;
+              case 2:
+                if (modificationState.getValue2() == true) throw new UnsupportedOperationException(
                   "The editor structure persistence layer has updated something before the scope was updated. Not yet supported.");
-              if (modificationState.getValue6() == true)
-                throw new UnsupportedOperationException(
+                if (modificationState.getValue6() == true) throw new UnsupportedOperationException(
                   "The editor structure persistence layer has deleted something before the scope was updated. Not yet supported.");
-              break;
-            case 3:
-              if (modificationState.getValue3() == true)
-                throw new UnsupportedOperationException(
+                break;
+              case 3:
+                if (modificationState.getValue3() == true) throw new UnsupportedOperationException(
                   "The resource persistence layer has updated something before the scope was updated. Not yet supported.");
-              if (modificationState.getValue7() == true)
-                throw new UnsupportedOperationException(
+                if (modificationState.getValue7() == true) throw new UnsupportedOperationException(
                   "The resource persistence layer has deleted something before the scope was updated. Not yet supported.");
-              break;
+                break;
             }
           }
         }
 
-        CombinedPersistenceLayer combinedPersistenceLayer =
-          new CombinedPersistenceLayer(mContextFactory, finalLayers[0], finalLayers[1], finalLayers[2], finalLayers[3]);
+        CombinedPersistenceLayer combinedPersistenceLayer = new CombinedPersistenceLayer(mContextFactory,
+          finalLayers[0],
+          finalLayers[1],
+          finalLayers[2],
+          finalLayers[3]
+        );
         if (mToolkit instanceof GenericToolkit)
           ((GenericToolkit) mToolkit).setPersistenceLayer(mScope, combinedPersistenceLayer);
         else if (mToolkit instanceof WrappedToolkit) {
@@ -414,13 +377,11 @@ public class WrappedScope implements Scope {
   /**
    * @see java.lang.Object#toString()
    */
-  @SuppressWarnings({"null", "unused"})
+  @SuppressWarnings({ "null", "unused" })
   @Override
   public String toString() {
     Scope scope = mScope;
-    if (scope == null)
-      return super.toString();
-    else
-      return super.toString() + "[" + scope.getName() + "]";
+    if (scope == null) return super.toString();
+    else return super.toString() + "[" + scope.getName() + "]";
   }
 }

@@ -8,15 +8,14 @@ import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.lambda.interfaces.Predicate2;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ContextExtendedCompletionStage<T> extends ExtendedCompletionStage<T> {
 
@@ -180,12 +179,12 @@ public interface ContextExtendedCompletionStage<T> extends ExtendedCompletionSta
 
   @Override
   <R> ContextExtendedCompletionStage<R> splitCompose(Predicate<T> pBoolFunc,
-    Function1<T, @NonNull ExtendedCompletionStage<R>> pTrueFunc,
-    Function1<T, @NonNull ExtendedCompletionStage<R>> pFalseFunc);
+    Function1<T, @NotNull ExtendedCompletionStage<R>> pTrueFunc,
+    Function1<T, @NotNull ExtendedCompletionStage<R>> pFalseFunc);
 
   <R> ContextExtendedCompletionStage<R> splitCompose(Predicate2<T, Context> pBoolFunc,
-    Function2<T, Context, @NonNull ExtendedCompletionStage<R>> pTrueFunc,
-    Function2<T, Context, @NonNull ExtendedCompletionStage<R>> pFalseFunc);
+    Function2<T, Context, @NotNull ExtendedCompletionStage<R>> pTrueFunc,
+    Function2<T, Context, @NotNull ExtendedCompletionStage<R>> pFalseFunc);
 
   @Override
   <R> ContextExtendedCompletionStage<R> splitApply(Predicate<T> pBoolFunc, Function1<T, R> pTrueFunc,
@@ -206,10 +205,10 @@ public interface ContextExtendedCompletionStage<T> extends ExtendedCompletionSta
   ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(Collection<? extends ExtendedCompletionStage<?>> pCfs);
 
   @Override
-  ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(@NonNull ExtendedCompletionStage<?> @NonNull... pCfs);
+  ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(@NotNull ExtendedCompletionStage<?> @NotNull ... pCfs);
 
   @Override
-  ContextExtendedCompletionStage<@Nullable Object> relatedAnyOf(@NonNull ExtendedCompletionStage<?> @NonNull... pCfs);
+  ContextExtendedCompletionStage<@Nullable Object> relatedAnyOf(@NotNull ExtendedCompletionStage<?> @NotNull ... pCfs);
 
   @Override
   <U> ContextExtendedCompletionStage<List<U>> relatedListOf(Collection<? extends ExtendedCompletionStage<U>> pCfs);

@@ -2,8 +2,7 @@ package com.diamondq.common.errors;
 
 import com.diamondq.common.i18n.I18NString;
 import com.diamondq.common.i18n.MessagesEnum;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ExtendedIllegalArgumentException extends ExtendedRuntimeException {
 
@@ -13,11 +12,12 @@ public class ExtendedIllegalArgumentException extends ExtendedRuntimeException {
     super(pString);
   }
 
-  public ExtendedIllegalArgumentException(MessagesEnum pCode, @Nullable Object @Nullable... pParams) {
+  public ExtendedIllegalArgumentException(MessagesEnum pCode, @Nullable Object @Nullable ... pParams) {
     super(pCode, pParams);
   }
 
-  public ExtendedIllegalArgumentException(Throwable pCause, MessagesEnum pCode, @Nullable Object @Nullable... pParams) {
+  public ExtendedIllegalArgumentException(Throwable pCause, MessagesEnum pCode,
+    @Nullable Object @Nullable ... pParams) {
     super(pCause, pCode, pParams);
   }
 }

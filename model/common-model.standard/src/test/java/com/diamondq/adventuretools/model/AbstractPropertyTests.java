@@ -10,18 +10,17 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.google.common.collect.Iterables;
-
-import java.util.Collection;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Collection;
 
 public abstract class AbstractPropertyTests implements StandardTest {
 
   protected @Nullable Toolkit mToolkit;
 
-  protected @Nullable Scope   mScope;
+  protected @Nullable Scope mScope;
 
   @Override
   public void setup(Toolkit pToolkit, Scope pScope) {
@@ -65,8 +64,8 @@ public abstract class AbstractPropertyTests implements StandardTest {
     StructureDefinition def = checkAndCreate(name);
     Assert.assertNotNull(def);
 
-    def = def.addPropertyDefinition(
-      toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
+    def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String)
+      .setPrimaryKey(true));
     def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "testValue", PropertyType.String));
 
     toolkit.writeStructureDefinition(scope, def);
@@ -125,8 +124,8 @@ public abstract class AbstractPropertyTests implements StandardTest {
     StructureDefinition def = checkAndCreate(parentDefName);
     Assert.assertNotNull(def);
 
-    def = def.addPropertyDefinition(
-      toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
+    def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String)
+      .setPrimaryKey(true));
     def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "testValue", PropertyType.String));
 
     toolkit.writeStructureDefinition(scope, def);
@@ -135,13 +134,16 @@ public abstract class AbstractPropertyTests implements StandardTest {
 
     StructureDefinition childDef = checkAndCreate(childDefName);
     Assert.assertNotNull(childDef);
-    childDef = childDef.addPropertyDefinition(
-      toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String).setPrimaryKey(true));
-    childDef =
-      childDef.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "testValue", PropertyType.String));
-    childDef =
-      childDef.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "parent", PropertyType.StructureRef)
-        .addKeyword(CommonKeywordKeys.INHERIT_PARENT, CommonKeywordValues.TRUE));
+    childDef = childDef.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "name", PropertyType.String)
+      .setPrimaryKey(true));
+    childDef = childDef.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope,
+      "testValue",
+      PropertyType.String
+    ));
+    childDef = childDef.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope,
+      "parent",
+      PropertyType.StructureRef
+    ).addKeyword(CommonKeywordKeys.INHERIT_PARENT, CommonKeywordValues.TRUE));
 
     toolkit.writeStructureDefinition(scope, childDef);
 
@@ -190,10 +192,13 @@ public abstract class AbstractPropertyTests implements StandardTest {
     String value = prop.getValue(childStructure);
     Assert.assertNull(value);
 
-    Collection<Property<@Nullable StructureRef>> parentProps =
-      childStructure.lookupPropertiesByKeyword(CommonKeywordKeys.INHERIT_PARENT, null, PropertyType.StructureRef);
-    childStructure =
-      childStructure.updateProperty(Iterables.get(parentProps, 0).setValue(parentStructure.getReference()));
+    Collection<Property<@Nullable StructureRef>> parentProps = childStructure.lookupPropertiesByKeyword(
+      CommonKeywordKeys.INHERIT_PARENT,
+      null,
+      PropertyType.StructureRef
+    );
+    childStructure = childStructure.updateProperty(Iterables.get(parentProps, 0)
+      .setValue(parentStructure.getReference()));
     prop = childStructure.lookupPropertyByName("testValue");
     Assert.assertNotNull(prop);
 

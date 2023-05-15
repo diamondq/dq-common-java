@@ -1,21 +1,20 @@
 package com.diamondq.common.storage.jdbc;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class JDBCResultSetIterator implements Iterator<@Nullable String> {
 
   private PreparedStatement mPs;
 
-  @Nullable
-  private ResultSet         mRs;
+  @Nullable private ResultSet mRs;
 
-  private boolean           moved;
+  private boolean moved;
 
   public JDBCResultSetIterator(PreparedStatement pPs, ResultSet pRs) {
     mPs = pPs;
@@ -29,10 +28,8 @@ public class JDBCResultSetIterator implements Iterator<@Nullable String> {
   @Override
   public boolean hasNext() {
     ResultSet rs = mRs;
-    if (rs == null)
-      return false;
-    if (moved == true)
-      return true;
+    if (rs == null) return false;
+    if (moved == true) return true;
     try {
       boolean next = rs.next();
       if (next == false) {
@@ -54,8 +51,7 @@ public class JDBCResultSetIterator implements Iterator<@Nullable String> {
   @Override
   public @Nullable String next() {
     ResultSet rs = mRs;
-    if (rs == null)
-      throw new NoSuchElementException();
+    if (rs == null) throw new NoSuchElementException();
     try {
       if (moved == false) {
         boolean next = rs.next();
@@ -65,9 +61,7 @@ public class JDBCResultSetIterator implements Iterator<@Nullable String> {
           mPs.close();
           throw new NoSuchElementException();
         }
-      }
-      else
-        moved = false;
+      } else moved = false;
       return rs.getString(1);
     }
     catch (SQLException ex) {

@@ -1,33 +1,32 @@
 package com.diamondq.common.storage.kv;
 
 import com.google.common.collect.ImmutableList;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An abstract TableDefinitionBuilder
  *
  * @param <TDB> the actual type of the TableDefinitionBuilder
  */
-public abstract class KVTableDefinitionBuilder<@NonNull TDB extends KVTableDefinitionBuilder<@NonNull TDB>> {
+public abstract class KVTableDefinitionBuilder<@NotNull TDB extends KVTableDefinitionBuilder<@NotNull TDB>> {
 
-  protected @Nullable String                           mTableName;
+  protected @Nullable String mTableName;
 
-  protected @Nullable String                           mSinglePrimaryKeyName;
+  protected @Nullable String mSinglePrimaryKeyName;
 
   protected ImmutableList.Builder<IKVColumnDefinition> mColBuilder = ImmutableList.builder();
 
   /**
    * Builds the actual TableDefinition
-   * 
+   *
    * @return the table definition
    */
   public abstract IKVTableDefinition build();
 
   /**
    * Sets the table name
-   * 
+   *
    * @param pValue the name
    * @return the builder
    */
@@ -39,7 +38,7 @@ public abstract class KVTableDefinitionBuilder<@NonNull TDB extends KVTableDefin
 
   /**
    * Sets the single primary key column name
-   * 
+   *
    * @param pValue the name
    * @return the builder
    */
@@ -51,7 +50,7 @@ public abstract class KVTableDefinitionBuilder<@NonNull TDB extends KVTableDefin
 
   /**
    * Adds a column
-   * 
+   *
    * @param pValue the column definition
    * @return the builder
    */

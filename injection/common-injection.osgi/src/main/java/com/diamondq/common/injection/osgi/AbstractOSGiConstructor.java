@@ -7,6 +7,18 @@ import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
 import com.diamondq.common.injection.osgi.ConstructorInfo.SpecialTypes;
 import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
+import org.javatuples.Triplet;
+import org.jetbrains.annotations.Nullable;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -22,22 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Triplet;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.util.tracker.ServiceTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class AbstractOSGiConstructor {
 
-  private static final Logger      sLogger = LoggerFactory.getLogger(AbstractOSGiConstructor.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(AbstractOSGiConstructor.class);
 
   private static final Set<String> sSKIP_PROPS;
 
@@ -64,17 +63,17 @@ public class AbstractOSGiConstructor {
 
   protected final Map<String, FilterTracker> mTrackers = new HashMap<>();
 
-  protected final ConstructorInfo            mInfo;
+  protected final ConstructorInfo mInfo;
 
-  protected volatile ContextFactory          mContextFactory;
+  protected volatile ContextFactory mContextFactory;
 
-  protected volatile ComponentContext        mComponentContext;
+  protected volatile ComponentContext mComponentContext;
 
-  protected volatile Map<String, Object>     mCurrentProps;
+  protected volatile Map<String, Object> mCurrentProps;
 
   protected @Nullable ServiceRegistration<?> mRegistration;
 
-  protected @Nullable Object                 mServiceObject;
+  protected @Nullable Object mServiceObject;
 
   @SuppressWarnings("null")
   public AbstractOSGiConstructor(ConstructorInfoBuilder pBuilder) {
@@ -129,13 +128,12 @@ public class AbstractOSGiConstructor {
       if (registration != null) {
         sLogger.trace("Clearing old registration");
         registration.unregister();
-        if (mInfo.deleteMethod != null)
-          try {
-            mInfo.deleteMethod.invoke(this, mServiceObject);
-          }
-          catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new RuntimeException(ex);
-          }
+        if (mInfo.deleteMethod != null) try {
+          mInfo.deleteMethod.invoke(this, mServiceObject);
+        }
+        catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+          throw new RuntimeException(ex);
+        }
         mRegistration = null;
       }
     }
@@ -162,20 +160,18 @@ public class AbstractOSGiConstructor {
 
         for (int i = 0; i < mInfo.filters.length; i++) {
           String filterStr = PropertiesParsing.getNullableString(mCurrentProps, mInfo.filters[i]);
-          if (filterStr == null)
-            continue;
+          if (filterStr == null) continue;
           String finalFilterStr;
-          if (filterStr.isEmpty() == true)
-            finalFilterStr = "(objectClass=" + mInfo.filterClasses[i].getName() + ")";
-          else
-            finalFilterStr = "(&(objectClass=" + mInfo.filterClasses[i].getName() + ")" + filterStr + ")";
+          if (filterStr.isEmpty() == true) finalFilterStr = "(objectClass=" + mInfo.filterClasses[i].getName() + ")";
+          else finalFilterStr = "(&(objectClass=" + mInfo.filterClasses[i].getName() + ")" + filterStr + ")";
           Filter filter;
           try {
             filter = mComponentContext.getBundleContext().createFilter(finalFilterStr);
           }
           catch (InvalidSyntaxException ex) {
             throw new IllegalArgumentException("Unable to parse the filter " + finalFilterStr + " within " + errorId,
-              ex);
+              ex
+            );
           }
 
           /* Create or get a FilterTracker */
@@ -187,8 +183,10 @@ public class AbstractOSGiConstructor {
           }
 
           sLogger.trace("Starting ServiceTracker for {}", finalFilterStr);
-          ServiceTracker<Object, Object> tracker =
-            new ServiceTracker<>(mComponentContext.getBundleContext(), filter, filterTracker);
+          ServiceTracker<Object, Object> tracker = new ServiceTracker<>(mComponentContext.getBundleContext(),
+            filter,
+            filterTracker
+          );
           filterTracker.setTracker(tracker);
           tracker.open();
         }
@@ -215,8 +213,7 @@ public class AbstractOSGiConstructor {
         String errorId =
           mComponentContext.getBundleContext().getBundle().getSymbolicName() + " with " + mCurrentProps.toString();
 
-        @Nullable
-        Object[] args = new @Nullable Object[mInfo.constructionArgs.length];
+        @Nullable Object[] args = new @Nullable Object[mInfo.constructionArgs.length];
         for (int i = 0; i < mInfo.constructionArgs.length; i++) {
           ConstructionArg arg = mInfo.constructionArgs[i];
           Object value = null;
@@ -225,18 +222,18 @@ public class AbstractOSGiConstructor {
             if (tracker == null) {
               if (arg.required == true)
                 throw new ExtendedIllegalArgumentException(Messages.NO_PROP_MATCHING_FILTER, mInfo.filters[i], errorId);
-            }
-            else {
+            } else {
               List<Triplet<Integer, Long, ServiceReference<Object>>> references = tracker.getReferences();
               if (references.isEmpty()) {
                 if (arg.required == Boolean.TRUE) {
-                  sLogger.trace("\tUnable to find references to arg #{}: propertyFilterKey={}", i,
-                    arg.propertyFilterKey);
+                  sLogger.trace("\tUnable to find references to arg #{}: propertyFilterKey={}",
+                    i,
+                    arg.propertyFilterKey
+                  );
                   available = false;
                   break;
                 }
-              }
-              else {
+              } else {
                 if (arg.collection == true) {
                   List<Object> list = new ArrayList<>();
                   for (Triplet<Integer, Long, ServiceReference<Object>> triplet : references) {
@@ -244,36 +241,36 @@ public class AbstractOSGiConstructor {
                     Object obj = mComponentContext.getBundleContext().getService(ref);
                     if (obj == null) {
                       if (arg.required == Boolean.TRUE) {
-                        sLogger.trace("\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}", i,
-                          arg.propertyFilterKey, ref);
+                        sLogger.trace("\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}",
+                          i,
+                          arg.propertyFilterKey,
+                          ref
+                        );
                         list = null;
                         available = false;
                         break;
                       }
-                    }
-                    else
-                      list.add(obj);
+                    } else list.add(obj);
                   }
                   value = list;
-                }
-                else {
+                } else {
                   ServiceReference<Object> ref = references.iterator().next().getValue2();
                   Object obj = mComponentContext.getBundleContext().getService(ref);
                   if (obj == null) {
                     if (arg.required == Boolean.TRUE) {
-                      sLogger.trace("\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}", i,
-                        arg.propertyFilterKey, ref);
+                      sLogger.trace("\tUnable to resolve reference to arg #{}: propertyFilterKey={} -> {}",
+                        i,
+                        arg.propertyFilterKey,
+                        ref
+                      );
                       available = false;
                       break;
                     }
-                  }
-                  else
-                    value = obj;
+                  } else value = obj;
                 }
               }
             }
-          }
-          else if (arg.propertyValueKey != null) {
+          } else if (arg.propertyValueKey != null) {
             String propValue = arg.propertyValueKey;
             if (arg.argumentClass == String.class)
               value = PropertiesParsing.getNullableString(mCurrentProps, propValue);
@@ -285,82 +282,70 @@ public class AbstractOSGiConstructor {
               value = PropertiesParsing.getNullableBoolean(mCurrentProps, propValue);
             else if (arg.argumentClass == File.class) {
               String valueStr = PropertiesParsing.getNullableString(mCurrentProps, propValue);
-              if (valueStr != null)
-                value = new File(valueStr);
-            }
-            else
-              throw new UnsupportedOperationException();
+              if (valueStr != null) value = new File(valueStr);
+            } else throw new UnsupportedOperationException();
             if (value == null) {
-              if (arg.propertyValueSet == true)
-                value = arg.propertyValue;
+              if (arg.propertyValueSet == true) value = arg.propertyValue;
               if (value == null) {
                 if (arg.required == Boolean.TRUE) {
-                  sLogger.trace("\tUnable to resolve reference to arg #{}: propertyValueKey={}", i,
-                    arg.propertyValueKey);
+                  sLogger.trace("\tUnable to resolve reference to arg #{}: propertyValueKey={}",
+                    i,
+                    arg.propertyValueKey
+                  );
                   available = false;
                   break;
                 }
               }
             }
-          }
-          else if (arg.specialType != SpecialTypes.NA) {
+          } else if (arg.specialType != SpecialTypes.NA) {
             switch (arg.specialType) {
-            case BUNDLECONTEXT:
-              value = mComponentContext.getBundleContext();
-              break;
-            case CONTEXTFACTORY:
-              value = mContextFactory;
-              break;
-            case COMPONENTCONTEXT:
-              value = mComponentContext;
-              break;
-            case NA:
-              throw new IllegalStateException();
+              case BUNDLECONTEXT:
+                value = mComponentContext.getBundleContext();
+                break;
+              case CONTEXTFACTORY:
+                value = mContextFactory;
+                break;
+              case COMPONENTCONTEXT:
+                value = mComponentContext;
+                break;
+              case NA:
+                throw new IllegalStateException();
             }
-          }
-          else
-            throw new UnsupportedOperationException();
+          } else throw new UnsupportedOperationException();
           args[i] = value;
         }
 
         if (available == true) {
-          @Nullable
-          Object service;
+          @Nullable Object service;
           try {
             Constructor<?> c = mInfo.constructor;
             if (c != null) {
               Object serviceObj = c.newInstance(args);
               service = serviceObj;
-            }
-            else {
+            } else {
               Method m = mInfo.method;
               if (m != null) {
                 Object serviceObj = m.invoke(this, args);
                 service = serviceObj;
-              }
-              else
-                throw new IllegalStateException();
+              } else throw new IllegalStateException();
             }
           }
-          catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-            | InvocationTargetException ex) {
+          catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+                 InvocationTargetException ex) {
             throw new RuntimeException(ex);
           }
-          if (service != null)
-            registerService(service);
-        }
-        else {
+          if (service != null) registerService(service);
+        } else {
           ServiceRegistration<?> registration = mRegistration;
           if (registration != null) {
             sLogger.trace("Clearing old registration");
             registration.unregister();
-            if (mInfo.deleteMethod != null)
-              try {
-                mInfo.deleteMethod.invoke(this, mServiceObject);
-              }
-              catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                throw new RuntimeException(ex);
-              }
+            if (mInfo.deleteMethod != null) try {
+              mInfo.deleteMethod.invoke(this, mServiceObject);
+            }
+            catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+              throw new RuntimeException(ex);
+            }
             mRegistration = null;
           }
         }
@@ -376,16 +361,14 @@ public class AbstractOSGiConstructor {
 
     for (Map.Entry<String, Object> pair : mCurrentProps.entrySet()) {
       String key = pair.getKey();
-      if (key.startsWith("."))
-        continue;
-      if (sSKIP_PROPS.contains(key) == true)
-        continue;
+      if (key.startsWith(".")) continue;
+      if (sSKIP_PROPS.contains(key) == true) continue;
       properties.put(key, pair.getValue());
     }
 
     sLogger.trace("Registering constructed service...");
     mServiceObject = pService;
-    mRegistration =
-      mComponentContext.getBundleContext().registerService(mInfo.registrationClasses, pService, properties);
+    mRegistration = mComponentContext.getBundleContext()
+      .registerService(mInfo.registrationClasses, pService, properties);
   }
 }

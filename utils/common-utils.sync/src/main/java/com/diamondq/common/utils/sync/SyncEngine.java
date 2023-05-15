@@ -2,11 +2,11 @@ package com.diamondq.common.utils.sync;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
 import org.javatuples.Sextet;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Singleton;
 import java.util.ArrayList;
@@ -159,13 +159,13 @@ public class SyncEngine {
     /* Stream the data into a set of data */
 
     long aSourceStartTimer = System.currentTimeMillis();
-    ExtendedCompletionStage<@NonNull Map<@NonNull A_KEY, @NonNull A_FRAG>> aSourceFuture = pInfo.getASource()
+    ExtendedCompletionStage<@NotNull Map<@NotNull A_KEY, @NotNull A_FRAG>> aSourceFuture = pInfo.getASource()
       .thenApply((source) -> {
         result.aSourceLoadElapsedTime = System.currentTimeMillis() - aSourceStartTimer;
         return source;
       });
     long bSourceStartTimer = System.currentTimeMillis();
-    ExtendedCompletionStage<@NonNull Map<@NonNull B_KEY, @NonNull B_FRAG>> bSourceFuture = pInfo.getBSource()
+    ExtendedCompletionStage<@NotNull Map<@NotNull B_KEY, @NotNull B_FRAG>> bSourceFuture = pInfo.getBSource()
       .thenApply((source) -> {
         result.bSourceLoadElapsedTime = System.currentTimeMillis() - bSourceStartTimer;
         return source;

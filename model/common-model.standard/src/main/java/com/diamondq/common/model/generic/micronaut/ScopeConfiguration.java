@@ -1,19 +1,18 @@
 package com.diamondq.common.model.generic.micronaut;
 
-import java.util.List;
-import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.convert.format.MapFormat;
 import io.micronaut.core.convert.format.MapFormat.MapTransformation;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Map;
 
 @EachProperty("persistence.scopes")
 public class ScopeConfiguration {
 
-  public final String                        name;
+  public final String name;
 
   @MapFormat(transformation = MapTransformation.FLAT)
   public @Nullable List<Map<String, Object>> structures;

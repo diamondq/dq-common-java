@@ -1,8 +1,7 @@
 package com.diamondq.common.security.acme.model;
 
 import com.diamondq.common.model.interfaces.Structure;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class PersistedState {
 
@@ -29,12 +28,9 @@ public class PersistedState {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     PersistedState other = (PersistedState) pObj;
     return mStructure.equals(other.mStructure);
   }
@@ -44,8 +40,8 @@ public class PersistedState {
   }
 
   public PersistedState setId(String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("id").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("id")
+      .setValue(pValue)));
   }
 
   public @Nullable String getAcmeServer() {
@@ -53,8 +49,8 @@ public class PersistedState {
   }
 
   public PersistedState setAcmeServer(String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("acmeServer").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("acmeServer")
+      .setValue(pValue)));
   }
 
   public @Nullable String getUserKeyPair() {
@@ -62,8 +58,8 @@ public class PersistedState {
   }
 
   public PersistedState setUserKeyPair(String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("userKeyPair").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("userKeyPair")
+      .setValue(pValue)));
   }
 
   public @Nullable String getDomainKeyPair() {
@@ -71,8 +67,8 @@ public class PersistedState {
   }
 
   public PersistedState setDomainKeyPair(String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("domainKeyPair").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("domainKeyPair")
+      .setValue(pValue)));
   }
 
   public @Nullable String getRegistrationLocation() {
@@ -80,8 +76,8 @@ public class PersistedState {
   }
 
   public PersistedState setRegistrationLocation(String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("registrationLocation").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("registrationLocation")
+      .setValue(pValue)));
   }
 
   public @Nullable String getCertChain() {
@@ -89,8 +85,8 @@ public class PersistedState {
   }
 
   public PersistedState setCertChain(@Nullable String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("certChain").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("certChain")
+      .setValue(pValue)));
   }
 
   public @Nullable String getDomainCert() {
@@ -98,8 +94,8 @@ public class PersistedState {
   }
 
   public PersistedState setDomainCert(@Nullable String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("domainCert").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("domainCert")
+      .setValue(pValue)));
   }
 
   public @Nullable String getAuthorizationLocation() {
@@ -107,8 +103,8 @@ public class PersistedState {
   }
 
   public PersistedState setAuthorizationLocation(String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("authorizationLocation").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("authorizationLocation")
+      .setValue(pValue)));
   }
 
   public @Nullable String getCertificateLocation() {
@@ -116,8 +112,8 @@ public class PersistedState {
   }
 
   public PersistedState setCertificateLocation(@Nullable String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("certificateLocation").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("certificateLocation")
+      .setValue(pValue)));
   }
 
   public @Nullable String getCsr() {
@@ -125,7 +121,7 @@ public class PersistedState {
   }
 
   public PersistedState setCsr(String pValue) {
-    return new PersistedState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("csr").setValue(pValue)));
+    return new PersistedState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("csr")
+      .setValue(pValue)));
   }
 }

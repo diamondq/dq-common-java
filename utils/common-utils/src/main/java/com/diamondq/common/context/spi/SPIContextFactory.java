@@ -1,7 +1,7 @@
 package com.diamondq.common.context.spi;
 
 import com.diamondq.common.context.ContextFactory;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 

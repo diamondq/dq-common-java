@@ -1,7 +1,17 @@
 package com.diamondq.common.servers.undertow;
 
 import com.diamondq.common.config.Config;
+import io.undertow.Undertow;
+import io.undertow.Undertow.Builder;
+import io.undertow.UndertowOptions;
+import org.jetbrains.annotations.Nullable;
+import org.xnio.Option;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -15,29 +25,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.xnio.Option;
-
-import io.undertow.Undertow;
-import io.undertow.Undertow.Builder;
-import io.undertow.UndertowOptions;
-
 public abstract class UndertowServer {
 
-  @Nullable
-  public static UndertowServer sINSTANCE = null;
+  @Nullable public static UndertowServer sINSTANCE = null;
 
-  private final Config         mConfig;
+  private final Config mConfig;
 
   public UndertowServer(Config pConfig) {
-    if (sINSTANCE != null)
-      throw new RuntimeException("Unable to initialize the web server twice");
+    if (sINSTANCE != null) throw new RuntimeException("Unable to initialize the web server twice");
     sINSTANCE = this;
 
     mConfig = pConfig;
@@ -119,14 +114,13 @@ public abstract class UndertowServer {
     for (Field f : fields) {
       if (f.getType().isAssignableFrom(Option.class)) {
         try {
-          @SuppressWarnings("unchecked")
-          Option<Object> option = (Option<Object>) f.get(null);
+          @SuppressWarnings("unchecked") Option<Object> option = (Option<Object>) f.get(null);
           String optionName = option.getName();
 
           String answer = mConfig.bind("web.undertow.options." + optionName, String.class);
-          if (answer != null)
-            pBuilder =
-              pBuilder.setServerOption(option, option.parseValue(answer, UndertowServer.class.getClassLoader()));
+          if (answer != null) pBuilder = pBuilder.setServerOption(option,
+            option.parseValue(answer, UndertowServer.class.getClassLoader())
+          );
         }
         catch (IllegalArgumentException | IllegalAccessException ex) {
           throw new RuntimeException(ex);
@@ -141,10 +135,8 @@ public abstract class UndertowServer {
     try {
       Path path = Paths.get(pFileName);
       InputStream stream;
-      if (Files.exists(path) == true)
-        stream = Files.newInputStream(path);
-      else
-        stream = null;
+      if (Files.exists(path) == true) stream = Files.newInputStream(path);
+      else stream = null;
 
       try {
         KeyStore loadedKeystore = KeyStore.getInstance("JKS");
@@ -152,8 +144,7 @@ public abstract class UndertowServer {
         return loadedKeystore;
       }
       finally {
-        if (stream != null)
-          stream.close();
+        if (stream != null) stream.close();
       }
     }
     catch (NoSuchAlgorithmException | CertificateException | KeyStoreException | IOException ex) {
@@ -161,8 +152,8 @@ public abstract class UndertowServer {
     }
   }
 
-  private static SSLContext createSSLContext(final KeyStore pKeyStore, @Nullable
-  final KeyStore pTrustStore, String pKeystorePassword) {
+  private static SSLContext createSSLContext(final KeyStore pKeyStore, @Nullable final KeyStore pTrustStore,
+    String pKeystorePassword) {
     try {
       KeyManager[] keyManagers;
       KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
@@ -170,8 +161,7 @@ public abstract class UndertowServer {
       keyManagers = keyManagerFactory.getKeyManagers();
 
       TrustManager[] trustManagers;
-      TrustManagerFactory trustManagerFactory =
-        TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+      TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
       trustManagerFactory.init(pTrustStore);
       trustManagers = trustManagerFactory.getTrustManagers();
 

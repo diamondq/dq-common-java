@@ -2,24 +2,23 @@ package com.diamondq.common.vertx.processor.model;
 
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.i18n.MessagesEnum;
+import org.jetbrains.annotations.Nullable;
 
 import javax.lang.model.element.Element;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ElementIllegalArgumentException extends ExtendedIllegalArgumentException {
 
   private static final long serialVersionUID = -2156808969110417281L;
 
-  private final Element     mElement;
+  private final Element mElement;
 
-  public ElementIllegalArgumentException(Element pElement, MessagesEnum pCode, @Nullable Object @Nullable... pParams) {
+  public ElementIllegalArgumentException(Element pElement, MessagesEnum pCode, @Nullable Object @Nullable ... pParams) {
     super(pCode, pParams);
     mElement = pElement;
   }
 
   public ElementIllegalArgumentException(Element pElement, Throwable pCause, MessagesEnum pCode,
-    @Nullable Object @Nullable... pParams) {
+    @Nullable Object @Nullable ... pParams) {
     super(pCause, pCode, pParams);
     mElement = pElement;
   }

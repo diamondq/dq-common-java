@@ -1,7 +1,5 @@
 package com.diamondq.common.model.persistence;
 
-import static com.diamondq.common.builders.BuilderWithMapHelper.of;
-
 import com.diamondq.common.builders.BuilderWithMapHelper;
 import com.diamondq.common.builders.IBuilder;
 import com.diamondq.common.builders.IBuilderFactory;
@@ -18,7 +16,11 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.google.common.cache.Cache;
+import org.jetbrains.annotations.Nullable;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -27,11 +29,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import static com.diamondq.common.builders.BuilderWithMapHelper.of;
 
 public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLayer {
 
@@ -40,7 +38,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
   public static class ResourceBundlePersistenceLayerBuilderFactory
     implements IBuilderFactory<ResourceBundlePersistenceLayer> {
 
-    protected final ContextFactory   mContextFactory;
+    protected final ContextFactory mContextFactory;
 
     protected final ConverterManager mConverterManager;
 
@@ -63,19 +61,21 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
   public static class ResourceBundlePersistenceLayerBuilder
     implements IBuilderWithMap<ResourceBundlePersistenceLayerBuilder, ResourceBundlePersistenceLayer> {
 
-    private @Nullable String                                     mResourceBaseName;
+    private @Nullable String mResourceBaseName;
 
-    private @Nullable ClassLoader                                mClassLoader;
+    private @Nullable ClassLoader mClassLoader;
 
-    private ContextFactory                                       mContextFactory;
+    private ContextFactory mContextFactory;
 
-    private final ConverterManager                               mConverterManager;
+    private final ConverterManager mConverterManager;
 
     private static final BuilderWithMapHelper.Mapping<?, ?, ?>[] sMappings;
 
     static {
-      sMappings = new BuilderWithMapHelper.Mapping<?, ?, ?>[] {
-          of(String.class, "resourceBaseName", ResourceBundlePersistenceLayerBuilder::resourceBaseName)};
+      sMappings = new BuilderWithMapHelper.Mapping<?, ?, ?>[] { of(String.class,
+        "resourceBaseName",
+        ResourceBundlePersistenceLayerBuilder::resourceBaseName
+      ) };
     }
 
     private ResourceBundlePersistenceLayerBuilder(ContextFactory pContextFactory, ConverterManager pConverterManager) {
@@ -127,7 +127,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
     }
   }
 
-  protected final String                mBaseName;
+  protected final String mBaseName;
 
   protected final @Nullable ClassLoader mClassLoader;
 
@@ -141,7 +141,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internal2LookupResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
    */
   @Override
   protected @Nullable String internal2LookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale,
@@ -157,7 +157,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#isResourceStringWritingSupported(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean isResourceStringWritingSupported(Toolkit pToolkit, Scope pScope) {
@@ -176,8 +176,8 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
-   *      java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
+   *   java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
    */
   @Override
   public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope, StructureDefinitionRef pRef,
@@ -187,8 +187,8 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.Structure, boolean, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.Structure, boolean, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   protected boolean internalWriteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -198,8 +198,8 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -209,7 +209,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureByName(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String)
    */
   @Override
   protected @Nullable Structure internalLookupStructureByName(Toolkit pToolkit, Scope pScope, String pDefName,
@@ -219,7 +219,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   protected StructureDefinition internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope,
@@ -229,7 +229,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, int)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, int)
    */
   @Override
   protected @Nullable StructureDefinition internalLookupStructureDefinitionByNameAndRevision(Toolkit pToolkit,
@@ -239,7 +239,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   protected void internalDeleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
@@ -248,7 +248,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalGetAllMissingStructureDefinitionRefs(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.google.common.cache.Cache)
+   *   com.diamondq.common.model.interfaces.Scope, com.google.common.cache.Cache)
    */
   @Override
   protected Collection<StructureDefinitionRef> internalGetAllMissingStructureDefinitionRefs(Toolkit pToolkit,
@@ -258,7 +258,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
    */
   @Override
   protected void internalWriteEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
@@ -268,7 +268,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalLookupEditorStructureDefinitionByName(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
    */
   @Override
   protected @Nullable List<EditorStructureDefinition> internalLookupEditorStructureDefinitionByName(Toolkit pToolkit,
@@ -278,7 +278,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
    */
   @Override
   protected void internalDeleteEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
@@ -288,7 +288,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String, java.lang.String)
    */
   @Override
   protected void internalWriteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey,
@@ -298,7 +298,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
    */
   @Override
   protected void internalDeleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
@@ -312,7 +312,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
@@ -321,7 +321,7 @@ public class ResourceBundlePersistenceLayer extends AbstractCachingPersistenceLa
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef) {

@@ -10,6 +10,8 @@ import com.diamondq.common.lambda.interfaces.Consumer2;
 import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
+import io.vertx.core.Vertx;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,21 +19,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.vertx.core.Vertx;
-
 public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCompletableFuture<T> {
 
   private final io.vertx.core.Context mVertxContext;
 
-  private final Executor              mExecutor;
+  private final Executor mExecutor;
 
   public VertxContextExtendedCompletableFuture() {
     super();
     Vertx vertx = VertxUtils.getDefaultVertx();
-    if (vertx == null)
-      throw new IllegalStateException();
+    if (vertx == null) throw new IllegalStateException();
     mVertxContext = vertx.getOrCreateContext();
     mExecutor = new ContextWrappedExecutor(mVertxContext);
   }
@@ -52,8 +49,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
   private VertxContextExtendedCompletableFuture(CompletableFuture<T> pFuture) {
     super(pFuture);
     Vertx vertx = VertxUtils.getDefaultVertx();
-    if (vertx == null)
-      throw new IllegalStateException();
+    if (vertx == null) throw new IllegalStateException();
     mVertxContext = vertx.getOrCreateContext();
     mExecutor = new ContextWrappedExecutor(mVertxContext);
   }
@@ -87,10 +83,8 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
     return new VertxContextExtendedCompletableFuture<List<T>>(CompletableFuture.allOf(args).thenApply((v) -> {
       List<T> results = new ArrayList<>();
       for (ExtendedCompletionStage<T> stage : cfs) {
-        if (stage instanceof ExtendedCompletableFuture)
-          results.add(((ExtendedCompletableFuture<T>) stage).join());
-        else
-          throw new UnsupportedOperationException();
+        if (stage instanceof ExtendedCompletableFuture) results.add(((ExtendedCompletableFuture<T>) stage).join());
+        else throw new UnsupportedOperationException();
       }
       return results;
     }));
@@ -183,7 +177,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.context.ContextExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Function2)
+   *   com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
   public <U, V> ContextExtendedCompletableFuture<V> thenCombine(ExtendedCompletionStage<U> pOther,
@@ -193,7 +187,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.context.ContextExtendedCompletableFuture#thenCombine(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Function3)
+   *   com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
   public <U, V> ContextExtendedCompletionStage<V> thenCombine(ExtendedCompletionStage<U> pOther,
@@ -203,7 +197,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.context.ContextExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Function2)
+   *   com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
   public <U, V> ContextExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
@@ -213,7 +207,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.context.ContextExtendedCompletableFuture#thenCombineAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Function3)
+   *   com.diamondq.common.lambda.interfaces.Function3)
    */
   @Override
   public <U, V> ContextExtendedCompletionStage<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
@@ -273,7 +267,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#acceptEither(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Consumer1)
+   *   com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> acceptEither(ExtendedCompletionStage<T> pOther,
@@ -283,7 +277,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#acceptEitherAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Consumer1)
+   *   com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther,
@@ -293,7 +287,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#applyToEither(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Function1)
+   *   com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
   public <U> ExtendedCompletableFuture<U> applyToEither(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn) {
@@ -302,7 +296,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#applyToEitherAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Function1)
+   *   com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
   public <U> ExtendedCompletableFuture<U> applyToEitherAsync(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn) {
@@ -311,7 +305,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterBoth(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      java.lang.Runnable)
+   *   java.lang.Runnable)
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(ExtendedCompletionStage<?> pOther, Runnable pAction) {
@@ -320,7 +314,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterBothAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      java.lang.Runnable)
+   *   java.lang.Runnable)
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther,
@@ -330,7 +324,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterEither(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      java.lang.Runnable)
+   *   java.lang.Runnable)
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> runAfterEither(ExtendedCompletionStage<?> pOther, Runnable pAction) {
@@ -339,7 +333,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#runAfterEitherAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      java.lang.Runnable)
+   *   java.lang.Runnable)
    */
   @Override
   public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther,
@@ -349,7 +343,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptBoth(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Consumer2)
+   *   com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
   public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(ExtendedCompletionStage<U> pOther,
@@ -359,7 +353,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptBothAsync(com.diamondq.common.lambda.future.ExtendedCompletionStage,
-   *      com.diamondq.common.lambda.interfaces.Consumer2)
+   *   com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
   public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(ExtendedCompletionStage<U> pOther,

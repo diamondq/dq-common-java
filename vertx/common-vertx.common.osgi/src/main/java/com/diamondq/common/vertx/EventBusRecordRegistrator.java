@@ -3,6 +3,18 @@ package com.diamondq.common.vertx;
 import com.diamondq.common.context.Context;
 import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.errors.Verify;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.servicediscovery.Record;
+import io.vertx.servicediscovery.ServiceDiscovery;
+import io.vertx.servicediscovery.Status;
+import io.vertx.servicediscovery.spi.ServiceExporter;
+import io.vertx.servicediscovery.spi.ServicePublisher;
+import org.jetbrains.annotations.Nullable;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,35 +26,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.servicediscovery.Record;
-import io.vertx.servicediscovery.ServiceDiscovery;
-import io.vertx.servicediscovery.Status;
-import io.vertx.servicediscovery.spi.ServiceExporter;
-import io.vertx.servicediscovery.spi.ServicePublisher;
-
 public class EventBusRecordRegistrator implements ServiceExporter {
 
-  private ContextFactory                                      mContextFactory;
+  private ContextFactory mContextFactory;
 
-  private Vertx                                               mVertx;
+  private Vertx mVertx;
 
-  private ServiceDiscovery                                    mServiceDiscovery;
+  private ServiceDiscovery mServiceDiscovery;
 
-  private BundleContext                                       mBundleContext;
+  private BundleContext mBundleContext;
 
   private final ConcurrentMap<String, ServiceRegistration<?>> mRegistrations = new ConcurrentHashMap<>();
 
-  private final ConcurrentMap<String, String>                 mById          = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, String> mById = new ConcurrentHashMap<>();
 
-  private final ConcurrentMap<String, String>                 mIdByReg       = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, String> mIdByReg = new ConcurrentHashMap<>();
 
   @SuppressWarnings("null")
   public EventBusRecordRegistrator() {
@@ -67,8 +65,10 @@ public class EventBusRecordRegistrator implements ServiceExporter {
     Verify.notNullArg(mContextFactory, VertxMessages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY, "contextFactory");
     try (Context context = mContextFactory.newContext(EventBusRecordRegistrator.class, this)) {
       Verify.notNullArg(mVertx, VertxMessages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY, "vertx");
-      Verify.notNullArg(mServiceDiscovery, VertxMessages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY,
-        "serviceDiscovery");
+      Verify.notNullArg(mServiceDiscovery,
+        VertxMessages.EVENTBUSRECORDREGISTRATOR_MISSING_DEPENDENCY,
+        "serviceDiscovery"
+      );
       mBundleContext = pContext;
       mServiceDiscovery.registerServiceExporter(this, new JsonObject());
     }
@@ -81,18 +81,15 @@ public class EventBusRecordRegistrator implements ServiceExporter {
     try (Context context = mContextFactory.newContext(EventBusRecordRegistrator.class, this, pRecord)) {
       context.info("{}", pRecord);
       JsonObject location = pRecord.getLocation();
-      if (location == null)
-        return;
+      if (location == null) return;
       String address = location.getString(Record.ENDPOINT);
-      if (address == null)
-        return;
+      if (address == null) return;
 
       Status status = pRecord.getStatus();
       String recordName = pRecord.getName();
       String recordType = pRecord.getType();
       String regId = pRecord.getRegistration();
-      if (regId == null)
-        return;
+      if (regId == null) return;
       StringBuilder sb = new StringBuilder();
       sb.append(address);
       sb.append('/');
@@ -119,30 +116,24 @@ public class EventBusRecordRegistrator implements ServiceExporter {
           EventService service = new EventServiceImpl(address);
 
           Dictionary<String, Object> props = new Hashtable<>();
-          if (recordName != null)
-            props.put("name", recordName);
-          if (recordType != null)
-            props.put("type", recordType);
+          if (recordName != null) props.put("name", recordName);
+          if (recordType != null) props.put("type", recordType);
           for (String key : metadata.fieldNames()) {
             Object value = metadata.getValue(key);
-            if (value != null)
-              props.put(key, value);
+            if (value != null) props.put(key, value);
           }
           ServiceRegistration<EventService> newReg = mBundleContext.registerService(EventService.class, service, props);
-          if (mRegistrations.putIfAbsent(regKey, newReg) != null)
-            newReg.unregister();
+          if (mRegistrations.putIfAbsent(regKey, newReg) != null) newReg.unregister();
           else {
             mById.put(regId, regKey);
             mIdByReg.put(regKey, regId);
           }
         }
-      }
-      else {
+      } else {
         if (status != Status.UP) {
           mRegistrations.remove(regKey, reg);
           String id = mIdByReg.remove(regKey);
-          if (id != null)
-            mById.remove(id);
+          if (id != null) mById.remove(id);
           reg.unregister();
         }
       }
@@ -152,16 +143,21 @@ public class EventBusRecordRegistrator implements ServiceExporter {
 
   /**
    * @see io.vertx.servicediscovery.spi.ServiceExporter#init(io.vertx.core.Vertx,
-   *      io.vertx.servicediscovery.spi.ServicePublisher, io.vertx.core.json.JsonObject, io.vertx.core.Promise)
+   *   io.vertx.servicediscovery.spi.ServicePublisher, io.vertx.core.json.JsonObject, io.vertx.core.Promise)
    */
   @Override
   public void init(Vertx pVertx, ServicePublisher pPublisher, JsonObject pConfiguration,
     Promise<@Nullable Void> pFuture) {
-    try (Context ctx =
-      mContextFactory.newContext(EventBusRecordRegistrator.class, this, pVertx, pPublisher, pConfiguration, pFuture)) {
+    try (Context ctx = mContextFactory.newContext(EventBusRecordRegistrator.class,
+      this,
+      pVertx,
+      pPublisher,
+      pConfiguration,
+      pFuture
+    )) {
       /* Get all the existing records and process them before marking us as active */
 
-      VertxUtils.<Function<Record, Boolean>, List<Record>> call(mServiceDiscovery::getRecords, (r) -> true)
+      VertxUtils.<Function<Record, Boolean>, List<Record>>call(mServiceDiscovery::getRecords, (r) -> true)
         .thenAccept((records) -> {
 
           for (Record record : records)
@@ -208,8 +204,7 @@ public class EventBusRecordRegistrator implements ServiceExporter {
       String regKey = mById.remove(pId);
       mIdByReg.remove(regKey);
       ServiceRegistration<?> serviceRegistration = mRegistrations.remove(regKey);
-      if (serviceRegistration != null)
-        serviceRegistration.unregister();
+      if (serviceRegistration != null) serviceRegistration.unregister();
     }
     catch (RuntimeException ex) {
       throw mContextFactory.reportThrowable(EventBusRecordRegistrator.class, this, ex);
@@ -231,8 +226,7 @@ public class EventBusRecordRegistrator implements ServiceExporter {
     for (ServiceRegistration<?> reg : values)
       reg.unregister();
 
-    if (pCloseHandler != null)
-      pCloseHandler.handle(null);
+    if (pCloseHandler != null) pCloseHandler.handle(null);
   }
 
 }

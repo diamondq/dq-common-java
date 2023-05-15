@@ -2,7 +2,7 @@ package com.diamondq.common.utils.sync.abstracts;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.utils.sync.SyncInfo;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This abstract simplifies the SyncInfo since both A & B are the same types

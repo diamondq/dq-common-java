@@ -1,8 +1,8 @@
 package com.diamondq.common.model.interfaces;
 
-import java.util.Set;
+import org.jetbrains.annotations.Nullable;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.Set;
 
 public interface EditorComponentDefinition<T extends EditorComponentDefinition<T>> {
 
@@ -16,7 +16,7 @@ public interface EditorComponentDefinition<T extends EditorComponentDefinition<T
 
   /**
    * The column number for this component. Columns start at 0.
-   * 
+   *
    * @return the column number
    */
   public int getColumn();

@@ -12,40 +12,40 @@ import javax.jdo.JDOQLTypedQuery;
 import javax.jdo.query.BooleanExpression;
 
 import org.apache.openaz.pepapi.PepAgent;
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import org.jetbrains.annotations.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class AuthQueryExtenderImpl implements AuthenticationQueryExtender {
 
-  @SuppressWarnings("unused")
-  private static final Logger sLogger = LoggerFactory.getLogger(AuthQueryExtenderImpl.class);
+  @SuppressWarnings(
+    "unused") private static final Logger sLogger = LoggerFactory.getLogger(AuthQueryExtenderImpl.class);
 
-  private final Code          mCode;
+  private final Code mCode;
 
-  private final Parser        mParser;
+  private final Parser mParser;
 
   @Inject
   public AuthQueryExtenderImpl(PepAgent pAgent, Config pConfig) {
     String fqdn = pConfig.bind("application.fqdn", String.class);
-    if (fqdn == null)
-      throw new IllegalArgumentException();
+    if (fqdn == null) throw new IllegalArgumentException();
     mCode = new Code(fqdn);
     mParser = new Parser(pAgent);
   }
 
   /**
    * @see com.diamondq.common.security.openaz.AuthenticationQueryExtender#extendForAccessControl(javax.jdo.JDOQLTypedQuery,
-   *      javax.jdo.query.BooleanExpression, java.util.List, java.lang.Object[])
+   *   javax.jdo.query.BooleanExpression, java.util.List, java.lang.Object[])
    */
   @Override
   public BooleanExpression extendForAccessControl(JDOQLTypedQuery<?> pTypedQuery, BooleanExpression pExpression,
-    List<?> pAssociations, Object @Nullable... pObjects) {
+    List<?> pAssociations, Object @Nullable ... pObjects) {
 
     Object[] expand = new Object[(pObjects != null ? pObjects.length + 1 : 1)];
-    if (pObjects != null)
-      System.arraycopy(pObjects, 0, expand, 1, pObjects.length);
+    if (pObjects != null) System.arraycopy(pObjects, 0, expand, 1, pObjects.length);
     expand[0] = mCode;
 
     IFunctionArgument result = mParser.generateParseTree(pAssociations, expand);

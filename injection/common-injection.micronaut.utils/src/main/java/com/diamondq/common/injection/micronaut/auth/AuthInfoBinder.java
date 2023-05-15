@@ -1,11 +1,11 @@
 package com.diamondq.common.injection.micronaut.auth;
 
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.client.bind.ClientRequestUriContext;
 import io.micronaut.http.client.bind.TypedClientArgumentRequestBinder;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,7 +22,7 @@ public class AuthInfoBinder implements TypedClientArgumentRequestBinder<AuthInfo
   }
 
   @Override
-  @NonNull
+  @NotNull
   public Argument<AuthInfo> argumentType() {
     return Argument.of(AuthInfo.class);
   }
@@ -32,7 +32,7 @@ public class AuthInfoBinder implements TypedClientArgumentRequestBinder<AuthInfo
     MutableHttpRequest<?> pRequest) {
 
     /* Ask the AuthInfo to perform the injection */
-    
+
     pValue.injectAuth(pUriContext, pRequest);
   }
 }

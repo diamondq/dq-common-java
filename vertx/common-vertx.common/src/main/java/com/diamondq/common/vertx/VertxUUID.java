@@ -1,13 +1,12 @@
 package com.diamondq.common.vertx;
 
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.Nullable;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 @DataObject
 public class VertxUUID implements Comparable<VertxUUID> {
@@ -57,9 +56,8 @@ public class VertxUUID implements Comparable<VertxUUID> {
   }
 
   /**
-   * Constructs a new {@code UUID} using the specified data. {@code
-   * mostSigBits} is used for the most significant 64 bits of the {@code
-   * UUID} and {@code leastSigBits} becomes the least significant 64 bits of the {@code UUID}.
+   * Constructs a new {@code UUID} using the specified data. {@code mostSigBits} is used for the most significant 64
+   * bits of the {@code UUID} and {@code leastSigBits} becomes the least significant 64 bits of the {@code UUID}.
    *
    * @param pMostSigBits The most significant bits of the {@code UUID}
    * @param pLeastSigBits The least significant bits of the {@code UUID}
@@ -115,7 +113,7 @@ public class VertxUUID implements Comparable<VertxUUID> {
    * @param name A string that specifies a {@code UUID}
    * @return A {@code UUID} with the specified value
    * @throws IllegalArgumentException If name does not conform to the string representation as described in
-   *           {@link #toString}
+   *                                  {@link #toString}
    */
   public static VertxUUID fromString(String name) {
     int len = name.length();
@@ -218,8 +216,8 @@ public class VertxUUID implements Comparable<VertxUUID> {
    * The timestamp value is only meaningful in a time-based UUID, which has version type 1. If this {@code UUID} is not
    * a time-based UUID then this method throws UnsupportedOperationException.
    *
-   * @throws UnsupportedOperationException If this UUID is not a version 1 UUID
    * @return The timestamp of this {@code UUID}.
+   * @throws UnsupportedOperationException If this UUID is not a version 1 UUID
    */
   public long timestamp() {
     if (version() != 1) {
@@ -275,7 +273,7 @@ public class VertxUUID implements Comparable<VertxUUID> {
    * Returns a {@code String} object representing this {@code UUID}.
    * <p>
    * The UUID string representation is as described by this BNF: <blockquote>
-   * 
+   *
    * <pre>
    * {@code
    * UUID                   = <time_low> "-" <time_mid> "-"
@@ -294,7 +292,7 @@ public class VertxUUID implements Comparable<VertxUUID> {
    *       | "A" | "B" | "C" | "D" | "E" | "F"
    * }
    * </pre>
-   * 
+   *
    * </blockquote>
    *
    * @return A string representation of this {@code UUID}
@@ -316,17 +314,16 @@ public class VertxUUID implements Comparable<VertxUUID> {
   }
 
   /**
-   * Compares this object to the specified object. The result is {@code
-   * true} if and only if the argument is not {@code null}, is a {@code UUID} object, has the same variant, and contains
-   * the same value, bit for bit, as this {@code UUID}.
+   * Compares this object to the specified object. The result is {@code true} if and only if the argument is not
+   * {@code null}, is a {@code UUID} object, has the same variant, and contains the same value, bit for bit, as this
+   * {@code UUID}.
    *
    * @param pObj The object to be compared
    * @return {@code true} if the objects are the same; {@code false} otherwise
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if ((null == pObj) || (pObj.getClass() != VertxUUID.class))
-      return false;
+    if ((null == pObj) || (pObj.getClass() != VertxUUID.class)) return false;
     VertxUUID id = (VertxUUID) pObj;
     return (mostSigBits == id.mostSigBits && leastSigBits == id.leastSigBits);
   }
@@ -346,7 +343,7 @@ public class VertxUUID implements Comparable<VertxUUID> {
   public int compareTo(VertxUUID val) {
     // The ordering is intentionally set up so that the UUIDs
     // can simply be numerically compared as two numbers
-    return (this.mostSigBits < val.mostSigBits ? -1 : (this.mostSigBits > val.mostSigBits ? 1
-      : (this.leastSigBits < val.leastSigBits ? -1 : (this.leastSigBits > val.leastSigBits ? 1 : 0))));
+    return (this.mostSigBits < val.mostSigBits ? -1 : (this.mostSigBits > val.mostSigBits ? 1 : (
+      this.leastSigBits < val.leastSigBits ? -1 : (this.leastSigBits > val.leastSigBits ? 1 : 0))));
   }
 }

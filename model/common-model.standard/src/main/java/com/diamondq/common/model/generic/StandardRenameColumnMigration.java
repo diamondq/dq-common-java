@@ -2,10 +2,9 @@ package com.diamondq.common.model.generic;
 
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.Structure;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StandardRenameColumnMigration implements BiFunction<Structure, Structure, Structure> {
 
@@ -24,13 +23,10 @@ public class StandardRenameColumnMigration implements BiFunction<Structure, Stru
   @Override
   public Structure apply(Structure pOld, Structure pNew) {
     Property<@Nullable Object> oldProperty = pOld.lookupPropertyByName(mOldColumnName);
-    if (oldProperty == null)
-      return pNew;
+    if (oldProperty == null) return pNew;
     Property<@Nullable Object> newProperty = pNew.lookupMandatoryPropertyByName(mNewColumnName);
-    if (oldProperty.isValueSet() == true)
-      pNew = pNew.updateProperty(newProperty.setValue(oldProperty.getValue(pOld)));
-    else
-      pNew = pNew.updateProperty(newProperty.clearValueSet());
+    if (oldProperty.isValueSet() == true) pNew = pNew.updateProperty(newProperty.setValue(oldProperty.getValue(pOld)));
+    else pNew = pNew.updateProperty(newProperty.clearValueSet());
 
     return pNew;
   }

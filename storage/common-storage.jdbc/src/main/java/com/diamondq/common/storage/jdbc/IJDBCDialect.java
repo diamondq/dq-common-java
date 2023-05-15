@@ -1,6 +1,8 @@
 package com.diamondq.common.storage.jdbc;
 
 import com.diamondq.common.storage.kv.KVColumnType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -9,9 +11,6 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 /**
  * Interface defining a JDBC Dialect (aka Postgres, MySQL, Oracle, etc.)
  */
@@ -19,7 +18,7 @@ public interface IJDBCDialect {
 
   /**
    * Returns the DDL necessary to create a new schema
-   * 
+   *
    * @param pSchemaName the schema name
    * @return the DDL SQL
    */
@@ -27,7 +26,7 @@ public interface IJDBCDialect {
 
   /**
    * Returns the data type, used for CREATE TABLE actions to create a column on unlimited text size (such as a CLOB).
-   * 
+   *
    * @return the type
    */
   public String getUnlimitedTextType();
@@ -84,10 +83,10 @@ public interface IJDBCDialect {
 
   public void writeBinary(PreparedStatement pPs, int pIndex, byte @Nullable [] pValue) throws SQLException;
 
-  public Set<@NonNull String> getReservedWords();
+  public Set<@NotNull String> getReservedWords();
 
   public String getAutoIncrement(KVColumnType pType, BigDecimal pAutoIncrementStart,
     @Nullable BigDecimal pAutoIncrementBy);
-  
+
   public String getLimitKeyword();
 }

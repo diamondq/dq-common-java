@@ -2,17 +2,16 @@ package com.diamondq.common.model.generic;
 
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.Structure;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class StandardCopyColumnMigration implements BiFunction<Structure, Structure, Structure> {
 
-  private final @NonNull String[] mColumns;
+  private final @NotNull String[] mColumns;
 
-  public StandardCopyColumnMigration(@NonNull String[] pColumns) {
+  public StandardCopyColumnMigration(@NotNull String[] pColumns) {
     mColumns = pColumns;
   }
 
@@ -27,8 +26,7 @@ public class StandardCopyColumnMigration implements BiFunction<Structure, Struct
         Property<@Nullable Object> newProperty = pNew.lookupMandatoryPropertyByName(colName);
         if (oldProperty.isValueSet() == true)
           pNew = pNew.updateProperty(newProperty.setValue(oldProperty.getValue(pOld)));
-        else
-          pNew = pNew.updateProperty(newProperty.clearValueSet());
+        else pNew = pNew.updateProperty(newProperty.clearValueSet());
       }
     }
 

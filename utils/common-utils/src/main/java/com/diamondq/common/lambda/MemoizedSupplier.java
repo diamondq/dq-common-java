@@ -1,15 +1,15 @@
 package com.diamondq.common.lambda;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class MemoizedSupplier<TYPE> {
 
-  private final Supplier<TYPE>     mSupplier;
+  private final Supplier<TYPE> mSupplier;
 
-  private transient boolean        mIsSupplied;
+  private transient boolean mIsSupplied;
 
   private transient @Nullable TYPE mSuppliedValue;
 
@@ -22,10 +22,8 @@ public class MemoizedSupplier<TYPE> {
 
   public TYPE getValue() {
     synchronized (this) {
-      if (mIsSupplied == false)
-        mSuppliedValue = mSupplier.get();
-      @SuppressWarnings("null")
-      TYPE result = mSuppliedValue;
+      if (mIsSupplied == false) mSuppliedValue = mSupplier.get();
+      @SuppressWarnings("null") TYPE result = mSuppliedValue;
       return result;
     }
   }
@@ -43,12 +41,9 @@ public class MemoizedSupplier<TYPE> {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     MemoizedSupplier<?> other = (MemoizedSupplier<?>) pObj;
     return Objects.equals(mSupplier, other.mSupplier);
   }

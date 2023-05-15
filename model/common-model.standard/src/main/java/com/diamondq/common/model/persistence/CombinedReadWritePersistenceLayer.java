@@ -16,13 +16,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This persistence layer will always write to the 'write' layer, but will first read from the 'write' layer and if it's
@@ -36,9 +35,9 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
    */
   public static class CombinedReadWritePersistenceLayerBuilder {
 
-    private @Nullable ContextFactory   mContextFactory;
+    private @Nullable ContextFactory mContextFactory;
 
-    private @Nullable Scope            mScope;
+    private @Nullable Scope mScope;
 
     private @Nullable PersistenceLayer mStructureReadLayer;
 
@@ -167,14 +166,11 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
      */
     public CombinedReadWritePersistenceLayer build() {
       ContextFactory contextFactory = mContextFactory;
-      if (contextFactory == null)
-        throw new IllegalArgumentException("The mandatory field contextFactory was not set");
+      if (contextFactory == null) throw new IllegalArgumentException("The mandatory field contextFactory was not set");
       Scope scope = mScope;
-      if (scope == null)
-        throw new IllegalArgumentException("The mandatory field scope was not set");
+      if (scope == null) throw new IllegalArgumentException("The mandatory field scope was not set");
       PersistenceLayer structureWriteLayer = mStructureWriteLayer;
-      if (structureWriteLayer == null)
-        structureWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
+      if (structureWriteLayer == null) structureWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
       PersistenceLayer structureDefinitionWriteLayer = mStructureDefinitionWriteLayer;
       if (structureDefinitionWriteLayer == null)
         structureDefinitionWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
@@ -182,30 +178,36 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
       if (editorStructureDefinitionWriteLayer == null)
         editorStructureDefinitionWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
       PersistenceLayer resourceWriteLayer = mResourceWriteLayer;
-      if (resourceWriteLayer == null)
-        resourceWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
-      return new CombinedReadWritePersistenceLayer(contextFactory, mStructureReadLayer, structureWriteLayer,
-        mStructureDefinitionReadLayer, structureDefinitionWriteLayer, mEditorStructureDefinitionReadLayer,
-        editorStructureDefinitionWriteLayer, mResourceReadLayer, resourceWriteLayer);
+      if (resourceWriteLayer == null) resourceWriteLayer = new NewMemoryPersistenceLayer(contextFactory);
+      return new CombinedReadWritePersistenceLayer(contextFactory,
+        mStructureReadLayer,
+        structureWriteLayer,
+        mStructureDefinitionReadLayer,
+        structureDefinitionWriteLayer,
+        mEditorStructureDefinitionReadLayer,
+        editorStructureDefinitionWriteLayer,
+        mResourceReadLayer,
+        resourceWriteLayer
+      );
     }
   }
 
   private final @Nullable PersistenceLayer mStructureReadLayer;
 
-  private final PersistenceLayer           mStructureWriteLayer;
+  private final PersistenceLayer mStructureWriteLayer;
 
   private final @Nullable PersistenceLayer mStructureDefinitionReadLayer;
 
-  private final PersistenceLayer           mStructureDefinitionWriteLayer;
+  private final PersistenceLayer mStructureDefinitionWriteLayer;
 
   @SuppressWarnings("unused")
   private final @Nullable PersistenceLayer mEditorStructureDefinitionReadLayer;
 
-  private final PersistenceLayer           mEditorStructureDefinitionWriteLayer;
+  private final PersistenceLayer mEditorStructureDefinitionWriteLayer;
 
   private final @Nullable PersistenceLayer mResourceReadLayer;
 
-  private final PersistenceLayer           mResourceWriteLayer;
+  private final PersistenceLayer mResourceWriteLayer;
 
   public CombinedReadWritePersistenceLayer(ContextFactory pContextFactory,
     @Nullable PersistenceLayer pStructureReadLayer, PersistenceLayer pStructureWriteLayer,
@@ -214,10 +216,17 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
     PersistenceLayer pEditorStructureDefinitionWriteLayer, @Nullable PersistenceLayer pResourceReadLayer,
     PersistenceLayer pResourceWriteLayer) {
     super(pContextFactory);
-    ContextFactory.staticReportTrace(CombinedReadWritePersistenceLayer.class, this, pStructureReadLayer,
-      pStructureWriteLayer, pStructureDefinitionReadLayer, pStructureDefinitionWriteLayer,
-      pEditorStructureDefinitionReadLayer, pEditorStructureDefinitionWriteLayer, pResourceReadLayer,
-      pResourceWriteLayer);
+    ContextFactory.staticReportTrace(CombinedReadWritePersistenceLayer.class,
+      this,
+      pStructureReadLayer,
+      pStructureWriteLayer,
+      pStructureDefinitionReadLayer,
+      pStructureDefinitionWriteLayer,
+      pEditorStructureDefinitionReadLayer,
+      pEditorStructureDefinitionWriteLayer,
+      pResourceReadLayer,
+      pResourceWriteLayer
+    );
     mStructureReadLayer = pStructureReadLayer;
     mStructureWriteLayer = pStructureWriteLayer;
     mStructureDefinitionReadLayer = pStructureDefinitionReadLayer;
@@ -230,7 +239,7 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public StructureDefinition writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
@@ -241,103 +250,102 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#enableStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
     PersistenceLayer readLayer = mStructureDefinitionReadLayer;
-    if (readLayer != null)
-      readLayer.enableStructureDefinition(pToolkit, pScope, pValue);
+    if (readLayer != null) readLayer.enableStructureDefinition(pToolkit, pScope, pValue);
     mStructureWriteLayer.enableStructureDefinition(pToolkit, pScope, pValue);
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void deleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
     PersistenceLayer readLayer = mStructureDefinitionReadLayer;
-    if (readLayer == null)
-      mStructureDefinitionWriteLayer.deleteStructureDefinition(pToolkit, pScope, pValue);
+    if (readLayer == null) mStructureDefinitionWriteLayer.deleteStructureDefinition(pToolkit, pScope, pValue);
     else {
       StructureDefinition fromRead = readLayer.lookupStructureDefinitionByName(pToolkit, pScope, pValue.getName());
       if (fromRead != null) {
 
         /* We need to write a tombstone */
 
-        StructureDefinition tombstone =
-          mStructureDefinitionWriteLayer.createNewTombstoneStructureDefinition(pToolkit, pScope, pValue.getName());
+        StructureDefinition tombstone = mStructureDefinitionWriteLayer.createNewTombstoneStructureDefinition(pToolkit,
+          pScope,
+          pValue.getName()
+        );
         mStructureDefinitionWriteLayer.writeStructureDefinition(pToolkit, pScope, tombstone);
-      }
-      else
-        mStructureDefinitionWriteLayer.deleteStructureDefinition(pToolkit, pScope, pValue);
+      } else mStructureDefinitionWriteLayer.deleteStructureDefinition(pToolkit, pScope, pValue);
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructureDefinitionRefs(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope) {
     PersistenceLayer readLayer = mStructureDefinitionReadLayer;
-    if (readLayer == null)
-      return mStructureDefinitionWriteLayer.getAllStructureDefinitionRefs(pToolkit, pScope);
+    if (readLayer == null) return mStructureDefinitionWriteLayer.getAllStructureDefinitionRefs(pToolkit, pScope);
     Map<String, StructureDefinitionRef> results = Maps.newHashMap();
     readLayer.getAllStructureDefinitionRefs(pToolkit, pScope).forEach((sd) -> {
       results.put(sd.getSerializedString(), sd);
     });
     mStructureDefinitionWriteLayer.getAllStructureDefinitionRefs(pToolkit, pScope).forEach((sd) -> {
-      if (sd instanceof Tombstone)
-        results.remove(sd.getSerializedString());
-      else
-        results.put(sd.getSerializedString(), sd);
+      if (sd instanceof Tombstone) results.remove(sd.getSerializedString());
+      else results.put(sd.getSerializedString(), sd);
     });
     return ImmutableSet.copyOf(results.values());
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
   public @Nullable StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName) {
     PersistenceLayer readLayer = mStructureDefinitionReadLayer;
     if (readLayer == null)
       return mStructureDefinitionWriteLayer.lookupStructureDefinitionByName(pToolkit, pScope, pName);
-    StructureDefinition result =
-      mStructureDefinitionWriteLayer.lookupStructureDefinitionByName(pToolkit, pScope, pName);
-    if (result == null)
-      result = readLayer.lookupStructureDefinitionByName(pToolkit, pScope, pName);
-    if ((result != null) && (result instanceof Tombstone))
-      result = null;
+    StructureDefinition result = mStructureDefinitionWriteLayer.lookupStructureDefinitionByName(pToolkit,
+      pScope,
+      pName
+    );
+    if (result == null) result = readLayer.lookupStructureDefinitionByName(pToolkit, pScope, pName);
+    if ((result != null) && (result instanceof Tombstone)) result = null;
     return result;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
    */
   @Override
   public @Nullable StructureDefinition lookupStructureDefinitionByNameAndRevision(Toolkit pToolkit, Scope pScope,
     String pName, @Nullable Integer pRevision) {
     PersistenceLayer readLayer = mStructureDefinitionReadLayer;
-    if (readLayer == null)
-      return mStructureDefinitionWriteLayer.lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName,
-        pRevision);
-    StructureDefinition result =
-      mStructureDefinitionWriteLayer.lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, pRevision);
+    if (readLayer == null) return mStructureDefinitionWriteLayer.lookupStructureDefinitionByNameAndRevision(pToolkit,
+      pScope,
+      pName,
+      pRevision
+    );
+    StructureDefinition result = mStructureDefinitionWriteLayer.lookupStructureDefinitionByNameAndRevision(pToolkit,
+      pScope,
+      pName,
+      pRevision
+    );
     if (result == null)
       result = readLayer.lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, pRevision);
-    if ((result != null) && (result instanceof Tombstone))
-      result = null;
+    if ((result != null) && (result instanceof Tombstone)) result = null;
     return result;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupLatestStructureDefinitionRevision(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
   public @Nullable Integer lookupLatestStructureDefinitionRevision(Toolkit pToolkit, Scope pScope, String pDefName) {
@@ -345,14 +353,13 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
     if (readLayer == null)
       return mStructureDefinitionWriteLayer.lookupLatestStructureDefinitionRevision(pToolkit, pScope, pDefName);
     Integer result = mStructureDefinitionWriteLayer.lookupLatestStructureDefinitionRevision(pToolkit, pScope, pDefName);
-    if (result == null)
-      result = readLayer.lookupLatestStructureDefinitionRevision(pToolkit, pScope, pDefName);
+    if (result == null) result = readLayer.lookupLatestStructureDefinitionRevision(pToolkit, pScope, pDefName);
     return result;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
@@ -361,31 +368,30 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
     @Nullable Structure pOldStructure) {
-    Structure retrievedStructure =
-      lookupStructureBySerializedRef(pToolkit, pScope, pStructure.getReference().getSerializedString());
+    Structure retrievedStructure = lookupStructureBySerializedRef(pToolkit,
+      pScope,
+      pStructure.getReference().getSerializedString()
+    );
     if (pOldStructure == null) {
       if (retrievedStructure == null)
         return mStructureWriteLayer.writeStructure(pToolkit, pScope, pStructure, pOldStructure);
       return false;
-    }
-    else {
-      if (retrievedStructure == null)
-        return false;
-      if (pOldStructure.equals(retrievedStructure) == false)
-        return false;
+    } else {
+      if (retrievedStructure == null) return false;
+      if (pOldStructure.equals(retrievedStructure) == false) return false;
       return mStructureWriteLayer.writeStructure(pToolkit, pScope, pStructure, pOldStructure);
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureBySerializedRef(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
   public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope,
@@ -394,39 +400,36 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
     if (readLayer == null)
       return mStructureWriteLayer.lookupStructureBySerializedRef(pGenericToolkit, pScope, pSerializedRef);
     Structure result = mStructureWriteLayer.lookupStructureBySerializedRef(pGenericToolkit, pScope, pSerializedRef);
-    if ((result != null) && (result instanceof Tombstone))
-      result = null;
-    if (result == null)
-      result = readLayer.lookupStructureBySerializedRef(pGenericToolkit, pScope, pSerializedRef);
+    if ((result != null) && (result instanceof Tombstone)) result = null;
+    if (result == null) result = readLayer.lookupStructureBySerializedRef(pGenericToolkit, pScope, pSerializedRef);
     return result;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue) {
     PersistenceLayer readLayer = mStructureReadLayer;
-    if (readLayer == null)
-      return mStructureWriteLayer.deleteStructure(pToolkit, pScope, pValue);
+    if (readLayer == null) return mStructureWriteLayer.deleteStructure(pToolkit, pScope, pValue);
 
     /* Does the structure exist in the read layer */
 
-    Structure old =
-      readLayer.lookupStructureBySerializedRef(pToolkit, pScope, pValue.getReference().getSerializedString());
+    Structure old = readLayer.lookupStructureBySerializedRef(pToolkit,
+      pScope,
+      pValue.getReference().getSerializedString()
+    );
     if (old != null) {
       Structure tombstone = mStructureWriteLayer.createNewTombstoneStructure(pToolkit, pScope, pValue);
       mStructureWriteLayer.writeStructure(pToolkit, pScope, tombstone);
       return true;
-    }
-    else
-      return mStructureWriteLayer.deleteStructure(pToolkit, pScope, pValue);
+    } else return mStructureWriteLayer.deleteStructure(pToolkit, pScope, pValue);
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
    */
   @Override
   public void writeEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
@@ -436,7 +439,7 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
    */
   @Override
   public void deleteEditorStructureDefinition(Toolkit pToolkit, Scope pScope, EditorStructureDefinition pValue) {
@@ -445,7 +448,7 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupEditorStructureDefinitionByRef(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
    */
   @Override
   public List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef(Toolkit pToolkit, Scope pScope,
@@ -455,8 +458,8 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
-   *      java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
+   *   java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
    */
   @Override
   public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope, StructureDefinitionRef pRef,
@@ -470,17 +473,15 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
         results.put(s.getReference().getSerializedString(), s);
       });
     readLayer.getAllStructuresByDefinition(pToolkit, pScope, pRef, pParentKey, pParentPropertyDef).forEach((s) -> {
-      if (s instanceof Tombstone)
-        results.remove(s.getReference().getSerializedString());
-      else
-        results.put(s.getReference().getSerializedString(), s);
+      if (s instanceof Tombstone) results.remove(s.getReference().getSerializedString());
+      else results.put(s.getReference().getSerializedString(), s);
     });
     return ImmutableList.copyOf(results.values());
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#isResourceStringWritingSupported(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean isResourceStringWritingSupported(Toolkit pToolkit, Scope pScope) {
@@ -489,7 +490,7 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String, java.lang.String)
    */
   @Override
   public void writeResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey, String pValue) {
@@ -498,7 +499,7 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
    */
   @Override
   public void deleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
@@ -511,20 +512,17 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
     if (readValue != null) {
       String tombstone = mResourceWriteLayer.createNewTombstoneResourceString(pToolkit, pScope);
       mResourceWriteLayer.writeResourceString(pToolkit, pScope, pLocale, pKey, tombstone);
-    }
-    else
-      mResourceWriteLayer.deleteResourceString(pToolkit, pScope, pLocale, pKey);
+    } else mResourceWriteLayer.deleteResourceString(pToolkit, pScope, pLocale, pKey);
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getResourceStringLocales(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public Collection<Locale> getResourceStringLocales(Toolkit pToolkit, Scope pScope) {
     PersistenceLayer readLayer = mResourceReadLayer;
-    if (readLayer == null)
-      return mResourceWriteLayer.getResourceStringLocales(pToolkit, pScope);
+    if (readLayer == null) return mResourceWriteLayer.getResourceStringLocales(pToolkit, pScope);
     ImmutableSet.Builder<Locale> builder = ImmutableSet.builder();
     builder.addAll(readLayer.getResourceStringLocales(pToolkit, pScope));
     builder.addAll(mResourceWriteLayer.getResourceStringLocales(pToolkit, pScope));
@@ -533,45 +531,38 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getResourceStringsByLocale(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale)
    */
   @Override
   public Map<String, String> getResourceStringsByLocale(Toolkit pToolkit, Scope pScope, Locale pLocale) {
     PersistenceLayer readLayer = mResourceReadLayer;
-    if (readLayer == null)
-      return mResourceWriteLayer.getResourceStringsByLocale(pToolkit, pScope, pLocale);
+    if (readLayer == null) return mResourceWriteLayer.getResourceStringsByLocale(pToolkit, pScope, pLocale);
     Map<String, String> results = readLayer.getResourceStringsByLocale(pToolkit, pScope, pLocale);
     mResourceWriteLayer.getResourceStringsByLocale(pToolkit, pScope, pLocale).forEach((k, v) -> {
-      if (mResourceWriteLayer.isTombstoneResourceString(pToolkit, pScope, v) == true)
-        results.remove(k);
-      else
-        results.put(k, v);
+      if (mResourceWriteLayer.isTombstoneResourceString(pToolkit, pScope, v) == true) results.remove(k);
+      else results.put(k, v);
     });
     return ImmutableMap.copyOf(results);
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#lookupResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
    */
   @Override
   public @Nullable String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey) {
     PersistenceLayer readLayer = mResourceReadLayer;
-    if (readLayer == null)
-      return mResourceWriteLayer.lookupResourceString(pToolkit, pScope, pLocale, pKey);
+    if (readLayer == null) return mResourceWriteLayer.lookupResourceString(pToolkit, pScope, pLocale, pKey);
     String value = mResourceWriteLayer.lookupResourceString(pToolkit, pScope, pLocale, pKey);
     if (value != null) {
-      if (mResourceWriteLayer.isTombstoneResourceString(pToolkit, pScope, value) == true)
-        return null;
-    }
-    else
-      value = readLayer.lookupResourceString(pToolkit, pScope, pLocale, pKey);
+      if (mResourceWriteLayer.isTombstoneResourceString(pToolkit, pScope, value) == true) return null;
+    } else value = readLayer.lookupResourceString(pToolkit, pScope, pLocale, pKey);
     return value;
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#internalLookupResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
    */
   @Override
   protected @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
@@ -584,22 +575,20 @@ public class CombinedReadWritePersistenceLayer extends AbstractPersistenceLayer 
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
     boolean inferred = false;
     PersistenceLayer layer = mStructureReadLayer;
-    if (layer != null)
-      if (layer.inferStructureDefinitions(pGenericToolkit, pScope) == true)
-        inferred = true;
-    if (mStructureWriteLayer.inferStructureDefinitions(pGenericToolkit, pScope) == true)
-      inferred = true;
+    if (layer != null) if (layer.inferStructureDefinitions(pGenericToolkit, pScope) == true) inferred = true;
+    if (mStructureWriteLayer.inferStructureDefinitions(pGenericToolkit, pScope) == true) inferred = true;
     return inferred;
   }
 
   /**
-   * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit, com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit,
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef) {

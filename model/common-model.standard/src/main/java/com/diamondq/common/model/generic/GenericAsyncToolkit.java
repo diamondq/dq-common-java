@@ -16,6 +16,9 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,17 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
-
 public class GenericAsyncToolkit implements AsyncToolkit {
 
-  private final ConcurrentMap<Scope, PersistenceLayer>                 mPersistence;
+  private final ConcurrentMap<Scope, PersistenceLayer> mPersistence;
 
   private final ConcurrentMap<PersistenceLayer, AsyncPersistenceLayer> mAsyncPersistence;
 
-  private final GenericToolkit                                         mSyncToolkit;
+  private final GenericToolkit mSyncToolkit;
 
   public GenericAsyncToolkit(ConcurrentMap<Scope, PersistenceLayer> pPersistence, ConcurrentMap<String, Scope> pScopes,
     GenericToolkit pGenericToolkit) {
@@ -60,8 +59,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    */
   protected AsyncPersistenceLayer getPersistenceLayer(Scope pScope) {
     PersistenceLayer layer = mPersistence.get(pScope);
-    if (layer == null)
-      throw new UnknownScopeException(pScope);
+    if (layer == null) throw new UnknownScopeException(pScope);
     AsyncPersistenceLayer asyncPersistenceLayer = mAsyncPersistence.get(layer);
     if (asyncPersistenceLayer == null) {
       AsyncPersistenceLayer newAsyncPersistenceLayer = layer.getAsyncPersistenceLayer();
@@ -82,7 +80,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createNewStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, int)
+   *   java.lang.String, int)
    */
   @Override
   public StructureDefinition createNewStructureDefinition(Scope pScope, String pName, int pRevision) {
@@ -91,7 +89,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#writeStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public ContextExtendedCompletionStage<StructureDefinition> writeStructureDefinition(Scope pScope,
@@ -101,7 +99,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#deleteStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(Scope pScope,
@@ -111,7 +109,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createStructureDefinitionRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, boolean)
+   *   com.diamondq.common.model.interfaces.StructureDefinition, boolean)
    */
   @Override
   public StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable,
@@ -121,7 +119,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createStructureDefinitionRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized) {
@@ -130,7 +128,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createStructureRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public StructureRef createStructureRef(Scope pScope, Structure pResolvable) {
@@ -139,7 +137,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createStructureRefStr(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public String createStructureRefStr(Scope pScope, Structure pResolvable) {
@@ -148,8 +146,8 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createPropertyDefinitionRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.PropertyDefinition,
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public PropertyDefinitionRef createPropertyDefinitionRef(Scope pScope, PropertyDefinition pResolvable,
@@ -159,7 +157,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createPropertyRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Property, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Property, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public <@Nullable T> PropertyRef<@Nullable T> createPropertyRef(Scope pScope,
@@ -169,7 +167,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#lookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(Scope pScope,
@@ -179,7 +177,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#lookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, java.lang.Integer)
+   *   java.lang.String, java.lang.Integer)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(
@@ -189,7 +187,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createNewPropertyDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
+   *   java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
   public PropertyDefinition createNewPropertyDefinition(Scope pScope, String pName, PropertyType pType) {
@@ -198,7 +196,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#collapsePrimaryKeys(com.diamondq.common.model.interfaces.Scope,
-   *      java.util.List)
+   *   java.util.List)
    */
   @Override
   public String collapsePrimaryKeys(Scope pScope, List<@Nullable Object> pNames) {
@@ -207,7 +205,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#lookupStructureBySerializedRef(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(Scope pScope,
@@ -217,17 +215,17 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#lookupStructureByPrimaryKeys(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.Object[])
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.lang.Object[])
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(Scope pScope,
-    StructureDefinition pStructureDef, @Nullable Object @NonNull... pPrimaryKeys) {
+    StructureDefinition pStructureDef, @Nullable Object @NotNull ... pPrimaryKeys) {
     return getPersistenceLayer(pScope).lookupStructureByPrimaryKeys(this, pScope, pStructureDef, pPrimaryKeys);
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createNewStructure(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public Structure createNewStructure(Scope pScope, StructureDefinition pStructureDefinition) {
@@ -236,7 +234,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#writeStructure(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> writeStructure(Scope pScope, Structure pStructure) {
@@ -245,7 +243,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#writeStructure(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public ContextExtendedCompletionStage<Boolean> writeStructure(Scope pScope, Structure pStructure,
@@ -255,7 +253,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#deleteStructure(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public ContextExtendedCompletionStage<Boolean> deleteStructure(Scope pScope, Structure pOldStructure) {
@@ -264,7 +262,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createNewProperty(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition, boolean, java.lang.Object)
+   *   com.diamondq.common.model.interfaces.PropertyDefinition, boolean, java.lang.Object)
    */
   @Override
   public <@Nullable TYPE> Property<@Nullable TYPE> createNewProperty(Scope pScope,
@@ -274,7 +272,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createStructureRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public StructureRef createStructureRefFromSerialized(Scope pScope, String pValue) {
@@ -283,19 +281,24 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createStructureRefFromParts(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure, java.lang.String,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)
+   *   com.diamondq.common.model.interfaces.Structure, java.lang.String,
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)
    */
   @Override
   public StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure,
     @Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys) {
-    return getPersistenceLayer(pScope).createStructureRefFromParts(this, pScope, pStructure, pPropName, pDef,
-      pPrimaryKeys);
+    return getPersistenceLayer(pScope).createStructureRefFromParts(this,
+      pScope,
+      pStructure,
+      pPropName,
+      pDef,
+      pPrimaryKeys
+    );
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createPropertyRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
@@ -304,8 +307,8 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinitionRef, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinitionRef, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyDefinition)
    */
   @Override
   public ContextExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(Scope pScope,
@@ -315,7 +318,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createNewQueryBuilder(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String)
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String)
    */
   @Override
   public QueryBuilder createNewQueryBuilder(Scope pScope, StructureDefinition pStructureDefinition, String pQueryName) {
@@ -324,7 +327,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#writeQueryBuilder(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.QueryBuilder)
+   *   com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
   public ContextExtendedCompletionStage<ModelQuery> writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder) {
@@ -333,7 +336,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   *   com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
   public ContextExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(Scope pScope, ModelQuery pQuery,
@@ -343,39 +346,48 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#createStandardMigration(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StandardMigrations, java.lang.Object[])
+   *   com.diamondq.common.model.interfaces.StandardMigrations, java.lang.Object[])
    */
   @Override
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
-    StandardMigrations pMigrationType, @NonNull Object @Nullable... pParams) {
+    StandardMigrations pMigrationType, @NotNull Object @Nullable ... pParams) {
     return getPersistenceLayer(pScope).createStandardMigration(this, pScope, pMigrationType, pParams);
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#addMigration(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, int, int, java.util.function.BiFunction)
+   *   java.lang.String, int, int, java.util.function.BiFunction)
    */
   @Override
   public void addMigration(Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
     BiFunction<Structure, Structure, Structure> pMigrationFunction) {
-    getPersistenceLayer(pScope).addMigration(this, pScope, pStructureDefinitionName, pFromRevision, pToRevision,
-      pMigrationFunction);
+    getPersistenceLayer(pScope).addMigration(this,
+      pScope,
+      pStructureDefinitionName,
+      pFromRevision,
+      pToRevision,
+      pMigrationFunction
+    );
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#determineMigrationPath(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, int, int)
+   *   java.lang.String, int, int)
    */
   @Override
   public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
     Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision) {
-    return getPersistenceLayer(pScope).determineMigrationPath(this, pScope, pStructureDefName, pFromRevision,
-      pToRevision);
+    return getPersistenceLayer(pScope).determineMigrationPath(this,
+      pScope,
+      pStructureDefName,
+      pFromRevision,
+      pToRevision
+    );
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#lookupLatestStructureDefinitionRevision(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(Scope pScope,
@@ -385,7 +397,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#clearStructures(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope,
@@ -395,7 +407,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#countByQuery(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   *   com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
   public ContextExtendedCompletionStage<Integer> countByQuery(Scope pScope, ModelQuery pQuery,

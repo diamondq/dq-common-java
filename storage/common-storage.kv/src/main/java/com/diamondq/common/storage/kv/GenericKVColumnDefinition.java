@@ -1,21 +1,21 @@
 package com.diamondq.common.storage.kv;
 
-import java.math.BigDecimal;
+import org.jetbrains.annotations.Nullable;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.math.BigDecimal;
 
 /**
  * A generic KVColumnDefinition
  */
 public class GenericKVColumnDefinition implements IKVColumnDefinition {
 
-  private final String               mName;
+  private final String mName;
 
-  private final KVColumnType         mType;
+  private final KVColumnType mType;
 
-  private final boolean              mIsPrimaryKey;
+  private final boolean mIsPrimaryKey;
 
-  private final @Nullable Integer    mMaxLength;
+  private final @Nullable Integer mMaxLength;
 
   private final @Nullable BigDecimal mMinValue;
 
@@ -27,7 +27,7 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
 
   /**
    * Default constructor
-   * 
+   *
    * @param pName the name
    * @param pType the type
    * @param pIsPrimaryKey true if this is the primary key

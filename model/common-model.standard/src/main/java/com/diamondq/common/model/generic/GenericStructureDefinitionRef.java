@@ -3,10 +3,9 @@ package com.diamondq.common.model.generic;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericStructureDefinitionRef extends AbstractRef<StructureDefinition> implements StructureDefinitionRef {
 
@@ -18,10 +17,14 @@ public class GenericStructureDefinitionRef extends AbstractRef<StructureDefiniti
   }
 
   public GenericStructureDefinitionRef(Scope pScope, String pSerializedString) {
-    super(pScope, pSerializedString.indexOf(':') == -1 ? pSerializedString
-      : pSerializedString.substring(0, pSerializedString.indexOf(':')), StructureDefinition.class);
-    mRevision = pSerializedString.indexOf(':') == -1 ? null
-      : Integer.valueOf(pSerializedString.substring(pSerializedString.indexOf(':') + 1));
+    super(pScope,
+      pSerializedString.indexOf(':') == -1 ? pSerializedString : pSerializedString.substring(0,
+        pSerializedString.indexOf(':')
+      ),
+      StructureDefinition.class
+    );
+    mRevision = pSerializedString.indexOf(':') == -1 ? null : Integer.valueOf(pSerializedString.substring(
+      pSerializedString.indexOf(':') + 1));
   }
 
   /**
@@ -37,8 +40,7 @@ public class GenericStructureDefinitionRef extends AbstractRef<StructureDefiniti
    */
   @Override
   public StructureDefinitionRef getWildcardReference() {
-    if (mRevision == null)
-      return this;
+    if (mRevision == null) return this;
     return new GenericStructureDefinitionRef(mScope, mId, null);
   }
 
@@ -52,10 +54,8 @@ public class GenericStructureDefinitionRef extends AbstractRef<StructureDefiniti
 
   @Override
   public String getSerializedString() {
-    if (mRevision == null)
-      return mId;
-    else
-      return new StringBuilder(mId).append(':').append(mRevision).toString();
+    if (mRevision == null) return mId;
+    else return new StringBuilder(mId).append(':').append(mRevision).toString();
   }
 
   /**
@@ -71,14 +71,12 @@ public class GenericStructureDefinitionRef extends AbstractRef<StructureDefiniti
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     GenericStructureDefinitionRef other = (GenericStructureDefinitionRef) pObj;
-    return Objects.equals(mScope, other.mScope) && Objects.equals(mId, other.mId)
-      && Objects.equals(mActualClass, other.mActualClass) && Objects.equals(mRevision, other.mRevision);
+    return Objects.equals(mScope, other.mScope) && Objects.equals(mId, other.mId) && Objects.equals(mActualClass,
+      other.mActualClass
+    ) && Objects.equals(mRevision, other.mRevision);
   }
 }

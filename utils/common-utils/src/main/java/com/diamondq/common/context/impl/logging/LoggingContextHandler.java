@@ -2,8 +2,8 @@ package com.diamondq.common.context.impl.logging;
 
 import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -319,8 +319,8 @@ public class LoggingContextHandler implements ContextHandler {
     int expandedLen;
     if (argsLen == 0) expandedLen = 2;
     else expandedLen = argsLen + 2;
-    @Nullable Object @NonNull [] expandedArgs = new Object[expandedLen];
-    @Nullable Object @NonNull [] filteredArgs;
+    @Nullable Object @NotNull [] expandedArgs = new Object[expandedLen];
+    @Nullable Object @NotNull [] filteredArgs;
 
     /* See if the last entry is a Throwable */
 

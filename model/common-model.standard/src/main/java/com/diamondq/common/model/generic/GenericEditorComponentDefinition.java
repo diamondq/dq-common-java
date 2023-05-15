@@ -7,27 +7,26 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public abstract class GenericEditorComponentDefinition<T extends EditorComponentDefinition<T>>
   implements EditorComponentDefinition<T> {
 
-  protected final @Nullable TranslatableString    mLabel;
+  protected final @Nullable TranslatableString mLabel;
 
-  protected final int                             mColumn;
+  protected final int mColumn;
 
-  protected final int                             mColumnSpan;
+  protected final int mColumnSpan;
 
-  protected final int                             mOrder;
+  protected final int mOrder;
 
   protected final @Nullable PropertyDefinitionRef mVisibleIfProperty;
 
-  protected final @Nullable Set<String>           mVisibleIfValueEquals;
+  protected final @Nullable Set<String> mVisibleIfValueEquals;
 
   protected GenericEditorComponentDefinition(@Nullable TranslatableString pLabel, int pColumn, int pColumnSpan,
     int pOrder, @Nullable PropertyDefinitionRef pVisibleIfProperty, @Nullable Set<String> pVisibleIfValueEquals) {
@@ -134,13 +133,19 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
   @Override
   public T addVisibleIfValueEquals(String pValue) {
     Set<String> visibleIfValueEquals = mVisibleIfValueEquals;
-    @SuppressWarnings("null")
-    @NonNull
-    Predicate<String> equalTo = Predicates.equalTo(pValue);
-    return constructNew(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty,
-      ImmutableSet.<String> builder().addAll(Sets
-        .filter(visibleIfValueEquals == null ? Collections.emptySet() : visibleIfValueEquals, Predicates.not(equalTo)))
-        .add(pValue).build());
+    @SuppressWarnings("null") @NotNull Predicate<String> equalTo = Predicates.equalTo(pValue);
+    return constructNew(mLabel,
+      mColumn,
+      mColumnSpan,
+      mOrder,
+      mVisibleIfProperty,
+      ImmutableSet.<String>builder()
+        .addAll(Sets.filter(visibleIfValueEquals == null ? Collections.emptySet() : visibleIfValueEquals,
+          Predicates.not(equalTo)
+        ))
+        .add(pValue)
+        .build()
+    );
   }
 
   /**
@@ -149,10 +154,13 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
   @Override
   public T removeVisibleIfValueEquals(String pValue) {
     Set<String> visibleIfValueEquals = mVisibleIfValueEquals;
-    @SuppressWarnings("null")
-    @NonNull
-    Predicate<String> equalTo = Predicates.equalTo(pValue);
-    return constructNew(mLabel, mColumn, mColumnSpan, mOrder, mVisibleIfProperty, Sets
-      .filter(visibleIfValueEquals == null ? Collections.emptySet() : visibleIfValueEquals, Predicates.not(equalTo)));
+    @SuppressWarnings("null") @NotNull Predicate<String> equalTo = Predicates.equalTo(pValue);
+    return constructNew(mLabel,
+      mColumn,
+      mColumnSpan,
+      mOrder,
+      mVisibleIfProperty,
+      Sets.filter(visibleIfValueEquals == null ? Collections.emptySet() : visibleIfValueEquals, Predicates.not(equalTo))
+    );
   }
 }

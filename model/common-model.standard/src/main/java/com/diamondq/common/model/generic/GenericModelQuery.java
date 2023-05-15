@@ -6,23 +6,29 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.storage.kv.GenericQuery;
 import com.diamondq.common.storage.kv.WhereInfo;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
-
 public class GenericModelQuery extends GenericQuery implements ModelQuery {
 
-  private final StructureDefinition          mStructureDefinition;
+  private final StructureDefinition mStructureDefinition;
 
   private final @Nullable PropertyDefinition mParentPropertyDefinition;
 
   public GenericModelQuery(StructureDefinition pStructureDefinition, String pQueryName,
     @Nullable List<WhereInfo> pWhereList, @Nullable String pParentParamKey,
-    @Nullable PropertyDefinition pParentPropertyDefinition, @Nullable List<Pair<String, Boolean>> pSortList, @Nullable String pLimitKey) {
-    super(pStructureDefinition.getName(), pQueryName, pWhereList, pParentParamKey,
-      (pParentPropertyDefinition == null ? null : pParentPropertyDefinition.getName()), pSortList, pLimitKey);
+    @Nullable PropertyDefinition pParentPropertyDefinition, @Nullable List<Pair<String, Boolean>> pSortList,
+    @Nullable String pLimitKey) {
+    super(pStructureDefinition.getName(),
+      pQueryName,
+      pWhereList,
+      pParentParamKey,
+      (pParentPropertyDefinition == null ? null : pParentPropertyDefinition.getName()),
+      pSortList,
+      pLimitKey
+    );
     mStructureDefinition = pStructureDefinition;
     mParentPropertyDefinition = pParentPropertyDefinition;
   }
@@ -46,7 +52,8 @@ public class GenericModelQuery extends GenericQuery implements ModelQuery {
   @SuppressWarnings("null")
   @Override
   protected ToStringHelper toStringHelper(ToStringHelper pHelper) {
-    return super.toStringHelper(pHelper).add("structureDefinition", mStructureDefinition.getName())
+    return super.toStringHelper(pHelper)
+      .add("structureDefinition", mStructureDefinition.getName())
       .add("parentPropertyDefinition", mParentPropertyDefinition);
   }
 

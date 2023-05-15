@@ -7,12 +7,11 @@ import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.jaxrs.model.ApplicationInfo;
 import com.diamondq.common.jaxrs.model.ApplicationInfo.Builder;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ApplicationInfoFactory extends AbstractOSGiConstructor {
 
@@ -29,8 +28,8 @@ public class ApplicationInfoFactory extends AbstractOSGiConstructor {
     );
   }
 
-  public ApplicationInfo onCreate(String pFQDN, @Nullable Boolean pHttpEnabled, Integer pHttpPort, @Nullable String pHttpHost,
-    @Nullable Boolean pHttpsEnabled, Integer pHttpsPort, @Nullable String pHttpsHost) {
+  public ApplicationInfo onCreate(String pFQDN, @Nullable Boolean pHttpEnabled, Integer pHttpPort,
+    @Nullable String pHttpHost, @Nullable Boolean pHttpsEnabled, Integer pHttpsPort, @Nullable String pHttpsHost) {
     try (Context context = mContextFactory.newContext(ApplicationInfoFactory.class, this)) {
 
       /* Get the FQDN property */
@@ -47,8 +46,7 @@ public class ApplicationInfoFactory extends AbstractOSGiConstructor {
 
         /* Get the host and port */
 
-        if (pHttpHost == null)
-          throw new ExtendedIllegalArgumentException(Messages.APPLICATIONINFO_HTTP_HOST_REQUIRED);
+        if (pHttpHost == null) throw new ExtendedIllegalArgumentException(Messages.APPLICATIONINFO_HTTP_HOST_REQUIRED);
 
         /* Build the URI */
 
@@ -58,9 +56,7 @@ public class ApplicationInfoFactory extends AbstractOSGiConstructor {
         catch (URISyntaxException ex) {
           throw new RuntimeException(ex);
         }
-      }
-      else
-        unsecuredURI = null;
+      } else unsecuredURI = null;
 
       /* Get if HTTPS is enabled */
 
@@ -79,9 +75,7 @@ public class ApplicationInfoFactory extends AbstractOSGiConstructor {
         catch (URISyntaxException ex) {
           throw new RuntimeException(ex);
         }
-      }
-      else
-        securedURI = null;
+      } else securedURI = null;
 
       /* Finish the building of the ApplicationInfo */
 

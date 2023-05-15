@@ -4,7 +4,7 @@ import com.diamondq.common.converters.AbstractConverter;
 import com.diamondq.common.i18n.I18NString;
 import com.diamondq.common.i18n.MessagesEnum;
 import com.diamondq.common.types.Types;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

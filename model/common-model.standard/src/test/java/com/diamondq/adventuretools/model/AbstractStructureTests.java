@@ -10,8 +10,7 @@ import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,7 +18,7 @@ public abstract class AbstractStructureTests implements StandardTest {
 
   protected @Nullable Toolkit mToolkit;
 
-  protected @Nullable Scope   mScope;
+  protected @Nullable Scope mScope;
 
   @Override
   public void setup(Toolkit pToolkit, Scope pScope) {
@@ -63,12 +62,13 @@ public abstract class AbstractStructureTests implements StandardTest {
 
     /* Setup PropertyDefinition */
 
-    newDef = newDef.addPropertyDefinition(
-      toolkit.createNewPropertyDefinition(scope, propName, PropertyType.String).setPrimaryKey(true));
+    newDef = newDef.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, propName, PropertyType.String)
+      .setPrimaryKey(true));
 
-    newDef =
-      newDef.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, parentName, PropertyType.PropertyRef)
-        .addKeyword(CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT));
+    newDef = newDef.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope,
+      parentName,
+      PropertyType.PropertyRef
+    ).addKeyword(CommonKeywordKeys.CONTAINER, CommonKeywordValues.CONTAINER_PARENT));
 
     /* Write */
 

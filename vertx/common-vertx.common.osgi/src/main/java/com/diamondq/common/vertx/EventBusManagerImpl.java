@@ -6,6 +6,12 @@ import com.diamondq.common.context.ContextExtendedCompletionStage;
 import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.errors.Verify;
 import com.diamondq.common.lambda.future.FutureUtils;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.eventbus.Message;
+import io.vertx.servicediscovery.ServiceDiscovery;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,30 +19,20 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.micrometer.core.instrument.MeterRegistry;
-import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.Message;
-import io.vertx.servicediscovery.ServiceDiscovery;
-
 public class EventBusManagerImpl implements EventBusManager {
 
-  @SuppressWarnings("unused")
-  private static final int sDEFAULT_QUEUE_SIZE = 100;
+  @SuppressWarnings("unused") private static final int sDEFAULT_QUEUE_SIZE = 100;
 
-  private static final int sDEFAULT_INFLIGHT   = Runtime.getRuntime().availableProcessors() * 2;
+  private static final int sDEFAULT_INFLIGHT = Runtime.getRuntime().availableProcessors() * 2;
 
   private static class TransitMessage<I, R> {
-    @SuppressWarnings("unused")
-    public final I                                                                   toSend;
+    @SuppressWarnings("unused") public final I toSend;
 
     @SuppressWarnings("unused")
-    public final @Nullable DeliveryOptions                                           deliveryOptions;
+    public final @Nullable DeliveryOptions deliveryOptions;
 
-    @SuppressWarnings("unused")
-    public final ContextExtendedCompletableFuture<ContextExtendedCompletionStage<R>> sendFuture;
+    @SuppressWarnings(
+      "unused") public final ContextExtendedCompletableFuture<ContextExtendedCompletionStage<R>> sendFuture;
 
     public TransitMessage(I pToSend, @Nullable DeliveryOptions pDeliveryOptions,
       ContextExtendedCompletableFuture<ContextExtendedCompletionStage<R>> pSendFuture) {
@@ -49,22 +45,22 @@ public class EventBusManagerImpl implements EventBusManager {
   }
 
   private static class SendQueue {
-    public final String                      address;
+    public final String address;
 
     public final Queue<TransitMessage<?, ?>> queue;
 
     /**
      * We'll track the number of entries in queue separately to make it easier to report metrics
      */
-    public int                               queueSize;
+    public int queueSize;
 
     /**
      * How many messages are actually inflight (ie. waiting for results). If this number exceeds maxInFlight, then we
      * start queuing the requests.
      */
-    public int                               inflight;
+    public int inflight;
 
-    public final int                         maxInflight;
+    public final int maxInflight;
 
     public SendQueue(MeterRegistry pMeterRegistry, String pAddress, int pMaxInflight) {
       address = pAddress;
@@ -86,18 +82,17 @@ public class EventBusManagerImpl implements EventBusManager {
 
   }
 
-  private final ConcurrentMap<String, SendQueue> mSendQueues   = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, SendQueue> mSendQueues = new ConcurrentHashMap<>();
 
-  @SuppressWarnings("unused")
-  private final AtomicLong                       mMessagesSent = new AtomicLong();
+  @SuppressWarnings("unused") private final AtomicLong mMessagesSent = new AtomicLong();
 
-  private ContextFactory                         mContextFactory;
+  private ContextFactory mContextFactory;
 
-  private Vertx                                  mVertx;
+  private Vertx mVertx;
 
-  private ServiceDiscovery                       mServiceDiscovery;
+  private ServiceDiscovery mServiceDiscovery;
 
-  private MeterRegistry                          mMeterRegistry;
+  private MeterRegistry mMeterRegistry;
 
   @SuppressWarnings("null")
   public EventBusManagerImpl() {
@@ -137,7 +132,7 @@ public class EventBusManagerImpl implements EventBusManager {
 
   /**
    * @see com.diamondq.common.vertx.EventBusManager#send(java.lang.String, java.lang.Object,
-   *      io.vertx.core.eventbus.DeliveryOptions)
+   *   io.vertx.core.eventbus.DeliveryOptions)
    */
   @Override
   public <I, R> ContextExtendedCompletionStage<ContextExtendedCompletionStage<R>> send(String pAddress, I pToSend,
@@ -154,14 +149,12 @@ public class EventBusManagerImpl implements EventBusManager {
         /* Create a new SendQueue */
 
         SendQueue newSendQueue = new SendQueue(mMeterRegistry, pAddress, sDEFAULT_INFLIGHT);
-        if ((sendQueue = mSendQueues.putIfAbsent(pAddress, newSendQueue)) == null)
-          sendQueue = newSendQueue;
+        if ((sendQueue = mSendQueues.putIfAbsent(pAddress, newSendQueue)) == null) sendQueue = newSendQueue;
       }
 
       ContextExtendedCompletableFuture<ContextExtendedCompletionStage<R>> result = FutureUtils.newCompletableFuture();
 
-      @Nullable
-      SendQueue toSendQueue = null;
+      @Nullable SendQueue toSendQueue = null;
 
       synchronized (sendQueue) {
 
@@ -174,8 +167,7 @@ public class EventBusManagerImpl implements EventBusManager {
           sendQueue.queueSize++;
           sendQueue.queue.add(new TransitMessage<I, R>(pToSend, pDeliveryOptions, result));
 
-        }
-        else {
+        } else {
 
           /* Otherwise, just send it */
 
@@ -186,21 +178,19 @@ public class EventBusManagerImpl implements EventBusManager {
         ctx.trace("send -> {} in flight / {} queue size", sendQueue.inflight, sendQueue.queueSize);
       }
 
-      if (toSendQueue != null)
-        result.complete(sendOneMessage(toSendQueue, pToSend, pDeliveryOptions));
+      if (toSendQueue != null) result.complete(sendOneMessage(toSendQueue, pToSend, pDeliveryOptions));
 
       return result;
     }
   }
 
-  @SuppressWarnings({"null"})
+  @SuppressWarnings({ "null" })
   private <I, R> ContextExtendedCompletionStage<R> sendOneMessage(SendQueue sendQueue, I pToSend,
     @Nullable DeliveryOptions pDeliveryOptions) {
     try (Context ctx = mContextFactory.newContext(EventBusManagerImpl.class, this, sendQueue)) {
 
       DeliveryOptions options = pDeliveryOptions;
-      if (options == null)
-        options = new DeliveryOptions();
+      if (options == null) options = new DeliveryOptions();
 
       //
       // toProcess.processingComplete.handler((mr) -> {
@@ -218,19 +208,21 @@ public class EventBusManagerImpl implements EventBusManager {
       //
       /* Send the message */
 
-      VertxUtils.<String, I, DeliveryOptions, Message<R>> call(mVertx.eventBus()::request, sendQueue.address, pToSend,
-        options);
+      VertxUtils.<String, I, DeliveryOptions, Message<R>>call(mVertx.eventBus()::request,
+        sendQueue.address,
+        pToSend,
+        options
+      );
 
       ctx.prepareForAlternateThreads();
-      mVertx.eventBus().<Boolean> request(sendQueue.address, pToSend, options, (ar) -> {
+      mVertx.eventBus().<Boolean>request(sendQueue.address, pToSend, options, (ar) -> {
         try (Context ctx2 = ctx.activateOnThread("after Vertx.send: {}", ar)) {
           synchronized (sendQueue) {
             sendQueue.inflight--;
           }
           if (ar.succeeded() == false) {
             Throwable cause = ar.cause();
-            if (cause == null)
-              cause = new RuntimeException();
+            if (cause == null) cause = new RuntimeException();
 //            sendQueue.pendingResults.decrementAndGet();
 //            toProcess.processingComplete.unregister();
 //            toProcess.resultFuture.completeExceptionally(cause);

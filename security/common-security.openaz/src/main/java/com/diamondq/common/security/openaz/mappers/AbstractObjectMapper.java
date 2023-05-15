@@ -3,17 +3,16 @@ package com.diamondq.common.security.openaz.mappers;
 import org.apache.openaz.pepapi.MapperRegistry;
 import org.apache.openaz.pepapi.ObjectMapper;
 import org.apache.openaz.pepapi.PepConfig;
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractObjectMapper implements ObjectMapper {
 
   protected final Class<?> mClass;
 
-  @Nullable
-  protected MapperRegistry mRegistry;
+  @Nullable protected MapperRegistry mRegistry;
 
-  @Nullable
-  protected PepConfig      mConfig;
+  @Nullable protected PepConfig mConfig;
 
   public AbstractObjectMapper(Class<?> pClass) {
     mClass = pClass;

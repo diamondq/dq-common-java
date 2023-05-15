@@ -1,18 +1,17 @@
 package com.diamondq.common.converters;
 
 import com.diamondq.common.TypeReference;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractConverter<I, O> implements Converter<I, O> {
 
   protected final @Nullable String mGroupName;
 
-  protected final Type             mInputType;
+  protected final Type mInputType;
 
-  protected final Type             mOutputType;
+  protected final Type mOutputType;
 
   protected AbstractConverter(Class<I> pInputClass, Class<O> pOutputClass, @Nullable String pGroupName) {
     mInputType = pInputClass;

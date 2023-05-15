@@ -1,8 +1,8 @@
 package com.diamondq.common.model.interfaces;
 
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.List;
 
 public interface EditorGroupDefinition extends EditorComponentDefinition<EditorGroupDefinition> {
 

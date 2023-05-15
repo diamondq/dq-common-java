@@ -1,8 +1,7 @@
 package com.diamondq.common.security.acme.model;
 
 import com.diamondq.common.model.interfaces.Structure;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ChallengeState {
 
@@ -29,12 +28,9 @@ public class ChallengeState {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     ChallengeState other = (ChallengeState) pObj;
     return mStructure.equals(other.mStructure);
   }
@@ -44,8 +40,8 @@ public class ChallengeState {
   }
 
   public ChallengeState setToken(String pValue) {
-    return new ChallengeState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("token").setValue(pValue)));
+    return new ChallengeState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("token")
+      .setValue(pValue)));
   }
 
   public @Nullable String getResponse() {
@@ -53,8 +49,8 @@ public class ChallengeState {
   }
 
   public ChallengeState setResponse(String pValue) {
-    return new ChallengeState(
-      mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("response").setValue(pValue)));
+    return new ChallengeState(mStructure.updateProperty(mStructure.lookupMandatoryPropertyByName("response")
+      .setValue(pValue)));
   }
 
 }

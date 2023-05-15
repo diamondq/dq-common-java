@@ -5,26 +5,9 @@ import com.diamondq.common.xmpp.cdi.XMPPClientRef;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
-
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.time.Duration;
-import java.util.List;
-import java.util.Locale;
-import java.util.SortedSet;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Default;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.Annotated;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import rocks.xmpp.core.XmppException;
 import rocks.xmpp.core.net.ChannelEncryption;
 import rocks.xmpp.core.net.client.ClientConnectionConfiguration;
@@ -34,10 +17,24 @@ import rocks.xmpp.core.session.XmppClient;
 import rocks.xmpp.core.session.XmppSessionConfiguration;
 import rocks.xmpp.core.session.debug.XmppDebugger;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Default;
+import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.Annotated;
+import javax.enterprise.inject.spi.InjectionPoint;
+import javax.inject.Inject;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.time.Duration;
+import java.util.List;
+import java.util.Locale;
+import java.util.SortedSet;
+
 @ApplicationScoped
 public class XMPPClientProducer {
 
-  private static final Logger             sLogger = LoggerFactory.getLogger(XMPPClientProducer.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(XMPPClientProducer.class);
 
   private final Cache<String, XmppClient> mCache;
 
@@ -48,7 +45,9 @@ public class XMPPClientProducer {
 
   @Produces
   @Dependent
-  public @Nullable @Default @XMPPClientRef("") XmppClient getClient(InjectionPoint pInjectionPoint, Config pConfig,
+  public @Nullable
+  @Default
+  @XMPPClientRef("") XmppClient getClient(InjectionPoint pInjectionPoint, Config pConfig,
     XMPPServerLookup pServerInfoLookup) {
 
     String scope = pInjectionPoint.getBean().getScope().getName();
@@ -64,14 +63,11 @@ public class XMPPClientProducer {
     String clientKey;
 
     /* If it does not, then use the 'default' client */
-    if (clientAnnotation == null)
-      clientKey = scope + "/__DEFAULT__";
-    else
-      clientKey = scope + "/" + clientAnnotation.value();
+    if (clientAnnotation == null) clientKey = scope + "/__DEFAULT__";
+    else clientKey = scope + "/" + clientAnnotation.value();
 
     XmppClient client = mCache.getIfPresent(clientKey);
-    if (client != null)
-      return client;
+    if (client != null) return client;
 
     /* So, create a new client */
 
@@ -105,27 +101,22 @@ public class XMPPClientProducer {
       socketBuilder = socketBuilder.port(serverInfo.port);
 
       Integer connectTimeout = pConfig.bind("xmpp.tcp.connect-timeout", Integer.class);
-      if (connectTimeout != null)
-        socketBuilder = socketBuilder.connectTimeout(connectTimeout);
+      if (connectTimeout != null) socketBuilder = socketBuilder.connectTimeout(connectTimeout);
 
       Integer keepAliveInterval = pConfig.bind("xmpp.tcp.keep-alive-interval", Integer.class);
-      if (keepAliveInterval != null)
-        socketBuilder.keepAliveInterval(keepAliveInterval);
+      if (keepAliveInterval != null) socketBuilder.keepAliveInterval(keepAliveInterval);
 
       Boolean secure = pConfig.bind("xmpp.tcp.secure", Boolean.class);
-      if (secure != null)
-        socketBuilder = socketBuilder.channelEncryption(ChannelEncryption.REQUIRED);
+      if (secure != null) socketBuilder = socketBuilder.channelEncryption(ChannelEncryption.REQUIRED);
 
       String proxyHost = pConfig.bind("xmpp.tcp.proxy.hostname", String.class);
       if (proxyHost != null) {
         Integer proxyPort = pConfig.bind("xmpp.tcp.proxy.port", Integer.class);
-        if (proxyPort == null)
-          throw new IllegalArgumentException(
-            "The xmpp.tcp.proxy.port is required if xmpp.tcp.proxy.hostname is provided.");
+        if (proxyPort == null) throw new IllegalArgumentException(
+          "The xmpp.tcp.proxy.port is required if xmpp.tcp.proxy.hostname is provided.");
 
         String proxyTypeStr = pConfig.bind("xmpp.tcp.proxy.type", String.class);
-        if (proxyTypeStr == null)
-          proxyTypeStr = Proxy.Type.SOCKS.toString();
+        if (proxyTypeStr == null) proxyTypeStr = Proxy.Type.SOCKS.toString();
         Proxy.Type proxyType = Proxy.Type.valueOf(proxyTypeStr);
 
         InetSocketAddress address = new InetSocketAddress(proxyHost, proxyPort);
@@ -143,8 +134,9 @@ public class XMPPClientProducer {
       String debuggerName = pConfig.bind("xmpp.session.debugger", String.class);
       if (debuggerName != null) {
         try {
-          @SuppressWarnings("unchecked")
-          Class<? extends XmppDebugger> debuggerClass = (Class<? extends XmppDebugger>) Class.forName(debuggerName);
+          @SuppressWarnings(
+            "unchecked") Class<? extends XmppDebugger> debuggerClass = (Class<? extends XmppDebugger>) Class.forName(
+            debuggerName);
           builder = builder.debugger(debuggerClass);
         }
         catch (ClassNotFoundException ex) {
@@ -167,35 +159,27 @@ public class XMPPClientProducer {
         if ("backoff".equals(reconnectType)) {
           Integer slotTime = pConfig.bind("xmpp.session.reconnection-strategy.slot-time", Integer.class);
           Integer ceilingTime = pConfig.bind("xmpp.session.reconnection-strategy.ceiling", Integer.class);
-          if (slotTime == null)
-            throw new IllegalArgumentException(
-              "The xmpp.session.reconnection-strategy.slot-time is required for a backoff type.");
-          if (ceilingTime == null)
-            throw new IllegalArgumentException(
-              "The xmpp.session.reconnection-strategy.ceiling is required for a backoff type.");
+          if (slotTime == null) throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.slot-time is required for a backoff type.");
+          if (ceilingTime == null) throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.ceiling is required for a backoff type.");
           reconnectionStrategy = ReconnectionStrategy.truncatedBinaryExponentialBackoffStrategy(slotTime, ceilingTime);
-        }
-        else if ("after".equals(reconnectType)) {
+        } else if ("after".equals(reconnectType)) {
           Integer afterTime = pConfig.bind("xmpp.session.reconnection-strategy.after-time", Integer.class);
-          if (afterTime == null)
-            throw new IllegalArgumentException(
-              "The xmpp.session.reconnection-strategy.after-time is required for a after type.");
+          if (afterTime == null) throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.after-time is required for a after type.");
           reconnectionStrategy = ReconnectionStrategy.alwaysAfter(Duration.ofMillis(afterTime));
-        }
-        else if ("random".equals(reconnectType)) {
+        } else if ("random".equals(reconnectType)) {
           Integer minTime = pConfig.bind("xmpp.session.reconnection-strategy.min-time", Integer.class);
-          if (minTime == null)
-            throw new IllegalArgumentException(
-              "The xmpp.session.reconnection-strategy.min-time is required for a random type.");
+          if (minTime == null) throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.min-time is required for a random type.");
           Integer maxTime = pConfig.bind("xmpp.session.reconnection-strategy.max-time", Integer.class);
-          if (maxTime == null)
-            throw new IllegalArgumentException(
-              "The xmpp.session.reconnection-strategy.max-time is required for a random type.");
-          reconnectionStrategy =
-            ReconnectionStrategy.alwaysRandomlyAfter(Duration.ofMillis(minTime), Duration.ofMillis(maxTime));
-        }
-        else
-          throw new IllegalArgumentException("Unrecognized reconnection-strategy type: " + reconnectType);
+          if (maxTime == null) throw new IllegalArgumentException(
+            "The xmpp.session.reconnection-strategy.max-time is required for a random type.");
+          reconnectionStrategy = ReconnectionStrategy.alwaysRandomlyAfter(Duration.ofMillis(minTime),
+            Duration.ofMillis(maxTime)
+          );
+        } else throw new IllegalArgumentException("Unrecognized reconnection-strategy type: " + reconnectType);
 
         builder = builder.reconnectionStrategy(reconnectionStrategy);
       }

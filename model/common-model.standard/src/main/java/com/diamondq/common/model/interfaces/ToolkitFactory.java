@@ -1,9 +1,9 @@
 package com.diamondq.common.model.interfaces;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Iterator;
 import java.util.ServiceLoader;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ToolkitFactory {
 
@@ -23,7 +23,7 @@ public abstract class ToolkitFactory {
    * service. If the context class loader is null, the system class loader will be used.</li>
    * <li>Otherwise, the system-default implementation is returned.</li>
    * </ul>
-   * 
+   *
    * @return a new <code>ToolkitFactory</code> instance, never null.
    */
 
@@ -39,8 +39,7 @@ public abstract class ToolkitFactory {
 
     try {
       String systemProp = System.getProperty(ToolkitFactory.class.getName());
-      if (systemProp != null)
-        result = newInstance(ToolkitFactory.class, systemProp, pLoader);
+      if (systemProp != null) result = newInstance(ToolkitFactory.class, systemProp, pLoader);
     }
     catch (SecurityException se) {
     }
@@ -51,8 +50,7 @@ public abstract class ToolkitFactory {
 
       ServiceLoader<ToolkitFactory> serviceLoader = ServiceLoader.load(ToolkitFactory.class);
       Iterator<ToolkitFactory> iterator = serviceLoader.iterator();
-      if (iterator.hasNext())
-        result = iterator.next();
+      if (iterator.hasNext()) result = iterator.next();
     }
 
     if (result == null) {
@@ -76,8 +74,7 @@ public abstract class ToolkitFactory {
         ClassLoader cl = pClassLoader;
         if (cl == null) {
           cl = Thread.currentThread().getContextClassLoader();
-          if (cl == null)
-            cl = ClassLoader.getSystemClassLoader();
+          if (cl == null) cl = ClassLoader.getSystemClassLoader();
         }
 
         providerClass = Class.forName(pClassName, false, cl);
@@ -103,7 +100,7 @@ public abstract class ToolkitFactory {
 
   /**
    * Returns a new GenericToolkit
-   * 
+   *
    * @return the new GenericToolkit, never null
    */
 

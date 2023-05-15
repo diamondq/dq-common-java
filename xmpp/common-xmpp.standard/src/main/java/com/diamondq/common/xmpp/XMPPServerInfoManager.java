@@ -1,7 +1,6 @@
 package com.diamondq.common.xmpp;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
+import org.jetbrains.annotations.Nullable;
 import rocks.xmpp.core.session.Manager;
 import rocks.xmpp.core.session.XmppSession;
 

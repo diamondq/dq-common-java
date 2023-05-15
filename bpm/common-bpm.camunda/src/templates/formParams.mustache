@@ -1,1 +1,1 @@
-{{#isFormParam}}{{^isFile}}@Part(value = "{{baseName}}"){{#isNullable}} @Nullable @org.checkerframework.checker.nullness.qual.Nullable{{/isNullable}} {{{dataType}}} {{paramName}}{{/isFile}}{{#isFile}} @Part(value = "{{baseName}}") InputStream {{paramName}}InputStream{{/isFile}}{{/isFormParam}}
+{{#isFormParam}}{{^isFile}}@Part(value = "{{baseName}}"){{#isNullable}} @Nullable {{/isNullable}} {{{dataType}}} {{paramName}}{{/isFile}}{{#isFile}} @Part(value = "{{baseName}}") InputStream {{paramName}}InputStream{{/isFile}}{{/isFormParam}}

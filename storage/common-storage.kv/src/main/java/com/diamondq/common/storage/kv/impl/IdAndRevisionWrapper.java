@@ -1,8 +1,7 @@
 package com.diamondq.common.storage.kv.impl;
 
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Generic implementation of an Id and Revision wrapper
@@ -11,14 +10,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class IdAndRevisionWrapper<P> implements IObjectWithIdAndRev<IdAndRevisionWrapper<P>> {
 
-  @Nullable
-  private String _id;
+  @Nullable private String _id;
 
-  @Nullable
-  private String _rev;
+  @Nullable private String _rev;
 
-  @Nullable
-  private P      data;
+  @Nullable private P data;
 
   /**
    * Default constructor
@@ -63,7 +59,7 @@ public class IdAndRevisionWrapper<P> implements IObjectWithIdAndRev<IdAndRevisio
 
   /**
    * Returns the data
-   * 
+   *
    * @return the data
    */
   public @Nullable P getData() {
@@ -72,7 +68,7 @@ public class IdAndRevisionWrapper<P> implements IObjectWithIdAndRev<IdAndRevisio
 
   /**
    * Sets the new data
-   * 
+   *
    * @param pValue the data
    * @return the wrapper
    */

@@ -1,5 +1,22 @@
 package com.diamondq.common.tracing.opentracing.xmpp;
 
+import io.opentracing.Span;
+import io.opentracing.SpanContext;
+import io.opentracing.Tracer.SpanBuilder;
+import io.opentracing.propagation.Format;
+import io.opentracing.propagation.TextMapExtractAdapter;
+import io.opentracing.propagation.TextMapInjectAdapter;
+import io.opentracing.util.GlobalTracer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import rocks.xmpp.core.session.XmppClient;
+import rocks.xmpp.core.stanza.IQEvent;
+import rocks.xmpp.core.stanza.IQHandler;
+import rocks.xmpp.core.stanza.model.IQ;
+import rocks.xmpp.core.stanza.model.IQ.Type;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -10,30 +27,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer.SpanBuilder;
-import io.opentracing.propagation.Format;
-import io.opentracing.propagation.TextMapExtractAdapter;
-import io.opentracing.propagation.TextMapInjectAdapter;
-import io.opentracing.util.GlobalTracer;
-import rocks.xmpp.core.session.XmppClient;
-import rocks.xmpp.core.stanza.IQEvent;
-import rocks.xmpp.core.stanza.IQHandler;
-import rocks.xmpp.core.stanza.model.IQ;
-import rocks.xmpp.core.stanza.model.IQ.Type;
-
 public class OpenTracingExtender {
 
-  private static final Logger                        sLogger          =
-    LoggerFactory.getLogger(OpenTracingExtender.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(OpenTracingExtender.class);
 
-  private static final String                        sKEYWORD         = "__OPENTRACING__";
+  private static final String sKEYWORD = "__OPENTRACING__";
 
   private static final ConcurrentMap<String, String> sPendingIDRemaps = new ConcurrentHashMap<>();
 
@@ -45,8 +43,7 @@ public class OpenTracingExtender {
     @Override
     public void accept(IQEvent pEvent) {
       Span activeSpan = GlobalTracer.get().activeSpan();
-      if (activeSpan == null)
-        return;
+      if (activeSpan == null) return;
       IQ iq = pEvent.getIQ();
       Type type = iq.getType();
 
@@ -54,18 +51,16 @@ public class OpenTracingExtender {
 
       if ((type == Type.GET) || (type == Type.SET)) {
         try {
-          Map<@NonNull String, @NonNull String> map = new HashMap<>();
-          GlobalTracer.get().inject(activeSpan.context(), Format.Builtin.TEXT_MAP_INJECT,
-            new TextMapInjectAdapter(map));
+          Map<@NotNull String, @NotNull String> map = new HashMap<>();
+          GlobalTracer.get()
+            .inject(activeSpan.context(), Format.Builtin.TEXT_MAP_INJECT, new TextMapInjectAdapter(map));
           StringBuilder sb = new StringBuilder();
           sb.append(iq.getId());
           sb.append(sKEYWORD);
           boolean isFirst = true;
-          for (Map.Entry<@NonNull String, @NonNull String> pair : map.entrySet()) {
-            if (isFirst == true)
-              isFirst = false;
-            else
-              sb.append('&');
+          for (Map.Entry<@NotNull String, @NotNull String> pair : map.entrySet()) {
+            if (isFirst == true) isFirst = false;
+            else sb.append('&');
             sb.append(URLEncoder.encode(pair.getKey(), "UTF-8"));
             sb.append('=');
             sb.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
@@ -100,8 +95,7 @@ public class OpenTracingExtender {
       if ((type == Type.RESULT) || (type == Type.ERROR)) {
         String incomingId = iq.getId();
         String remapId = sPendingIDRemaps.remove(incomingId);
-        if (remapId != null)
-          iq.setId(remapId);
+        if (remapId != null) iq.setId(remapId);
       }
 
     }
@@ -131,8 +125,8 @@ public class OpenTracingExtender {
           }
         }
 
-        SpanContext spanContext =
-          GlobalTracer.get().extract(Format.Builtin.TEXT_MAP_EXTRACT, new TextMapExtractAdapter(map));
+        SpanContext spanContext = GlobalTracer.get()
+          .extract(Format.Builtin.TEXT_MAP_EXTRACT, new TextMapExtractAdapter(map));
         return GlobalTracer.get().buildSpan("").asChildOf(spanContext);
       }
     }
@@ -146,8 +140,7 @@ public class OpenTracingExtender {
 
     private final IQHandler mDelegate;
 
-    @SuppressWarnings("unused")
-    private final String    mOperation;
+    @SuppressWarnings("unused") private final String mOperation;
 
     public WrappedIQHandler(IQHandler pDelegate, String pOperation) {
       mDelegate = pDelegate;
@@ -163,11 +156,9 @@ public class OpenTracingExtender {
       /* Let's see if there is a tracing block */
 
       String id = pIQ.getId();
-      if (id == null)
-        return mDelegate.handleRequest(pIQ);
+      if (id == null) return mDelegate.handleRequest(pIQ);
       SpanBuilder spanBuilder = processID(id);
-      if (spanBuilder == null)
-        return mDelegate.handleRequest(pIQ);
+      if (spanBuilder == null) return mDelegate.handleRequest(pIQ);
       Span span = spanBuilder.start();
       try {
         return mDelegate.handleRequest(pIQ);

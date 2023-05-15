@@ -1,16 +1,16 @@
 package com.diamondq.common.model.interfaces;
 
-import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.Objects;
 
 public class ModelEnvelope<DEFS, CONTENT> {
 
-  public final Toolkit    toolkit;
+  public final Toolkit toolkit;
 
-  public final Scope      scope;
+  public final Scope scope;
 
-  public final DEFS       defs;
+  public final DEFS defs;
 
   public volatile CONTENT content;
 
@@ -47,14 +47,12 @@ public class ModelEnvelope<DEFS, CONTENT> {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     ModelEnvelope<?, ?> other = (ModelEnvelope<?, ?>) pObj;
-    return Objects.equals(toolkit, other.toolkit) && Objects.equals(scope, other.scope)
-      && Objects.equals(defs, other.defs) && Objects.equals(content, other.content);
+    return Objects.equals(toolkit, other.toolkit) && Objects.equals(scope, other.scope) && Objects.equals(defs,
+      other.defs
+    ) && Objects.equals(content, other.content);
   }
 }

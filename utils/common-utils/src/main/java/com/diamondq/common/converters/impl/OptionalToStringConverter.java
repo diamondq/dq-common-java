@@ -5,7 +5,7 @@ import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.types.Types;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Singleton;
 import java.util.Optional;

@@ -5,6 +5,12 @@ import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.FutureUtils;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
+import io.vertx.core.eventbus.EventBusOptions;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.logging.SLF4JLogDelegateFactory;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -13,24 +19,27 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
-import io.vertx.core.eventbus.EventBusOptions;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.core.logging.SLF4JLogDelegateFactory;
-
 @SuppressWarnings("deprecation")
 public class VertxProvider extends AbstractOSGiConstructor {
 
   public VertxProvider() {
-    super(ConstructorInfoBuilder.builder().constructorClass(VertxProvider.class).factoryMethod("create")
-      .factoryDelete("onDelete").register(Vertx.class) //
-      .cArg().type(String.class).prop(".blockedThreadCheckInterval").optional().build().cArg().type(String.class)
-      .prop(".blockedThreadCheckIntervalUnit").optional().build()
-    // .cArg().type(String.class).prop("domain").required().build() //
-    // .cArg().type(String.class).prop("host").required().build() //
+    super(ConstructorInfoBuilder.builder()
+        .constructorClass(VertxProvider.class)
+        .factoryMethod("create")
+        .factoryDelete("onDelete")
+        .register(Vertx.class) //
+        .cArg()
+        .type(String.class)
+        .prop(".blockedThreadCheckInterval")
+        .optional()
+        .build()
+        .cArg()
+        .type(String.class)
+        .prop(".blockedThreadCheckIntervalUnit")
+        .optional()
+        .build()
+      // .cArg().type(String.class).prop("domain").required().build() //
+      // .cArg().type(String.class).prop("host").required().build() //
     );
   }
 
@@ -40,21 +49,27 @@ public class VertxProvider extends AbstractOSGiConstructor {
     /* Assign the Vertx future as the primary future */
 
     try {
-      Method ofFuture =
-        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("of", CompletableFuture.class);
-      Method newCompletableFuture =
-        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
-      Method completedFuture =
-        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFuture", Object.class);
-      Method completedFailure =
-        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFailure", Throwable.class);
+      Method ofFuture = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("of", CompletableFuture.class);
+      Method newCompletableFuture = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
+      Method completedFuture = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFuture",
+        Object.class
+      );
+      Method completedFailure = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFailure",
+        Throwable.class
+      );
       Method listOf = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("listOf", List.class);
       Set<Class<?>> replacements = new HashSet<>();
       replacements.add(ContextExtendedCompletableFuture.class);
       replacements.add(ExtendedCompletableFuture.class);
 
-      FutureUtils.setMethods(ofFuture, newCompletableFuture, completedFuture, completedFailure, listOf,
-        VertxContextExtendedCompletableFuture.class, replacements);
+      FutureUtils.setMethods(ofFuture,
+        newCompletableFuture,
+        completedFuture,
+        completedFailure,
+        listOf,
+        VertxContextExtendedCompletableFuture.class,
+        replacements
+      );
     }
     catch (NoSuchMethodException | SecurityException ex) {
       throw new RuntimeException(ex);
@@ -63,10 +78,12 @@ public class VertxProvider extends AbstractOSGiConstructor {
     // options.setAddressResolverOptions(addressResolverOptions);
     if (pBlockedThreadCheckInterval != null) {
       long blockedThreadCheckIntervalTime = Long.parseLong(pBlockedThreadCheckInterval);
-      TimeUnit blockedThreadCheckIntervalUnit = pBlockedThreadCheckIntervalUnit == null ? TimeUnit.MILLISECONDS
-        : TimeUnit.valueOf(pBlockedThreadCheckIntervalUnit);
-      options.setBlockedThreadCheckInterval(
-        TimeUnit.MILLISECONDS.convert(blockedThreadCheckIntervalTime, blockedThreadCheckIntervalUnit));
+      TimeUnit blockedThreadCheckIntervalUnit =
+        pBlockedThreadCheckIntervalUnit == null ? TimeUnit.MILLISECONDS : TimeUnit.valueOf(
+          pBlockedThreadCheckIntervalUnit);
+      options.setBlockedThreadCheckInterval(TimeUnit.MILLISECONDS.convert(blockedThreadCheckIntervalTime,
+        blockedThreadCheckIntervalUnit
+      ));
     }
     // options.setClustered(clustered);
     // options.setClusterHost(clusterHost);

@@ -2,30 +2,28 @@ package com.diamondq.common.vertx.streams;
 
 import com.diamondq.common.context.Context;
 import com.diamondq.common.context.ContextFactory;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.streams.ReadStream;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.streams.ReadStream;
 
 public class ReadStreamInputStream extends InputStream {
 
   private volatile @Nullable IOException mException;
 
-  private volatile Buffer                mInternalBuffer;
+  private volatile Buffer mInternalBuffer;
 
-  private volatile int                   mCurrentPos;
+  private volatile int mCurrentPos;
 
-  private volatile boolean               mFinished              = false;
+  private volatile boolean mFinished = false;
 
-  private int                            mMaxInternalBufferSize = 1024 * 1024;
+  private int mMaxInternalBufferSize = 1024 * 1024;
 
-  private @Nullable BackPressure         mPaused                = null;
+  private @Nullable BackPressure mPaused = null;
 
-  private boolean                        mWaiting               = false;
+  private boolean mWaiting = false;
 
   public ReadStreamInputStream(ReadStream<Buffer> pStream) {
     mInternalBuffer = Buffer.buffer();
@@ -43,8 +41,7 @@ public class ReadStreamInputStream extends InputStream {
           }
         }
       }).handle((v, ex, ctx) -> {
-        if (ex != null)
-          ctx.reportThrowable(ex);
+        if (ex != null) ctx.reportThrowable(ex);
         synchronized (ReadStreamInputStream.this) {
           mFinished = true;
           if (mWaiting == true) {
@@ -71,13 +68,11 @@ public class ReadStreamInputStream extends InputStream {
 
         /* If we're finished, then there's no point in waiting for more data */
 
-        if (mFinished == true)
-          return;
+        if (mFinished == true) return;
 
         /* If we have data at of at least the size, then we're good */
 
-        if (mInternalBuffer.length() - mCurrentPos >= pMinBytes)
-          return;
+        if (mInternalBuffer.length() - mCurrentPos >= pMinBytes) return;
 
         /* We need more data. If we're paused, then unpause */
 
@@ -104,15 +99,12 @@ public class ReadStreamInputStream extends InputStream {
    */
   @Override
   public int read() throws IOException {
-    if (mException != null)
-      throw mException;
+    if (mException != null) throw mException;
 
     requireMinimumBytes(1);
 
-    if (mInternalBuffer.length() - mCurrentPos >= 1)
-      return mInternalBuffer.getByte(mCurrentPos++);
-    if (mFinished == true)
-      return -1;
+    if (mInternalBuffer.length() - mCurrentPos >= 1) return mInternalBuffer.getByte(mCurrentPos++);
+    if (mFinished == true) return -1;
     throw new IOException();
   }
 
@@ -121,11 +113,9 @@ public class ReadStreamInputStream extends InputStream {
    */
   @Override
   public int read(byte[] pB, int pOff, int pLen) throws IOException {
-    if (pLen == 0)
-      return 0;
+    if (pLen == 0) return 0;
 
-    if (mException != null)
-      throw mException;
+    if (mException != null) throw mException;
 
     requireMinimumBytes(1);
 
@@ -137,8 +127,7 @@ public class ReadStreamInputStream extends InputStream {
       mCurrentPos += copyBytes;
       return copyBytes;
     }
-    if (mFinished == true)
-      return -1;
+    if (mFinished == true) return -1;
     throw new IOException();
   }
 
@@ -147,8 +136,7 @@ public class ReadStreamInputStream extends InputStream {
    */
   @Override
   public int available() throws IOException {
-    if (mException != null)
-      throw mException;
+    if (mException != null) throw mException;
 
     requireMinimumBytes(1);
 

@@ -17,6 +17,10 @@ import com.diamondq.common.model.interfaces.Toolkit;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.javatuples.Quartet;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,36 +29,36 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Quartet;
-
 public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   private final List<PersistenceLayer> mStructurePersistenceLayer;
 
-  private final transient boolean      mStructurePersistenceLayerIsSingleton;
+  private final transient boolean mStructurePersistenceLayerIsSingleton;
 
   private final List<PersistenceLayer> mStructureDefinitionPersistenceLayer;
 
-  private final transient boolean      mStructureDefinitionPersistenceLayerIsSingleton;
+  private final transient boolean mStructureDefinitionPersistenceLayerIsSingleton;
 
   private final List<PersistenceLayer> mEditorStructureDefinitionPersistenceLayer;
 
-  private final transient boolean      mEditorStructureDefinitionPersistenceLayerIsSingleton;
+  private final transient boolean mEditorStructureDefinitionPersistenceLayerIsSingleton;
 
   private final List<PersistenceLayer> mResourcePersistenceLayer;
 
-  private final transient boolean      mResourcePersistenceLayerIsSingleton;
+  private final transient boolean mResourcePersistenceLayerIsSingleton;
 
   public CombinedPersistenceLayer(ContextFactory pContextFactory, List<PersistenceLayer> pStructurePersistenceLayer,
     List<PersistenceLayer> pStructureDefinitionPersistenceLayer,
     List<PersistenceLayer> pEditorStructureDefinitionPersistenceLayer,
     List<PersistenceLayer> pResourcePersistenceLayer) {
     super(pContextFactory);
-    ContextFactory.staticReportTrace(CombinedPersistenceLayer.class, this, pStructurePersistenceLayer,
-      pStructureDefinitionPersistenceLayer, pEditorStructureDefinitionPersistenceLayer, pResourcePersistenceLayer);
+    ContextFactory.staticReportTrace(CombinedPersistenceLayer.class,
+      this,
+      pStructurePersistenceLayer,
+      pStructureDefinitionPersistenceLayer,
+      pEditorStructureDefinitionPersistenceLayer,
+      pResourcePersistenceLayer
+    );
     mStructurePersistenceLayer = ImmutableList.copyOf(pStructurePersistenceLayer);
     mStructurePersistenceLayerIsSingleton = (mStructurePersistenceLayer.size() == 1);
     mStructureDefinitionPersistenceLayer = ImmutableList.copyOf(pStructureDefinitionPersistenceLayer);
@@ -67,32 +71,37 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * Returns a copy of the persistence layers associated with this combining layer
-   * 
+   *
    * @return the layers (structure, structure definition, editor structure definition and resource)
    */
   public Quartet<List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>, List<PersistenceLayer>> getPersistenceLayers() {
-    return Quartet.with(mStructurePersistenceLayer, mStructureDefinitionPersistenceLayer,
-      mEditorStructureDefinitionPersistenceLayer, mResourcePersistenceLayer);
+    return Quartet.with(mStructurePersistenceLayer,
+      mStructureDefinitionPersistenceLayer,
+      mEditorStructureDefinitionPersistenceLayer,
+      mResourcePersistenceLayer
+    );
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public StructureDefinition writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
     mStructureDefinitionPersistenceLayer.forEach((l) -> l.writeStructureDefinition(pToolkit, pScope, pValue));
     enableStructureDefinition(pToolkit, pScope, pValue);
-    StructureDefinition sd =
-      lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pValue.getName(), pValue.getRevision());
-    if (sd == null)
-      throw new IllegalStateException();
+    StructureDefinition sd = lookupStructureDefinitionByNameAndRevision(pToolkit,
+      pScope,
+      pValue.getName(),
+      pValue.getRevision()
+    );
+    if (sd == null) throw new IllegalStateException();
     return sd;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#enableStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
@@ -101,7 +110,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void deleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
@@ -110,7 +119,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructureDefinitionRefs(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope) {
@@ -118,14 +127,15 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
       return mStructureDefinitionPersistenceLayer.get(0).getAllStructureDefinitionRefs(pToolkit, pScope);
 
     ImmutableSet.Builder<StructureDefinitionRef> results = ImmutableSet.builder();
-    mStructureDefinitionPersistenceLayer
-      .forEach((l) -> results.addAll(l.getAllStructureDefinitionRefs(pToolkit, pScope)));
+    mStructureDefinitionPersistenceLayer.forEach((l) -> results.addAll(l.getAllStructureDefinitionRefs(pToolkit,
+      pScope
+    )));
     return results.build();
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
   public @Nullable StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName) {
@@ -134,52 +144,47 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
     for (PersistenceLayer l : mStructureDefinitionPersistenceLayer) {
       StructureDefinition sd = l.lookupStructureDefinitionByName(pToolkit, pScope, pName);
-      if (sd != null)
-        return sd;
+      if (sd != null) return sd;
     }
     return null;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.Integer)
    */
   @Override
   public @Nullable StructureDefinition lookupStructureDefinitionByNameAndRevision(Toolkit pToolkit, Scope pScope,
     String pName, @Nullable Integer pRevision) {
-    if (mStructureDefinitionPersistenceLayerIsSingleton == true)
-      return mStructureDefinitionPersistenceLayer.get(0).lookupStructureDefinitionByNameAndRevision(pToolkit, pScope,
-        pName, pRevision);
+    if (mStructureDefinitionPersistenceLayerIsSingleton == true) return mStructureDefinitionPersistenceLayer.get(0)
+      .lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, pRevision);
 
     for (PersistenceLayer l : mStructureDefinitionPersistenceLayer) {
       StructureDefinition sd = l.lookupStructureDefinitionByNameAndRevision(pToolkit, pScope, pName, pRevision);
-      if (sd != null)
-        return sd;
+      if (sd != null) return sd;
     }
     return null;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupLatestStructureDefinitionRevision(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
   public @Nullable Integer lookupLatestStructureDefinitionRevision(Toolkit pToolkit, Scope pScope, String pDefName) {
-    if (mStructureDefinitionPersistenceLayerIsSingleton == true)
-      return mStructureDefinitionPersistenceLayer.get(0).lookupLatestStructureDefinitionRevision(pToolkit, pScope,
-        pDefName);
+    if (mStructureDefinitionPersistenceLayerIsSingleton == true) return mStructureDefinitionPersistenceLayer.get(0)
+      .lookupLatestStructureDefinitionRevision(pToolkit, pScope, pDefName);
 
     for (PersistenceLayer l : mStructureDefinitionPersistenceLayer) {
       Integer revision = l.lookupLatestStructureDefinitionRevision(pToolkit, pScope, pDefName);
-      if (revision != null)
-        return revision;
+      if (revision != null) return revision;
     }
     return null;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure) {
@@ -188,22 +193,21 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
     @Nullable Structure pOldStructure) {
     for (PersistenceLayer l : mStructurePersistenceLayer) {
-      if (l.writeStructure(pToolkit, pScope, pStructure, pOldStructure) == false)
-        return false;
+      if (l.writeStructure(pToolkit, pScope, pStructure, pOldStructure) == false) return false;
     }
     return true;
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#writeQueryBuilder(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
   public ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
@@ -212,26 +216,23 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
       ModelQuery firstQuery = null;
       for (PersistenceLayer l : mStructurePersistenceLayer) {
         ModelQuery query = l.writeQueryBuilder(pToolkit, pScope, pQueryBuilder);
-        if (firstQuery == null)
-          firstQuery = query;
+        if (firstQuery == null) firstQuery = query;
         mappedQueries.put(l, query);
       }
-      if (firstQuery == null)
-        throw new IllegalStateException();
+      if (firstQuery == null) throw new IllegalStateException();
       return context.exit(new CombinedQuery(firstQuery, mappedQueries));
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
   public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues) {
     try (Context context = mContextFactory.newContext(CombinedPersistenceLayer.class, this, pQuery, pParamValues)) {
-      if (pQuery instanceof CombinedQuery == false)
-        throw new IllegalArgumentException();
+      if (pQuery instanceof CombinedQuery == false) throw new IllegalArgumentException();
       CombinedQuery cq = (CombinedQuery) pQuery;
       Map<PersistenceLayer, ModelQuery> mappedQueries = cq.getMappedQueries();
       List<Structure> results = new ArrayList<>();
@@ -247,7 +248,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupStructureBySerializedRef(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
   public @Nullable Structure lookupStructureBySerializedRef(Toolkit pGenericToolkit, Scope pScope,
@@ -257,96 +258,103 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
     for (PersistenceLayer l : mStructurePersistenceLayer) {
       Structure s = l.lookupStructureBySerializedRef(pGenericToolkit, pScope, pSerializedRef);
-      if (s != null)
-        return s;
+      if (s != null) return s;
     }
     return null;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue) {
     for (PersistenceLayer l : mStructurePersistenceLayer) {
-      if (l.deleteStructure(pToolkit, pScope, pValue) == false)
-        return false;
+      if (l.deleteStructure(pToolkit, pScope, pValue) == false) return false;
     }
     return true;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
    */
   @Override
   public void writeEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
     EditorStructureDefinition pEditorStructureDefinition) {
-    mEditorStructureDefinitionPersistenceLayer
-      .forEach((l) -> l.writeEditorStructureDefinition(pToolkit, pScope, pEditorStructureDefinition));
+    mEditorStructureDefinitionPersistenceLayer.forEach((l) -> l.writeEditorStructureDefinition(pToolkit,
+      pScope,
+      pEditorStructureDefinition
+    ));
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteEditorStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.EditorStructureDefinition)
    */
   @Override
   public void deleteEditorStructureDefinition(Toolkit pToolkit, Scope pScope, EditorStructureDefinition pValue) {
-    mEditorStructureDefinitionPersistenceLayer
-      .forEach((l) -> l.deleteEditorStructureDefinition(pToolkit, pScope, pValue));
+    mEditorStructureDefinitionPersistenceLayer.forEach((l) -> l.deleteEditorStructureDefinition(pToolkit,
+      pScope,
+      pValue
+    ));
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#lookupEditorStructureDefinitionByRef(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef)
    */
   @Override
   public List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef(Toolkit pToolkit, Scope pScope,
     StructureDefinitionRef pRef) {
     if (mEditorStructureDefinitionPersistenceLayerIsSingleton == true)
-      return mEditorStructureDefinitionPersistenceLayer.get(0).lookupEditorStructureDefinitionByRef(pToolkit, pScope,
-        pRef);
+      return mEditorStructureDefinitionPersistenceLayer.get(0)
+        .lookupEditorStructureDefinitionByRef(pToolkit, pScope, pRef);
 
     ImmutableList.Builder<EditorStructureDefinition> results = ImmutableList.builder();
-    mEditorStructureDefinitionPersistenceLayer
-      .forEach((l) -> results.addAll(l.lookupEditorStructureDefinitionByRef(pToolkit, pScope, pRef)));
+    mEditorStructureDefinitionPersistenceLayer.forEach((l) -> results.addAll(l.lookupEditorStructureDefinitionByRef(
+      pToolkit,
+      pScope,
+      pRef
+    )));
     return results.build();
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
-   *      java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinitionRef,
+   *   java.lang.String, com.diamondq.common.model.interfaces.PropertyDefinition)
    */
   @Override
   public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope, StructureDefinitionRef pRef,
     @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef) {
-    if (mStructurePersistenceLayerIsSingleton == true)
-      return mStructurePersistenceLayer.get(0).getAllStructuresByDefinition(pToolkit, pScope, pRef, pParentKey,
-        pParentPropertyDef);
+    if (mStructurePersistenceLayerIsSingleton == true) return mStructurePersistenceLayer.get(0)
+      .getAllStructuresByDefinition(pToolkit, pScope, pRef, pParentKey, pParentPropertyDef);
 
     ImmutableSet.Builder<Structure> results = ImmutableSet.builder();
-    mStructurePersistenceLayer.forEach(
-      (l) -> results.addAll(l.getAllStructuresByDefinition(pToolkit, pScope, pRef, pParentKey, pParentPropertyDef)));
+    mStructurePersistenceLayer.forEach((l) -> results.addAll(l.getAllStructuresByDefinition(pToolkit,
+      pScope,
+      pRef,
+      pParentKey,
+      pParentPropertyDef
+    )));
     return results.build();
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#isResourceStringWritingSupported(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean isResourceStringWritingSupported(Toolkit pToolkit, Scope pScope) {
     for (PersistenceLayer l : mResourcePersistenceLayer)
-      if (l.isResourceStringWritingSupported(pToolkit, pScope) == true)
-        return true;
+      if (l.isResourceStringWritingSupported(pToolkit, pScope) == true) return true;
     return false;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#writeResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String, java.lang.String)
    */
   @Override
   public void writeResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey, String pValue) {
@@ -357,7 +365,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#deleteResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
    */
   @Override
   public void deleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
@@ -368,7 +376,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getResourceStringLocales(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public Collection<Locale> getResourceStringLocales(Toolkit pToolkit, Scope pScope) {
@@ -382,7 +390,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#getResourceStringsByLocale(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale)
    */
   @Override
   public Map<String, String> getResourceStringsByLocale(Toolkit pToolkit, Scope pScope, Locale pLocale) {
@@ -396,7 +404,7 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#lookupResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
    */
   @Override
   public @Nullable String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey) {
@@ -405,15 +413,14 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
     for (PersistenceLayer l : mResourcePersistenceLayer) {
       String result = l.lookupResourceString(pToolkit, pScope, pLocale, pKey);
-      if (result != null)
-        return result;
+      if (result != null) return result;
     }
     return null;
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#internalLookupResourceString(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.util.Locale, java.lang.String)
    */
   @Override
   protected @Nullable String internalLookupResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey) {
@@ -430,21 +437,20 @@ public class CombinedPersistenceLayer extends AbstractPersistenceLayer {
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
     boolean inferred = false;
     for (PersistenceLayer l : mStructurePersistenceLayer)
-      if (l.inferStructureDefinitions(pGenericToolkit, pScope) == true)
-        inferred = true;
+      if (l.inferStructureDefinitions(pGenericToolkit, pScope) == true) inferred = true;
 
     return inferred;
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef) {

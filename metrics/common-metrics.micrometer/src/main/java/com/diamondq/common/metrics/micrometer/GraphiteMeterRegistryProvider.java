@@ -2,16 +2,14 @@ package com.diamondq.common.metrics.micrometer;
 
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
-
-import java.time.Duration;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.util.HierarchicalNameMapper;
 import io.micrometer.graphite.GraphiteConfig;
 import io.micrometer.graphite.GraphiteMeterRegistry;
+import org.jetbrains.annotations.Nullable;
+
+import java.time.Duration;
 
 public class GraphiteMeterRegistryProvider extends AbstractOSGiConstructor {
 

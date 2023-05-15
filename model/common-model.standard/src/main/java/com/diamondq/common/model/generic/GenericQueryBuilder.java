@@ -6,27 +6,26 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.storage.kv.WhereInfo;
 import com.diamondq.common.storage.kv.WhereOperator;
 import com.google.common.collect.ImmutableList;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
-
 public class GenericQueryBuilder implements QueryBuilder {
 
-  private final StructureDefinition                  mStructureDefinition;
+  private final StructureDefinition mStructureDefinition;
 
-  private final String                               mQueryName;
+  private final String mQueryName;
 
-  private final ImmutableList<WhereInfo>             mWhereList;
+  private final ImmutableList<WhereInfo> mWhereList;
 
-  private final @Nullable String                     mParentParamKey;
+  private final @Nullable String mParentParamKey;
 
-  private final @Nullable PropertyDefinition         mParentPropertyDefinition;
+  private final @Nullable PropertyDefinition mParentPropertyDefinition;
 
   private final ImmutableList<Pair<String, Boolean>> mSortList;
 
-  private final @Nullable String                     mLimitKey;
+  private final @Nullable String mLimitKey;
 
   public GenericQueryBuilder(StructureDefinition pStructureDefinition, String pQueryName,
     @Nullable List<WhereInfo> pWhereList, @Nullable String pParentParamKey,
@@ -58,13 +57,11 @@ public class GenericQueryBuilder implements QueryBuilder {
     return mWhereList;
   }
 
-  @Nullable
-  String getParentParamKey() {
+  @Nullable String getParentParamKey() {
     return mParentParamKey;
   }
 
-  @Nullable
-  PropertyDefinition getParentPropertyDefinition() {
+  @Nullable PropertyDefinition getParentPropertyDefinition() {
     return mParentPropertyDefinition;
   }
 
@@ -72,42 +69,59 @@ public class GenericQueryBuilder implements QueryBuilder {
     return mSortList;
   }
 
-  @Nullable
-  String getLimitKey() {
+  @Nullable String getLimitKey() {
     return mLimitKey;
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.QueryBuilder#andWhereConstant(java.lang.String,
-   *      com.diamondq.common.storage.kv.WhereOperator, java.lang.Object)
+   *   com.diamondq.common.storage.kv.WhereOperator, java.lang.Object)
    */
   @Override
   public GenericQueryBuilder andWhereConstant(String pKey, WhereOperator pOperator, Object pValue) {
-    return new GenericQueryBuilder(mStructureDefinition, mQueryName,
-      ImmutableList.<WhereInfo> builder().addAll(mWhereList).add(new WhereInfo(pKey, pOperator, pValue, null)).build(),
-      mParentParamKey, mParentPropertyDefinition, mSortList, mLimitKey);
+    return new GenericQueryBuilder(mStructureDefinition,
+      mQueryName,
+      ImmutableList.<WhereInfo>builder().addAll(mWhereList).add(new WhereInfo(pKey, pOperator, pValue, null)).build(),
+      mParentParamKey,
+      mParentPropertyDefinition,
+      mSortList,
+      mLimitKey
+    );
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.QueryBuilder#andWhereParam(java.lang.String,
-   *      com.diamondq.common.storage.kv.WhereOperator, java.lang.String)
+   *   com.diamondq.common.storage.kv.WhereOperator, java.lang.String)
    */
   @Override
   public GenericQueryBuilder andWhereParam(String pKey, WhereOperator pOperator, String pParamKey) {
-    return new GenericQueryBuilder(
-      mStructureDefinition, mQueryName, ImmutableList.<WhereInfo> builder().addAll(mWhereList)
-        .add(new WhereInfo(pKey, pOperator, null, pParamKey)).build(),
-      mParentParamKey, mParentPropertyDefinition, mSortList, mLimitKey);
+    return new GenericQueryBuilder(mStructureDefinition,
+      mQueryName,
+      ImmutableList.<WhereInfo>builder()
+        .addAll(mWhereList)
+        .add(new WhereInfo(pKey, pOperator, null, pParamKey))
+        .build(),
+      mParentParamKey,
+      mParentPropertyDefinition,
+      mSortList,
+      mLimitKey
+    );
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.QueryBuilder#andWhereParentIs(java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition)
+   *   com.diamondq.common.model.interfaces.PropertyDefinition)
    */
   @Override
   public QueryBuilder andWhereParentIs(String pParentParamKey, PropertyDefinition pParentPropertyDef) {
-    return new GenericQueryBuilder(mStructureDefinition, mQueryName, mWhereList, pParentParamKey, pParentPropertyDef,
-      mSortList, mLimitKey);
+    return new GenericQueryBuilder(mStructureDefinition,
+      mQueryName,
+      mWhereList,
+      pParentParamKey,
+      pParentPropertyDef,
+      mSortList,
+      mLimitKey
+    );
   }
 
   /**
@@ -115,10 +129,14 @@ public class GenericQueryBuilder implements QueryBuilder {
    */
   @Override
   public QueryBuilder orderBy(String pKey, boolean pIsAscending) {
-    return new GenericQueryBuilder(mStructureDefinition, mQueryName, mWhereList, mParentParamKey,
+    return new GenericQueryBuilder(mStructureDefinition,
+      mQueryName,
+      mWhereList,
+      mParentParamKey,
       mParentPropertyDefinition,
-      ImmutableList.<Pair<String, Boolean>> builder().addAll(mSortList).add(Pair.with(pKey, pIsAscending)).build(),
-      mLimitKey);
+      ImmutableList.<Pair<String, Boolean>>builder().addAll(mSortList).add(Pair.with(pKey, pIsAscending)).build(),
+      mLimitKey
+    );
   }
 
   /**
@@ -126,7 +144,13 @@ public class GenericQueryBuilder implements QueryBuilder {
    */
   @Override
   public QueryBuilder limit(String pParamKey) {
-    return new GenericQueryBuilder(mStructureDefinition, mQueryName, mWhereList, mParentParamKey,
-      mParentPropertyDefinition, mSortList, pParamKey);
+    return new GenericQueryBuilder(mStructureDefinition,
+      mQueryName,
+      mWhereList,
+      mParentParamKey,
+      mParentPropertyDefinition,
+      mSortList,
+      pParamKey
+    );
   }
 }

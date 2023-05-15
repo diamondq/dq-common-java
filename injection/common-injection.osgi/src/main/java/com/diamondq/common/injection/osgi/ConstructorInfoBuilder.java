@@ -4,15 +4,14 @@ import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
 import com.diamondq.common.injection.osgi.ConstructorInfo.SpecialTypes;
 import com.diamondq.common.injection.osgi.i18n.Messages;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConstructorInfoBuilder {
 
@@ -22,33 +21,33 @@ public class ConstructorInfoBuilder {
 
   private List<ConstructionArg> mConstructionArgs;
 
-  private @Nullable Class<?>    mConstructionClass;
+  private @Nullable Class<?> mConstructionClass;
 
-  private List<String>          mRegistrationClasses;
+  private List<String> mRegistrationClasses;
 
-  private @Nullable String      mConstructionMethod;
+  private @Nullable String mConstructionMethod;
 
-  private @Nullable String      mDeleteMethod;
+  private @Nullable String mDeleteMethod;
 
   public static class ConstructorArgBuilder {
 
     private final ConstructorInfoBuilder mBuilder;
 
-    private @Nullable Class<?>           mClass;
+    private @Nullable Class<?> mClass;
 
-    private @Nullable String             mFilter;
+    private @Nullable String mFilter;
 
-    private @Nullable String             mProperty;
+    private @Nullable String mProperty;
 
-    private @Nullable Boolean            mRequired;
+    private @Nullable Boolean mRequired;
 
-    private @Nullable Boolean            mCollection;
+    private @Nullable Boolean mCollection;
 
-    private @Nullable Object             mValue;
+    private @Nullable Object mValue;
 
-    private boolean                      mValueSet    = false;
+    private boolean mValueSet = false;
 
-    private SpecialTypes                 mSpecialType = SpecialTypes.NA;
+    private SpecialTypes mSpecialType = SpecialTypes.NA;
 
     public ConstructorArgBuilder(ConstructorInfoBuilder pConstructorInfoBuilder) {
       mBuilder = pConstructorInfoBuilder;
@@ -107,8 +106,7 @@ public class ConstructorInfoBuilder {
 
     public ConstructorInfoBuilder build() {
       Class<?> localClass = mClass;
-      if (localClass == null)
-        throw new ExtendedIllegalArgumentException(Messages.CONSTRUCTION_CLASS_REQUIRED);
+      if (localClass == null) throw new ExtendedIllegalArgumentException(Messages.CONSTRUCTION_CLASS_REQUIRED);
 
       /* Make sure there is a way to find the argument */
 
@@ -124,8 +122,15 @@ public class ConstructorInfoBuilder {
       if ((mValueSet == true) && (mValue == null) && (required == true))
         throw new ExtendedIllegalArgumentException(Messages.REQUIRED_VALUE_NULL);
 
-      ConstructionArg arg =
-        new ConstructionArg(localClass, mFilter, mProperty, mValue, mValueSet, required, collection, mSpecialType);
+      ConstructionArg arg = new ConstructionArg(localClass,
+        mFilter,
+        mProperty,
+        mValue,
+        mValueSet,
+        required,
+        collection,
+        mSpecialType
+      );
       mBuilder.mConstructionArgs.add(arg);
       return mBuilder;
     }
@@ -178,22 +183,17 @@ public class ConstructorInfoBuilder {
     }
 
     String localConstructionMethod = mConstructionMethod;
-    @Nullable
-    Constructor<?> constructor = null;
-    @Nullable
-    Method method = null;
-    @Nullable
-    Method deleteMethod = null;
+    @Nullable Constructor<?> constructor = null;
+    @Nullable Method method = null;
+    @Nullable Method deleteMethod = null;
 
     if (localConstructionMethod == null) {
       /* Figure out the constructor */
 
       Constructor<?>[] possibleConstructors = localConstructionClass.getConstructors();
       for (Constructor<?> possibleConstructor : possibleConstructors) {
-        @NonNull
-        Parameter[] parameters = possibleConstructor.getParameters();
-        if (parameters.length != mConstructionArgs.size())
-          continue;
+        @NotNull Parameter[] parameters = possibleConstructor.getParameters();
+        if (parameters.length != mConstructionArgs.size()) continue;
         boolean match = true;
         for (int i = 0; i < parameters.length; i++) {
           Class<?> paramClass = parameters[i].getType();
@@ -205,8 +205,7 @@ public class ConstructorInfoBuilder {
             }
 
             /* TODO: Check the generic parameter is possible */
-          }
-          else {
+          } else {
             if (paramClass.isAssignableFrom(arg.argumentClass) == false) {
 
               // if ((paramClass.isPrimitive()) && (paramClass.)
@@ -218,8 +217,7 @@ public class ConstructorInfoBuilder {
             }
           }
         }
-        if (match == false)
-          continue;
+        if (match == false) continue;
         constructor = possibleConstructor;
       }
       if (constructor == null) {
@@ -227,28 +225,24 @@ public class ConstructorInfoBuilder {
         sb.append('(');
         boolean first = true;
         for (ConstructionArg arg : mConstructionArgs) {
-          if (first == true)
-            first = false;
-          else
-            sb.append(", ");
+          if (first == true) first = false;
+          else sb.append(", ");
           sb.append(arg.argumentClass.getName());
         }
         sb.append(')');
-        throw new ExtendedIllegalArgumentException(Messages.NO_MATCHING_CONSTRUCTOR, localConstructionClass.getName(),
-          sb.toString());
+        throw new ExtendedIllegalArgumentException(Messages.NO_MATCHING_CONSTRUCTOR,
+          localConstructionClass.getName(),
+          sb.toString()
+        );
       }
-    }
-    else {
+    } else {
       /* Figure out the method */
 
       Method[] possibleMethods = localConstructionClass.getDeclaredMethods();
       for (Method possibleMethod : possibleMethods) {
-        if (possibleMethod.getName().equals(localConstructionMethod) == false)
-          continue;
-        @NonNull
-        Parameter[] parameters = possibleMethod.getParameters();
-        if (parameters.length != mConstructionArgs.size())
-          continue;
+        if (possibleMethod.getName().equals(localConstructionMethod) == false) continue;
+        @NotNull Parameter[] parameters = possibleMethod.getParameters();
+        if (parameters.length != mConstructionArgs.size()) continue;
         boolean match = true;
         for (int i = 0; i < parameters.length; i++) {
           Class<?> paramClass = parameters[i].getType();
@@ -258,27 +252,22 @@ public class ConstructorInfoBuilder {
               match = false;
               break;
             }
-          }
-          else {
+          } else {
             if (paramClass.isAssignableFrom(arg.argumentClass) == false) {
               match = false;
               break;
             }
           }
         }
-        if (match == false)
-          continue;
+        if (match == false) continue;
         method = possibleMethod;
       }
       String localDeleteMethod = mDeleteMethod;
       if (localDeleteMethod != null) {
         for (Method possibleMethod : possibleMethods) {
-          if (possibleMethod.getName().equals(localDeleteMethod) == false)
-            continue;
-          @NonNull
-          Parameter[] parameters = possibleMethod.getParameters();
-          if (parameters.length != 1)
-            continue;
+          if (possibleMethod.getName().equals(localDeleteMethod) == false) continue;
+          @NotNull Parameter[] parameters = possibleMethod.getParameters();
+          if (parameters.length != 1) continue;
           boolean match = false;
           for (String matchClassName : mRegistrationClasses) {
             Class<?> matchClass;
@@ -293,8 +282,7 @@ public class ConstructorInfoBuilder {
               break;
             }
           }
-          if (match == false)
-            continue;
+          if (match == false) continue;
           deleteMethod = possibleMethod;
         }
       }
@@ -302,9 +290,15 @@ public class ConstructorInfoBuilder {
         throw new ExtendedIllegalArgumentException(Messages.NO_MATCHING_METHOD, localConstructionMethod);
     }
 
-    return new ConstructorInfo(localConstructionClass, constructor, method, deleteMethod,
-      mConstructionArgs.toArray(new @NonNull ConstructionArg[0]), filterList.toArray(new @NonNull String[0]),
-      filterClassList.toArray(new @NonNull Class[0]), mRegistrationClasses.toArray(new @NonNull String[0]));
+    return new ConstructorInfo(localConstructionClass,
+      constructor,
+      method,
+      deleteMethod,
+      mConstructionArgs.toArray(new @NotNull ConstructionArg[0]),
+      filterList.toArray(new @NotNull String[0]),
+      filterClassList.toArray(new @NotNull Class[0]),
+      mRegistrationClasses.toArray(new @NotNull String[0])
+    );
   }
 
 }

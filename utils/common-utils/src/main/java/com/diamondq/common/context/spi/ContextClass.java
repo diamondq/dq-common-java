@@ -3,8 +3,8 @@ package com.diamondq.common.context.spi;
 import com.diamondq.common.context.Context;
 import com.diamondq.common.errors.I18NStringAndException;
 import com.diamondq.common.i18n.I18NString;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,7 +92,7 @@ public class ContextClass implements Context {
    * @see com.diamondq.common.context.Context#setData(java.lang.String, java.lang.Object)
    */
   @Override
-  public <@NonNull T> void setData(String pKey, T pValue) {
+  public <@NotNull T> void setData(String pKey, T pValue) {
 
     /* Make sure the context is open */
 

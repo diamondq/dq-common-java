@@ -1,11 +1,6 @@
 package com.diamondq.common.utils.scxml.impl;
 
 import com.diamondq.common.injection.InjectionContext;
-
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Objects;
-
 import org.apache.commons.scxml2.ErrorReporter;
 import org.apache.commons.scxml2.Evaluator;
 import org.apache.commons.scxml2.EventDispatcher;
@@ -15,13 +10,17 @@ import org.apache.commons.scxml2.SCXMLSemantics;
 import org.apache.commons.scxml2.TriggerEvent;
 import org.apache.commons.scxml2.model.ModelException;
 import org.apache.commons.scxml2.model.SCXML;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Objects;
 
 public class DQSCXMLExecutor extends SCXMLExecutor {
 
   private final InjectionContext mInjectionContext;
 
-  private final Field            mExecutionContextField;
+  private final Field mExecutionContextField;
 
   public DQSCXMLExecutor(InjectionContext pContext) {
     super();

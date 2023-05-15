@@ -1,10 +1,8 @@
 package com.diamondq.common.vertx;
 
 import com.diamondq.common.context.ContextExtendedCompletionStage;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.vertx.core.eventbus.DeliveryOptions;
+import org.jetbrains.annotations.Nullable;
 
 public interface EventBusManager {
 
@@ -15,7 +13,7 @@ public interface EventBusManager {
   /**
    * Sends a message to an address. Will queue the send if there is a backlog. Will only allow a fixed number of
    * messages to be pending before queuing.
-   * 
+   *
    * @param pAddress
    * @param pToSend
    * @param pDeliveryOptions

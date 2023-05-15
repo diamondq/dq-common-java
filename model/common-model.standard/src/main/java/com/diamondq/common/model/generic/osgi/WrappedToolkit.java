@@ -23,6 +23,12 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.ToolkitFactory;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import org.javatuples.Octet;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -30,34 +36,26 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Octet;
-import org.javatuples.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class WrappedToolkit implements Toolkit {
-  private static final Logger               sLogger                          =
-    LoggerFactory.getLogger(WrappedToolkit.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(WrappedToolkit.class);
 
-  protected Toolkit                         mToolkit;
+  protected Toolkit mToolkit;
 
-  protected volatile boolean                mWriteStructure                  = false;
+  protected volatile boolean mWriteStructure = false;
 
-  protected volatile boolean                mWriteStructureDefinition        = false;
+  protected volatile boolean mWriteStructureDefinition = false;
 
-  protected volatile boolean                mWriteEditorStructureDefinition  = false;
+  protected volatile boolean mWriteEditorStructureDefinition = false;
 
-  protected volatile boolean                mWriteResource                   = false;
+  protected volatile boolean mWriteResource = false;
 
-  protected volatile boolean                mDeleteStructure                 = false;
+  protected volatile boolean mDeleteStructure = false;
 
-  protected volatile boolean                mDeleteStructureDefinition       = false;
+  protected volatile boolean mDeleteStructureDefinition = false;
 
-  protected volatile boolean                mDeleteEditorStructureDefinition = false;
+  protected volatile boolean mDeleteEditorStructureDefinition = false;
 
-  protected volatile boolean                mDeleteResource                  = false;
+  protected volatile boolean mDeleteResource = false;
 
   protected volatile @Nullable AsyncToolkit mAsyncToolkit;
 
@@ -83,29 +81,31 @@ public class WrappedToolkit implements Toolkit {
   }
 
   private Scope dewrapScope(Scope pScope) {
-    if (pScope instanceof WrappedScope)
-      return ((WrappedScope) pScope).getScope();
+    if (pScope instanceof WrappedScope) return ((WrappedScope) pScope).getScope();
     return pScope;
   }
 
   private @Nullable Scope dewrapNullableScope(@Nullable Scope pScope) {
-    if (pScope == null)
-      return null;
-    if (pScope instanceof WrappedScope)
-      return ((WrappedScope) pScope).getScope();
+    if (pScope == null) return null;
+    if (pScope instanceof WrappedScope) return ((WrappedScope) pScope).getScope();
     return pScope;
   }
 
   public PersistenceLayer getPersistenceLayer(Scope pScope) {
-    if (mToolkit instanceof GenericToolkit)
-      return ((GenericToolkit) mToolkit).getPersistenceLayer(pScope);
-    else
-      throw new UnsupportedOperationException();
+    if (mToolkit instanceof GenericToolkit) return ((GenericToolkit) mToolkit).getPersistenceLayer(pScope);
+    else throw new UnsupportedOperationException();
   }
 
   public Octet<Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean> getModificationState() {
-    return Octet.with(mWriteStructure, mWriteStructureDefinition, mWriteEditorStructureDefinition, mWriteResource,
-      mDeleteStructure, mDeleteStructureDefinition, mDeleteEditorStructureDefinition, mDeleteResource);
+    return Octet.with(mWriteStructure,
+      mWriteStructureDefinition,
+      mWriteEditorStructureDefinition,
+      mWriteResource,
+      mDeleteStructure,
+      mDeleteStructureDefinition,
+      mDeleteEditorStructureDefinition,
+      mDeleteResource
+    );
   }
 
   public void clearModificationState() {
@@ -121,10 +121,8 @@ public class WrappedToolkit implements Toolkit {
 
   public void setPersistenceLayer(Scope pScope, PersistenceLayer pLayer) {
     try {
-      if (mToolkit instanceof GenericToolkit)
-        ((GenericToolkit) mToolkit).setPersistenceLayer(pScope, pLayer);
-      else
-        throw new UnsupportedOperationException();
+      if (mToolkit instanceof GenericToolkit) ((GenericToolkit) mToolkit).setPersistenceLayer(pScope, pLayer);
+      else throw new UnsupportedOperationException();
     }
     catch (RuntimeException ex) {
       throw ex;
@@ -138,8 +136,7 @@ public class WrappedToolkit implements Toolkit {
   public AsyncToolkit getAsyncToolkit() {
     AsyncToolkit asyncToolkit = mToolkit.getAsyncToolkit();
     synchronized (this) {
-      if (mAsyncToolkit == asyncToolkit)
-        return Verify.notNull(mWrappedAsyncToolkit);
+      if (mAsyncToolkit == asyncToolkit) return Verify.notNull(mWrappedAsyncToolkit);
       mAsyncToolkit = asyncToolkit;
       mWrappedAsyncToolkit = new WrappedAsyncToolkit(mAsyncToolkit);
       return mWrappedAsyncToolkit;
@@ -188,7 +185,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createNewStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public StructureDefinition createNewStructureDefinition(Scope pScope, String pName) {
@@ -197,7 +194,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createNewStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, int)
+   *   java.lang.String, int)
    */
   @Override
   public StructureDefinition createNewStructureDefinition(Scope pScope, String pName, int pRevision) {
@@ -206,7 +203,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#writeStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public StructureDefinition writeStructureDefinition(Scope pScope, StructureDefinition pValue) {
@@ -216,7 +213,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#deleteStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void deleteStructureDefinition(Scope pScope, StructureDefinition pValue) {
@@ -226,7 +223,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createStructureDefinitionRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, boolean)
+   *   com.diamondq.common.model.interfaces.StructureDefinition, boolean)
    */
   @Override
   public StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable,
@@ -236,7 +233,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createStructureDefinitionRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized) {
@@ -245,7 +242,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createStructureRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public StructureRef createStructureRef(Scope pScope, Structure pResolvable) {
@@ -254,7 +251,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createStructureRefStr(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public String createStructureRefStr(Scope pScope, Structure pResolvable) {
@@ -263,8 +260,8 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createPropertyDefinitionRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.PropertyDefinition,
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public PropertyDefinitionRef createPropertyDefinitionRef(Scope pScope, PropertyDefinition pResolvable,
@@ -274,7 +271,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createPropertyRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Property, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Property, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public <@Nullable T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
@@ -284,7 +281,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructureDefinitionByName(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public @Nullable StructureDefinition lookupStructureDefinitionByName(Scope pScope, String pName) {
@@ -293,7 +290,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, java.lang.Integer)
+   *   java.lang.String, java.lang.Integer)
    */
   @Override
   public @Nullable StructureDefinition lookupStructureDefinitionByNameAndRevision(Scope pScope, String pName,
@@ -303,7 +300,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createNewPropertyDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
+   *   java.lang.String, com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
   public PropertyDefinition createNewPropertyDefinition(Scope pScope, String pName, PropertyType pType) {
@@ -312,7 +309,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#collapsePrimaryKeys(com.diamondq.common.model.interfaces.Scope,
-   *      java.util.List)
+   *   java.util.List)
    */
   @Override
   public String collapsePrimaryKeys(Scope pScope, List<@Nullable Object> pNames) {
@@ -321,7 +318,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructureBySerializedRef(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public @Nullable Structure lookupStructureBySerializedRef(Scope pScope, String pSerializedRef) {
@@ -330,17 +327,17 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructureByPrimaryKeys(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.Object[])
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.lang.Object[])
    */
   @Override
   public @Nullable Structure lookupStructureByPrimaryKeys(Scope pScope, StructureDefinition pStructureDef,
-    @Nullable Object @NonNull... pPrimaryKeys) {
+    @Nullable Object @NotNull ... pPrimaryKeys) {
     return mToolkit.lookupStructureByPrimaryKeys(dewrapScope(pScope), pStructureDef, pPrimaryKeys);
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createNewStructure(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public Structure createNewStructure(Scope pScope, StructureDefinition pStructureDefinition) {
@@ -349,7 +346,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#writeStructure(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public void writeStructure(Scope pScope, Structure pStructure) {
@@ -359,7 +356,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#writeStructure(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure, com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public boolean writeStructure(Scope pScope, Structure pStructure, @Nullable Structure pOldStructure) {
@@ -369,7 +366,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#deleteStructure(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   public boolean deleteStructure(Scope pScope, Structure pOldStructure) {
@@ -379,7 +376,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createNewProperty(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition, boolean, java.lang.Object)
+   *   com.diamondq.common.model.interfaces.PropertyDefinition, boolean, java.lang.Object)
    */
   @Override
   public <@Nullable TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
@@ -389,7 +386,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createNewTranslatableString(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public TranslatableString createNewTranslatableString(Scope pScope, String pKey) {
@@ -398,7 +395,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupEditorStructureDefinitionByRef(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinitionRef)
+   *   com.diamondq.common.model.interfaces.StructureDefinitionRef)
    */
   @Override
   public List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef(Scope pScope,
@@ -424,7 +421,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createNewEditorStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, com.diamondq.common.model.interfaces.StructureDefinitionRef)
+   *   java.lang.String, com.diamondq.common.model.interfaces.StructureDefinitionRef)
    */
   @Override
   public EditorStructureDefinition createNewEditorStructureDefinition(Scope pScope, String pName,
@@ -434,7 +431,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#writeEditorStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.EditorStructureDefinition)
+   *   com.diamondq.common.model.interfaces.EditorStructureDefinition)
    */
   @Override
   public void writeEditorStructureDefinition(Scope pScope, EditorStructureDefinition pEditorStructureDefinition) {
@@ -444,7 +441,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#deleteEditorStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.EditorStructureDefinition)
+   *   com.diamondq.common.model.interfaces.EditorStructureDefinition)
    */
   @Override
   public void deleteEditorStructureDefinition(Scope pScope, EditorStructureDefinition pValue) {
@@ -454,7 +451,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createStructureRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public StructureRef createStructureRefFromSerialized(Scope pScope, String pValue) {
@@ -463,8 +460,8 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createStructureRefFromParts(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.Structure, java.lang.String,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)
+   *   com.diamondq.common.model.interfaces.Structure, java.lang.String,
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.util.List)
    */
   @Override
   public StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure,
@@ -474,7 +471,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createPropertyRefFromSerialized(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
@@ -483,8 +480,8 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#getAllStructuresByDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinitionRef, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinitionRef, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyDefinition)
    */
   @Override
   public Collection<Structure> getAllStructuresByDefinition(Scope pScope, StructureDefinitionRef pRef,
@@ -494,7 +491,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupResourceString(com.diamondq.common.model.interfaces.Scope,
-   *      java.util.Locale, java.lang.String)
+   *   java.util.Locale, java.lang.String)
    */
   @Override
   public @Nullable String lookupResourceString(Scope pScope, @Nullable Locale pLocale, String pKey) {
@@ -503,7 +500,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#setGlobalDefaultLocale(com.diamondq.common.model.interfaces.Scope,
-   *      java.util.Locale)
+   *   java.util.Locale)
    */
   @Override
   public void setGlobalDefaultLocale(@Nullable Scope pScope, Locale pLocale) {
@@ -512,7 +509,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#setThreadLocale(com.diamondq.common.model.interfaces.Scope,
-   *      java.util.Locale)
+   *   java.util.Locale)
    */
   @Override
   public void setThreadLocale(@Nullable Scope pScope, @Nullable Locale pLocale) {
@@ -529,7 +526,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#writeResourceString(com.diamondq.common.model.interfaces.Scope,
-   *      java.util.Locale, java.lang.String, java.lang.String)
+   *   java.util.Locale, java.lang.String, java.lang.String)
    */
   @Override
   public void writeResourceString(Scope pScope, Locale pLocale, String pKey, String pValue) {
@@ -539,7 +536,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#deleteResourceString(com.diamondq.common.model.interfaces.Scope,
-   *      java.util.Locale, java.lang.String)
+   *   java.util.Locale, java.lang.String)
    */
   @Override
   public void deleteResourceString(Scope pScope, Locale pLocale, String pKey) {
@@ -549,7 +546,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#getResourceStringsByLocale(com.diamondq.common.model.interfaces.Scope,
-   *      java.util.Locale)
+   *   java.util.Locale)
    */
   @Override
   public Map<String, String> getResourceStringsByLocale(Scope pScope, Locale pLocale) {
@@ -566,7 +563,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createNewQueryBuilder(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String)
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String)
    */
   @Override
   public QueryBuilder createNewQueryBuilder(Scope pScope, StructureDefinition pStructureDefinition, String pQueryName) {
@@ -575,7 +572,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   *   com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
   public List<Structure> lookupStructuresByQuery(Scope pScope, ModelQuery pQuery,
@@ -585,7 +582,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#writeQueryBuilder(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.QueryBuilder)
+   *   com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
   public ModelQuery writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder) {
@@ -594,28 +591,32 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#createStandardMigration(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StandardMigrations, java.lang.Object[])
+   *   com.diamondq.common.model.interfaces.StandardMigrations, java.lang.Object[])
    */
   @Override
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
-    StandardMigrations pMigrationType, @NonNull Object @Nullable... pParams) {
+    StandardMigrations pMigrationType, @NotNull Object @Nullable ... pParams) {
     return mToolkit.createStandardMigration(dewrapScope(pScope), pMigrationType, pParams);
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#addMigration(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, int, int, java.util.function.BiFunction)
+   *   java.lang.String, int, int, java.util.function.BiFunction)
    */
   @Override
   public void addMigration(Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
     BiFunction<Structure, Structure, Structure> pMigrationFunction) {
-    mToolkit.addMigration(dewrapScope(pScope), pStructureDefinitionName, pFromRevision, pToRevision,
-      pMigrationFunction);
+    mToolkit.addMigration(dewrapScope(pScope),
+      pStructureDefinitionName,
+      pFromRevision,
+      pToRevision,
+      pMigrationFunction
+    );
   }
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#determineMigrationPath(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String, int, int)
+   *   java.lang.String, int, int)
    */
   @Override
   public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
@@ -625,7 +626,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#lookupLatestStructureDefinitionRevision(com.diamondq.common.model.interfaces.Scope,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @Override
   public @Nullable Integer lookupLatestStructureDefinitionRevision(Scope pScope, String pDefName) {
@@ -642,7 +643,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#populateStructureDefinition(com.diamondq.common.model.interfaces.Scope,
-   *      byte[])
+   *   byte[])
    */
   @Override
   public StructureDefinition populateStructureDefinition(Scope pScope, byte[] pBytes) {
@@ -651,7 +652,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#clearStructures(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void clearStructures(Scope pScope, StructureDefinition pStructureDef) {
@@ -660,7 +661,7 @@ public class WrappedToolkit implements Toolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.Toolkit#countByQuery(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   *   com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
   public int countByQuery(Scope pScope, ModelQuery pQuery, @Nullable Map<String, Object> pParamValues) {

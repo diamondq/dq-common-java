@@ -1,36 +1,36 @@
 package com.diamondq.common.storage.kv;
 
-import java.math.BigDecimal;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.math.BigDecimal;
 
 /**
  * Abstract Column Definition Builder
  *
  * @param <CDB> the actual type for the Column Definition Builder
  */
-public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDefinitionBuilder<@NonNull CDB>> {
+public abstract class KVColumnDefinitionBuilder<@NotNull CDB extends KVColumnDefinitionBuilder<@NotNull CDB>> {
 
-  protected @Nullable String       mName;
+  protected @Nullable String mName;
 
-  protected @Nullable Integer      mMaxLength;
+  protected @Nullable Integer mMaxLength;
 
-  protected @Nullable BigDecimal   mMinValue;
+  protected @Nullable BigDecimal mMinValue;
 
-  protected @Nullable BigDecimal   mMaxValue;
+  protected @Nullable BigDecimal mMaxValue;
 
   protected @Nullable KVColumnType mType;
 
-  protected boolean                mIsPrimaryKey = false;
+  protected boolean mIsPrimaryKey = false;
 
-  protected @Nullable BigDecimal   mAutoIncrementStart;
+  protected @Nullable BigDecimal mAutoIncrementStart;
 
-  protected @Nullable BigDecimal   mAutoIncrementBy;
+  protected @Nullable BigDecimal mAutoIncrementBy;
 
   /**
    * Sets the name
-   * 
+   *
    * @param pValue the name
    * @return the builder
    */
@@ -42,7 +42,7 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
 
   /**
    * Sets that this column is a primary key
-   * 
+   *
    * @return the builder
    */
   @SuppressWarnings("unchecked")
@@ -53,7 +53,7 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
 
   /**
    * Sets the maximum length
-   * 
+   *
    * @param pMaxLength the max length
    * @return the builder
    */
@@ -65,7 +65,7 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
 
   /**
    * Sets the type
-   * 
+   *
    * @param pValue the type
    * @return the builder
    */
@@ -77,7 +77,7 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
 
   /**
    * Sets the minimum value
-   * 
+   *
    * @param pValue the min value
    * @return the builder
    */
@@ -89,7 +89,7 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
 
   /**
    * Sets the maximum value
-   * 
+   *
    * @param pValue the max value
    * @return the builder
    */
@@ -101,7 +101,7 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
 
   /**
    * Sets the autoincrement start value
-   * 
+   *
    * @param pValue the value
    * @return the builder
    */
@@ -113,7 +113,7 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
 
   /**
    * Sets the autoincrement by value
-   * 
+   *
    * @param pValue the value
    * @return the builder
    */
@@ -125,7 +125,7 @@ public abstract class KVColumnDefinitionBuilder<@NonNull CDB extends KVColumnDef
 
   /**
    * Builds the actual column definition
-   * 
+   *
    * @return the column definition
    */
   public abstract IKVColumnDefinition build();

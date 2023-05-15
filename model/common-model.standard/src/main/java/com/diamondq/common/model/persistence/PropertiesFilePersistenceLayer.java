@@ -1,7 +1,5 @@
 package com.diamondq.common.model.persistence;
 
-import static com.diamondq.common.builders.BuilderWithMapHelper.of;
-
 import com.diamondq.common.builders.BuilderWithMapHelper;
 import com.diamondq.common.builders.IBuilder;
 import com.diamondq.common.builders.IBuilderFactory;
@@ -22,7 +20,14 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList.Builder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,14 +45,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.diamondq.common.builders.BuilderWithMapHelper.of;
 
 /**
  * A Persistence Layer that stores the information in Properties files.
@@ -61,7 +59,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   public static class PropertiesFilePersistenceLayerBuilderFactory
     implements IBuilderFactory<PropertiesFilePersistenceLayer> {
 
-    protected final ContextFactory   mContextFactory;
+    protected final ContextFactory mContextFactory;
 
     protected final ConverterManager mConverterManager;
 
@@ -84,17 +82,17 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   public static class PropertiesFilePersistenceLayerBuilder
     implements IBuilderWithMap<PropertiesFilePersistenceLayerBuilder, PropertiesFilePersistenceLayer> {
 
-    private @Nullable File                                       mStructureDir;
+    private @Nullable File mStructureDir;
 
-    private @Nullable Integer                                    mCacheStructuresSeconds;
+    private @Nullable Integer mCacheStructuresSeconds;
 
-    private @Nullable File                                       mStructureDefDir;
+    private @Nullable File mStructureDefDir;
 
-    private @Nullable File                                       mEditorStructureDefDir;
+    private @Nullable File mEditorStructureDefDir;
 
-    private ContextFactory                                       mContextFactory;
+    private ContextFactory mContextFactory;
 
-    private final ConverterManager                             mConverterManager;
+    private final ConverterManager mConverterManager;
 
     private static final BuilderWithMapHelper.Mapping<?, ?, ?>[] sMappings;
 
@@ -109,11 +107,14 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     }
 
     static {
-      sMappings = new BuilderWithMapHelper.Mapping<?, ?, ?>[] {
-          of(String.class, "structureDir", PropertiesFilePersistenceLayerBuilder::structureDir),
-          of(Integer.class, "cacheStructuresSeconds", PropertiesFilePersistenceLayerBuilder::cacheStructuresSeconds),
-          of(String.class, "structureDefDir", PropertiesFilePersistenceLayerBuilder::structureDefDir),
-          of(String.class, "editorStructureDefDir", PropertiesFilePersistenceLayerBuilder::editorStructureDefDir)};
+      sMappings = new BuilderWithMapHelper.Mapping<?, ?, ?>[] { of(String.class,
+        "structureDir",
+        PropertiesFilePersistenceLayerBuilder::structureDir
+      ), of(Integer.class, "cacheStructuresSeconds", PropertiesFilePersistenceLayerBuilder::cacheStructuresSeconds), of(
+        String.class,
+        "structureDefDir",
+        PropertiesFilePersistenceLayerBuilder::structureDefDir
+      ), of(String.class, "editorStructureDefDir", PropertiesFilePersistenceLayerBuilder::editorStructureDefDir) };
     }
 
     /**
@@ -176,11 +177,14 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     @Override
     public PropertiesFilePersistenceLayer build() {
       Integer cacheStructuresSeconds = mCacheStructuresSeconds;
-      if (cacheStructuresSeconds == null)
-        cacheStructuresSeconds = -1;
+      if (cacheStructuresSeconds == null) cacheStructuresSeconds = -1;
       ContextFactory contextFactory = mContextFactory;
-      return new PropertiesFilePersistenceLayer(contextFactory, mStructureDir, cacheStructuresSeconds, mStructureDefDir,
-        mEditorStructureDefDir);
+      return new PropertiesFilePersistenceLayer(contextFactory,
+        mStructureDir,
+        cacheStructuresSeconds,
+        mStructureDefDir,
+        mEditorStructureDefDir
+      );
     }
   }
 
@@ -196,7 +200,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * Default constructor
-   * 
+   *
    * @param pContextFactory the context factory
    * @param pStructureBaseDir the directory for structures
    * @param pCacheStructuresSeconds the number of seconds to cache
@@ -205,10 +209,27 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
    */
   public PropertiesFilePersistenceLayer(ContextFactory pContextFactory, @Nullable File pStructureBaseDir,
     int pCacheStructuresSeconds, @Nullable File pStructureDefBaseDir, @Nullable File pEditorStructureDefBaseDir) {
-    super(pContextFactory, pStructureBaseDir != null, true, pCacheStructuresSeconds, pStructureDefBaseDir != null, true,
-      -1, pEditorStructureDefBaseDir != null, true, -1, false, true, -1);
-    ContextFactory.staticReportTrace(PropertiesFilePersistenceLayer.class, this, pStructureBaseDir,
-      pCacheStructuresSeconds, pStructureDefBaseDir, pEditorStructureDefBaseDir);
+    super(pContextFactory,
+      pStructureBaseDir != null,
+      true,
+      pCacheStructuresSeconds,
+      pStructureDefBaseDir != null,
+      true,
+      -1,
+      pEditorStructureDefBaseDir != null,
+      true,
+      -1,
+      false,
+      true,
+      -1
+    );
+    ContextFactory.staticReportTrace(PropertiesFilePersistenceLayer.class,
+      this,
+      pStructureBaseDir,
+      pCacheStructuresSeconds,
+      pStructureDefBaseDir,
+      pEditorStructureDefBaseDir
+    );
     mStructureBaseDir = pStructureBaseDir;
     mStructureDefBaseDir = pStructureDefBaseDir;
     mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
@@ -217,7 +238,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * Additional constructor
-   * 
+   *
    * @param pContextFactory the context factory
    * @param pStructureBaseDir the directory for structures
    * @param pCacheStructures
@@ -238,14 +259,35 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
     @Nullable File pEditorStructureDefBaseDir, boolean pCacheEditorStructureDefinitions,
     int pCacheEditorStructureDefinitionsSeconds, @Nullable File pResourcesBaseDir, boolean pCacheResources,
     int pCacheResourcesSeconds) {
-    super(pContextFactory, pStructureBaseDir != null, pCacheStructures, pCacheStructuresSeconds,
-      pStructureDefBaseDir != null, pCacheStructureDefinitions, pCacheStructureDefinitionsSeconds,
-      pEditorStructureDefBaseDir != null, pCacheEditorStructureDefinitions, pCacheEditorStructureDefinitionsSeconds,
-      pResourcesBaseDir != null, pCacheResources, pCacheResourcesSeconds);
+    super(pContextFactory,
+      pStructureBaseDir != null,
+      pCacheStructures,
+      pCacheStructuresSeconds,
+      pStructureDefBaseDir != null,
+      pCacheStructureDefinitions,
+      pCacheStructureDefinitionsSeconds,
+      pEditorStructureDefBaseDir != null,
+      pCacheEditorStructureDefinitions,
+      pCacheEditorStructureDefinitionsSeconds,
+      pResourcesBaseDir != null,
+      pCacheResources,
+      pCacheResourcesSeconds
+    );
     sLogger.trace("PropertiesFilePersistenceLayer({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) from {}",
-      pStructureBaseDir, pCacheStructures, pCacheStructuresSeconds, pStructureDefBaseDir, pCacheStructureDefinitions,
-      pCacheStructureDefinitionsSeconds, pEditorStructureDefBaseDir, pCacheEditorStructureDefinitions,
-      pCacheEditorStructureDefinitionsSeconds, pResourcesBaseDir, pCacheResources, pCacheResourcesSeconds, this);
+      pStructureBaseDir,
+      pCacheStructures,
+      pCacheStructuresSeconds,
+      pStructureDefBaseDir,
+      pCacheStructureDefinitions,
+      pCacheStructureDefinitionsSeconds,
+      pEditorStructureDefBaseDir,
+      pCacheEditorStructureDefinitions,
+      pCacheEditorStructureDefinitionsSeconds,
+      pResourcesBaseDir,
+      pCacheResources,
+      pCacheResourcesSeconds,
+      this
+    );
     mStructureBaseDir = pStructureBaseDir;
     mStructureDefBaseDir = pStructureDefBaseDir;
     mEditorStructureDefBaseDir = pEditorStructureDefBaseDir;
@@ -262,53 +304,53 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   protected @Nullable File getStructureFile(String pKey, Supplier<@Nullable File> pParentFileSupplier,
     boolean pCreateIfMissing) {
-    try (Context context =
-      mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pKey, pCreateIfMissing)) {
-      @NonNull
-      String[] parts = pKey.split("/");
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class,
+      this,
+      pKey,
+      pCreateIfMissing
+    )) {
+      @NotNull String[] parts = pKey.split("/");
       parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
       File structureFile = pParentFileSupplier.get();
-      if (structureFile == null)
-        throw new IllegalStateException("Constructor was called with a null structureFile");
+      if (structureFile == null) throw new IllegalStateException("Constructor was called with a null structureFile");
       for (String p : parts)
         structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
       if (structureFile.exists() == false) {
-        if (pCreateIfMissing == false)
-          return context.exit(null);
-        if (structureFile.getParentFile().exists() == false)
-          structureFile.getParentFile().mkdirs();
+        if (pCreateIfMissing == false) return context.exit(null);
+        if (structureFile.getParentFile().exists() == false) structureFile.getParentFile().mkdirs();
       }
       return context.exit(structureFile);
     }
   }
 
   protected @Nullable File getStructureDir(@Nullable String pKey, boolean pCreateIfMissing) {
-    @NonNull
-    String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
+    @NotNull String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
     File structureFile = getStructureBaseDir();
-    if (structureFile == null)
-      throw new IllegalStateException("Constructor was called with a null structureFile");
+    if (structureFile == null) throw new IllegalStateException("Constructor was called with a null structureFile");
     for (String p : parts)
       structureFile = new File(structureFile, escapeValue(p, sValidFileNamesBitSet, null));
-    if (structureFile.exists() == false)
-      if (pCreateIfMissing == false)
-        return null;
+    if (structureFile.exists() == false) if (pCreateIfMissing == false) return null;
     structureFile.mkdirs();
     return structureFile;
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#loadStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
    */
   @Override
   protected @Nullable Properties loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     boolean pCreateIfMissing) {
-    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
-      pDefName, pKey, pCreateIfMissing)) {
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class,
+      this,
+      pToolkit,
+      pScope,
+      pDefName,
+      pKey,
+      pCreateIfMissing
+    )) {
       File structureFile = getStructureFile(pKey, this::getStructureBaseDir, pCreateIfMissing);
-      if (structureFile == null)
-        return context.exit(null);
+      if (structureFile == null) return context.exit(null);
 
       Properties p = new Properties();
       if (structureFile.exists() == true) {
@@ -327,87 +369,77 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#getStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
   protected <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
     String pKey, PropertyType pType) {
     String value = pConfig.getProperty(pKey);
     switch (pType) {
-    case String: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? "" : (String) value);
-      return result;
-    }
-    case Boolean: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? Boolean.FALSE : (Boolean) Boolean.parseBoolean(value));
-      return result;
-    }
-    case Integer: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? Integer.valueOf(0) : (Integer) Integer.parseInt(value));
-      return result;
-    }
-    case Long: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
-      return result;
-    }
-    case Decimal: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? new BigDecimal(0.0) : new BigDecimal(value));
-      return result;
-    }
-    case PropertyRef: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? "" : (String) value);
-      return result;
-    }
-    case StructureRef: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? "" : (String) value);
-      return result;
-    }
-    case StructureRefList: {
-      @NonNull
-      String[] strings = (value == null ? "" : value).split(",");
-      for (int i = 0; i < strings.length; i++)
-        strings[i] = unescape(strings[i]);
-      @SuppressWarnings("unchecked")
-      R result = (R) strings;
-      return result;
-    }
-    case Binary: {
-      byte[] data = (value == null ? new byte[0] : Base64.getDecoder().decode(value));
-      @SuppressWarnings("unchecked")
-      R result = (R) data;
-      return result;
-    }
-    case EmbeddedStructureList: {
-      throw new UnsupportedOperationException();
-    }
-    case Image: {
-      throw new UnsupportedOperationException();
-    }
-    case Timestamp: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
-      return result;
-    }
-    case UUID: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? null : UUID.fromString(value));
-      return result;
-    }
+      case String: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? "" : (String) value);
+        return result;
+      }
+      case Boolean: {
+        @SuppressWarnings("unchecked") R result = (R) (
+          value == null ? Boolean.FALSE : (Boolean) Boolean.parseBoolean(value));
+        return result;
+      }
+      case Integer: {
+        @SuppressWarnings("unchecked") R result = (R) (
+          value == null ? Integer.valueOf(0) : (Integer) Integer.parseInt(value));
+        return result;
+      }
+      case Long: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
+        return result;
+      }
+      case Decimal: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? new BigDecimal(0.0) : new BigDecimal(value));
+        return result;
+      }
+      case PropertyRef: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? "" : (String) value);
+        return result;
+      }
+      case StructureRef: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? "" : (String) value);
+        return result;
+      }
+      case StructureRefList: {
+        @NotNull String[] strings = (value == null ? "" : value).split(",");
+        for (int i = 0; i < strings.length; i++)
+          strings[i] = unescape(strings[i]);
+        @SuppressWarnings("unchecked") R result = (R) strings;
+        return result;
+      }
+      case Binary: {
+        byte[] data = (value == null ? new byte[0] : Base64.getDecoder().decode(value));
+        @SuppressWarnings("unchecked") R result = (R) data;
+        return result;
+      }
+      case EmbeddedStructureList: {
+        throw new UnsupportedOperationException();
+      }
+      case Image: {
+        throw new UnsupportedOperationException();
+      }
+      case Timestamp: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? Long.valueOf(0) : (Long) Long.parseLong(value));
+        return result;
+      }
+      case UUID: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? null : UUID.fromString(value));
+        return result;
+      }
     }
     throw new IllegalArgumentException();
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#isStructureConfigChanged(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object)
    */
   @Override
   protected boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, Properties pConfig) {
@@ -416,8 +448,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#removeStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
   protected boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
@@ -427,7 +459,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#hasStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
    */
   @Override
   protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
@@ -437,8 +469,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#persistContainerProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
-   *      com.diamondq.common.model.interfaces.Property)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+   *   com.diamondq.common.model.interfaces.Property)
    */
   @Override
   protected boolean persistContainerProp(Toolkit pToolkit, Scope pScope, Structure pStructure, Property<?> pProp) {
@@ -447,83 +479,78 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#setStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
    */
   @Override
-  protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
+  protected <@NotNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
     boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
     switch (pType) {
-    case String: {
-      pConfig.setProperty(pKey, (String) pValue);
-      break;
-    }
-    case Boolean: {
-      pConfig.setProperty(pKey, pValue.toString());
-      break;
-    }
-    case Integer: {
-      pConfig.setProperty(pKey, pValue.toString());
-      break;
-    }
-    case Long: {
-      pConfig.setProperty(pKey, pValue.toString());
-      break;
-    }
-    case Decimal: {
-      pConfig.setProperty(pKey, pValue.toString());
-      break;
-    }
-    case PropertyRef: {
-      pConfig.setProperty(pKey, pValue.toString());
-      break;
-    }
-    case StructureRef: {
-      pConfig.setProperty(pKey, pValue.toString());
-      break;
-    }
-    case StructureRefList: {
-      @SuppressWarnings("null")
-      @NonNull
-      String[] strings = (String[]) pValue;
-      @NonNull
-      String[] escaped = new @NonNull String[strings.length];
-      for (int i = 0; i < strings.length; i++)
-        escaped[i] = escape(strings[i]);
-      String escapedStr = String.join(",", escaped);
-      pConfig.setProperty(pKey, escapedStr);
-      break;
-    }
-    case Binary: {
-      byte[] bytes;
-      if ((pValue instanceof byte[]) == false)
-        bytes = pValue.toString().getBytes(Charsets.UTF_8);
-      else
-        bytes = (byte[]) pValue;
-      pConfig.setProperty(pKey, Base64.getEncoder().encodeToString(bytes));
-      break;
-    }
-    case EmbeddedStructureList: {
-      throw new UnsupportedOperationException();
-    }
-    case Image: {
-      throw new UnsupportedOperationException();
-    }
-    case Timestamp: {
-      pConfig.setProperty(pKey, pValue.toString());
-      break;
-    }
-    case UUID: {
-      pConfig.setProperty(pKey, pValue.toString());
-      break;
-    }
+      case String: {
+        pConfig.setProperty(pKey, (String) pValue);
+        break;
+      }
+      case Boolean: {
+        pConfig.setProperty(pKey, pValue.toString());
+        break;
+      }
+      case Integer: {
+        pConfig.setProperty(pKey, pValue.toString());
+        break;
+      }
+      case Long: {
+        pConfig.setProperty(pKey, pValue.toString());
+        break;
+      }
+      case Decimal: {
+        pConfig.setProperty(pKey, pValue.toString());
+        break;
+      }
+      case PropertyRef: {
+        pConfig.setProperty(pKey, pValue.toString());
+        break;
+      }
+      case StructureRef: {
+        pConfig.setProperty(pKey, pValue.toString());
+        break;
+      }
+      case StructureRefList: {
+        @SuppressWarnings("null") @NotNull String[] strings = (String[]) pValue;
+        @NotNull String[] escaped = new @NotNull String[strings.length];
+        for (int i = 0; i < strings.length; i++)
+          escaped[i] = escape(strings[i]);
+        String escapedStr = String.join(",", escaped);
+        pConfig.setProperty(pKey, escapedStr);
+        break;
+      }
+      case Binary: {
+        byte[] bytes;
+        if ((pValue instanceof byte[]) == false) bytes = pValue.toString().getBytes(Charsets.UTF_8);
+        else bytes = (byte[]) pValue;
+        pConfig.setProperty(pKey, Base64.getEncoder().encodeToString(bytes));
+        break;
+      }
+      case EmbeddedStructureList: {
+        throw new UnsupportedOperationException();
+      }
+      case Image: {
+        throw new UnsupportedOperationException();
+      }
+      case Timestamp: {
+        pConfig.setProperty(pKey, pValue.toString());
+        break;
+      }
+      case UUID: {
+        pConfig.setProperty(pKey, pValue.toString());
+        break;
+      }
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#constructOptimisticObj(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   protected @Nullable String constructOptimisticObj(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -533,23 +560,28 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
-   *      java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
+   *   java.lang.Object)
    */
   @Override
   protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Properties pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
-    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
-      pDefName, pKey, pConfig, pMustMatchOptimisticObj, pOptimisticObj)) {
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class,
+      this,
+      pToolkit,
+      pScope,
+      pDefName,
+      pKey,
+      pConfig,
+      pMustMatchOptimisticObj,
+      pOptimisticObj
+    )) {
       File structureFile = getStructureFile(pKey, this::getStructureBaseDir, true);
 
       if (pMustMatchOptimisticObj == true) {
-        @Nullable
-        Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
-        @Nullable
-        String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
-        if (Objects.equals(pOptimisticObj, oldOptimistic) == false)
-          return context.exit(false);
+        @Nullable Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
+        @Nullable String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
+        if (Objects.equals(pOptimisticObj, oldOptimistic) == false) return context.exit(false);
       }
 
       try {
@@ -585,13 +617,12 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalWriteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   protected StructureDefinition internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope,
     StructureDefinition pValue) {
-    if (mPersistStructureDefinitions == false)
-      return pValue;
+    if (mPersistStructureDefinitions == false) return pValue;
 
     byte[] bytes = pValue.saveToByteArray();
     StringBuilder key = new StringBuilder();
@@ -614,23 +645,27 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Structure pStructure) {
-    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
-      pDefName, pKey, pStructure)) {
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class,
+      this,
+      pToolkit,
+      pScope,
+      pDefName,
+      pKey,
+      pStructure
+    )) {
       File structureFile = getStructureFile(pKey, this::getStructureBaseDir, false);
-      if (structureFile == null)
-        return context.exit(false);
+      if (structureFile == null) return context.exit(false);
 
       String optimisticObj = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, pStructure);
       Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
       String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
-      if (Objects.equals(optimisticObj, oldOptimistic) == false)
-        return context.exit(false);
+      if (Objects.equals(optimisticObj, oldOptimistic) == false) return context.exit(false);
 
       structureFile.delete();
 
@@ -640,30 +675,35 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalPopulateChildStructureList(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object,
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
    */
   @Override
   protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope, @Nullable Properties pConfig,
     StructureDefinition pStructureDefinition, String pStructureDefName, @Nullable String pKey,
     @Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
-    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class, this, pToolkit, pScope,
-      pConfig, pStructureDefinition, pStructureDefName, pKey, pPropDef, pStructureRefListBuilder)) {
+    try (Context context = mContextFactory.newContext(PropertiesFilePersistenceLayer.class,
+      this,
+      pToolkit,
+      pScope,
+      pConfig,
+      pStructureDefinition,
+      pStructureDefName,
+      pKey,
+      pPropDef,
+      pStructureRefListBuilder
+    )) {
       File structureDir = getStructureDir(pKey, false);
-      if (structureDir == null)
-        return;
+      if (structureDir == null) return;
       File childDir = (pPropDef == null ? structureDir : new File(structureDir, pPropDef.getName()));
-      if (childDir.exists() == false)
-        return;
+      if (childDir.exists() == false) return;
       File[] listTypeDirs = childDir.listFiles((File pFile) -> pFile.isDirectory());
       if (listTypeDirs == null)
         throw new IllegalArgumentException("Unable to list the content of " + childDir.toString());
       StringBuilder refBuilder = new StringBuilder();
-      if (pKey != null)
-        refBuilder.append(pKey).append('/');
-      if (pPropDef != null)
-        refBuilder.append(pPropDef.getName()).append('/');
+      if (pKey != null) refBuilder.append(pKey).append('/');
+      if (pPropDef != null) refBuilder.append(pPropDef.getName()).append('/');
       int preTypeOffset = refBuilder.length();
       for (File listTypeDir : listTypeDirs) {
 
@@ -677,40 +717,36 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
             boolean match = false;
             for (StructureDefinitionRef sdr : referenceTypes) {
               StructureDefinition sd = sdr.resolve();
-              if (sd == null)
-                continue;
+              if (sd == null) continue;
               String testName = sd.getName();
               if (typeName.equals(testName)) {
                 match = true;
                 break;
               }
             }
-            if (match == false)
-              continue;
+            if (match == false) continue;
           }
-        }
-        else if (pKey == null) {
+        } else if (pKey == null) {
           /*
            * Special case where there is no parent key. In this case, the StructureDefinition is the restriction
            */
 
-          if (typeName.equals(pStructureDefName) == false)
-            continue;
+          if (typeName.equals(pStructureDefName) == false) continue;
         }
 
         refBuilder.setLength(preTypeOffset);
         refBuilder.append(typeName).append('/');
         int preNameOffset = refBuilder.length();
 
-        File[] listFiles =
-          Objects.requireNonNull(listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(".properties")));
+        File[] listFiles = Objects.requireNonNull(listTypeDir.listFiles((File pDir, String pName) -> pName.endsWith(
+          ".properties")));
         for (File f : listFiles) {
           String name = unescapeValue(f.getName().substring(0, f.getName().length() - ".properties".length()));
 
           refBuilder.setLength(preNameOffset);
           refBuilder.append(name);
-          pStructureRefListBuilder
-            .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
+          pStructureRefListBuilder.add(pScope.getToolkit()
+            .createStructureRefFromSerialized(pScope, refBuilder.toString()));
         }
       }
       return;
@@ -724,7 +760,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
@@ -733,7 +769,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef) {

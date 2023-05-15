@@ -4,54 +4,41 @@ import com.cloudant.client.api.ClientBuilder;
 import com.cloudant.client.api.CloudantClient;
 import com.cloudant.client.api.Database;
 import com.google.gson.GsonBuilder;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class DatabaseFactory {
 
   public static class DatabaseFactoryBuilder {
 
-    @Nullable
-    private String      mAccount;
+    @Nullable private String mAccount;
 
-    @Nullable
-    private Long        mConnectTimeoutInSeconds;
+    @Nullable private Long mConnectTimeoutInSeconds;
 
-    private boolean     mDisableSSLAuthentication = false;
+    private boolean mDisableSSLAuthentication = false;
 
-    @Nullable
-    private GsonBuilder gsonBuilder;
+    @Nullable private GsonBuilder gsonBuilder;
 
-    @Nullable
-    private Integer     mMaxConnections;
+    @Nullable private Integer mMaxConnections;
 
-    @Nullable
-    private String      mPassword;
+    @Nullable private String mPassword;
 
-    @Nullable
-    private String      mProxyPassword;
+    @Nullable private String mProxyPassword;
 
-    @Nullable
-    private String      mProxyURL;
+    @Nullable private String mProxyURL;
 
-    @Nullable
-    private String      mProxyUser;
+    @Nullable private String mProxyUser;
 
-    @Nullable
-    private Long        mReadTimeout;
+    @Nullable private Long mReadTimeout;
 
-    @Nullable
-    private String      mUsername;
+    @Nullable private String mUsername;
 
-    @Nullable
-    private String      mURL;
+    @Nullable private String mURL;
 
-    @Nullable
-    private String      mDatabase;
+    @Nullable private String mDatabase;
 
     public DatabaseFactoryBuilder account(String pValue) {
       mAccount = pValue;
@@ -120,48 +107,35 @@ public class DatabaseFactory {
 
     public Database build() {
       ClientBuilder builder;
-      if (mAccount != null)
-        builder = ClientBuilder.account(mAccount);
-      else if (mURL != null)
-        try {
-          builder = ClientBuilder.url(new URL(mURL));
-        }
-        catch (MalformedURLException ex) {
-          throw new RuntimeException(ex);
-        }
-      else
-        throw new IllegalArgumentException("At least one of account or url must be set");
+      if (mAccount != null) builder = ClientBuilder.account(mAccount);
+      else if (mURL != null) try {
+        builder = ClientBuilder.url(new URL(mURL));
+      }
+      catch (MalformedURLException ex) {
+        throw new RuntimeException(ex);
+      }
+      else throw new IllegalArgumentException("At least one of account or url must be set");
       if (mConnectTimeoutInSeconds != null)
         builder = builder.connectTimeout(mConnectTimeoutInSeconds, TimeUnit.SECONDS);
-      if (mDisableSSLAuthentication == true)
-        builder = builder.disableSSLAuthentication();
-      if (gsonBuilder != null)
-        builder = builder.gsonBuilder(gsonBuilder);
-      if (mMaxConnections != null)
-        builder = builder.maxConnections(mMaxConnections);
-      if (mPassword != null)
-        builder = builder.password(mPassword);
-      if (mProxyPassword != null)
-        builder = builder.proxyPassword(mProxyPassword);
-      if (mProxyURL != null)
-        try {
-          builder = builder.proxyURL(new URL(mProxyURL));
-        }
-        catch (MalformedURLException ex) {
-          throw new RuntimeException(ex);
-        }
-      if (mProxyUser != null)
-        builder = builder.proxyUser(mProxyUser);
-      if (mReadTimeout != null)
-        builder = builder.readTimeout(mReadTimeout, TimeUnit.SECONDS);
-      if (mUsername != null)
-        builder = builder.username(mUsername);
+      if (mDisableSSLAuthentication == true) builder = builder.disableSSLAuthentication();
+      if (gsonBuilder != null) builder = builder.gsonBuilder(gsonBuilder);
+      if (mMaxConnections != null) builder = builder.maxConnections(mMaxConnections);
+      if (mPassword != null) builder = builder.password(mPassword);
+      if (mProxyPassword != null) builder = builder.proxyPassword(mProxyPassword);
+      if (mProxyURL != null) try {
+        builder = builder.proxyURL(new URL(mProxyURL));
+      }
+      catch (MalformedURLException ex) {
+        throw new RuntimeException(ex);
+      }
+      if (mProxyUser != null) builder = builder.proxyUser(mProxyUser);
+      if (mReadTimeout != null) builder = builder.readTimeout(mReadTimeout, TimeUnit.SECONDS);
+      if (mUsername != null) builder = builder.username(mUsername);
 
       CloudantClient client = builder.build();
       String name = mDatabase;
-      if (name == null)
-        throw new IllegalArgumentException(
-          "The mandatory field database was not set on the " + this.getClass().getSimpleName());
+      if (name == null) throw new IllegalArgumentException(
+        "The mandatory field database was not set on the " + this.getClass().getSimpleName());
       return client.database(name, true);
     }
   }

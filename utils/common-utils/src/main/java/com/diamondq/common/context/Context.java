@@ -1,8 +1,8 @@
 package com.diamondq.common.context;
 
 import com.diamondq.common.errors.I18NStringAndException;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -115,7 +115,7 @@ public interface Context extends AutoCloseable {
    * @param pKey the key
    * @param pValue the value
    */
-  <@NonNull T> void setData(String pKey, T pValue);
+  <@NotNull T> void setData(String pKey, T pValue);
 
   /**
    * Retrieve data associated with the current context (or parent contexts)

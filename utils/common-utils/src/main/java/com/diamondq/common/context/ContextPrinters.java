@@ -1,6 +1,6 @@
 package com.diamondq.common.context;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;

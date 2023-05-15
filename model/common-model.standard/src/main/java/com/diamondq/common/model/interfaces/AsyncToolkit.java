@@ -1,15 +1,14 @@
 package com.diamondq.common.model.interfaces;
 
 import com.diamondq.common.context.ContextExtendedCompletionStage;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
 
 public interface AsyncToolkit {
 
@@ -166,7 +165,7 @@ public interface AsyncToolkit {
    *
    * @param pScope the scope
    * @param pSerializedRef the serialized reference string (generally created from
-   *          {@link StructureRef#getSerializedString()}
+   *   {@link StructureRef#getSerializedString()}
    * @return the Structure or null
    */
   public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(Scope pScope,
@@ -174,7 +173,7 @@ public interface AsyncToolkit {
 
   /**
    * Looks up a Structure with the given primary keys
-   * 
+   *
    * @param pScope the scope
    * @param pStructureDef the structure definition
    * @param pPrimaryKeys the primary keys
@@ -220,7 +219,7 @@ public interface AsyncToolkit {
    * @param pScope the scope
    * @param pOldStructure the Structure to delete.
    * @return true if the structure was deleted or false if it wasn't deleted because there wasn't a structure that
-   *         matches the old structure.
+   *   matches the old structure.
    */
   public ContextExtendedCompletionStage<Boolean> deleteStructure(Scope pScope, Structure pOldStructure);
 
@@ -290,7 +289,7 @@ public interface AsyncToolkit {
 
   /**
    * Writes the query builder.
-   * 
+   *
    * @param pScope the scope
    * @param pQueryBuilder the query builder
    * @return the query
@@ -299,7 +298,7 @@ public interface AsyncToolkit {
 
   /**
    * Executes a previously written query
-   * 
+   *
    * @param pScope the scope
    * @param pQuery the query
    * @param pParamValues the map of parameters
@@ -310,7 +309,7 @@ public interface AsyncToolkit {
 
   /**
    * Executes a previously written query and returns the number of matching records
-   * 
+   *
    * @param pScope the scope
    * @param pQuery the query
    * @param pParamValues the map of parameters
@@ -328,7 +327,7 @@ public interface AsyncToolkit {
    * @return the migration function
    */
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
-    StandardMigrations pMigrationType, @NonNull Object @Nullable... pParams);
+    StandardMigrations pMigrationType, @NotNull Object @Nullable ... pParams);
 
   /**
    * Adds a migration between two revisions of a Structure's Definition
@@ -338,8 +337,7 @@ public interface AsyncToolkit {
    * @param pFromRevision the older revision of the StructureDefinition
    * @param pToRevision the newer revision of the StructureDefinition
    * @param pMigrationFunction the function that takes the older Structure and migrates it to the new Structure. The
-   *          starting point of the new Structure is passed in as the second parameter, and must be returned as the
-   *          result.
+   *   starting point of the new Structure is passed in as the second parameter, and must be returned as the result.
    */
   public void addMigration(Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
     BiFunction<Structure, Structure, Structure> pMigrationFunction);
@@ -368,14 +366,14 @@ public interface AsyncToolkit {
 
   /**
    * Returns the synchronous version of the toolkit
-   * 
+   *
    * @return the toolkit
    */
   public Toolkit getSyncToolkit();
 
   /**
    * Deletes all structures for the given structure definition
-   * 
+   *
    * @param pScope the scope
    * @param pStructureDef the structure definition
    * @return the future

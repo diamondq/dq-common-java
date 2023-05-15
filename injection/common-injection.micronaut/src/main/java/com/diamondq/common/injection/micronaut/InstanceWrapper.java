@@ -1,15 +1,14 @@
 package com.diamondq.common.injection.micronaut;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.enterprise.inject.Instance;
+import javax.enterprise.util.TypeLiteral;
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-
-import javax.enterprise.inject.Instance;
-import javax.enterprise.util.TypeLiteral;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class InstanceWrapper<T> implements Instance<@Nullable T> {
 
@@ -31,7 +30,7 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
    * @see javax.inject.Provider#get()
    */
   @Override
-  public @NonNull T get() {
+  public @NotNull T get() {
     return Objects.requireNonNull(mList.get(0));
   }
 
@@ -39,7 +38,7 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
    * @see javax.enterprise.inject.Instance#select(java.lang.annotation.Annotation[])
    */
   @Override
-  public Instance<@Nullable T> select(Annotation @Nullable... pQualifiers) {
+  public Instance<@Nullable T> select(Annotation @Nullable ... pQualifiers) {
     throw new UnsupportedOperationException();
   }
 
@@ -47,7 +46,7 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
    * @see javax.enterprise.inject.Instance#select(java.lang.Class, java.lang.annotation.Annotation[])
    */
   @Override
-  public <U extends @Nullable T> Instance<U> select(Class<U> pSubtype, Annotation @Nullable... pQualifiers) {
+  public <U extends @Nullable T> Instance<U> select(Class<U> pSubtype, Annotation @Nullable ... pQualifiers) {
     throw new UnsupportedOperationException();
   }
 
@@ -56,7 +55,7 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
    */
   @Override
   public <U extends T> Instance<U> select(@SuppressWarnings("null") TypeLiteral<U> pSubtype,
-    Annotation @Nullable... pQualifiers) {
+    Annotation @Nullable ... pQualifiers) {
     throw new UnsupportedOperationException();
   }
 

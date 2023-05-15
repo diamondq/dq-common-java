@@ -1,16 +1,14 @@
 package com.diamondq.common.injection.micronaut;
 
+import io.micronaut.context.annotation.Factory;
+import org.jetbrains.annotations.Nullable;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.micronaut.context.annotation.Factory;
 
 @Factory
 public class ExecutorServiceFactory {
@@ -24,17 +22,18 @@ public class ExecutorServiceFactory {
     @Override
     public @Nullable Thread newThread(Runnable pR) {
       Thread thread = baseThreadFactory.newThread(pR);
-      if (thread != null)
-        thread.setDaemon(true);
+      if (thread != null) thread.setDaemon(true);
       return thread;
     }
   };
 
-  public @Named("DiamondQ") @Singleton ExecutorService getExecutorService() {
+  public @Named("DiamondQ")
+  @Singleton ExecutorService getExecutorService() {
     return Executors.newCachedThreadPool(daemonThreadFactory);
   }
 
-  public @Named("DiamondQ") @Singleton ScheduledExecutorService getScheduledExecutorService() {
+  public @Named("DiamondQ")
+  @Singleton ScheduledExecutorService getScheduledExecutorService() {
     return Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2, daemonThreadFactory);
   }
 }

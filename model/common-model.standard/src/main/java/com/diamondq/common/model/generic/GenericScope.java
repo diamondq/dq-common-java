@@ -2,16 +2,15 @@ package com.diamondq.common.model.generic;
 
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Toolkit;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericScope implements Scope {
 
   private final Toolkit mToolkit;
 
-  private final String  mName;
+  private final String mName;
 
   public GenericScope(Toolkit pToolkit, String pName) {
     mToolkit = pToolkit;
@@ -47,12 +46,9 @@ public class GenericScope implements Scope {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     GenericScope other = (GenericScope) pObj;
     return Objects.equals(mName, other.mName) && Objects.equals(mToolkit, other.mToolkit);
   }

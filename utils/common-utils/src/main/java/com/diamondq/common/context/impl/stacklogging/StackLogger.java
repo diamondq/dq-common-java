@@ -4,7 +4,7 @@ import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Singleton;

@@ -4,8 +4,7 @@ import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.Toolkit;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,7 +12,7 @@ public abstract class AbstractPropertyDefinitionTests implements StandardTest {
 
   protected @Nullable Toolkit mToolkit;
 
-  protected @Nullable Scope   mScope;
+  protected @Nullable Scope mScope;
 
   @Override
   public void setup(Toolkit pToolkit, Scope pScope) {
@@ -57,7 +56,9 @@ public abstract class AbstractPropertyDefinitionTests implements StandardTest {
     Assert.assertNotNull(def);
 
     def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope,
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-", PropertyType.String).setPrimaryKey(true));
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-",
+      PropertyType.String
+    ).setPrimaryKey(true));
 
     toolkit.writeStructureDefinition(scope, def);
   }
@@ -77,8 +78,8 @@ public abstract class AbstractPropertyDefinitionTests implements StandardTest {
     StructureDefinition def = checkAndCreate(name);
     Assert.assertNotNull(def);
 
-    def = def.addPropertyDefinition(
-      toolkit.createNewPropertyDefinition(scope, "abc/def", PropertyType.String).setPrimaryKey(true));
+    def = def.addPropertyDefinition(toolkit.createNewPropertyDefinition(scope, "abc/def", PropertyType.String)
+      .setPrimaryKey(true));
 
     toolkit.writeStructureDefinition(scope, def);
   }

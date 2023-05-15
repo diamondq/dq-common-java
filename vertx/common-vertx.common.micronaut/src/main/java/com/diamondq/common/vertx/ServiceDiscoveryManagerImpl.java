@@ -5,7 +5,16 @@ import com.diamondq.common.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.context.ContextExtendedCompletionStage;
 import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.lambda.future.FutureUtils;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.servicediscovery.Record;
+import io.vertx.servicediscovery.ServiceDiscovery;
+import io.vertx.servicediscovery.Status;
+import io.vertx.serviceproxy.ServiceProxyBuilder;
+import org.jetbrains.annotations.Nullable;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,30 +24,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.servicediscovery.Record;
-import io.vertx.servicediscovery.ServiceDiscovery;
-import io.vertx.servicediscovery.Status;
-import io.vertx.serviceproxy.ServiceProxyBuilder;
-
 @Singleton
 public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
 
   private final ConcurrentMap<String, Record> mCachedRecords = new ConcurrentHashMap<>();
 
-  private final ContextFactory                mContextFactory;
+  private final ContextFactory mContextFactory;
 
-  private final ServiceDiscovery              mServiceDiscovery;
+  private final ServiceDiscovery mServiceDiscovery;
 
-  private final List<Consumer<Record>>        mCallbacks     = new CopyOnWriteArrayList<>();
+  private final List<Consumer<Record>> mCallbacks = new CopyOnWriteArrayList<>();
 
-  private final ScheduledExecutorService      mScheduledExecutorService;
+  private final ScheduledExecutorService mScheduledExecutorService;
 
   @Inject
   public ServiceDiscoveryManagerImpl(ScheduledExecutorService pScheduledExecutorService, ContextFactory pContextFactory,
@@ -63,8 +60,7 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
             for (Consumer<Record> callback : mCallbacks) {
               callback.accept(record);
             }
-          }
-          else {
+          } else {
             mCachedRecords.remove(id);
           }
         }
@@ -74,7 +70,7 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
 
   /**
    * @see com.diamondq.common.vertx.ServiceDiscoveryManager#lookupService(io.vertx.core.Vertx, java.lang.Class,
-   *      java.lang.String)
+   *   java.lang.String)
    */
   @SuppressWarnings("null")
   @Override
@@ -88,12 +84,11 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
         ContextExtendedCompletableFuture<Record> recordFuture = FutureUtils.newCompletableFuture();
         Consumer<Record> callback = (r) -> {
           String name = r.getName();
-          if ((name != null) && (name.equals(pName)))
-            recordFuture.complete(r);
+          if ((name != null) && (name.equals(pName))) recordFuture.complete(r);
         };
         mCallbacks.add(callback);
         JsonObject filter = new JsonObject().put("name", pName);
-        VertxUtils.<JsonObject, @Nullable Record> callReturnsNullable(mServiceDiscovery::getRecord, filter)
+        VertxUtils.<JsonObject, @Nullable Record>callReturnsNullable(mServiceDiscovery::getRecord, filter)
 
           /* Check the result */
 
@@ -104,9 +99,7 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
               /* If it wasn't found, then we'll wait until timeout for the announcement to occur */
 
               return recordFuture.orTimeoutAsync(30, TimeUnit.SECONDS, mScheduledExecutorService);
-            }
-            else
-              return FutureUtils.completedFuture(r);
+            } else return FutureUtils.completedFuture(r);
           })
 
           .thenApply((r) -> {

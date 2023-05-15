@@ -1,8 +1,8 @@
 package com.diamondq.common.utils.sync.abstracts;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

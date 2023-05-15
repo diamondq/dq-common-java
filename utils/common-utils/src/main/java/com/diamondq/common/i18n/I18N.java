@@ -1,5 +1,7 @@
 package com.diamondq.common.i18n;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,23 +16,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.spi.ResourceBundleControlProvider;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 /**
  * Internationalization helper class
  */
 public class I18N {
 
-  private static ConcurrentMap<String, Map<Locale, String>>          sCachedStrings = new ConcurrentHashMap<>();
+  private static ConcurrentMap<String, Map<Locale, String>> sCachedStrings = new ConcurrentHashMap<>();
 
   private static final @Nullable List<ResourceBundleControlProvider> providers;
 
-  private static final Control                                       INSTANCE;
+  private static final Control INSTANCE;
 
   static {
     List<ResourceBundleControlProvider> list = null;
-    ServiceLoader<ResourceBundleControlProvider> serviceLoaders =
-      ServiceLoader.loadInstalled(ResourceBundleControlProvider.class);
+    ServiceLoader<ResourceBundleControlProvider> serviceLoaders = ServiceLoader.loadInstalled(
+      ResourceBundleControlProvider.class);
     for (ResourceBundleControlProvider provider : serviceLoaders) {
       if (list == null) {
         list = new ArrayList<>();
@@ -44,13 +44,13 @@ public class I18N {
 
   /**
    * Formats a given string (provided by resource key) with arguments into a locale specific value.
-   * 
+   *
    * @param pLocale the locale
    * @param pFormatKey the key
    * @param pArgs the arguments
    * @return the formated string
    */
-  public static String getFormat(Locale pLocale, MessagesEnum pFormatKey, @Nullable Object @Nullable... pArgs) {
+  public static String getFormat(Locale pLocale, MessagesEnum pFormatKey, @Nullable Object @Nullable ... pArgs) {
 
     ResourceBundle bundle = pFormatKey.getBundle(pLocale);
     String format = bundle.getString(pFormatKey.getCode());
@@ -59,7 +59,7 @@ public class I18N {
     return messageFormat.format(pArgs);
   }
 
-  public static Map<Locale, String> getAllFormats(MessagesEnum pFormatKey, @Nullable Object @Nullable... pArgs) {
+  public static Map<Locale, String> getAllFormats(MessagesEnum pFormatKey, @Nullable Object @Nullable ... pArgs) {
 
     /* This is a really expensive lookup, so the getString will be cached */
 
@@ -75,16 +75,14 @@ public class I18N {
       for (Locale locale : Locale.getAvailableLocales()) {
         try {
           ResourceBundle bundle = pFormatKey.getBundle(locale);
-          if ((locale.equals(defaultLocale) == false) && (bundle.equals(defaultBundle) == true))
-            continue;
+          if ((locale.equals(defaultLocale) == false) && (bundle.equals(defaultBundle) == true)) continue;
           String format = bundle.getString(pFormatKey.getCode());
           newMap.put(locale, format);
         }
         catch (MissingResourceException ex) {
         }
       }
-      if ((map = sCachedStrings.putIfAbsent(pFormatKey.getCode(), newMap)) == null)
-        map = newMap;
+      if ((map = sCachedStrings.putIfAbsent(pFormatKey.getCode(), newMap)) == null) map = newMap;
     }
 
     Map<Locale, String> resultMap = new HashMap<>();
@@ -103,7 +101,7 @@ public class I18N {
   /**
    * This is called by MessageEnum classes that are generated to get the ClassLoader. The default behavior is to just
    * return the ClassLoader that loaded the enum class.
-   * 
+   *
    * @param pClass the MessagesEnum class
    * @param pBasename the base name
    * @return a ClassLoader
@@ -115,7 +113,7 @@ public class I18N {
   /**
    * This is called by MessageEnum classes that are generated to get the Control. The default behavior is to return
    * null.
-   * 
+   *
    * @param pClass the MessagesEnum class
    * @param pBasename the base name
    * @return a Control

@@ -8,6 +8,8 @@ import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.Script;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureRef;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -16,16 +18,13 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.eclipse.jdt.annotation.NonNull;
-
 public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 
-  private final PropertyDefinition               mPropertyDefinition;
+  private final PropertyDefinition mPropertyDefinition;
 
-  private final boolean                          mValueSet;
+  private final boolean mValueSet;
 
-  private final TYPE                             mValue;
+  private final TYPE mValue;
 
   private final @Nullable MemoizedSupplier<TYPE> mSupplier;
 
@@ -44,10 +43,8 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
   @Override
   public TYPE getValue(Structure pContainer) {
     if (mValueSet == true) {
-      if (mSupplier != null)
-        return mSupplier.getValue();
-      else
-        return mValue;
+      if (mSupplier != null) return mSupplier.getValue();
+      else return mValue;
     }
 
     if (mPropertyDefinition.getKeywords().containsKey(CommonKeywordKeys.INHERIT_PARENT) == false) {
@@ -56,10 +53,9 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
         Structure parent = parentRef.resolve();
         if (parent != null) {
           Property<TYPE> parentProperty = parent.lookupPropertyByName(mPropertyDefinition.getName());
-          if (parentProperty != null)
-            if (parentProperty.getDefinition().isFinal() == false)
-              if (parentProperty.getDefinition().getType() == mPropertyDefinition.getType())
-                return parentProperty.getValue(parent);
+          if (parentProperty != null) if (parentProperty.getDefinition().isFinal() == false)
+            if (parentProperty.getDefinition().getType() == mPropertyDefinition.getType())
+              return parentProperty.getValue(parent);
         }
       }
     }
@@ -72,8 +68,7 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
       Script defaultScript = mPropertyDefinition.getDefaultValueScript();
       if (defaultScript != null) {
         Object scriptResult = defaultScript.evaluate(this);
-        if (scriptResult != null)
-          defaultValue = scriptResult.toString();
+        if (scriptResult != null) defaultValue = scriptResult.toString();
       }
     }
 
@@ -82,41 +77,36 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
       /* Typecast it back to the defined type */
 
       switch (mPropertyDefinition.getType()) {
-      case String: {
-        @SuppressWarnings("unchecked")
-        TYPE defaultResult = (TYPE) defaultValue;
-        return defaultResult;
-      }
-      case Integer: {
-        @SuppressWarnings("unchecked")
-        TYPE defaultResult = (TYPE) (Integer) Integer.parseInt(defaultValue);
-        return defaultResult;
-      }
-      case Long: {
-        @SuppressWarnings("unchecked")
-        TYPE defaultResult = (TYPE) (Long) Long.parseLong(defaultValue);
-        return defaultResult;
-      }
-      case Decimal: {
-        @SuppressWarnings("unchecked")
-        TYPE defaultResult = (TYPE) new BigDecimal(defaultValue);
-        return defaultResult;
-      }
-      case Boolean: {
-        @SuppressWarnings("unchecked")
-        TYPE defaultResult = (TYPE) (Boolean) Boolean.parseBoolean(defaultValue);
-        return defaultResult;
-      }
-      case Timestamp:
-      case UUID:
-      case Binary:
-      case Image:
-      case EmbeddedStructureList:
-      case PropertyRef:
-      case StructureRef:
-      case StructureRefList: {
-        return null;
-      }
+        case String: {
+          @SuppressWarnings("unchecked") TYPE defaultResult = (TYPE) defaultValue;
+          return defaultResult;
+        }
+        case Integer: {
+          @SuppressWarnings("unchecked") TYPE defaultResult = (TYPE) (Integer) Integer.parseInt(defaultValue);
+          return defaultResult;
+        }
+        case Long: {
+          @SuppressWarnings("unchecked") TYPE defaultResult = (TYPE) (Long) Long.parseLong(defaultValue);
+          return defaultResult;
+        }
+        case Decimal: {
+          @SuppressWarnings("unchecked") TYPE defaultResult = (TYPE) new BigDecimal(defaultValue);
+          return defaultResult;
+        }
+        case Boolean: {
+          @SuppressWarnings("unchecked") TYPE defaultResult = (TYPE) (Boolean) Boolean.parseBoolean(defaultValue);
+          return defaultResult;
+        }
+        case Timestamp:
+        case UUID:
+        case Binary:
+        case Image:
+        case EmbeddedStructureList:
+        case PropertyRef:
+        case StructureRef:
+        case StructureRefList: {
+          return null;
+        }
       }
     }
 
@@ -145,138 +135,129 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
 
     if (pValue != null) {
       switch (mPropertyDefinition.getType()) {
-      case Binary:
-        break;
-      case Boolean: {
-        if (pValue instanceof Boolean)
+        case Binary:
           break;
-        if (pValue instanceof String) {
-          pValue = (TYPE) (Boolean) Boolean.parseBoolean((String) pValue);
-          break;
+        case Boolean: {
+          if (pValue instanceof Boolean) break;
+          if (pValue instanceof String) {
+            pValue = (TYPE) (Boolean) Boolean.parseBoolean((String) pValue);
+            break;
+          }
+          throw new IllegalArgumentException("A Boolean Property must only be passed a Boolean or a String");
         }
-        throw new IllegalArgumentException("A Boolean Property must only be passed a Boolean or a String");
-      }
-      case Decimal: {
-        if (pValue instanceof BigDecimal)
-          break;
-        if (pValue instanceof Short) {
-          pValue = (TYPE) new BigDecimal((Short) pValue);
-          break;
+        case Decimal: {
+          if (pValue instanceof BigDecimal) break;
+          if (pValue instanceof Short) {
+            pValue = (TYPE) new BigDecimal((Short) pValue);
+            break;
+          }
+          if (pValue instanceof Long) {
+            pValue = (TYPE) BigDecimal.valueOf((Long) pValue);
+            break;
+          }
+          if (pValue instanceof Integer) {
+            pValue = (TYPE) new BigDecimal((Integer) pValue);
+            break;
+          }
+          if (pValue instanceof Float) {
+            pValue = (TYPE) new BigDecimal((Float) pValue);
+            break;
+          }
+          if (pValue instanceof Double) {
+            pValue = (TYPE) BigDecimal.valueOf((Double) pValue);
+            break;
+          }
+          if (pValue instanceof String) {
+            pValue = (TYPE) new BigDecimal((String) pValue);
+            break;
+          }
+          throw new IllegalArgumentException(
+            "A Decimal Property must be passed a BigDecimal, Short, Long, Integer, Float, Double or String");
         }
-        if (pValue instanceof Long) {
-          pValue = (TYPE) BigDecimal.valueOf((Long) pValue);
+        case EmbeddedStructureList:
           break;
-        }
-        if (pValue instanceof Integer) {
-          pValue = (TYPE) new BigDecimal((Integer) pValue);
+        case Image:
           break;
-        }
-        if (pValue instanceof Float) {
-          pValue = (TYPE) new BigDecimal((Float) pValue);
-          break;
-        }
-        if (pValue instanceof Double) {
-          pValue = (TYPE) BigDecimal.valueOf((Double) pValue);
-          break;
-        }
-        if (pValue instanceof String) {
-          pValue = (TYPE) new BigDecimal((String) pValue);
-          break;
-        }
-        throw new IllegalArgumentException(
-          "A Decimal Property must be passed a BigDecimal, Short, Long, Integer, Float, Double or String");
-      }
-      case EmbeddedStructureList:
-        break;
-      case Image:
-        break;
-      case Integer: {
-        if (pValue instanceof Integer)
-          break;
-        if (pValue instanceof Long) {
-          if (((Long) pValue).longValue() > Integer.MAX_VALUE)
-            throw new IllegalArgumentException(
+        case Integer: {
+          if (pValue instanceof Integer) break;
+          if (pValue instanceof Long) {
+            if (((Long) pValue).longValue() > Integer.MAX_VALUE) throw new IllegalArgumentException(
               "An Integer Property can only be passed a Long that is less than a MAX Integer");
-          pValue = (TYPE) (Integer) ((Long) pValue).intValue();
+            pValue = (TYPE) (Integer) ((Long) pValue).intValue();
+            break;
+          }
+          if (pValue instanceof Short) {
+            pValue = (TYPE) (Integer) new Short((Short) pValue).intValue();
+            break;
+          }
+          if (pValue instanceof String) {
+            pValue = (TYPE) (Integer) Integer.parseInt((String) pValue);
+            break;
+          }
+          throw new IllegalArgumentException("An Integer Property must be passed an Integer, Long or a String");
+        }
+        case Long: {
+          if (pValue instanceof Long) break;
+          if (pValue instanceof Integer) {
+            pValue = (TYPE) (Long) ((Integer) pValue).longValue();
+            break;
+          }
+          if (pValue instanceof String) {
+            pValue = (TYPE) (Integer) Integer.parseInt((String) pValue);
+            break;
+          }
+          throw new IllegalArgumentException("An Long Property must be passed an Integer, Long or a String");
+        }
+        case PropertyRef: {
+          if (pValue instanceof PropertyRef) break;
+          if (pValue instanceof String) {
+            pValue = (TYPE) mPropertyDefinition.getScope()
+              .getToolkit()
+              .createPropertyRefFromSerialized(mPropertyDefinition.getScope(), (String) pValue);
+            break;
+          }
+          throw new IllegalArgumentException("A PropertyRef Property must be passed a PropertyRef or a String");
+        }
+        case String: {
+          if (pValue instanceof String) break;
+          pValue = (TYPE) pValue.toString();
           break;
         }
-        if (pValue instanceof Short) {
-          pValue = (TYPE) (Integer) new Short((Short) pValue).intValue();
-          break;
+        case StructureRef: {
+          if (pValue instanceof StructureRef) break;
+          if (pValue instanceof String) {
+            pValue = (TYPE) mPropertyDefinition.getScope()
+              .getToolkit()
+              .createStructureRefFromSerialized(mPropertyDefinition.getScope(), (String) pValue);
+            break;
+          }
+          throw new IllegalArgumentException("A StructureRef Property must be passed a String");
         }
-        if (pValue instanceof String) {
-          pValue = (TYPE) (Integer) Integer.parseInt((String) pValue);
-          break;
+        case StructureRefList: {
+          if (pValue instanceof List) break;
+          throw new IllegalArgumentException("A StructureRefList Property must be passed a List");
         }
-        throw new IllegalArgumentException("An Integer Property must be passed an Integer, Long or a String");
-      }
-      case Long: {
-        if (pValue instanceof Long)
-          break;
-        if (pValue instanceof Integer) {
-          pValue = (TYPE) (Long) ((Integer) pValue).longValue();
-          break;
+        case Timestamp: {
+          if (pValue instanceof Long) break;
+          if (pValue instanceof Integer) {
+            long asLong = Long.valueOf((Integer) pValue);
+            pValue = (TYPE) (Long) asLong;
+            break;
+          }
+          if (pValue instanceof String) {
+            pValue = (TYPE) Long.valueOf((String) pValue);
+            break;
+          }
+          if (pValue instanceof Date) {
+            pValue = (TYPE) (Long) (((Date) pValue).getTime());
+            break;
+          }
+          throw new IllegalArgumentException("A Timestamp Property must be passed a Long, Integer or String");
         }
-        if (pValue instanceof String) {
-          pValue = (TYPE) (Integer) Integer.parseInt((String) pValue);
-          break;
+        case UUID: {
+          if (pValue instanceof UUID) break;
+          throw new IllegalArgumentException("A UUID Property must be passed a UUID");
         }
-        throw new IllegalArgumentException("An Long Property must be passed an Integer, Long or a String");
-      }
-      case PropertyRef: {
-        if (pValue instanceof PropertyRef)
-          break;
-        if (pValue instanceof String) {
-          pValue = (TYPE) mPropertyDefinition.getScope().getToolkit()
-            .createPropertyRefFromSerialized(mPropertyDefinition.getScope(), (String) pValue);
-          break;
-        }
-        throw new IllegalArgumentException("A PropertyRef Property must be passed a PropertyRef or a String");
-      }
-      case String: {
-        if (pValue instanceof String)
-          break;
-        pValue = (TYPE) pValue.toString();
-        break;
-      }
-      case StructureRef: {
-        if (pValue instanceof StructureRef)
-          break;
-        if (pValue instanceof String) {
-          pValue = (TYPE) mPropertyDefinition.getScope().getToolkit()
-            .createStructureRefFromSerialized(mPropertyDefinition.getScope(), (String) pValue);
-          break;
-        }
-        throw new IllegalArgumentException("A StructureRef Property must be passed a String");
-      }
-      case StructureRefList: {
-        if (pValue instanceof List)
-          break;
-        throw new IllegalArgumentException("A StructureRefList Property must be passed a List");
-      }
-      case Timestamp: {
-        if (pValue instanceof Long)
-          break;
-        if (pValue instanceof Integer) {
-          long asLong = Long.valueOf((Integer) pValue);
-          pValue = (TYPE) (Long) asLong;
-          break;
-        }
-        if (pValue instanceof String) {
-          pValue = (TYPE) Long.valueOf((String) pValue);
-          break;
-        }
-        if (pValue instanceof Date) {
-          pValue = (TYPE) (Long) (((Date) pValue).getTime());
-          break;
-        }
-        throw new IllegalArgumentException("A Timestamp Property must be passed a Long, Integer or String");
-      }
-      case UUID: {
-        if (pValue instanceof UUID)
-          break;
-        throw new IllegalArgumentException("A UUID Property must be passed a UUID");
-      }
       }
     }
 
@@ -287,7 +268,7 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
    * @see com.diamondq.common.model.interfaces.Property#clearValueSet()
    */
   @Override
-  public @NonNull Property<@Nullable TYPE> clearValueSet() {
+  public @NotNull Property<@Nullable TYPE> clearValueSet() {
     return new GenericProperty<>(mPropertyDefinition, false, null, null);
   }
 
@@ -320,12 +301,9 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     GenericProperty<?> other = (GenericProperty<?>) pObj;
     return Objects.equals(mPropertyDefinition, other.mPropertyDefinition) && Objects.equals(mValue, other.mValue)
       && Objects.equals(mValueSet, other.mValueSet) && Objects.equals(mSupplier, other.mSupplier);

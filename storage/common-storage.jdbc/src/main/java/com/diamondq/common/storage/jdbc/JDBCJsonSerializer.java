@@ -3,11 +3,10 @@ package com.diamondq.common.storage.jdbc;
 import com.diamondq.common.storage.kv.IKVColumnDefinition;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class JDBCJsonSerializer implements IPreparedStatementSerializer {
 
@@ -19,7 +18,7 @@ public class JDBCJsonSerializer implements IPreparedStatementSerializer {
 
   /**
    * @see com.diamondq.common.storage.jdbc.IPreparedStatementSerializer#serializeToPreparedStatement(java.lang.Object,
-   *      java.sql.PreparedStatement, int)
+   *   java.sql.PreparedStatement, int)
    */
   @Override
   public <@Nullable O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
@@ -36,7 +35,7 @@ public class JDBCJsonSerializer implements IPreparedStatementSerializer {
 
   /**
    * @see com.diamondq.common.storage.jdbc.IPreparedStatementSerializer#serializeColumnToPreparedStatement(java.lang.Object,
-   *      com.diamondq.common.storage.kv.IKVColumnDefinition, java.sql.PreparedStatement, int)
+   *   com.diamondq.common.storage.kv.IKVColumnDefinition, java.sql.PreparedStatement, int)
    */
   @Override
   public @Nullable Object serializeColumnToPreparedStatement(@Nullable Object pValue, IKVColumnDefinition pColDef,

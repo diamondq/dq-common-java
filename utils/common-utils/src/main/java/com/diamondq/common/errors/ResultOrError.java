@@ -2,28 +2,27 @@ package com.diamondq.common.errors;
 
 import com.diamondq.common.UtilMessages;
 import com.diamondq.common.i18n.I18NString;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Objects;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 /**
  * This is a wrapper class, similar to Optional<T> that is used to hold either a Result or an error
- * 
+ *
  * @param <T> the type of the result
  */
 public class ResultOrError<T> {
 
-  private final @Nullable T          mValue;
+  private final @Nullable T mValue;
 
-  private final boolean              mIsError;
+  private final boolean mIsError;
 
   private final @Nullable I18NString mError;
 
-  private final @Nullable Throwable  mException;
+  private final @Nullable Throwable mException;
 
   private ResultOrError(@Nullable T pValue, @Nullable I18NString pError, @Nullable Throwable pException,
     boolean pIsError) {
@@ -35,7 +34,7 @@ public class ResultOrError<T> {
 
   /**
    * Create a new ResultOrError with the result
-   * 
+   *
    * @param <A> the type of the result
    * @param pValue the result
    * @return the ResultOrError instance
@@ -46,7 +45,7 @@ public class ResultOrError<T> {
 
   /**
    * Creates a new ResultOrError with an error string
-   * 
+   *
    * @param <A> the type of the result
    * @param pValue the error string
    * @return the ResultOrError instance
@@ -61,7 +60,7 @@ public class ResultOrError<T> {
 
   /**
    * Creates a new ResultOrError with an exception
-   * 
+   *
    * @param <A> the type of the result
    * @param ex the exception
    * @return the ResultOrError instance
@@ -72,7 +71,7 @@ public class ResultOrError<T> {
 
   /**
    * Transfers the existing error Result to a new Result with a different type
-   * 
+   *
    * @param <A> the new type
    * @return the transferred error Result
    */
@@ -82,7 +81,7 @@ public class ResultOrError<T> {
 
   /**
    * Returns true if this instance is holding a result
-   * 
+   *
    * @return true if a result or false otherwise
    */
   public boolean isResult() {
@@ -91,7 +90,7 @@ public class ResultOrError<T> {
 
   /**
    * Returns true if this instance is holding an error
-   * 
+   *
    * @return true if an error or false otherwise
    */
   public boolean isError() {
@@ -100,45 +99,41 @@ public class ResultOrError<T> {
 
   /**
    * Returns the result (or if it was an error, then it throws an exception)
-   * 
+   *
    * @return the result
    */
   public T getOrThrow() {
     if (mIsError == true) {
       Throwable exception = mException;
       if (exception != null) {
-        if (exception instanceof ExtendedRuntimeException)
-          throw (ExtendedRuntimeException) exception;
+        if (exception instanceof ExtendedRuntimeException) throw (ExtendedRuntimeException) exception;
         I18NString error = Objects.requireNonNull(mError);
         throw new ExtendedRuntimeException(exception, error.message, error.params);
       }
       throw new ExtendedRuntimeException(Objects.requireNonNull(mError));
     }
-    @SuppressWarnings("null")
-    T result = mValue;
+    @SuppressWarnings("null") T result = mValue;
     return result;
   }
 
   /**
    * Returns the error string (or if it was successful, then it throws an exception)
-   * 
+   *
    * @return the error string
    */
   public I18NString getError() {
     I18NString result = mError;
-    if (result == null)
-      throw new ExtendedRuntimeException(UtilMessages.RESULTORERROR_IS_NOT_AN_ERROR);
+    if (result == null) throw new ExtendedRuntimeException(UtilMessages.RESULTORERROR_IS_NOT_AN_ERROR);
     return result;
   }
 
   /**
    * Returns the optional exception (or if it was successful, then it throws an exception)
-   * 
+   *
    * @return the exception
    */
   public @Nullable Throwable getException() {
-    if (mIsError == false)
-      throw new ExtendedRuntimeException(UtilMessages.RESULTORERROR_IS_NOT_AN_ERROR);
+    if (mIsError == false) throw new ExtendedRuntimeException(UtilMessages.RESULTORERROR_IS_NOT_AN_ERROR);
     return mException;
   }
 
@@ -149,19 +144,13 @@ public class ResultOrError<T> {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if (mIsError == false) {
-      @Nullable
-      T value = mValue;
-      if (value == null)
-        sb.append("null");
-      else
-        sb.append(value.toString());
-    }
-    else {
+      @Nullable T value = mValue;
+      if (value == null) sb.append("null");
+      else sb.append(value.toString());
+    } else {
       I18NString error = mError;
-      if (error == null)
-        sb.append("null");
-      else
-        sb.append(error.toString());
+      if (error == null) sb.append("null");
+      else sb.append(error.toString());
       if (mException != null) {
         try (StringWriter sw = new StringWriter()) {
           try (PrintWriter pw = new PrintWriter(sw)) {

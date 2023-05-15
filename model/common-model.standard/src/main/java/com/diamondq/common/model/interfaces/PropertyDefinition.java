@@ -1,11 +1,10 @@
 package com.diamondq.common.model.interfaces;
 
 import com.google.common.collect.Multimap;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A PropertyDefinition defines all metadata about a given property.
@@ -87,14 +86,14 @@ public interface PropertyDefinition
 
   /**
    * Returns the Multimap of keywords (ie. key=value pairs).
-   * 
+   *
    * @return the multimap
    */
   public Multimap<String, String> getKeywords();
 
   /**
    * Adds a new keyword to this StructureDefinition
-   * 
+   *
    * @param pKey the key
    * @param pValue the value
    * @return the updated PropertyDefinition
@@ -103,7 +102,7 @@ public interface PropertyDefinition
 
   /**
    * Removes a keyword from this StructureDefinition
-   * 
+   *
    * @param pKey the key
    * @param pValue the value
    * @return the updated PropertyDefinition
@@ -112,14 +111,14 @@ public interface PropertyDefinition
 
   /**
    * Returns the order of this property with other primary keys. Only applies if this property is a primary key
-   * 
+   *
    * @return the order (returns 0 if it's not a primary key)
    */
   public int getPrimaryKeyOrder();
 
   /**
    * Changes the primary order of this primary with other primary keys.
-   * 
+   *
    * @param pOrder the new order
    * @return the updated PropertyDefinition
    */

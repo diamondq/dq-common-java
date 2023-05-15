@@ -8,44 +8,42 @@ import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.errors.Verify;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
+import io.vertx.core.Verticle;
+import io.vertx.core.Vertx;
+import io.vertx.servicediscovery.ServiceDiscovery;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.Nullable;
+import org.osgi.framework.Constants;
+import org.osgi.service.component.ComponentContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
-import org.osgi.framework.Constants;
-import org.osgi.service.component.ComponentContext;
-
-import io.vertx.core.Verticle;
-import io.vertx.core.Vertx;
-import io.vertx.servicediscovery.ServiceDiscovery;
-
 public abstract class AbstractVerticleOsgi {
 
-  protected ContextFactory                          mContextFactory;
+  protected ContextFactory mContextFactory;
 
-  protected ConverterManager                        mConverterManager;
+  protected ConverterManager mConverterManager;
 
-  protected SecurityContextManager                  mSecurityContextManager;
+  protected SecurityContextManager mSecurityContextManager;
 
-  protected ServiceDiscovery                        mServiceDiscovery;
+  protected ServiceDiscovery mServiceDiscovery;
 
-  protected Vertx                                   mVertx;
+  protected Vertx mVertx;
 
-  private int                                       mInstanceCount;
+  private int mInstanceCount;
 
-  private String                                    mName;
+  private String mName;
 
-  private @Nullable String                          mAddress;
+  private @Nullable String mAddress;
 
-  private @Nullable Map<String, String>             mMetaData;
+  private @Nullable Map<String, String> mMetaData;
 
-  private final Method                              mSetupMethod;
+  private final Method mSetupMethod;
 
-  private final Method                              mShutdownMethod;
+  private final Method mShutdownMethod;
 
   protected volatile @Nullable Pair<String, String> mRegistration;
 
@@ -54,14 +52,28 @@ public abstract class AbstractVerticleOsgi {
     @Nullable Map<String, String> pMetaData) {
 
     try {
-      mSetupMethod = pSetupClass.getDeclaredMethod("setup", ContextFactory.class, ServiceDiscovery.class, Vertx.class,
-        Integer.TYPE, Supplier.class, String.class, String.class, Map.class);
-      mShutdownMethod = pSetupClass.getDeclaredMethod("shutdown", ContextFactory.class, ServiceDiscovery.class,
-        Vertx.class, Pair.class);
+      mSetupMethod = pSetupClass.getDeclaredMethod("setup",
+        ContextFactory.class,
+        ServiceDiscovery.class,
+        Vertx.class,
+        Integer.TYPE,
+        Supplier.class,
+        String.class,
+        String.class,
+        Map.class
+      );
+      mShutdownMethod = pSetupClass.getDeclaredMethod("shutdown",
+        ContextFactory.class,
+        ServiceDiscovery.class,
+        Vertx.class,
+        Pair.class
+      );
     }
     catch (NoSuchMethodException | SecurityException ex) {
-      throw new ExtendedIllegalArgumentException(ex, VertxMessages.ABSTRACTVERTICLEOSGI_NO_MATCHING_METHOD,
-        pSetupClass.getName());
+      throw new ExtendedIllegalArgumentException(ex,
+        VertxMessages.ABSTRACTVERTICLEOSGI_NO_MATCHING_METHOD,
+        pSetupClass.getName()
+      );
     }
     mInstanceCount = pInstanceCount;
     mName = pName;
@@ -106,10 +118,18 @@ public abstract class AbstractVerticleOsgi {
       Verify.notNullArg(mVertx, UtilMessages.VERIFY_DEPENDENCY_MISSING, "vertx", pid);
       try {
         Supplier<Verticle> supplier = getSupplier();
-        @SuppressWarnings("unchecked")
-        ContextExtendedCompletionStage<Pair<String, String>> regFuture =
-          (ContextExtendedCompletionStage<Pair<String, String>>) mSetupMethod.invoke(null, mContextFactory,
-            mServiceDiscovery, mVertx, mInstanceCount, supplier, mName, mAddress, mMetaData);
+        @SuppressWarnings(
+          "unchecked") ContextExtendedCompletionStage<Pair<String, String>> regFuture = (ContextExtendedCompletionStage<Pair<String, String>>) mSetupMethod.invoke(
+          null,
+          mContextFactory,
+          mServiceDiscovery,
+          mVertx,
+          mInstanceCount,
+          supplier,
+          mName,
+          mAddress,
+          mMetaData
+        );
         regFuture.thenAccept((reg, ctx2) -> {
           mRegistration = reg;
         }).exceptionally(VertxUtils::reportThrowable);
@@ -125,10 +145,14 @@ public abstract class AbstractVerticleOsgi {
       try {
         Pair<String, String> registration = mRegistration;
         if (registration != null) {
-          @SuppressWarnings("unchecked")
-          ContextExtendedCompletionStage<@Nullable Void> result =
-            (ContextExtendedCompletionStage<@Nullable Void>) mShutdownMethod.invoke(null, mContextFactory,
-              mServiceDiscovery, mVertx, registration);
+          @SuppressWarnings(
+            "unchecked") ContextExtendedCompletionStage<@Nullable Void> result = (ContextExtendedCompletionStage<@Nullable Void>) mShutdownMethod.invoke(
+            null,
+            mContextFactory,
+            mServiceDiscovery,
+            mVertx,
+            registration
+          );
           result.join();
         }
       }

@@ -21,14 +21,13 @@ import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A Persistence Layer that stores the information in a Storage KV store
@@ -37,7 +36,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   private final IKVStore mStore;
 
-  private boolean        mSetupTables = false;
+  private boolean mSetupTables = false;
 
   /**
    * Default constructor
@@ -58,8 +57,11 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
         KVTableDefinitionBuilder<?> tableBuilder = tableDefinitionSupport.createTableDefinitionBuilder();
         tableBuilder = tableBuilder.tableName("structures");
-        tableBuilder.addColumn(tableDefinitionSupport.createColumnDefinitionBuilder().name("definition")
-          .type(KVColumnType.Binary).maxLength(1024 * 1024 * 10).build());
+        tableBuilder.addColumn(tableDefinitionSupport.createColumnDefinitionBuilder()
+          .name("definition")
+          .type(KVColumnType.Binary)
+          .maxLength(1024 * 1024 * 10)
+          .build());
 
         tableDefinitionSupport.addTableDefinition(tableBuilder.build());
 
@@ -70,7 +72,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalLookupStructureDefinitionByNameAndRevision(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, int)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, int)
    */
   @Override
   protected @Nullable StructureDefinition internalLookupStructureDefinitionByNameAndRevision(Toolkit pToolkit,
@@ -79,10 +81,12 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
     IKVTransaction transaction = mStore.startTransaction();
     boolean commit = false;
     try {
-      @SuppressWarnings("unchecked")
-      Map<String, Object> result = transaction.getByKey("structures", pName, String.valueOf(pRevision), Map.class);
-      if (result == null)
-        return null;
+      @SuppressWarnings("unchecked") Map<String, Object> result = transaction.getByKey("structures",
+        pName,
+        String.valueOf(pRevision),
+        Map.class
+      );
+      if (result == null) return null;
       byte[] data = Verify.notNull((byte[]) result.get("definition"));
 
       /* Now convert the data into a StructureDefinition */
@@ -92,16 +96,14 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
       return sd;
     }
     finally {
-      if (commit == true)
-        transaction.commit();
-      else
-        transaction.rollback();
+      if (commit == true) transaction.commit();
+      else transaction.rollback();
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalGetAllMissingStructureDefinitionRefs(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.google.common.cache.Cache)
+   *   com.diamondq.common.model.interfaces.Scope, com.google.common.cache.Cache)
    */
   @Override
   protected Collection<StructureDefinitionRef> internalGetAllMissingStructureDefinitionRefs(Toolkit pToolkit,
@@ -111,34 +113,32 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
     boolean commit = false;
     try {
       ImmutableList.Builder<StructureDefinitionRef> resultBuilder = ImmutableList.builder();
-      for (Iterator<String> i = transaction.keyIterator("structures"); i.hasNext();) {
+      for (Iterator<String> i = transaction.keyIterator("structures"); i.hasNext(); ) {
         String name = i.next();
-        for (Iterator<String> i2 = transaction.keyIterator2("structures", name); i2.hasNext();) {
+        for (Iterator<String> i2 = transaction.keyIterator2("structures", name); i2.hasNext(); ) {
           String revStr = i2.next();
           int rev = Integer.valueOf(revStr);
           if (pStructureDefinitionCache != null) {
             String cacheKey = new StringBuilder(name).append('-').append(rev).toString();
-            if (pStructureDefinitionCache.getIfPresent(cacheKey) != null)
-              continue;
+            if (pStructureDefinitionCache.getIfPresent(cacheKey) != null) continue;
           }
           resultBuilder.add(pToolkit.createStructureDefinitionRefFromSerialized(pScope,
-            new StringBuilder(name).append(':').append(rev).toString()));
+            new StringBuilder(name).append(':').append(rev).toString()
+          ));
         }
       }
       commit = true;
       return resultBuilder.build();
     }
     finally {
-      if (commit == true)
-        transaction.commit();
-      else
-        transaction.rollback();
+      if (commit == true) transaction.commit();
+      else transaction.rollback();
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalWriteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   protected StructureDefinition internalWriteStructureDefinition(Toolkit pToolkit, Scope pScope,
@@ -148,23 +148,24 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
     boolean commit = false;
     try {
       byte[] bytes = pValue.saveToByteArray();
-      transaction.putByKey("structures", pValue.getName(), String.valueOf(pValue.getRevision()),
-        Collections.singletonMap("definition", bytes));
+      transaction.putByKey("structures",
+        pValue.getName(),
+        String.valueOf(pValue.getRevision()),
+        Collections.singletonMap("definition", bytes)
+      );
       commit = true;
       return pValue;
     }
     finally {
-      if (commit == true)
-        transaction.commit();
-      else
-        transaction.rollback();
+      if (commit == true) transaction.commit();
+      else transaction.rollback();
     }
 
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   protected void internalDeleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
@@ -176,16 +177,14 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
       commit = true;
     }
     finally {
-      if (commit == true)
-        transaction.commit();
-      else
-        transaction.rollback();
+      if (commit == true) transaction.commit();
+      else transaction.rollback();
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
@@ -194,7 +193,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#loadStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
    */
   @Override
   protected @Nullable Map<String, Object> loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
@@ -204,8 +203,8 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#constructOptimisticObj(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   protected @Nullable String constructOptimisticObj(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -215,19 +214,19 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#setStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
    */
   @Override
-  protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
-    boolean pIsMeta, String pKey, PropertyType pType, @NonNull R pValue) {
+  protected <@NotNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
+    boolean pIsMeta, String pKey, PropertyType pType, @NotNull R pValue) {
     throw new UnsupportedOperationException();
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#getStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
   protected <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
@@ -237,7 +236,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#hasStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
    */
   @Override
   protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
@@ -247,8 +246,8 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#removeStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
   protected boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
@@ -258,8 +257,8 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
-   *      java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
+   *   java.lang.Object)
    */
   @Override
   protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -269,7 +268,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#isStructureConfigChanged(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object)
    */
   @Override
   protected boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig) {
@@ -278,9 +277,9 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalPopulateChildStructureList(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object,
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
    */
   @Override
   protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope,
@@ -291,8 +290,8 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#persistContainerProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
-   *      com.diamondq.common.model.interfaces.Property)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+   *   com.diamondq.common.model.interfaces.Property)
    */
   @Override
   protected boolean persistContainerProp(Toolkit pToolkit, Scope pScope, Structure pStructure, Property<?> pProp) {
@@ -301,8 +300,8 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -312,7 +311,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef) {

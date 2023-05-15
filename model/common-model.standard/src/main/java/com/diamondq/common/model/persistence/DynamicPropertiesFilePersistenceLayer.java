@@ -3,11 +3,10 @@ package com.diamondq.common.model.persistence;
 import com.diamondq.common.config.Config;
 import com.diamondq.common.context.ContextFactory;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersistenceLayer {
 
@@ -16,7 +15,7 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
    */
   public static class DynamicPropertiesFilePersistenceLayerBuilder {
 
-    private @Nullable String         mAccessKey;
+    private @Nullable String mAccessKey;
 
     private @Nullable ContextFactory mContextFactory;
 
@@ -43,22 +42,32 @@ public class DynamicPropertiesFilePersistenceLayer extends PropertiesFilePersist
      */
     public DynamicPropertiesFilePersistenceLayer build() {
       String accessKey = mAccessKey;
-      if (accessKey == null)
-        throw new IllegalArgumentException("The mandatory field accessKey was not set");
+      if (accessKey == null) throw new IllegalArgumentException("The mandatory field accessKey was not set");
       ContextFactory contextFactory = mContextFactory;
-      if (contextFactory == null)
-        throw new IllegalArgumentException("The contextFactory is not set");
+      if (contextFactory == null) throw new IllegalArgumentException("The contextFactory is not set");
       return new DynamicPropertiesFilePersistenceLayer(contextFactory, accessKey);
     }
   }
 
   private final static Map<String, File> sDirByAccessKey = Maps.newConcurrentMap();
 
-  private final String                   mAccessKey;
+  private final String mAccessKey;
 
   public DynamicPropertiesFilePersistenceLayer(ContextFactory pContextFactory, String pAccessKey) {
-    super(pContextFactory, new File("placeholder"), false, -1, new File("placeholder"), false, -1,
-      new File("placeholder"), false, -1, new File("placeholder"), false, -1);
+    super(pContextFactory,
+      new File("placeholder"),
+      false,
+      -1,
+      new File("placeholder"),
+      false,
+      -1,
+      new File("placeholder"),
+      false,
+      -1,
+      new File("placeholder"),
+      false,
+      -1
+    );
     ContextFactory.staticReportTrace(DynamicPropertiesFilePersistenceLayer.class, this, pAccessKey);
     mAccessKey = pAccessKey;
   }

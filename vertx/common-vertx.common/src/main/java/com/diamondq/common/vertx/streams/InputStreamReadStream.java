@@ -1,39 +1,38 @@
 package com.diamondq.common.vertx.streams;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.vertx.core.Context;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.ReadStream;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class InputStreamReadStream implements ReadStream<Buffer> {
 
-  private final InputStream                          mStream;
+  private final InputStream mStream;
 
-  private final Vertx                                mVertx;
+  private final Vertx mVertx;
 
-  private volatile @Nullable Context                 mExceptionContext;
+  private volatile @Nullable Context mExceptionContext;
 
-  private volatile @Nullable Handler<Throwable>      mExceptionHandler;
+  private volatile @Nullable Handler<Throwable> mExceptionHandler;
 
-  private volatile @Nullable Context                 mEndContext;
+  private volatile @Nullable Context mEndContext;
 
   private volatile @Nullable Handler<@Nullable Void> mEndHandler;
 
-  private volatile @Nullable Context                 mHandlerContext;
+  private volatile @Nullable Context mHandlerContext;
 
-  private volatile @Nullable Handler<Buffer>         mHandler;
+  private volatile @Nullable Handler<Buffer> mHandler;
 
-  private final byte[]                               mBuffer;
+  private final byte[] mBuffer;
 
-  private volatile boolean                           mIsFinished  = false;
+  private volatile boolean mIsFinished = false;
 
-  private volatile int                               mPausedState = 0;
+  private volatile int mPausedState = 0;
 
   public InputStreamReadStream(InputStream pStream, Vertx pVertx) {
     mStream = pStream;
@@ -90,8 +89,7 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
                 endHandler.handle(null);
               });
             }
-          }
-          else {
+          } else {
             Buffer buffer = Buffer.buffer(bytesRead);
             buffer.appendBytes(mBuffer, 0, bytesRead);
             Context context = mHandlerContext;
@@ -100,10 +98,8 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
             if ((context != null) && (handler != null)) {
               context.runOnContext((v) -> {
                 handler.handle(buffer);
-                if (mPausedState == 1)
-                  mPausedState = 2;
-                else if (mPausedState == 0)
-                  handleRead();
+                if (mPausedState == 1) mPausedState = 2;
+                else if (mPausedState == 0) handleRead();
               });
             }
           }
@@ -153,14 +149,11 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
 
   @Override
   public ReadStream<Buffer> resume() {
-    if (mPausedState == 1)
-      mPausedState = 0;
+    if (mPausedState == 1) mPausedState = 0;
     else if (mPausedState == 2) {
       mPausedState = 0;
       handleRead();
-    }
-    else
-      throw new IllegalStateException();
+    } else throw new IllegalStateException();
     return this;
   }
 

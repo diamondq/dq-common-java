@@ -7,8 +7,8 @@ import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.googlecode.gentyref.GenericTypeReflector;
 import com.googlecode.gentyref.TypeFactory;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -146,7 +146,7 @@ public class ConverterManagerImpl implements ConverterManager {
       Type rawType = pt.getRawType();
       if (rawType instanceof Class) {
 
-        @NonNull Type[] typeArgs = pt.getActualTypeArguments();
+        @NotNull Type[] typeArgs = pt.getActualTypeArguments();
         int typeArgsLen = typeArgs.length;
         boolean changed = false;
         if (typeArgsLen > 0) for (int i = 0; i < typeArgsLen; i++) {
@@ -192,7 +192,7 @@ public class ConverterManagerImpl implements ConverterManager {
     pSet.add(pType);
     if (pType instanceof Class) {
       Class<?> clazz = (Class<?>) pType;
-      @NonNull Class<?>[] interfaces = clazz.getInterfaces();
+      @NotNull Class<?>[] interfaces = clazz.getInterfaces();
       for (Class<?> intf : interfaces) {
         Type exactIntf = GenericTypeReflector.getExactSuperType(pType, intf);
         if (exactIntf != null) recurseType(exactIntf, pSet, pRawTypes);
@@ -207,7 +207,7 @@ public class ConverterManagerImpl implements ConverterManager {
       if (rawType instanceof Class) {
         Class<?> rawClass = (Class<?>) rawType;
         pRawTypes.add(rawClass);
-        @NonNull Class<?>[] interfaces = rawClass.getInterfaces();
+        @NotNull Class<?>[] interfaces = rawClass.getInterfaces();
         for (Class<?> intf : interfaces) {
           Type exactSuperType = GenericTypeReflector.getExactSuperType(pType, intf);
           if (exactSuperType != null) recurseType(exactSuperType, pSet, pRawTypes);
@@ -235,13 +235,13 @@ public class ConverterManagerImpl implements ConverterManager {
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, Class<O> pOutputClass) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, Class<O> pOutputClass) {
     assert pInput != null;
     return internalConvert(pInput, pInput.getClass(), pOutputClass, null, false);
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, Class<O> pOutputClass, @Nullable String pGroupName) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, Class<O> pOutputClass, @Nullable String pGroupName) {
     assert pInput != null;
     return internalConvert(pInput, pInput.getClass(), pOutputClass, pGroupName, false);
   }
@@ -261,13 +261,13 @@ public class ConverterManagerImpl implements ConverterManager {
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<O> pOutputType) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, TypeReference<O> pOutputType) {
     return internalConvert(pInput, pInput.getClass(), pOutputType.getType(), null, false);
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<I> pInputType,
-    TypeReference<@NonNull O> pOutputType, @Nullable String pGroupName) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, TypeReference<I> pInputType,
+    TypeReference<@NotNull O> pOutputType, @Nullable String pGroupName) {
     return internalConvert(pInput, pInput.getClass(), pOutputType.getType(), pGroupName, false);
   }
 
@@ -285,27 +285,27 @@ public class ConverterManagerImpl implements ConverterManager {
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<O> pOutputType, @Nullable String pGroupName) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, TypeReference<O> pOutputType, @Nullable String pGroupName) {
     return internalConvert(pInput, pInput.getClass(), pOutputType.getType(), pGroupName, false);
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType) {
     return internalConvert(pInput, pInputType.getType(), pOutputType.getType(), null, false);
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, Type pOutputType) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, Type pOutputType) {
     return internalConvert(pInput, pInput.getClass(), pOutputType, null, false);
   }
 
   @Override
-  public <@NonNull I, @NonNull O> @NonNull O convert(I pInput, Type pOutputType, @Nullable String pGroupName) {
+  public <@NotNull I, @NotNull O> @NotNull O convert(I pInput, Type pOutputType, @Nullable String pGroupName) {
     return internalConvert(pInput, pInput.getClass(), pOutputType, pGroupName, false);
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, Type pInputType, Type pOutputType) {
     return internalConvert(pInput, pInputType, pOutputType, null, false);
   }
 
@@ -335,11 +335,11 @@ public class ConverterManagerImpl implements ConverterManager {
   }
 
   @Override
-  public <@NonNull I, @NonNull O> O convert(I pInput, Type pInputType, Type pOutputType, @Nullable String pGroupName) {
+  public <@NotNull I, @NotNull O> O convert(I pInput, Type pInputType, Type pOutputType, @Nullable String pGroupName) {
     return internalConvert(pInput, pInputType, pOutputType, pGroupName, false);
   }
 
-  private <@NonNull I, @Nullable O> O internalConvert(I pInput, Type pInputType, Type pOutputType,
+  private <@NotNull I, @Nullable O> O internalConvert(I pInput, Type pInputType, Type pOutputType,
     @Nullable String pGroupName, boolean pAllowNullOutput) {
     Objects.requireNonNull(pInput);
 
@@ -356,7 +356,7 @@ public class ConverterManagerImpl implements ConverterManager {
 
     /* Attempt to look for a shortcut */
 
-    @NonNull TypePair inputTypePair = new TypePair(pGroupName, pInputType, pOutputType);
+    @NotNull TypePair inputTypePair = new TypePair(pGroupName, pInputType, pOutputType);
     Converter<?, ?> matchConverter = mShortcuts.get(inputTypePair);
     if (matchConverter == null) {
 

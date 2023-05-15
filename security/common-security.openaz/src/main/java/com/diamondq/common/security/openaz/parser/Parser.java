@@ -58,71 +58,70 @@ import org.apache.openaz.xacml.pdp.policy.Target;
 import org.apache.openaz.xacml.pdp.policy.expressions.Apply;
 import org.apache.openaz.xacml.pdp.policy.expressions.AttributeDesignator;
 import org.apache.openaz.xacml.std.StdIndividualDecisionRequestGenerator;
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import org.jetbrains.annotations.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
 public class Parser {
 
-  private static final Logger            sLogger = LoggerFactory.getLogger(Parser.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(Parser.class);
 
-  private final OpenAZPDPEngine          mPDPEngine;
+  private final OpenAZPDPEngine mPDPEngine;
 
   private final EvaluationContextFactory mEvalContextFactory;
 
-  private final ScopeResolver            mScopeResolver;
+  private final ScopeResolver mScopeResolver;
 
-  private final PepRequestFactory        mPEPRequestFactory;
+  private final PepRequestFactory mPEPRequestFactory;
 
-  private final Decision                 mDefaultDecision;
+  private final Decision mDefaultDecision;
 
-  private final Method                   mPolicySetEnsureReferenceeMethod;
+  private final Method mPolicySetEnsureReferenceeMethod;
 
-  private final Method                   mPolicyEnsureReferenceeMethod;
+  private final Method mPolicyEnsureReferenceeMethod;
 
   public Parser(PepAgent pAgent) {
     try {
       Method method = pAgent.getClass().getMethod("getPdpEngine");
       method.setAccessible(true);
       OpenAZPDPEngine pPDPEngine = (OpenAZPDPEngine) method.invoke(pAgent);
-      if (pPDPEngine == null)
-        throw new IllegalArgumentException();
+      if (pPDPEngine == null) throw new IllegalArgumentException();
       mPDPEngine = pPDPEngine;
       Field field = mPDPEngine.getClass().getDeclaredField("evaluationContextFactory");
       field.setAccessible(true);
       EvaluationContextFactory evalContextFactory = (EvaluationContextFactory) field.get(mPDPEngine);
-      if (evalContextFactory == null)
-        throw new IllegalArgumentException();
+      if (evalContextFactory == null) throw new IllegalArgumentException();
       mEvalContextFactory = evalContextFactory;
       field = mPDPEngine.getClass().getDeclaredField("scopeResolver");
       field.setAccessible(true);
       ScopeResolver scopeResolver = (ScopeResolver) field.get(mPDPEngine);
-      if (scopeResolver == null)
-        throw new IllegalArgumentException();
+      if (scopeResolver == null) throw new IllegalArgumentException();
       mScopeResolver = scopeResolver;
       field = mPDPEngine.getClass().getDeclaredField("defaultDecision");
       field.setAccessible(true);
       Decision defaultDecision = (Decision) field.get(mPDPEngine);
-      if (defaultDecision == null)
-        throw new IllegalArgumentException();
+      if (defaultDecision == null) throw new IllegalArgumentException();
       mDefaultDecision = defaultDecision;
       field = pAgent.getClass().getDeclaredField("pepRequestFactory");
       field.setAccessible(true);
       PepRequestFactory pepRequestFactory = (PepRequestFactory) field.get(pAgent);
-      if (pepRequestFactory == null)
-        throw new IllegalArgumentException();
+      if (pepRequestFactory == null) throw new IllegalArgumentException();
       mPEPRequestFactory = pepRequestFactory;
 
-      mPolicySetEnsureReferenceeMethod =
-        PolicySetIdReference.class.getDeclaredMethod("ensureReferencee", EvaluationContext.class);
+      mPolicySetEnsureReferenceeMethod = PolicySetIdReference.class.getDeclaredMethod("ensureReferencee",
+        EvaluationContext.class
+      );
       mPolicySetEnsureReferenceeMethod.setAccessible(true);
-      mPolicyEnsureReferenceeMethod =
-        PolicyIdReference.class.getDeclaredMethod("ensureReferencee", EvaluationContext.class);
+      mPolicyEnsureReferenceeMethod = PolicyIdReference.class.getDeclaredMethod("ensureReferencee",
+        EvaluationContext.class
+      );
       mPolicyEnsureReferenceeMethod.setAccessible(true);
     }
-    catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-      | InvocationTargetException | NoSuchFieldException ex) {
+    catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException |
+           InvocationTargetException | NoSuchFieldException ex) {
       throw new RuntimeException(ex);
     }
   }
@@ -136,21 +135,20 @@ public class Parser {
 
     /* Split the original request up into individual decision requests */
 
-    StdIndividualDecisionRequestGenerator stdIndividualDecisionRequestGenerator =
-      new StdIndividualDecisionRequestGenerator(mScopeResolver, request);
+    StdIndividualDecisionRequestGenerator stdIndividualDecisionRequestGenerator = new StdIndividualDecisionRequestGenerator(
+      mScopeResolver,
+      request
+    );
 
-    Iterator<Request> iterRequestsIndividualDecision =
-      stdIndividualDecisionRequestGenerator.getIndividualDecisionRequests();
-    if (!iterRequestsIndividualDecision.hasNext())
-      throw new RuntimeException("");
+    Iterator<Request> iterRequestsIndividualDecision = stdIndividualDecisionRequestGenerator.getIndividualDecisionRequests();
+    if (!iterRequestsIndividualDecision.hasNext()) throw new RuntimeException("");
 
     Set<IFunctionArgument> policySet = new HashSet<>();
     while (iterRequestsIndividualDecision.hasNext()) {
       Request requestIndividualDecision = iterRequestsIndividualDecision.next();
 
       EvaluationContext evaluationContext = mEvalContextFactory.getEvaluationContext(requestIndividualDecision);
-      if (evaluationContext == null)
-        throw new RuntimeException("");
+      if (evaluationContext == null) throw new RuntimeException("");
 
       PolicyFinderResult<PolicyDef> policyFinderResult = evaluationContext.getRootPolicyDef();
       if ((policyFinderResult.getStatus() != null) && !policyFinderResult.getStatus().isOk())
@@ -160,42 +158,37 @@ public class Parser {
       IFunctionArgument childResult;
       if (policyDefRoot == null) {
         switch (mDefaultDecision) {
-        case NOTAPPLICABLE:
-        case DENY:
-          childResult = ShortCircuit.FALSE.getLiteral();
-          break;
-        case PERMIT:
-          childResult = ShortCircuit.TRUE.getLiteral();
-          break;
-        case INDETERMINATE:
-        case INDETERMINATE_DENY:
-        case INDETERMINATE_DENYPERMIT:
-        case INDETERMINATE_PERMIT:
-        default:
-          throw new RuntimeException("");
+          case NOTAPPLICABLE:
+          case DENY:
+            childResult = ShortCircuit.FALSE.getLiteral();
+            break;
+          case PERMIT:
+            childResult = ShortCircuit.TRUE.getLiteral();
+            break;
+          case INDETERMINATE:
+          case INDETERMINATE_DENY:
+          case INDETERMINATE_DENYPERMIT:
+          case INDETERMINATE_PERMIT:
+          default:
+            throw new RuntimeException("");
         }
-      }
-      else {
+      } else {
 
         if (policyDefRoot instanceof PolicySet)
           childResult = handlePolicySet((PolicySet) policyDefRoot, evaluationContext);
-        else if (policyDefRoot instanceof Policy)
-          childResult = handlePolicy((Policy) policyDefRoot, evaluationContext);
-        else
-          throw new UnsupportedOperationException();
+        else if (policyDefRoot instanceof Policy) childResult = handlePolicy((Policy) policyDefRoot, evaluationContext);
+        else throw new UnsupportedOperationException();
       }
 
       ShortCircuit rsc = shortcut(childResult);
 
       /* If a policy is false, then it will always fail, so all the other policies don't count */
 
-      if (rsc == ShortCircuit.FALSE)
-        return rsc.getLiteral();
+      if (rsc == ShortCircuit.FALSE) return rsc.getLiteral();
 
       /* If a policy is true, then it can be skipped, since it doesn't matter */
 
-      if (rsc == ShortCircuit.TRUE)
-        continue;
+      if (rsc == ShortCircuit.TRUE) continue;
 
       /* Otherwise, the child is AND'd to the other children */
 
@@ -203,10 +196,8 @@ public class Parser {
 
     }
 
-    if (policySet.isEmpty() == true)
-      return ShortCircuit.FALSE.getLiteral();
-    if (policySet.size() == 1)
-      return policySet.iterator().next();
+    if (policySet.isEmpty() == true) return ShortCircuit.FALSE.getLiteral();
+    if (policySet.size() == 1) return policySet.iterator().next();
     return Conditional.builder().code(ConditionalCode.AND).addAllOperations(policySet).build();
   }
 
@@ -215,132 +206,119 @@ public class Parser {
       IFunctionArgument firstAny = null;
       Conditional.Builder anyBuilder = null;
       Iterator<AnyOf> anyOfs = pTarget.getAnyOfs();
-      if (anyOfs != null)
-        while (anyOfs.hasNext()) {
-          AnyOf anyOf = anyOfs.next();
-          IFunctionArgument firstAll = null;
-          Conditional.Builder allBuilder = null;
-          Iterator<AllOf> allOfs = anyOf.getAllOfs();
-          if (allOfs != null)
-            while (allOfs.hasNext()) {
-              AllOf allOf = allOfs.next();
-              IFunctionArgument firstMatch = null;
-              Conditional.Builder matchBuilder = null;
-              Iterator<Match> matches = allOf.getMatches();
-              if (matches != null)
-                while (matches.hasNext()) {
-                  Match match = matches.next();
-                  IFunctionArgument matchResult = handleMatch(match, pEvaluationContext);
+      if (anyOfs != null) while (anyOfs.hasNext()) {
+        AnyOf anyOf = anyOfs.next();
+        IFunctionArgument firstAll = null;
+        Conditional.Builder allBuilder = null;
+        Iterator<AllOf> allOfs = anyOf.getAllOfs();
+        if (allOfs != null) while (allOfs.hasNext()) {
+          AllOf allOf = allOfs.next();
+          IFunctionArgument firstMatch = null;
+          Conditional.Builder matchBuilder = null;
+          Iterator<Match> matches = allOf.getMatches();
+          if (matches != null) while (matches.hasNext()) {
+            Match match = matches.next();
+            IFunctionArgument matchResult = handleMatch(match, pEvaluationContext);
 
-                  ShortCircuit matchSC = shortcut(matchResult);
+            ShortCircuit matchSC = shortcut(matchResult);
 
-                  /* If a match is true, then it can be skipped */
+            /* If a match is true, then it can be skipped */
 
-                  if (matchSC == ShortCircuit.TRUE)
-                    continue;
+            if (matchSC == ShortCircuit.TRUE) continue;
 
-                  /*
-                   * If a match is false, then it's never going to match, so all other matches don't count
-                   */
+            /*
+             * If a match is false, then it's never going to match, so all other matches don't count
+             */
 
-                  if (matchSC == ShortCircuit.FALSE) {
-                    firstMatch = matchSC.getLiteral();
-                    matchBuilder = null;
-                    break;
-                  }
-
-                  /* Otherwise, the child is AND'd to the other children */
-
-                  if (firstMatch == null)
-                    firstMatch = matchResult;
-                  else {
-                    if (matchBuilder == null)
-                      matchBuilder = Conditional.builder().code(ConditionalCode.AND).addOperation(firstMatch);
-                    matchBuilder.addOperation(matchResult);
-                  }
-                }
-
-              IFunctionArgument allOfResult = matchBuilder == null
-                ? (firstMatch == null ? ShortCircuit.TRUE.getLiteral() : firstMatch) : matchBuilder.build();
-
-              ShortCircuit allSC = shortcut(allOfResult);
-
-              /* If a match is false, then it can be skipped */
-
-              if (allSC == ShortCircuit.FALSE)
-                continue;
-
-              /*
-               * If a match is true, then it's always going to match, so all other matches don't count
-               */
-
-              if (allSC == ShortCircuit.TRUE) {
-                firstAll = allSC.getLiteral();
-                allBuilder = null;
-                break;
-              }
-
-              /* Otherwise, the child is OR'd to the other children */
-
-              if (firstAll == null)
-                firstAll = allOfResult;
-              else {
-                if (allBuilder == null)
-                  allBuilder = Conditional.builder().code(ConditionalCode.OR).addOperation(firstAll);
-                allBuilder.addOperation(allOfResult);
-              }
+            if (matchSC == ShortCircuit.FALSE) {
+              firstMatch = matchSC.getLiteral();
+              matchBuilder = null;
+              break;
             }
 
-          IFunctionArgument anyOfResult =
-            allBuilder == null ? (firstAll == null ? ShortCircuit.FALSE.getLiteral() : firstAll) : allBuilder.build();
-          ShortCircuit anySC = shortcut(anyOfResult);
+            /* Otherwise, the child is AND'd to the other children */
 
-          /* If a match is true, then it can be skipped */
+            if (firstMatch == null) firstMatch = matchResult;
+            else {
+              if (matchBuilder == null)
+                matchBuilder = Conditional.builder().code(ConditionalCode.AND).addOperation(firstMatch);
+              matchBuilder.addOperation(matchResult);
+            }
+          }
 
-          if (anySC == ShortCircuit.TRUE)
-            continue;
+          IFunctionArgument allOfResult = matchBuilder == null ? (
+            firstMatch == null ? ShortCircuit.TRUE.getLiteral() : firstMatch) : matchBuilder.build();
+
+          ShortCircuit allSC = shortcut(allOfResult);
+
+          /* If a match is false, then it can be skipped */
+
+          if (allSC == ShortCircuit.FALSE) continue;
 
           /*
-           * If a match is false, then it's never going to match, so all other matches don't count
+           * If a match is true, then it's always going to match, so all other matches don't count
            */
 
-          if (anySC == ShortCircuit.FALSE) {
-            firstAny = anySC.getLiteral();
-            anyBuilder = null;
+          if (allSC == ShortCircuit.TRUE) {
+            firstAll = allSC.getLiteral();
+            allBuilder = null;
             break;
           }
 
-          /* Otherwise, the child is AND'd to the other children */
+          /* Otherwise, the child is OR'd to the other children */
 
-          if (firstAny == null)
-            firstAny = anyOfResult;
+          if (firstAll == null) firstAll = allOfResult;
           else {
-            if (anyBuilder == null)
-              anyBuilder = Conditional.builder().code(ConditionalCode.AND).addOperation(firstAny);
-            anyBuilder.addOperation(anyOfResult);
+            if (allBuilder == null) allBuilder = Conditional.builder().code(ConditionalCode.OR).addOperation(firstAll);
+            allBuilder.addOperation(allOfResult);
           }
         }
+
+        IFunctionArgument anyOfResult =
+          allBuilder == null ? (firstAll == null ? ShortCircuit.FALSE.getLiteral() : firstAll) : allBuilder.build();
+        ShortCircuit anySC = shortcut(anyOfResult);
+
+        /* If a match is true, then it can be skipped */
+
+        if (anySC == ShortCircuit.TRUE) continue;
+
+        /*
+         * If a match is false, then it's never going to match, so all other matches don't count
+         */
+
+        if (anySC == ShortCircuit.FALSE) {
+          firstAny = anySC.getLiteral();
+          anyBuilder = null;
+          break;
+        }
+
+        /* Otherwise, the child is AND'd to the other children */
+
+        if (firstAny == null) firstAny = anyOfResult;
+        else {
+          if (anyBuilder == null) anyBuilder = Conditional.builder().code(ConditionalCode.AND).addOperation(firstAny);
+          anyBuilder.addOperation(anyOfResult);
+        }
+      }
 
       IFunctionArgument targetResult =
         anyBuilder == null ? (firstAny == null ? ShortCircuit.TRUE.getLiteral() : firstAny) : anyBuilder.build();
 
       return targetResult;
-    }
-    else
-      return ShortCircuit.TRUE.getLiteral();
+    } else return ShortCircuit.TRUE.getLiteral();
   }
 
   private IFunctionArgument handleMatch(Match pMatch, EvaluationContext pEvaluationContext) {
     try {
       MatchResult result = pMatch.match(pEvaluationContext);
       switch (result.getMatchCode()) {
-      case MATCH:
-        return ShortCircuit.TRUE.getLiteral();
-      case NOMATCH:
-        return ShortCircuit.FALSE.getLiteral();
-      case INDETERMINATE:
-      default:
-        throw new UnsupportedOperationException();
+        case MATCH:
+          return ShortCircuit.TRUE.getLiteral();
+        case NOMATCH:
+          return ShortCircuit.FALSE.getLiteral();
+        case INDETERMINATE:
+        default:
+          throw new UnsupportedOperationException();
       }
     }
     catch (EvaluationException ex) {
@@ -359,8 +337,7 @@ public class Parser {
     IFunctionArgument targetResult = handleTarget(target, pEvaluationContext);
     ShortCircuit tsc = shortcut(targetResult);
 
-    if (tsc == ShortCircuit.FALSE)
-      return tsc.getLiteral();
+    if (tsc == ShortCircuit.FALSE) return tsc.getLiteral();
 
     /*
      * Assuming that this policy set is usable, then we need to look at the combining elements (ie. children Policy,
@@ -383,37 +360,31 @@ public class Parser {
 
           try {
             PolicySet child = (PolicySet) mPolicySetEnsureReferenceeMethod.invoke(policySetChild, pEvaluationContext);
-            if (child == null)
-              throw new IllegalArgumentException();
+            if (child == null) throw new IllegalArgumentException();
             childResult = handlePolicySet(child, pEvaluationContext);
           }
           catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new RuntimeException(ex);
           }
 
-        }
-        else if (policySetChild instanceof PolicyIdReference) {
+        } else if (policySetChild instanceof PolicyIdReference) {
 
           try {
             Policy child = (Policy) mPolicyEnsureReferenceeMethod.invoke(policySetChild, pEvaluationContext);
-            if (child == null)
-              throw new IllegalArgumentException();
+            if (child == null) throw new IllegalArgumentException();
             childResult = handlePolicy(child, pEvaluationContext);
           }
           catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new RuntimeException(ex);
           }
 
-        }
-        else
-          throw new UnsupportedOperationException();
+        } else throw new UnsupportedOperationException();
 
         ShortCircuit rsc = shortcut(childResult);
 
         /* If a rule is false, then it can be skipped */
 
-        if (rsc == ShortCircuit.FALSE)
-          continue;
+        if (rsc == ShortCircuit.FALSE) continue;
 
         /* If a rule is true, then it's always going to match, so all other rules don't count */
 
@@ -434,22 +405,18 @@ public class Parser {
 
     IFunctionArgument childResults;
     if (childSet.isEmpty() == true) {
-      if (trueMatch == true)
-        childResults = null;
-      else
-        return ShortCircuit.FALSE.getLiteral();
-    }
-    else if (childSet.size() == 1)
-      childResults = childSet.iterator().next();
-    else
-      childResults = Conditional.builder().code(ConditionalCode.OR).addAllOperations(childSet).build();
+      if (trueMatch == true) childResults = null;
+      else return ShortCircuit.FALSE.getLiteral();
+    } else if (childSet.size() == 1) childResults = childSet.iterator().next();
+    else childResults = Conditional.builder().code(ConditionalCode.OR).addAllOperations(childSet).build();
 
-    if (tsc == ShortCircuit.TRUE)
-      return (childResults == null ? ShortCircuit.TRUE.getLiteral() : childResults);
+    if (tsc == ShortCircuit.TRUE) return (childResults == null ? ShortCircuit.TRUE.getLiteral() : childResults);
 
-    if (childResults == null)
-      return targetResult;
-    return Conditional.builder().code(ConditionalCode.AND).addOperation(targetResult).addOperation(childResults)
+    if (childResults == null) return targetResult;
+    return Conditional.builder()
+      .code(ConditionalCode.AND)
+      .addOperation(targetResult)
+      .addOperation(childResults)
       .build();
   }
 
@@ -463,49 +430,43 @@ public class Parser {
 
     IFunctionArgument targetResult = handleTarget(target, pEvaluationContext);
     ShortCircuit tsc = shortcut(targetResult);
-    if (tsc == ShortCircuit.FALSE)
-      return tsc.getLiteral();
+    if (tsc == ShortCircuit.FALSE) return tsc.getLiteral();
 
     IFunctionArgument firstRule = null;
     Conditional.Builder orRule = null;
     Iterator<Rule> rules = pPolicy.getRules();
-    if (rules != null)
-      while (rules.hasNext()) {
-        Rule rule = rules.next();
+    if (rules != null) while (rules.hasNext()) {
+      Rule rule = rules.next();
 
-        IFunctionArgument ruleResult = handleRule(rule, pEvaluationContext);
-        ShortCircuit rsc = shortcut(ruleResult);
+      IFunctionArgument ruleResult = handleRule(rule, pEvaluationContext);
+      ShortCircuit rsc = shortcut(ruleResult);
 
-        /* If a rule is false, then it can be skipped */
+      /* If a rule is false, then it can be skipped */
 
-        if (rsc == ShortCircuit.FALSE)
-          continue;
+      if (rsc == ShortCircuit.FALSE) continue;
 
-        /* If a rule is true, then it's always going to match, so all other rules don't count */
+      /* If a rule is true, then it's always going to match, so all other rules don't count */
 
-        if (rsc == ShortCircuit.TRUE) {
-          firstRule = rsc.getLiteral();
-          orRule = null;
-          break;
-        }
-
-        /* Otherwise, the rule is OR'd to the other rules */
-
-        if (firstRule == null)
-          firstRule = ruleResult;
-        else {
-          if (orRule == null)
-            orRule = Conditional.builder().code(ConditionalCode.OR).addOperation(firstRule);
-          orRule.addOperation(ruleResult);
-        }
+      if (rsc == ShortCircuit.TRUE) {
+        firstRule = rsc.getLiteral();
+        orRule = null;
+        break;
       }
+
+      /* Otherwise, the rule is OR'd to the other rules */
+
+      if (firstRule == null) firstRule = ruleResult;
+      else {
+        if (orRule == null) orRule = Conditional.builder().code(ConditionalCode.OR).addOperation(firstRule);
+        orRule.addOperation(ruleResult);
+      }
+    }
 
     /* Now merge the target and rules together */
 
     IFunctionArgument ruleResults =
       orRule == null ? (firstRule == null ? ShortCircuit.FALSE.getLiteral() : firstRule) : orRule.build();
-    if (tsc == ShortCircuit.TRUE)
-      return ruleResults;
+    if (tsc == ShortCircuit.TRUE) return ruleResults;
 
     return Conditional.builder().code(ConditionalCode.AND).addOperation(targetResult).addOperation(ruleResults).build();
   }
@@ -518,36 +479,29 @@ public class Parser {
 
     IFunctionArgument targetResult = handleTarget(target, pEvaluationContext);
     ShortCircuit tsc = shortcut(targetResult);
-    if (tsc != ShortCircuit.NA)
-      targetResult = null;
+    if (tsc != ShortCircuit.NA) targetResult = null;
 
-    if (tsc == ShortCircuit.FALSE)
-      return tsc.getLiteral();
+    if (tsc == ShortCircuit.FALSE) return tsc.getLiteral();
 
     Condition condition = pRule.getCondition();
 
     if (condition != null) {
       Expression expression = condition.getExpression();
-      if (expression != null)
-        try {
-          IFunctionArgument arg = handleExpression(expression, pEvaluationContext, null);
-          ShortCircuit sc = shortcut(arg);
-          if (sc == ShortCircuit.TRUE)
-            return targetResult == null ? sc.getLiteral() : targetResult;
-          else if (sc == ShortCircuit.FALSE)
-            return sc.getLiteral();
-          else {
-            if (targetResult == null)
-              return arg;
-            else
-              return Conditional.builder().code(ConditionalCode.AND).addOperation(targetResult).addOperation(arg)
-                .build();
-          }
+      if (expression != null) try {
+        IFunctionArgument arg = handleExpression(expression, pEvaluationContext, null);
+        ShortCircuit sc = shortcut(arg);
+        if (sc == ShortCircuit.TRUE) return targetResult == null ? sc.getLiteral() : targetResult;
+        else if (sc == ShortCircuit.FALSE) return sc.getLiteral();
+        else {
+          if (targetResult == null) return arg;
+          else
+            return Conditional.builder().code(ConditionalCode.AND).addOperation(targetResult).addOperation(arg).build();
+        }
 
-        }
-        catch (EvaluationException ex) {
-          throw new RuntimeException(ex);
-        }
+      }
+      catch (EvaluationException ex) {
+        throw new RuntimeException(ex);
+      }
     }
 
     return targetResult == null ? tsc.getLiteral() : targetResult;
@@ -556,12 +510,10 @@ public class Parser {
   private IFunctionArgument handleExpression(Expression pExpression, EvaluationContext pEvaluationContext,
     @Nullable PolicyDefaults pPolicyDefaults) throws EvaluationException {
 
-    if (pExpression instanceof Apply)
-      return handleApply((Apply) pExpression, pEvaluationContext, pPolicyDefaults);
+    if (pExpression instanceof Apply) return handleApply((Apply) pExpression, pEvaluationContext, pPolicyDefaults);
     else if (pExpression instanceof AttributeDesignator)
       return handleDesignator((AttributeDesignator) pExpression, pEvaluationContext);
-    else
-      throw new UnsupportedOperationException();
+    else throw new UnsupportedOperationException();
   }
 
   private IFunctionArgument handleDesignator(AttributeDesignator pExpression, EvaluationContext pEvaluationContext) {
@@ -604,47 +556,39 @@ public class Parser {
          * If a literal evaluates to true in an AND, then it can be ignored, since it has no impact
          */
 
-        if (Boolean.TRUE == bool)
-          return ShortCircuit.TRUE;
+        if (Boolean.TRUE == bool) return ShortCircuit.TRUE;
 
         /*
          * If a literal evaluates to false in an AND, then the entire AND becomes false, regardless of whether there are
          * other types
          */
 
-        if (Boolean.FALSE == bool)
-          return ShortCircuit.FALSE;
+        if (Boolean.FALSE == bool) return ShortCircuit.FALSE;
       }
     }
     return ShortCircuit.NA;
   }
 
   private IFunctionArgument convertExpressionResultToLiteral(@Nullable ExpressionResult result, boolean pBooleanValue) {
-    if (result == null)
-      throw new UnsupportedOperationException();
+    if (result == null) throw new UnsupportedOperationException();
     if (result.isBag() == true) {
 
       Bag bag = result.getBag();
-      if (bag == null)
-        throw new UnsupportedOperationException();
+      if (bag == null) throw new UnsupportedOperationException();
       List<String> values = new ArrayList<>();
       for (AttributeValue<?> av : bag.getAttributeValueList()) {
         Object valueObject = av.getValue();
-        if (valueObject == null)
-          throw new UnsupportedOperationException();
+        if (valueObject == null) throw new UnsupportedOperationException();
         values.add(valueObject.toString());
       }
 
       LiteralBag literalBag = LiteralBag.builder().value(values).booleanValue(pBooleanValue).build();
       return literalBag;
-    }
-    else {
+    } else {
       AttributeValue<?> attributeValue = result.getValue();
-      if (attributeValue == null)
-        throw new UnsupportedOperationException();
+      if (attributeValue == null) throw new UnsupportedOperationException();
       Object valueObject = attributeValue.getValue();
-      if (valueObject == null)
-        throw new UnsupportedOperationException();
+      if (valueObject == null) throw new UnsupportedOperationException();
       LiteralSingle literal = LiteralSingle.builder().value(valueObject.toString()).booleanValue(pBooleanValue).build();
       return literal;
     }
@@ -657,87 +601,75 @@ public class Parser {
     String functionIdStr = functionId.stringValue();
     int offset = functionIdStr.lastIndexOf(':');
     String functionName;
-    if (offset == -1)
-      functionName = functionIdStr;
-    else
-      functionName = functionIdStr.substring(offset + 1);
+    if (offset == -1) functionName = functionIdStr;
+    else functionName = functionIdStr.substring(offset + 1);
     functionName = functionName.replace('-', '_').toUpperCase();
 
     OperationCode code = OperationCode.valueOf(functionName);
 
     switch (code) {
-    case AND: {
-      IFunctionArgument firstArg = null;
-      Conditional.Builder builder = null;
-      Iterator<Expression> arguments = pExpression.getArguments();
-      if (arguments != null)
-        while (arguments.hasNext()) {
+      case AND: {
+        IFunctionArgument firstArg = null;
+        Conditional.Builder builder = null;
+        Iterator<Expression> arguments = pExpression.getArguments();
+        if (arguments != null) while (arguments.hasNext()) {
           Expression expression = arguments.next();
           IFunctionArgument arg = handleExpression(expression, pEvaluationContext, pPolicyDefaults);
           ShortCircuit sc = shortcut(arg);
-          if (sc == ShortCircuit.TRUE)
-            continue;
-          if (sc == ShortCircuit.FALSE)
-            return sc.getLiteral();
-          if (firstArg == null)
-            firstArg = arg;
+          if (sc == ShortCircuit.TRUE) continue;
+          if (sc == ShortCircuit.FALSE) return sc.getLiteral();
+          if (firstArg == null) firstArg = arg;
           else {
-            if (builder == null)
-              builder = Conditional.builder().code(ConditionalCode.AND).addOperation(firstArg);
+            if (builder == null) builder = Conditional.builder().code(ConditionalCode.AND).addOperation(firstArg);
             builder.addOperation(arg);
           }
         }
 
-      return builder == null ? (firstArg == null ? ShortCircuit.TRUE.getLiteral() : firstArg) : builder.build();
-    }
-    case STRING_ONE_AND_ONLY: {
-      Iterator<Expression> arguments = pExpression.getArguments();
-      if (arguments != null)
-        while (arguments.hasNext()) {
+        return builder == null ? (firstArg == null ? ShortCircuit.TRUE.getLiteral() : firstArg) : builder.build();
+      }
+      case STRING_ONE_AND_ONLY: {
+        Iterator<Expression> arguments = pExpression.getArguments();
+        if (arguments != null) while (arguments.hasNext()) {
           IFunctionArgument r = handleExpression(arguments.next(), pEvaluationContext, pPolicyDefaults);
-          if (r instanceof ILiteralBag)
-            return LiteralSingle.builder().value(((ILiteralBag) r).getSingleValue())
-              .booleanValue(((ILiteralBag) r).isBooleanValue()).build();
-          else if (r instanceof ILiteralSingle)
-            return r;
-          else if (r instanceof IResource)
-            return r;
-          else
-            throw new UnsupportedOperationException();
+          if (r instanceof ILiteralBag) return LiteralSingle.builder()
+            .value(((ILiteralBag) r).getSingleValue())
+            .booleanValue(((ILiteralBag) r).isBooleanValue())
+            .build();
+          else if (r instanceof ILiteralSingle) return r;
+          else if (r instanceof IResource) return r;
+          else throw new UnsupportedOperationException();
         }
-      throw new UnsupportedOperationException();
-    }
-    default: {
-      Iterator<Expression> arguments = pExpression.getArguments();
-      List<IFunctionArgument> argResults = new ArrayList<>();
-      if (arguments != null)
-        while (arguments.hasNext()) {
+        throw new UnsupportedOperationException();
+      }
+      default: {
+        Iterator<Expression> arguments = pExpression.getArguments();
+        List<IFunctionArgument> argResults = new ArrayList<>();
+        if (arguments != null) while (arguments.hasNext()) {
           Expression expression = arguments.next();
           argResults.add(handleExpression(expression, pEvaluationContext, pPolicyDefaults));
         }
 
-      int argCount = code.getArgCount();
-      if ((argCount != -1) && (argCount != argResults.size()))
-        throw new UnsupportedOperationException();
+        int argCount = code.getArgCount();
+        if ((argCount != -1) && (argCount != argResults.size())) throw new UnsupportedOperationException();
 
-      /* If all the arguments are literals, then evaluate the function */
+        /* If all the arguments are literals, then evaluate the function */
 
-      boolean isLiteral = true;
-      for (IFunctionArgument ar : argResults)
-        if (((ar instanceof ILiteralSingle) == false) && ((ar instanceof ILiteralBag) == false)) {
-          isLiteral = false;
-          break;
+        boolean isLiteral = true;
+        for (IFunctionArgument ar : argResults)
+          if (((ar instanceof ILiteralSingle) == false) && ((ar instanceof ILiteralBag) == false)) {
+            isLiteral = false;
+            break;
+          }
+
+        if (isLiteral == true) {
+          ExpressionResult result = pExpression.evaluate(pEvaluationContext, pPolicyDefaults);
+          return convertExpressionResultToLiteral(result, code.isBooleanReturn());
         }
 
-      if (isLiteral == true) {
-        ExpressionResult result = pExpression.evaluate(pEvaluationContext, pPolicyDefaults);
-        return convertExpressionResultToLiteral(result, code.isBooleanReturn());
+        /* Generate an operation */
+
+        return Operation.builder().operation(code).addAllArguments(argResults).build();
       }
-
-      /* Generate an operation */
-
-      return Operation.builder().operation(code).addAllArguments(argResults).build();
-    }
     }
   }
 

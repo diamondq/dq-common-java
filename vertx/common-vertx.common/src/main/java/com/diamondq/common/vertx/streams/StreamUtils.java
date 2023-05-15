@@ -11,17 +11,15 @@ import com.diamondq.common.lambda.interfaces.Consumer4;
 import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.vertx.streams.impl.ReadStreamBackPressure;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.vertx.core.streams.ReadStream;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class StreamUtils {
 
   /**
    * Converts a Vertx ReadStream<T> into a CompletionStage and a Consumer
-   * 
+   *
    * @param pStream the stream
    * @param pConsumer the consumer
    * @return the result
@@ -74,8 +72,7 @@ public class StreamUtils {
       try (Context ctx2 = currentContext.activateOnThread("")) {
       }
       if (ex != null) {
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
+        if (ex instanceof RuntimeException) throw (RuntimeException) ex;
         throw new RuntimeException(ex);
       }
       return r;
@@ -84,16 +81,16 @@ public class StreamUtils {
 
   /**
    * Converts a Vertx ReadStream<T> into a CompletionStage and a Consumer
-   * 
+   *
    * @param pStream the stream
    * @param pOnStart the function called at the start to generate the intermediate object (usually a List)
    * @param pConsumer the consumer that receives a new item from the stream, the intermediate object (usually the list
-   *          to put the object)
+   *   to put the object)
    * @param pOnEnd called when the ReadStream is complete, and converts the intermediate object into it's final form
    * @return the result
    */
-  public static <T, @NonNull SI, U> ContextExtendedCompletionStage<U> processStream(ReadStream<T> pStream,
-    Function1<Context, SI> pOnStart, Consumer4<T, @NonNull SI, Context, BackPressure> pConsumer,
+  public static <T, @NotNull SI, U> ContextExtendedCompletionStage<U> processStream(ReadStream<T> pStream,
+    Function1<Context, SI> pOnStart, Consumer4<T, @NotNull SI, Context, BackPressure> pConsumer,
     Function2<SI, Context, U> pOnEnd) {
 
     ContextExtendedCompletableFuture<U> result = FutureUtils.newCompletableFuture();
@@ -146,8 +143,7 @@ public class StreamUtils {
       try (Context ctx2 = currentContext.activateOnThread("")) {
       }
       if (ex != null) {
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
+        if (ex instanceof RuntimeException) throw (RuntimeException) ex;
         throw new RuntimeException(ex);
       }
       return Verify.notNull(r);

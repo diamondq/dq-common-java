@@ -2,7 +2,7 @@ package com.diamondq.common.types;
 
 import com.diamondq.common.TypeReference;
 import com.diamondq.common.i18n.I18NString;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,20 +1,18 @@
 package com.diamondq.common.injection.cdi;
 
 import com.diamondq.common.config.Config;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
+import org.jetbrains.annotations.Nullable;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 
 @ApplicationScoped
 public class ExecutorsProvider {
@@ -29,10 +27,8 @@ public class ExecutorsProvider {
   @ApplicationScoped
   @Named("long-lived")
   public ScheduledExecutorService createScheduledExecutorServiceViaInjection(Instance<Config> pConfig) {
-    @Nullable
-    Config config = null;
-    if ((pConfig.isAmbiguous() == false) && (pConfig.isUnsatisfied() == false))
-      config = pConfig.get();
+    @Nullable Config config = null;
+    if ((pConfig.isAmbiguous() == false) && (pConfig.isUnsatisfied() == false)) config = pConfig.get();
     return createScheduledExecutorService(config);
   }
 
@@ -55,10 +51,8 @@ public class ExecutorsProvider {
 
     ThreadFactory threadFactory = Executors.defaultThreadFactory();
     Integer corePoolSize = null;
-    if (pConfig != null)
-      corePoolSize = pConfig.bind("executors.core-pool-size", Integer.class);
-    if (corePoolSize == null)
-      corePoolSize = Runtime.getRuntime().availableProcessors();
+    if (pConfig != null) corePoolSize = pConfig.bind("executors.core-pool-size", Integer.class);
+    if (corePoolSize == null) corePoolSize = Runtime.getRuntime().availableProcessors();
     ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(corePoolSize, threadFactory);
 
     /* See if the Guava MoreExecutors is present */
@@ -66,10 +60,10 @@ public class ExecutorsProvider {
     try {
       Class<?> moreExecutorsClass = Class.forName("com.google.common.util.concurrent.MoreExecutors");
       Method decorateMethod = moreExecutorsClass.getMethod("listeningDecorator", ScheduledExecutorService.class);
-      ScheduledExecutorService decoratedExecutor =
-        (ScheduledExecutorService) decorateMethod.invoke(null, scheduledExecutorService);
-      if (decoratedExecutor != null)
-        scheduledExecutorService = decoratedExecutor;
+      ScheduledExecutorService decoratedExecutor = (ScheduledExecutorService) decorateMethod.invoke(null,
+        scheduledExecutorService
+      );
+      if (decoratedExecutor != null) scheduledExecutorService = decoratedExecutor;
     }
     catch (ClassNotFoundException ex) {
     }

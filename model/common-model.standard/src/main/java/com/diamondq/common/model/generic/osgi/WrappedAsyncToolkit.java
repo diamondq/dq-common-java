@@ -17,19 +17,18 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
-
 public class WrappedAsyncToolkit implements AsyncToolkit {
 
-  private final AsyncToolkit           mAsyncToolkit;
+  private final AsyncToolkit mAsyncToolkit;
 
   protected volatile @Nullable Toolkit mSyncToolkit;
 
@@ -40,8 +39,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   private Scope dewrapScope(Scope pScope) {
-    if (pScope instanceof WrappedScope)
-      return ((WrappedScope) pScope).getScope();
+    if (pScope instanceof WrappedScope) return ((WrappedScope) pScope).getScope();
     return pScope;
   }
 
@@ -131,7 +129,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
 
   @Override
   public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(Scope pScope,
-    StructureDefinition pStructureDef, @Nullable Object @NonNull... pPrimaryKeys) {
+    StructureDefinition pStructureDef, @Nullable Object @NotNull ... pPrimaryKeys) {
     return mAsyncToolkit.lookupStructureByPrimaryKeys(dewrapScope(pScope), pStructureDef, pPrimaryKeys);
   }
 
@@ -202,15 +200,19 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
 
   @Override
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
-    StandardMigrations pMigrationType, @NonNull Object @Nullable... pParams) {
+    StandardMigrations pMigrationType, @NotNull Object @Nullable ... pParams) {
     return mAsyncToolkit.createStandardMigration(dewrapScope(pScope), pMigrationType, pParams);
   }
 
   @Override
   public void addMigration(Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
     BiFunction<Structure, Structure, Structure> pMigrationFunction) {
-    mAsyncToolkit.addMigration(dewrapScope(pScope), pStructureDefinitionName, pFromRevision, pToRevision,
-      pMigrationFunction);
+    mAsyncToolkit.addMigration(dewrapScope(pScope),
+      pStructureDefinitionName,
+      pFromRevision,
+      pToRevision,
+      pMigrationFunction
+    );
   }
 
   @Override
@@ -229,8 +231,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   public Toolkit getSyncToolkit() {
     Toolkit toolkit = mAsyncToolkit.getSyncToolkit();
     synchronized (this) {
-      if (mSyncToolkit == toolkit)
-        return Verify.notNull(mWrappedSyncToolkit);
+      if (mSyncToolkit == toolkit) return Verify.notNull(mWrappedSyncToolkit);
       mSyncToolkit = toolkit;
       mWrappedSyncToolkit = new WrappedToolkit(toolkit);
       return mWrappedSyncToolkit;
@@ -239,7 +240,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#clearStructures(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope,
@@ -249,7 +250,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
 
   /**
    * @see com.diamondq.common.model.interfaces.AsyncToolkit#countByQuery(com.diamondq.common.model.interfaces.Scope,
-   *      com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   *   com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
   public ContextExtendedCompletionStage<Integer> countByQuery(Scope pScope, ModelQuery pQuery,

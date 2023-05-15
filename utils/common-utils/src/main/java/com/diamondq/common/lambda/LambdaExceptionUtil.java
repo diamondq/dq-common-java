@@ -1,6 +1,7 @@
 package com.diamondq.common.lambda;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.function.BiConsumer;
@@ -9,8 +10,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 /**
  * Helper util class originated by MarcG on Stackoverflow (http://stackoverflow.com/a/27644392)
  */
@@ -18,23 +17,23 @@ public final class LambdaExceptionUtil {
 
   /**
    * Consumer with exceptions
-   * 
+   *
    * @param <T> the input type
    * @param <E> the exception
    */
   @FunctionalInterface
   public interface Consumer_WithExceptions<T, E extends Exception> {
     /**
-     * @see Consumer#accept(Object)
      * @param t the input
      * @throws E the exception
+     * @see Consumer#accept(Object)
      */
     void accept(T t) throws E;
   }
 
   /**
    * Producer with exceptions
-   * 
+   *
    * @param <T> the result type
    * @param <E> the exception
    */
@@ -42,7 +41,7 @@ public final class LambdaExceptionUtil {
   public interface Producer_WithExceptions<T, E extends Exception> {
     /**
      * producer
-     * 
+     *
      * @return the result
      * @throws E the exception
      */
@@ -51,7 +50,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * BiConsumer with Exceptions
-   * 
+   *
    * @param <T> input 1 type
    * @param <U> input 2 type
    * @param <E> exception type
@@ -60,7 +59,7 @@ public final class LambdaExceptionUtil {
   public interface BiConsumer_WithExceptions<T, U, E extends Exception> {
     /**
      * consumer
-     * 
+     *
      * @param t input 1
      * @param u input 2
      * @throws E exception
@@ -70,7 +69,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * BiFunction with Exception
-   * 
+   *
    * @param <T> input type 1
    * @param <U> input type 2
    * @param <R> result type
@@ -80,7 +79,7 @@ public final class LambdaExceptionUtil {
   public interface BiFunction_WithExceptions<T, U, R, E extends Exception> {
     /**
      * function
-     * 
+     *
      * @param t input 1
      * @param u input 2
      * @return result
@@ -91,7 +90,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * Function with Exception
-   * 
+   *
    * @param <T> input type
    * @param <R> result type
    * @param <E> exception type
@@ -100,7 +99,7 @@ public final class LambdaExceptionUtil {
   public interface Function_WithExceptions<T, R, E extends Exception> {
     /**
      * function
-     * 
+     *
      * @param t input
      * @return result
      * @throws E exception
@@ -110,7 +109,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * Supplier with Exception
-   * 
+   *
    * @param <T> result type
    * @param <E> exception type
    */
@@ -118,7 +117,7 @@ public final class LambdaExceptionUtil {
   public interface Supplier_WithExceptions<T, E extends Exception> {
     /**
      * supplier
-     * 
+     *
      * @return the result
      * @throws E exception
      */
@@ -127,14 +126,14 @@ public final class LambdaExceptionUtil {
 
   /**
    * Runnable with Exception
-   * 
+   *
    * @param <E> exception type
    */
   @FunctionalInterface
   public interface Runnable_WithExceptions<E extends Exception> {
     /**
      * runnable
-     * 
+     *
      * @throws E exception
      */
     void run() throws E;
@@ -144,9 +143,10 @@ public final class LambdaExceptionUtil {
    * .forEach(rethrowConsumer(name -> System.out.println(Class.forName(name)))); or
    * .forEach(rethrowConsumer(ClassNameUtil::println));
    */
+
   /**
    * Takes a consumer with exceptions and returns a Consumer or throws a Runtime Exception
-   * 
+   *
    * @param consumer the consumer with exceptions
    * @return the consumer
    */
@@ -157,10 +157,8 @@ public final class LambdaExceptionUtil {
       }
       catch (Exception exception) {
         RuntimeException e;
-        if (exception instanceof RuntimeException)
-          e = (RuntimeException) exception;
-        else
-          e = new RuntimeException(exception);
+        if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+        else e = new RuntimeException(exception);
         throw e;
       }
     };
@@ -168,7 +166,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * Takes a BiFunction with Exceptions and returns a Comparator or throws a Runtime Exception
-   * 
+   *
    * @param comparator the comparator with exceptions
    * @return the comparator
    */
@@ -177,16 +175,13 @@ public final class LambdaExceptionUtil {
     return (a, b) -> {
       try {
         Integer result = comparator.apply(a, b);
-        if (result == null)
-          return 0;
+        if (result == null) return 0;
         return result;
       }
       catch (Exception exception) {
         RuntimeException e;
-        if (exception instanceof RuntimeException)
-          e = (RuntimeException) exception;
-        else
-          e = new RuntimeException(exception);
+        if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+        else e = new RuntimeException(exception);
         throw e;
       }
     };
@@ -194,7 +189,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * Takes a BiConsumer with Exceptions and returns a BiConsumer or throws a Runtime Exception
-   * 
+   *
    * @param biConsumer the BiConsumer with exceptions
    * @return the BiConsumer
    */
@@ -206,10 +201,8 @@ public final class LambdaExceptionUtil {
       }
       catch (Exception exception) {
         RuntimeException e;
-        if (exception instanceof RuntimeException)
-          e = (RuntimeException) exception;
-        else
-          e = new RuntimeException(exception);
+        if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+        else e = new RuntimeException(exception);
         throw e;
       }
     };
@@ -217,7 +210,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * Takes a BiFunction with Exceptions and returns a BiFunction or throws a Runtime Exception
-   * 
+   *
    * @param biFunction the BiFunction with exceptions
    * @return the BiFunction
    */
@@ -229,10 +222,8 @@ public final class LambdaExceptionUtil {
       }
       catch (Exception exception) {
         RuntimeException e;
-        if (exception instanceof RuntimeException)
-          e = (RuntimeException) exception;
-        else
-          e = new RuntimeException(exception);
+        if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+        else e = new RuntimeException(exception);
         throw e;
       }
     };
@@ -240,7 +231,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * Takes a Function with Exceptions and returns a Function or throws a Runtime Exception
-   * 
+   *
    * @param function the Function with exceptions
    * @return the Function
    */
@@ -252,19 +243,18 @@ public final class LambdaExceptionUtil {
       }
       catch (Exception exception) {
         RuntimeException e;
-        if (exception instanceof RuntimeException)
-          e = (RuntimeException) exception;
-        else
-          e = new RuntimeException(exception);
+        if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+        else e = new RuntimeException(exception);
         throw e;
       }
     };
   }
 
   /* rethrowSupplier(() -> new StringJoiner(new String(new byte[]{77, 97, 114, 107}, "UTF-8"))), */
+
   /**
    * Takes a Supplier with Exceptions and returns a Supplier or throws a Runtime Exception
-   * 
+   *
    * @param function the Supplier with Exceptions
    * @return the Supplier
    */
@@ -275,10 +265,8 @@ public final class LambdaExceptionUtil {
       }
       catch (Exception exception) {
         RuntimeException e;
-        if (exception instanceof RuntimeException)
-          e = (RuntimeException) exception;
-        else
-          e = new RuntimeException(exception);
+        if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+        else e = new RuntimeException(exception);
         throw e;
       }
     };
@@ -286,7 +274,7 @@ public final class LambdaExceptionUtil {
 
   /**
    * Takes a Supplier and returns a completed future
-   * 
+   *
    * @param function the supplier
    * @return the future
    */
@@ -301,11 +289,11 @@ public final class LambdaExceptionUtil {
 
   /**
    * Takes a Supplier and returns a completed future
-   * 
+   *
    * @param function the supplier
    * @return the future
    */
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings({ "unchecked" })
   public static <T> ExtendedCompletableFuture<T> wrapSyncNonNullSupplierResult(Supplier<T> function) {
     try {
       return ExtendedCompletableFuture.completedFuture(function.get());
@@ -316,9 +304,10 @@ public final class LambdaExceptionUtil {
   }
 
   /* uncheck(() -> Class.forName("xxx")); */
+
   /**
    * Takes a Runnable with Exceptions and runs it, and either returns or throws a Runtime Exception
-   * 
+   *
    * @param t the Runnable with Exceptions
    */
   public static void uncheck(@SuppressWarnings("rawtypes") Runnable_WithExceptions t) {
@@ -327,18 +316,17 @@ public final class LambdaExceptionUtil {
     }
     catch (Exception exception) {
       RuntimeException e;
-      if (exception instanceof RuntimeException)
-        e = (RuntimeException) exception;
-      else
-        e = new RuntimeException(exception);
+      if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+      else e = new RuntimeException(exception);
       throw e;
     }
   }
 
   /* uncheck(() -> Class.forName("xxx")); */
+
   /**
    * Takes a Supplier with Exceptions and returns either the result or throws a Runtime Exception
-   * 
+   *
    * @param supplier the Supplier with Exceptions
    * @return the result
    */
@@ -348,18 +336,17 @@ public final class LambdaExceptionUtil {
     }
     catch (Exception exception) {
       RuntimeException e;
-      if (exception instanceof RuntimeException)
-        e = (RuntimeException) exception;
-      else
-        e = new RuntimeException(exception);
+      if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+      else e = new RuntimeException(exception);
       throw e;
     }
   }
 
   /* uncheck(Class::forName, "xxx"); */
+
   /**
    * Takes a Function with Exceptions and returns either the result or throws a Runtime Exception
-   * 
+   *
    * @param function the Function with Exceptions
    * @param t input parameter
    * @return the result
@@ -370,10 +357,8 @@ public final class LambdaExceptionUtil {
     }
     catch (Exception exception) {
       RuntimeException e;
-      if (exception instanceof RuntimeException)
-        e = (RuntimeException) exception;
-      else
-        e = new RuntimeException(exception);
+      if (exception instanceof RuntimeException) e = (RuntimeException) exception;
+      else e = new RuntimeException(exception);
       throw e;
     }
   }

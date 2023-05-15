@@ -2,15 +2,14 @@ package com.diamondq.common.model.generic;
 
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Objects;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class GenericTranslatableString implements TranslatableString {
 
-  private final Scope  mScope;
+  private final Scope mScope;
 
   private final String mKey;
 
@@ -31,15 +30,12 @@ public class GenericTranslatableString implements TranslatableString {
    * @see com.diamondq.common.model.interfaces.TranslatableString#resolve(java.util.Locale, java.lang.Object[])
    */
   @Override
-  public String resolve(@Nullable Locale pLocale, @Nullable Object @Nullable... pArgs) {
+  public String resolve(@Nullable Locale pLocale, @Nullable Object @Nullable ... pArgs) {
     String resourceString = mScope.getToolkit().lookupResourceString(mScope, pLocale, mKey);
-    if (resourceString == null)
-      resourceString = mKey;
+    if (resourceString == null) resourceString = mKey;
     String result;
-    if ((pArgs == null) || (pArgs.length == 0))
-      result = resourceString;
-    else
-      result = String.format(resourceString, pArgs);
+    if ((pArgs == null) || (pArgs.length == 0)) result = resourceString;
+    else result = String.format(resourceString, pArgs);
     return result;
   }
 
@@ -56,12 +52,9 @@ public class GenericTranslatableString implements TranslatableString {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     GenericTranslatableString other = (GenericTranslatableString) pObj;
     return Objects.equals(mScope, other.mScope) && Objects.equals(mKey, other.mKey);
   }

@@ -3,12 +3,11 @@ package com.diamondq.common.model.generic;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.Structure;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Supplier;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.eclipse.jdt.annotation.NonNull;
 
 public class GenericSDNameProperty implements Property<@Nullable String> {
 
@@ -46,7 +45,7 @@ public class GenericSDNameProperty implements Property<@Nullable String> {
    * @see com.diamondq.common.model.interfaces.Property#clearValueSet()
    */
   @Override
-  public @NonNull Property<@Nullable String> clearValueSet() {
+  public @NotNull Property<@Nullable String> clearValueSet() {
     throw new IllegalArgumentException();
   }
 
@@ -79,12 +78,9 @@ public class GenericSDNameProperty implements Property<@Nullable String> {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     GenericSDNameProperty other = (GenericSDNameProperty) pObj;
     return Objects.equals(mPropertyDefinition, other.mPropertyDefinition);
   }

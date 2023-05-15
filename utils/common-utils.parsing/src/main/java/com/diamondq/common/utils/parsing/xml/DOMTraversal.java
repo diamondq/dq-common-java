@@ -1,21 +1,21 @@
 package com.diamondq.common.utils.parsing.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 public class DOMTraversal {
 
   /**
    * Traverses from a given node down the arguments to a set of possible result nodes
-   * 
+   *
    * @param pStartingNode the starting node (NOTE: Unless it's an Element or Document, there are no real children)
    * @param pClass the target node type
    * @param pTraverseArgs the arguments. Each is a two part portion (ie. namespace URI/local name)
@@ -26,12 +26,9 @@ public class DOMTraversal {
     List<X> results = new ArrayList<>();
 
     Element elem;
-    if (pStartingNode instanceof Element)
-      elem = (Element) pStartingNode;
-    else if (pStartingNode instanceof Document)
-      elem = ((Document) pStartingNode).getDocumentElement();
-    else
-      return results;
+    if (pStartingNode instanceof Element) elem = (Element) pStartingNode;
+    else if (pStartingNode instanceof Document) elem = ((Document) pStartingNode).getDocumentElement();
+    else return results;
 
     /* Recursively handle the arguments */
 
@@ -40,8 +37,7 @@ public class DOMTraversal {
       internalTraverse(elem, pStartingNode instanceof Document, elementResults, pClass, 0, pTraverseArgs);
     else {
       if (pClass.isInstance(elem)) {
-        @SuppressWarnings("unchecked")
-        X xe = (X) elem;
+        @SuppressWarnings("unchecked") X xe = (X) elem;
         elementResults.add(xe);
       }
     }
@@ -68,14 +64,12 @@ public class DOMTraversal {
 
             /* Otherwise, add this as a result */
 
-            @SuppressWarnings("unchecked")
-            X xe = (X) pParent;
+            @SuppressWarnings("unchecked") X xe = (X) pParent;
             pResults.add(xe);
           }
         }
       }
-    }
-    else {
+    } else {
       boolean isLast = pOffset >= (pTraverseArgs.length - 2);
       if ((isLast == false) || ((isLast == true) && (Element.class.isAssignableFrom(pClass)))) {
         Node child = pParent.getFirstChild();
@@ -95,8 +89,7 @@ public class DOMTraversal {
 
                   /* Otherwise, add this as a result */
 
-                  @SuppressWarnings("unchecked")
-                  X xe = (X) e;
+                  @SuppressWarnings("unchecked") X xe = (X) e;
                   pResults.add(xe);
                 }
               }
@@ -104,18 +97,14 @@ public class DOMTraversal {
           }
           child = child.getNextSibling();
         }
-      }
-      else if (isLast == true) {
+      } else if (isLast == true) {
         if (Attr.class.isAssignableFrom(pClass)) {
           Attr attr = pParent.getAttributeNodeNS(namespaceURI, localName);
           if (attr != null) {
-            @SuppressWarnings("unchecked")
-            X xe = (X) attr;
+            @SuppressWarnings("unchecked") X xe = (X) attr;
             pResults.add(xe);
           }
-        }
-        else
-          throw new UnsupportedOperationException();
+        } else throw new UnsupportedOperationException();
       }
     }
   }
@@ -123,8 +112,7 @@ public class DOMTraversal {
   public static <X extends Node> @Nullable X traverseSingle(Node pStartingNode, Class<X> pClass,
     @Nullable String... pTraverseArgs) {
     List<X> resultList = traverse(pStartingNode, pClass, pTraverseArgs);
-    if (resultList.isEmpty())
-      return null;
+    if (resultList.isEmpty()) return null;
     X result = resultList.iterator().next();
     return result;
   }
@@ -137,12 +125,9 @@ public class DOMTraversal {
       sb.append("Unable to find ");
       boolean first = true;
       for (String s : pTraverseArgs) {
-        if (s == null)
-          continue;
-        if (first == true)
-          first = false;
-        else
-          sb.append(", ");
+        if (s == null) continue;
+        if (first == true) first = false;
+        else sb.append(", ");
         sb.append(s);
       }
       sb.append(" within the document");
@@ -155,13 +140,12 @@ public class DOMTraversal {
   /**
    * Return's the String value of the node. For an Attr, it's the Attributes value, for an Element, it's the
    * concatenation of all Text children. For all other node types, it's just the Node Value.
-   * 
+   *
    * @param pNode
    * @return the value
    */
   public static <X extends Node> String getValue(X pNode) {
-    if (pNode instanceof Attr)
-      return ((Attr) pNode).getValue();
+    if (pNode instanceof Attr) return ((Attr) pNode).getValue();
     else if (pNode instanceof Element) {
       Element e = (Element) pNode;
       StringBuilder sb = new StringBuilder();
@@ -174,11 +158,9 @@ public class DOMTraversal {
         child = child.getNextSibling();
       }
       return sb.toString();
-    }
-    else {
+    } else {
       String v = pNode.getNodeValue();
-      if (v == null)
-        v = "";
+      if (v == null) v = "";
       return v;
     }
   }

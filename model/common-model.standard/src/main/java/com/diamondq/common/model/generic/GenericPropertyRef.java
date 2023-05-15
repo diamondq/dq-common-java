@@ -6,15 +6,16 @@ import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureAndProperty;
 import com.diamondq.common.model.interfaces.StructureRef;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("rawtypes")
 public class GenericPropertyRef<@Nullable T> extends AbstractRef<Property> implements PropertyRef<T> {
 
   public GenericPropertyRef(Scope pScope, StructureRef pStructureRef, @Nullable String pPropDefName) {
-    super(pScope, pStructureRef.getSerializedString() + "/" + (pPropDefName == null ? "unknown" : pPropDefName),
-      Property.class);
+    super(pScope,
+      pStructureRef.getSerializedString() + "/" + (pPropDefName == null ? "unknown" : pPropDefName),
+      Property.class
+    );
   }
 
   public GenericPropertyRef(Scope pScope, String pRef) {
@@ -27,17 +28,13 @@ public class GenericPropertyRef<@Nullable T> extends AbstractRef<Property> imple
   @Override
   public @Nullable Property<T> resolve() {
     int lastOffset = mId.lastIndexOf('/');
-    if (lastOffset == -1)
-      throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);
+    if (lastOffset == -1) throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);
     String structureStr = mId.substring(0, lastOffset);
     Structure structure = mScope.getToolkit().lookupStructureBySerializedRef(mScope, structureStr);
-    if (structure == null)
-      return null;
+    if (structure == null) return null;
     String propName = mId.substring(lastOffset + 1);
-    if ("unknown".equals(propName))
-      return null;
-    else
-      return structure.lookupPropertyByName(propName);
+    if ("unknown".equals(propName)) return null;
+    else return structure.lookupPropertyByName(propName);
   }
 
   /**
@@ -46,17 +43,13 @@ public class GenericPropertyRef<@Nullable T> extends AbstractRef<Property> imple
   @Override
   public @Nullable StructureAndProperty<T> resolveToBoth() {
     int lastOffset = mId.lastIndexOf('/');
-    if (lastOffset == -1)
-      throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);
+    if (lastOffset == -1) throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);
     String structureStr = mId.substring(0, lastOffset);
     Structure structure = mScope.getToolkit().lookupStructureBySerializedRef(mScope, structureStr);
-    if (structure == null)
-      return null;
+    if (structure == null) return null;
     String propName = mId.substring(lastOffset + 1);
-    if ("unknown".equals(propName))
-      return new StructureAndProperty<>(structure, null);
-    else
-      return new StructureAndProperty<>(structure, structure.lookupPropertyByName(propName));
+    if ("unknown".equals(propName)) return new StructureAndProperty<>(structure, null);
+    else return new StructureAndProperty<>(structure, structure.lookupPropertyByName(propName));
   }
 
   /**
@@ -65,8 +58,7 @@ public class GenericPropertyRef<@Nullable T> extends AbstractRef<Property> imple
   @Override
   public @Nullable Structure resolveToStructure() {
     int lastOffset = mId.lastIndexOf('/');
-    if (lastOffset == -1)
-      throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);
+    if (lastOffset == -1) throw new IllegalArgumentException("Unknown format for the PropertyRef: " + mId);
     String structureStr = mId.substring(0, lastOffset);
     return mScope.getToolkit().lookupStructureBySerializedRef(mScope, structureStr);
   }

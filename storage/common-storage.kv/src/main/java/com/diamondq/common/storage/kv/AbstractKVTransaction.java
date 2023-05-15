@@ -1,6 +1,6 @@
 package com.diamondq.common.storage.kv;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract class for most KVTransaction implementations
@@ -14,8 +14,7 @@ public abstract class AbstractKVTransaction {
   }
 
   protected String getFlattenedKey(String pKey1, @Nullable String pKey2) {
-    if (pKey2 == null)
-      return pKey1 + "_(NULL)";
+    if (pKey2 == null) return pKey1 + "_(NULL)";
 
     return pKey1 + "_" + pKey2;
   }

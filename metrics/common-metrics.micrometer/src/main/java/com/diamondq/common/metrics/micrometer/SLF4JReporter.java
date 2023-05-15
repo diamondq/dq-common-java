@@ -4,6 +4,16 @@ import com.diamondq.common.context.Context;
 import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.errors.Verify;
 import com.diamondq.common.utils.parsing.properties.PropertiesParsing;
+import io.micrometer.core.instrument.Measurement;
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.Meter.Id;
+import io.micrometer.core.instrument.Meter.Type;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Statistic;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.distribution.HistogramSnapshot;
+import io.micrometer.core.instrument.distribution.HistogramSupport;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,27 +25,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Meter.Id;
-import io.micrometer.core.instrument.Meter.Type;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Statistic;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.distribution.HistogramSnapshot;
-import io.micrometer.core.instrument.distribution.HistogramSupport;
-
 public class SLF4JReporter {
 
-  private ContextFactory               mContextFactory;
+  private ContextFactory mContextFactory;
 
-  private ScheduledExecutorService     mScheduledExecutorService;
+  private ScheduledExecutorService mScheduledExecutorService;
 
-  private MeterRegistry                mMeterRegistry;
+  private MeterRegistry mMeterRegistry;
 
-  private long                         mReportEveryMills;
+  private long mReportEveryMills;
 
   private @Nullable ScheduledFuture<?> mScheduler;
 
@@ -62,22 +60,27 @@ public class SLF4JReporter {
   public void onActivate(Map<String, Object> pProps) {
     Verify.notNullArg(mContextFactory, Messages.SLF4JREPORTER_MISSING_DEPENDENCIES, "contextFactory");
     try (Context context = mContextFactory.newContext(SLF4JReporter.class, this, pProps)) {
-      Verify.notNullArg(mScheduledExecutorService, Messages.SLF4JREPORTER_MISSING_DEPENDENCIES,
-        "scheduledExecutorService");
+      Verify.notNullArg(mScheduledExecutorService,
+        Messages.SLF4JREPORTER_MISSING_DEPENDENCIES,
+        "scheduledExecutorService"
+      );
       Verify.notNullArg(mMeterRegistry, Messages.SLF4JREPORTER_MISSING_DEPENDENCIES, "meterRegistry");
 
       /* Get the scheduled reporting time */
 
       long reportTime = PropertiesParsing.getNonNullLong(pProps, ".report-time", 10L);
-      TimeUnit reportUnit = TimeUnit.valueOf(
-        PropertiesParsing.getNonNullString(pProps, ".report-time-unit", "SECONDS").toUpperCase(Locale.ENGLISH));
+      TimeUnit reportUnit = TimeUnit.valueOf(PropertiesParsing.getNonNullString(pProps, ".report-time-unit", "SECONDS")
+        .toUpperCase(Locale.ENGLISH));
 
       mReportEveryMills = TimeUnit.MILLISECONDS.convert(reportTime, reportUnit);
 
       /* Schedule the first reporting */
 
-      mScheduler = mScheduledExecutorService.scheduleAtFixedRate(this::onReport, mReportEveryMills, mReportEveryMills,
-        TimeUnit.MILLISECONDS);
+      mScheduler = mScheduledExecutorService.scheduleAtFixedRate(this::onReport,
+        mReportEveryMills,
+        mReportEveryMills,
+        TimeUnit.MILLISECONDS
+      );
     }
     catch (RuntimeException ex) {
       throw mContextFactory.reportThrowable(SLF4JReporter.class, this, ex);
@@ -122,9 +125,7 @@ public class SLF4JReporter {
             for (Tag tag : tags)
               tagStrings.add(tag.toString());
             context.info("{}({}) / {} = {} : {}", name, String.join(", ", tagStrings), type, statistic, value);
-          }
-          else
-            context.info("{} / {} = {} : {}", name, type, statistic, value);
+          } else context.info("{} / {} = {} : {}", name, type, statistic, value);
         }
         if (meter instanceof HistogramSupport) {
           HistogramSupport hs = (HistogramSupport) meter;

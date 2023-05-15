@@ -8,18 +8,17 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
-
-import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Map;
 
 public abstract class AbstractStructureDefinitionTests implements StandardTest {
 
   protected @Nullable Toolkit mToolkit;
 
-  protected @Nullable Scope   mScope;
+  protected @Nullable Scope mScope;
 
   @Override
   public void setup(Toolkit pToolkit, Scope pScope) {

@@ -1,8 +1,8 @@
 package com.diamondq.common.injection;
 
-import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import java.util.Map;
 
 public interface InjectionStartupBuilder {
 
@@ -28,11 +28,11 @@ public interface InjectionStartupBuilder {
    * @param pSingletons
    * @return the builder for fluent use
    */
-  public InjectionStartupBuilder singletons(@NonNull Object... pSingletons);
+  public InjectionStartupBuilder singletons(@NotNull Object... pSingletons);
 
   /**
    * Adds a singleton to the injection engine with the given name
-   * 
+   *
    * @param pSingleton the singleton
    * @param pName the name
    * @return the builder for fluent use
@@ -41,7 +41,7 @@ public interface InjectionStartupBuilder {
 
   /**
    * Defines the parent. Multiple calls just replace the previous call.
-   * 
+   *
    * @param pParent the parent to use
    * @return the builder for fluent use
    */
@@ -50,7 +50,7 @@ public interface InjectionStartupBuilder {
   /**
    * Defines an alternative classloader. If not provided, then the classloader that was used to load the
    * InjectionStartupBuilder class is used.
-   * 
+   *
    * @param pLoader the loader
    * @return the builder for fluent use
    */

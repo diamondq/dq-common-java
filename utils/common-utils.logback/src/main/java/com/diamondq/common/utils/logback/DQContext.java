@@ -1,23 +1,21 @@
 package com.diamondq.common.utils.logback;
 
-import com.diamondq.common.context.ContextFactory;
-import com.diamondq.common.context.spi.ContextClass;
-
-import java.util.List;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.util.OptionHelper;
+import com.diamondq.common.context.ContextFactory;
+import com.diamondq.common.context.spi.ContextClass;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class DQContext extends ClassicConverter {
 
-  protected boolean mPrintContext  = false;
+  protected boolean mPrintContext = false;
 
   protected boolean mPrintRefCount = false;
 
-  protected int     mContextLength = -1;
+  protected int mContextLength = -1;
 
   public DQContext() {
   }
@@ -54,20 +52,17 @@ public class DQContext extends ClassicConverter {
   @Override
   public String convert(ILoggingEvent pEvent) {
     ContextClass context = (ContextClass) ContextFactory.nullableCurrentContext();
-    if (context == null)
-      return "";
+    if (context == null) return "";
     List<String> stack = context.getContextStackNames(mPrintRefCount);
     StringBuilder sb = new StringBuilder();
     int size = stack.size();
     if (mPrintContext == true) {
       StringBuilder mid = new StringBuilder();
       for (int i = 0; i < size; i++) {
-        if (i == 0)
-          sb.append(stack.get(i));
+        if (i == 0) sb.append(stack.get(i));
         else if (i == (size - 1)) {
           String last = stack.get(i);
-          if (mContextLength == -1)
-            sb.append(mid);
+          if (mContextLength == -1) sb.append(mid);
           else {
             String midStr = mid.toString();
             if (last.length() + sb.length() + midStr.length() + 1 > mContextLength) {
@@ -78,20 +73,16 @@ public class DQContext extends ClassicConverter {
           }
           sb.append(">");
           sb.append(last);
-        }
-        else {
+        } else {
           mid.append(">");
           mid.append(stack.get(i));
         }
       }
-    }
-    else {
+    } else {
       Boolean duringNormal = context.getHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, false, Boolean.class);
-      if ((duringNormal != null) && (duringNormal == true))
-        size--;
-      if (size > 0)
-        for (int i = 0; i < size; i++)
-          sb.append("  ");
+      if ((duringNormal != null) && (duringNormal == true)) size--;
+      if (size > 0) for (int i = 0; i < size; i++)
+        sb.append("  ");
     }
 
     return sb.toString();

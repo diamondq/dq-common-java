@@ -1,8 +1,7 @@
 package com.diamondq.common.tracing.opentracing;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.opentracing.Span;
+import org.jetbrains.annotations.Nullable;
 
 public interface TraceIdExtractor {
 

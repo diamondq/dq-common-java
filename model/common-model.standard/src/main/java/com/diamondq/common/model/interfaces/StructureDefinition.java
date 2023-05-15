@@ -1,13 +1,12 @@
 package com.diamondq.common.model.interfaces;
 
 import com.google.common.collect.Multimap;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface StructureDefinition extends Resolvable<StructureDefinition, StructureDefinitionRef> {
 
@@ -73,12 +72,11 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
   /**
    * The complete set of property definitions achieved by merging the current PropertyDefinition's on this
    * StructureDefinition with the set of PropertyDefinitions on all parent StructureDefinitions (and their parents, and
-   * their parents, and so on). <br/>
-   * <br/>
-   * NOTE: That while the overall StructureDefinition is an immutable data structure, this map is not, as this
-   * StructureDefinition only holds StructureDefinitionRef's and not StructureDefinitions of their parents, and thus,
-   * those parents can change independently of this StructureDefinition. Thus, each call to getAllProperties may return
-   * a different map. The map returned, however, is still immutable.
+   * their parents, and so on). <br/> <br/> NOTE: That while the overall StructureDefinition is an immutable data
+   * structure, this map is not, as this StructureDefinition only holds StructureDefinitionRef's and not
+   * StructureDefinitions of their parents, and thus, those parents can change independently of this
+   * StructureDefinition. Thus, each call to getAllProperties may return a different map. The map returned, however, is
+   * still immutable.
    *
    * @return a Map of PropertyDefinitions using their name as the key
    */
@@ -152,7 +150,7 @@ public interface StructureDefinition extends Resolvable<StructureDefinition, Str
 
   /**
    * Saves the Structure into a byte array
-   * 
+   *
    * @return the byte array
    */
   public byte[] saveToByteArray();

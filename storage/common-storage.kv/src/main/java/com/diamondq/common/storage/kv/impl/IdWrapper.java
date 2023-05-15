@@ -1,8 +1,7 @@
 package com.diamondq.common.storage.kv.impl;
 
 import com.diamondq.common.storage.kv.IObjectWithId;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Generic implementation for Object with Id
@@ -11,11 +10,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class IdWrapper<P> implements IObjectWithId<IdWrapper<P>> {
 
-  @Nullable
-  private String _id;
+  @Nullable private String _id;
 
-  @Nullable
-  private P      data;
+  @Nullable private P data;
 
   /**
    * Default constructor
@@ -42,7 +39,7 @@ public class IdWrapper<P> implements IObjectWithId<IdWrapper<P>> {
 
   /**
    * Returns the actual data
-   * 
+   *
    * @return the data
    */
   public @Nullable P getData() {
@@ -51,7 +48,7 @@ public class IdWrapper<P> implements IObjectWithId<IdWrapper<P>> {
 
   /**
    * Sets the actual data
-   * 
+   *
    * @param pValue the data
    * @return the wrapper
    */

@@ -13,6 +13,15 @@ import com.diamondq.common.lambda.interfaces.Consumer4;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.lambda.interfaces.Function4;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Verticle;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.streams.ReadStream;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -22,21 +31,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
-
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.Verticle;
-import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.streams.ReadStream;
-
 public class VertxUtils {
 
   private static class Undeployer implements Closeable {
-    public final Vertx              vertx;
+    public final Vertx vertx;
 
     public final @Nullable String[] deployIds;
 
@@ -52,8 +50,7 @@ public class VertxUtils {
     @Override
     public void close() throws IOException {
       for (String did : deployIds)
-        if (did != null)
-          vertx.undeploy(did);
+        if (did != null) vertx.undeploy(did);
     }
 
   }
@@ -82,8 +79,7 @@ public class VertxUtils {
     try (
       Context ctx = ContextFactory.getInstance().newContext(VertxUtils.class, null, pVertx, pVerticle, pDeployCount)) {
 
-      @Nullable
-      String[] deploymentIds = new @Nullable String[pDeployCount];
+      @Nullable String[] deploymentIds = new @Nullable String[pDeployCount];
       List<ContextExtendedCompletionStage<?>> futures = new ArrayList<>();
       for (int i = 0; i < pDeployCount; i++) {
         final int offset = i;
@@ -92,7 +88,7 @@ public class VertxUtils {
 
           /* Deploy the verticle */
 
-          VertxUtils.<Verticle, String> call(pVertx::deployVerticle, pVerticle)
+          VertxUtils.<Verticle, String>call(pVertx::deployVerticle, pVerticle)
 
             /* And record the deployment id for future undeployment */
 
@@ -108,8 +104,7 @@ public class VertxUtils {
 
   public static void undeploy(@Nullable Closeable pDeployment) {
     try {
-      if (pDeployment != null)
-        pDeployment.close();
+      if (pDeployment != null) pDeployment.close();
     }
     catch (IOException ex) {
       throw new RuntimeException(ex);
@@ -125,32 +120,26 @@ public class VertxUtils {
 
   /**
    * Wrap a Function into a Future and a Vertx Handler function
-   * 
+   *
    * @param pFunction the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
-    Function<@NonNull T, ExtendedCompletionStage<R>> pFunction) {
+    Function<@NotNull T, ExtendedCompletionStage<R>> pFunction) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        T result = ar.result();
-        if (result == null)
-          throw new IllegalStateException();
+      } else {
+        @Nullable T result = ar.result();
+        if (result == null) throw new IllegalStateException();
         try {
           pFunction.apply(result).whenComplete((r, ex) -> {
-            if (ex != null)
-              future.completeExceptionally(ex);
-            else
-              future.complete(r);
+            if (ex != null) future.completeExceptionally(ex);
+            else future.complete(r);
           });
         }
         catch (RuntimeException ex) {
@@ -162,33 +151,27 @@ public class VertxUtils {
 
   /**
    * Wrap a Function into a Future and a Vertx Handler function
-   * 
+   *
    * @param pFunction the function
    * @param pArg1 the additional argument to pass to the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, A1, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
-    Function2<@NonNull T, A1, ExtendedCompletionStage<R>> pFunction, A1 pArg1) {
+    Function2<@NotNull T, A1, ExtendedCompletionStage<R>> pFunction, A1 pArg1) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        T result = ar.result();
-        if (result == null)
-          throw new IllegalStateException();
+      } else {
+        @Nullable T result = ar.result();
+        if (result == null) throw new IllegalStateException();
         try {
           pFunction.apply(result, pArg1).whenComplete((r, ex) -> {
-            if (ex != null)
-              future.completeExceptionally(ex);
-            else
-              future.complete(r);
+            if (ex != null) future.completeExceptionally(ex);
+            else future.complete(r);
           });
         }
         catch (RuntimeException ex) {
@@ -200,34 +183,28 @@ public class VertxUtils {
 
   /**
    * Wrap a Function into a Future and a Vertx Handler function
-   * 
+   *
    * @param pFunction the function
    * @param pArg1 the additional argument to pass to the function
    * @param pArg2 the additional argument to pass to the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, A1, A2, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
-    Function3<@NonNull T, A1, A2, ExtendedCompletionStage<R>> pFunction, A1 pArg1, A2 pArg2) {
+    Function3<@NotNull T, A1, A2, ExtendedCompletionStage<R>> pFunction, A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        T result = ar.result();
-        if (result == null)
-          throw new IllegalStateException();
+      } else {
+        @Nullable T result = ar.result();
+        if (result == null) throw new IllegalStateException();
         try {
           pFunction.apply(result, pArg1, pArg2).whenComplete((r, ex) -> {
-            if (ex != null)
-              future.completeExceptionally(ex);
-            else
-              future.complete(r);
+            if (ex != null) future.completeExceptionally(ex);
+            else future.complete(r);
           });
         }
         catch (RuntimeException ex) {
@@ -241,26 +218,22 @@ public class VertxUtils {
 
   /**
    * Wrap a Function into a Future and a Vertx Handler function
-   * 
+   *
    * @param pFunction the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
-    Function<@NonNull T, R> pFunction) {
+    Function<@NotNull T, R> pFunction) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        T result = ar.result();
-        if (result == null)
-          throw new IllegalStateException();
+      } else {
+        @Nullable T result = ar.result();
+        if (result == null) throw new IllegalStateException();
         try {
           R r = pFunction.apply(result);
           future.complete(r);
@@ -274,27 +247,23 @@ public class VertxUtils {
 
   /**
    * Wrap a Function into a Future and a Vertx Handler function
-   * 
+   *
    * @param pFunction the function
    * @param pArg1 the additional argument to pass to the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, A1, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
-    Function2<@NonNull T, A1, R> pFunction, A1 pArg1) {
+    Function2<@NotNull T, A1, R> pFunction, A1 pArg1) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        T result = ar.result();
-        if (result == null)
-          throw new IllegalStateException();
+      } else {
+        @Nullable T result = ar.result();
+        if (result == null) throw new IllegalStateException();
         try {
           R r = pFunction.apply(result, pArg1);
           future.complete(r);
@@ -308,28 +277,24 @@ public class VertxUtils {
 
   /**
    * Wrap a Function into a Future and a Vertx Handler function
-   * 
+   *
    * @param pFunction the function
    * @param pArg1 the additional argument to pass to the function
    * @param pArg2 the additional argument to pass to the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, A1, A2, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
-    Function3<@NonNull T, A1, A2, R> pFunction, A1 pArg1, A2 pArg2) {
+    Function3<@NotNull T, A1, A2, R> pFunction, A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        T result = ar.result();
-        if (result == null)
-          throw new IllegalStateException();
+      } else {
+        @Nullable T result = ar.result();
+        if (result == null) throw new IllegalStateException();
         try {
           R r = pFunction.apply(result, pArg1, pArg2);
           future.complete(r);
@@ -348,17 +313,12 @@ public class VertxUtils {
     pCallee.accept((ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
-        if (result == null)
-          future.completeExceptionally(new IllegalArgumentException());
-        else
-          future.complete(result);
+      } else {
+        @Nullable R result = ar.result();
+        if (result == null) future.completeExceptionally(new IllegalArgumentException());
+        else future.complete(result);
       }
     });
     return future;
@@ -370,17 +330,12 @@ public class VertxUtils {
     pCallee.accept(pArg1, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
-        if (result == null)
-          future.completeExceptionally(new IllegalArgumentException());
-        else
-          future.complete(result);
+      } else {
+        @Nullable R result = ar.result();
+        if (result == null) future.completeExceptionally(new IllegalArgumentException());
+        else future.complete(result);
       }
     });
     return future;
@@ -392,17 +347,12 @@ public class VertxUtils {
     pCallee.accept(pArg1, pArg2, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
-        if (result == null)
-          future.completeExceptionally(new IllegalArgumentException());
-        else
-          future.complete(result);
+      } else {
+        @Nullable R result = ar.result();
+        if (result == null) future.completeExceptionally(new IllegalArgumentException());
+        else future.complete(result);
       }
     });
     return future;
@@ -414,17 +364,12 @@ public class VertxUtils {
     pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
-        if (result == null)
-          future.completeExceptionally(new IllegalArgumentException());
-        else
-          future.complete(result);
+      } else {
+        @Nullable R result = ar.result();
+        if (result == null) future.completeExceptionally(new IllegalArgumentException());
+        else future.complete(result);
       }
     });
     return future;
@@ -436,17 +381,12 @@ public class VertxUtils {
     pCallee.apply((ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
-        if (result == null)
-          future.completeExceptionally(new IllegalArgumentException());
-        else
-          future.complete(result);
+      } else {
+        @Nullable R result = ar.result();
+        if (result == null) future.completeExceptionally(new IllegalArgumentException());
+        else future.complete(result);
       }
     });
     return future;
@@ -458,17 +398,12 @@ public class VertxUtils {
     pCallee.apply(pArg1, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
-        if (result == null)
-          future.completeExceptionally(new IllegalArgumentException());
-        else
-          future.complete(result);
+      } else {
+        @Nullable R result = ar.result();
+        if (result == null) future.completeExceptionally(new IllegalArgumentException());
+        else future.complete(result);
       }
     });
     return future;
@@ -480,17 +415,12 @@ public class VertxUtils {
     pCallee.apply(pArg1, pArg2, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
-        if (result == null)
-          future.completeExceptionally(new IllegalArgumentException());
-        else
-          future.complete(result);
+      } else {
+        @Nullable R result = ar.result();
+        if (result == null) future.completeExceptionally(new IllegalArgumentException());
+        else future.complete(result);
       }
     });
     return future;
@@ -502,17 +432,12 @@ public class VertxUtils {
     pCallee.apply(pArg1, pArg2, pArg3, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
-        if (result == null)
-          future.completeExceptionally(new IllegalArgumentException());
-        else
-          future.complete(result);
+      } else {
+        @Nullable R result = ar.result();
+        if (result == null) future.completeExceptionally(new IllegalArgumentException());
+        else future.complete(result);
       }
     });
     return future;
@@ -524,13 +449,10 @@ public class VertxUtils {
     pCallee.accept((ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
+      } else {
+        @Nullable R result = ar.result();
         future.complete(result);
       }
     });
@@ -543,13 +465,10 @@ public class VertxUtils {
     pCallee.accept(pArg1, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
+      } else {
+        @Nullable R result = ar.result();
         future.complete(result);
       }
     });
@@ -562,13 +481,10 @@ public class VertxUtils {
     pCallee.accept(pArg1, pArg2, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
+      } else {
+        @Nullable R result = ar.result();
         future.complete(result);
       }
     });
@@ -581,13 +497,10 @@ public class VertxUtils {
     pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
       if (ar.succeeded() == false) {
         Throwable cause = ar.cause();
-        if (cause == null)
-          cause = new RuntimeException();
+        if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
-      }
-      else {
-        @Nullable
-        R result = ar.result();
+      } else {
+        @Nullable R result = ar.result();
         future.complete(result);
       }
     });
@@ -612,10 +525,8 @@ public class VertxUtils {
         try (Context ctx = currentContext.activateOnThread("")) {
         }
       }
-      if (pendingError.object != null)
-        finished.completeExceptionally(pendingError.object);
-      else
-        finished.complete(null);
+      if (pendingError.object != null) finished.completeExceptionally(pendingError.object);
+      else finished.complete(null);
     });
 
     /* Handle an error */
@@ -634,8 +545,7 @@ public class VertxUtils {
       if (pendingError.object != null) {
         Throwable throwable = pendingError.object;
         pendingError.object = null;
-        if (throwable instanceof RuntimeException)
-          throw ((RuntimeException) throwable);
+        if (throwable instanceof RuntimeException) throw ((RuntimeException) throwable);
         throw new RuntimeException(throwable);
       }
       currentContext.prepareForAlternateThreads();
@@ -644,8 +554,7 @@ public class VertxUtils {
         boolean isDone;
         if (result instanceof ContextExtendedCompletableFuture)
           isDone = ((ContextExtendedCompletableFuture<@Nullable Void>) result).isDone();
-        else
-          isDone = false;
+        else isDone = false;
         if (isDone == false) {
           pStream.pause();
           result.handle((v, ex) -> {

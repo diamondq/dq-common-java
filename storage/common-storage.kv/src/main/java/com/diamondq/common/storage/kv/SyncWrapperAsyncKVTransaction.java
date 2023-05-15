@@ -2,12 +2,11 @@ package com.diamondq.common.storage.kv;
 
 import com.diamondq.common.lambda.LambdaExceptionUtil;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
 
 /**
  * Wrapper that takes an existing Synchronous Transaction and provides an Asynchronous Transaction. Of course, all
@@ -19,7 +18,7 @@ public class SyncWrapperAsyncKVTransaction extends AbstractKVTransaction impleme
 
   /**
    * Default constructor
-   * 
+   *
    * @param pTransaction the synchronous transaction
    */
   public SyncWrapperAsyncKVTransaction(IKVTransaction pTransaction) {
@@ -28,10 +27,10 @@ public class SyncWrapperAsyncKVTransaction extends AbstractKVTransaction impleme
 
   /**
    * @see com.diamondq.common.storage.kv.IKVAsyncTransaction#getByKey(java.lang.String, java.lang.String,
-   *      java.lang.String, java.lang.Class, java.lang.Object)
+   *   java.lang.String, java.lang.Class, java.lang.Object)
    */
   @Override
-  public <@Nullable O, @Nullable CONTEXT> ExtendedCompletableFuture<@NonNull Pair<O, CONTEXT>> getByKey(String pTable,
+  public <@Nullable O, @Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<O, CONTEXT>> getByKey(String pTable,
     String pKey1, @Nullable String pKey2, Class<O> pClass, CONTEXT pContext) {
     ExtendedCompletableFuture<Pair<O, CONTEXT>> result = LambdaExceptionUtil.wrapSyncSupplierResult(() -> {
       return Pair.with(mTransaction.getByKey(pTable, pKey1, pKey2, pClass), pContext);
@@ -41,7 +40,7 @@ public class SyncWrapperAsyncKVTransaction extends AbstractKVTransaction impleme
 
   /**
    * @see com.diamondq.common.storage.kv.IKVAsyncTransaction#putByKey(java.lang.String, java.lang.String,
-   *      java.lang.String, java.lang.Object, java.lang.Object)
+   *   java.lang.String, java.lang.Object, java.lang.Object)
    */
   @Override
   public <@Nullable O, @Nullable CONTEXT> ExtendedCompletableFuture<CONTEXT> putByKey(String pTable, String pKey1,
@@ -54,34 +53,38 @@ public class SyncWrapperAsyncKVTransaction extends AbstractKVTransaction impleme
 
   /**
    * @see com.diamondq.common.storage.kv.IKVAsyncTransaction#removeByKey(java.lang.String, java.lang.String,
-   *      java.lang.String, java.lang.Object)
+   *   java.lang.String, java.lang.Object)
    */
   @Override
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NonNull Pair<@NonNull Boolean, CONTEXT>> removeByKey(
+  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<@NotNull Boolean, CONTEXT>> removeByKey(
     String pTable, String pKey1, @Nullable String pKey2, CONTEXT pContext) {
-    return LambdaExceptionUtil
-      .wrapSyncNonNullSupplierResult(() -> Pair.with(mTransaction.removeByKey(pTable, pKey1, pKey2), pContext));
+    return LambdaExceptionUtil.wrapSyncNonNullSupplierResult(() -> Pair.with(mTransaction.removeByKey(pTable,
+      pKey1,
+      pKey2
+    ), pContext));
   }
 
   /**
    * @see com.diamondq.common.storage.kv.IKVAsyncTransaction#keyIterator(java.lang.String, java.lang.Object)
    */
   @Override
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NonNull Pair<Iterator<String>, CONTEXT>> keyIterator(
+  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<Iterator<String>, CONTEXT>> keyIterator(
     String pTable, CONTEXT pContext) {
-    return LambdaExceptionUtil
-      .wrapSyncNonNullSupplierResult(() -> Pair.with(mTransaction.keyIterator(pTable), pContext));
+    return LambdaExceptionUtil.wrapSyncNonNullSupplierResult(() -> Pair.with(mTransaction.keyIterator(pTable),
+      pContext
+    ));
   }
 
   /**
    * @see com.diamondq.common.storage.kv.IKVAsyncTransaction#keyIterator2(java.lang.String, java.lang.String,
-   *      java.lang.Object)
+   *   java.lang.Object)
    */
   @Override
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NonNull Pair<@NonNull Iterator<@NonNull String>, CONTEXT>> keyIterator2(
+  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<@NotNull Iterator<@NotNull String>, CONTEXT>> keyIterator2(
     String pTable, String pKey1, CONTEXT pContext) {
-    return LambdaExceptionUtil
-      .wrapSyncNonNullSupplierResult(() -> Pair.with(mTransaction.keyIterator2(pTable, pKey1), pContext));
+    return LambdaExceptionUtil.wrapSyncNonNullSupplierResult(() -> Pair.with(mTransaction.keyIterator2(pTable, pKey1),
+      pContext
+    ));
   }
 
   /**
@@ -99,7 +102,7 @@ public class SyncWrapperAsyncKVTransaction extends AbstractKVTransaction impleme
    * @see com.diamondq.common.storage.kv.IKVAsyncTransaction#getCount(java.lang.String, java.lang.Object)
    */
   @Override
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NonNull Pair<@NonNull Long, CONTEXT>> getCount(String pTable,
+  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<@NotNull Long, CONTEXT>> getCount(String pTable,
     CONTEXT pContext) {
     return LambdaExceptionUtil.wrapSyncNonNullSupplierResult(() -> Pair.with(mTransaction.getCount(pTable), pContext));
   }
@@ -108,7 +111,7 @@ public class SyncWrapperAsyncKVTransaction extends AbstractKVTransaction impleme
    * @see com.diamondq.common.storage.kv.IKVAsyncTransaction#getTableList(java.lang.Object)
    */
   @Override
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NonNull Pair<@NonNull Iterator<@NonNull String>, CONTEXT>> getTableList(
+  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<@NotNull Iterator<@NotNull String>, CONTEXT>> getTableList(
     CONTEXT pContext) {
     return LambdaExceptionUtil.wrapSyncNonNullSupplierResult(() -> Pair.with(mTransaction.getTableList(), pContext));
   }

@@ -10,22 +10,21 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class GenericEditorStructureDefinition implements EditorStructureDefinition {
 
-  private final String                                       mName;
+  private final String mName;
 
-  private final StructureDefinitionRef                       mStructureDefinitionRef;
+  private final StructureDefinitionRef mStructureDefinitionRef;
 
   private final List<? extends EditorComponentDefinition<?>> mComponents;
 
-  private final ImmutableMultimap<String, String>            mKeywords;
+  private final ImmutableMultimap<String, String> mKeywords;
 
   public GenericEditorStructureDefinition(String pName, StructureDefinitionRef pStructureDefinitionRef,
     @Nullable List<? extends EditorComponentDefinition<?>> pComponents, @Nullable Multimap<String, String> pKeywords) {
@@ -66,23 +65,27 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
    */
   @Override
   public <T extends EditorComponentDefinition<T>> EditorStructureDefinition addComponent(T pValue) {
-    @SuppressWarnings("null")
-    @NonNull
-    Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
-    return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef,
-      ImmutableList.<EditorComponentDefinition<?>> builder()
-        .addAll(Iterables.filter(mComponents, Predicates.not(equalTo))).add(pValue).build(),
-      mKeywords);
+    @SuppressWarnings("null") @NotNull Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
+    return new GenericEditorStructureDefinition(mName,
+      mStructureDefinitionRef,
+      ImmutableList.<EditorComponentDefinition<?>>builder()
+        .addAll(Iterables.filter(mComponents, Predicates.not(equalTo)))
+        .add(pValue)
+        .build(),
+      mKeywords
+    );
   }
 
   @Override
   public <T extends EditorComponentDefinition<T>> EditorStructureDefinition removeComponent(T pValue) {
-    @SuppressWarnings("null")
-    @NonNull Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
-    return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef,
-      ImmutableList.<EditorComponentDefinition<?>> builder()
-        .addAll(Iterables.filter(mComponents, Predicates.not(equalTo))).build(),
-      mKeywords);
+    @SuppressWarnings("null") @NotNull Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
+    return new GenericEditorStructureDefinition(mName,
+      mStructureDefinitionRef,
+      ImmutableList.<EditorComponentDefinition<?>>builder()
+        .addAll(Iterables.filter(mComponents, Predicates.not(equalTo)))
+        .build(),
+      mKeywords
+    );
   }
 
   /**
@@ -98,12 +101,17 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
    */
   @Override
   public EditorStructureDefinition addKeyword(String pKey, String pValue) {
-    return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef, mComponents,
-      ImmutableMultimap.<String, String> builder()
+    return new GenericEditorStructureDefinition(mName,
+      mStructureDefinitionRef,
+      mComponents,
+      ImmutableMultimap.<String, String>builder()
         .putAll(Multimaps.filterEntries(mKeywords,
-          Predicates.<Entry<String, String>> not(
-            (e) -> (e != null) && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))))
-        .put(pKey, pValue).build());
+          Predicates.<Entry<String, String>>not((e) -> (e != null) && pKey.equals(e.getKey())
+            && pValue.equals(e.getValue()))
+        ))
+        .put(pKey, pValue)
+        .build()
+    );
   }
 
   /**
@@ -111,9 +119,14 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
    */
   @Override
   public EditorStructureDefinition removeKeyword(String pKey, String pValue) {
-    return new GenericEditorStructureDefinition(mName, mStructureDefinitionRef, mComponents,
-      Multimaps.filterEntries(mKeywords, Predicates
-        .<Entry<String, String>> not((e) -> (e != null) && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))));
+    return new GenericEditorStructureDefinition(mName,
+      mStructureDefinitionRef,
+      mComponents,
+      Multimaps.filterEntries(mKeywords,
+        Predicates.<Entry<String, String>>not((e) -> (e != null) && pKey.equals(e.getKey())
+          && pValue.equals(e.getValue()))
+      )
+    );
   }
 
 }

@@ -1,5 +1,12 @@
 package com.diamondq.common.injection.impl;
 
+import com.diamondq.common.injection.InjectionContext;
+import com.diamondq.common.injection.InjectionStartupBuilder;
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.ApplicationContextBuilder;
+import io.micronaut.inject.qualifiers.Qualifiers;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,26 +14,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import com.diamondq.common.injection.InjectionContext;
-import com.diamondq.common.injection.InjectionStartupBuilder;
-
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.ApplicationContextBuilder;
-import io.micronaut.inject.qualifiers.Qualifiers;
-
 public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
 
-  private final Set<String>               mEnvironmentTags;
+  private final Set<String> mEnvironmentTags;
 
   private final List<Map<String, Object>> mPropertiesList;
 
-  private final Set<Object>               mSingletons;
+  private final Set<Object> mSingletons;
 
-  private final Map<Object, String>       mNamedSingletons;
+  private final Map<Object, String> mNamedSingletons;
 
-  private ClassLoader                     mClassLoader;
+  private ClassLoader mClassLoader;
 
   public InjectionStartupBuilderImpl() {
     mEnvironmentTags = new HashSet<>();
@@ -63,7 +61,7 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
    * @see com.diamondq.common.injection.InjectionStartupBuilder#singletons(java.lang.Object[])
    */
   @Override
-  public InjectionStartupBuilder singletons(@NonNull Object @NonNull... pSingletons) {
+  public InjectionStartupBuilder singletons(@NotNull Object @NotNull ... pSingletons) {
     synchronized (this) {
       for (final Object o : pSingletons)
         mSingletons.add(o);
@@ -115,16 +113,13 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
         builder = builder.properties(props);
       final InjectionContextImpl injectionContext = new InjectionContextImpl();
       builder = builder.singletons(injectionContext);
-      if (mSingletons.isEmpty() == false)
-        builder = builder.singletons(mSingletons);
+      if (mSingletons.isEmpty() == false) builder = builder.singletons(mSingletons);
       final ApplicationContext appContext = builder.build();
-      if (mNamedSingletons.isEmpty() == false)
-        for (Map.Entry<Object, String> pair : mNamedSingletons.entrySet()) {
-          Object instance = pair.getKey();
-          @SuppressWarnings("unchecked")
-          Class<Object> instanceClass = (Class<Object>) instance.getClass();
-          appContext.registerSingleton(instanceClass, instance, Qualifiers.byName(pair.getValue()));
-        }
+      if (mNamedSingletons.isEmpty() == false) for (Map.Entry<Object, String> pair : mNamedSingletons.entrySet()) {
+        Object instance = pair.getKey();
+        @SuppressWarnings("unchecked") Class<Object> instanceClass = (Class<Object>) instance.getClass();
+        appContext.registerSingleton(instanceClass, instance, Qualifiers.byName(pair.getValue()));
+      }
       injectionContext.setApplicationContext(appContext);
       appContext.start();
       return injectionContext;

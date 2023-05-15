@@ -18,6 +18,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -32,48 +34,45 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class GenericPropertyDefinition implements PropertyDefinition {
 
-  private final Scope                                mScope;
+  private final Scope mScope;
 
-  private final String                               mName;
+  private final String mName;
 
-  private final @Nullable TranslatableString         mLabel;
+  private final @Nullable TranslatableString mLabel;
 
-  private final boolean                              mIsPrimaryKey;
+  private final boolean mIsPrimaryKey;
 
-  private final int                                  mPrimaryKeyOrder;
+  private final int mPrimaryKeyOrder;
 
-  private final PropertyType                         mType;
+  private final PropertyType mType;
 
-  private final @Nullable Script                     mValidationScript;
+  private final @Nullable Script mValidationScript;
 
-  private final @Nullable String                     mDefaultValue;
+  private final @Nullable String mDefaultValue;
 
-  private final @Nullable Script                     mDefaultValueScript;
+  private final @Nullable Script mDefaultValueScript;
 
   private final ImmutableSet<StructureDefinitionRef> mReferenceTypes;
 
-  private final @Nullable BigDecimal                 mMinValue;
+  private final @Nullable BigDecimal mMinValue;
 
-  private final @Nullable BigDecimal                 mMaxValue;
+  private final @Nullable BigDecimal mMaxValue;
 
-  private final @Nullable Integer                    mMaxLength;
+  private final @Nullable Integer mMaxLength;
 
-  private final boolean                              mFinal;
+  private final boolean mFinal;
 
-  private final PropertyPattern                      mPropertyPattern;
+  private final PropertyPattern mPropertyPattern;
 
-  private final ImmutableMultimap<String, String>    mKeywords;
+  private final ImmutableMultimap<String, String> mKeywords;
 
-  private final @Nullable BigDecimal                 mAutoIncrementStart;
+  private final @Nullable BigDecimal mAutoIncrementStart;
 
-  private final @Nullable BigDecimal                 mAutoIncrementBy;
+  private final @Nullable BigDecimal mAutoIncrementBy;
 
-  private static final Pattern                       sValidNamePattern = Pattern.compile("^[0-9a-zA-Z.\\-_]+$");
+  private static final Pattern sValidNamePattern = Pattern.compile("^[0-9a-zA-Z.\\-_]+$");
 
   public GenericPropertyDefinition(Scope pScope, String pName, @Nullable TranslatableString pLabel,
     boolean pIsPrimaryKey, int pPrimaryKeyOrder, PropertyType pType, @Nullable Script pValidationScript,
@@ -112,8 +111,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
       /* Revision */
 
       int revision = buffer.getInt();
-      if (revision != 1)
-        throw new IllegalStateException();
+      if (revision != 1) throw new IllegalStateException();
 
       /* mName */
       int len = buffer.getInt();
@@ -127,9 +125,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
         bytes = new byte[len];
         buffer.get(bytes);
         mLabel = new GenericTranslatableString(pScope, new String(bytes, "UTF-8"));
-      }
-      else
-        mLabel = null;
+      } else mLabel = null;
 
       /* mIsPrimaryKey */
       mIsPrimaryKey = (buffer.get() == 1 ? true : false);
@@ -149,9 +145,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
         bytes = new byte[len];
         buffer.get(bytes);
         mDefaultValue = new String(bytes, "UTF-8");
-      }
-      else
-        mDefaultValue = null;
+      } else mDefaultValue = null;
 
       /* mDefaultValueScript */
       mDefaultValueScript = null;
@@ -174,9 +168,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
         bytes = new byte[len];
         buffer.get(bytes);
         mMinValue = new BigDecimal(new String(bytes, "UTF-8"));
-      }
-      else
-        mMinValue = null;
+      } else mMinValue = null;
 
       /* mMaxValue */
       len = buffer.getInt();
@@ -184,16 +176,12 @@ public class GenericPropertyDefinition implements PropertyDefinition {
         bytes = new byte[len];
         buffer.get(bytes);
         mMaxValue = new BigDecimal(new String(bytes, "UTF-8"));
-      }
-      else
-        mMaxValue = null;
+      } else mMaxValue = null;
 
       /* mMaxLength */
       int maxLength = buffer.getInt();
-      if (maxLength == -1)
-        mMaxLength = null;
-      else
-        mMaxLength = maxLength;
+      if (maxLength == -1) mMaxLength = null;
+      else mMaxLength = maxLength;
 
       /* mFinal */
       mFinal = buffer.get() == 1 ? true : false;
@@ -226,9 +214,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
         bytes = new byte[len];
         buffer.get(bytes);
         mAutoIncrementStart = new BigDecimal(new String(bytes, "UTF-8"));
-      }
-      else
-        mAutoIncrementStart = null;
+      } else mAutoIncrementStart = null;
 
       /* mAutoIncrementBy */
       len = buffer.getInt();
@@ -236,9 +222,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
         bytes = new byte[len];
         buffer.get(bytes);
         mAutoIncrementBy = new BigDecimal(new String(bytes, "UTF-8"));
-      }
-      else
-        mAutoIncrementBy = null;
+      } else mAutoIncrementBy = null;
     }
     catch (UnsupportedEncodingException ex) {
       throw new RuntimeException(ex);
@@ -250,9 +234,8 @@ public class GenericPropertyDefinition implements PropertyDefinition {
    */
   public void validate() {
 
-    if (sValidNamePattern.matcher(mName).matches() == false)
-      throw new IllegalArgumentException(
-        "The PropertyDefinition must have a valid name, which can only be the characters 0-9, a-z, A-Z, . and -.");
+    if (sValidNamePattern.matcher(mName).matches() == false) throw new IllegalArgumentException(
+      "The PropertyDefinition must have a valid name, which can only be the characters 0-9, a-z, A-Z, . and -.");
 
     /* Verify that any container parent property is not a primary key */
 
@@ -301,9 +284,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setLabel(@Nullable TranslatableString pValue) {
-    return new GenericPropertyDefinition(mScope, mName, pValue, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
-      mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      pValue,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -313,9 +312,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setPrimaryKey(boolean pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, pValue, mPrimaryKeyOrder, mType, mValidationScript,
-      mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal, mPropertyPattern,
-      mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      pValue,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -330,9 +345,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setValidationScript(@Nullable Script pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType, pValue,
-      mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal, mPropertyPattern,
-      mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      pValue,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -342,9 +373,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setDefaultValue(@Nullable String pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, pValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
-      mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      pValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -354,9 +401,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setDefaultValueScript(@Nullable Script pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, pValue, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
-      mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      pValue,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -366,21 +429,49 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition addReferenceType(StructureDefinitionRef pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript,
-      ImmutableSet.<StructureDefinitionRef> builder().addAll(mReferenceTypes).add(pValue).build(), mMinValue, mMaxValue,
-      mMaxLength, mFinal, mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      ImmutableSet.<StructureDefinitionRef>builder().addAll(mReferenceTypes).add(pValue).build(),
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
   public PropertyDefinition removeReferenceType(StructureDefinitionRef pValue) {
-    @SuppressWarnings("null")
-    @NonNull
-    Predicate<StructureDefinitionRef> equalTo = Predicates.equalTo(pValue);
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript,
-      Sets.filter(mReferenceTypes, Predicates.not(equalTo)), mMinValue, mMaxValue, mMaxLength,
-      mFinal, mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    @SuppressWarnings("null") @NotNull Predicate<StructureDefinitionRef> equalTo = Predicates.equalTo(pValue);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      Sets.filter(mReferenceTypes, Predicates.not(equalTo)),
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -390,9 +481,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setMinValue(@Nullable BigDecimal pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, pValue, mMaxValue, mMaxLength, mFinal,
-      mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      pValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -402,9 +509,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setMaxValue(@Nullable BigDecimal pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, pValue, mMaxLength, mFinal,
-      mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      pValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -414,9 +537,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setMaxLength(@Nullable Integer pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, pValue, mFinal,
-      mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      pValue,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   @Override
@@ -426,9 +565,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition setFinal(boolean pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, pValue,
-      mPropertyPattern, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      pValue,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   /**
@@ -444,9 +599,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
    */
   @Override
   public PropertyDefinition setPropertyPattern(PropertyPattern pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
-      pValue, mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      pValue,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   /**
@@ -462,15 +633,31 @@ public class GenericPropertyDefinition implements PropertyDefinition {
    */
   @Override
   public PropertyDefinition addKeyword(String pKey, String pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
       mPropertyPattern,
-      ImmutableMultimap.<String, String> builder()
+      ImmutableMultimap.<String, String>builder()
         .putAll(Multimaps.filterEntries(mKeywords,
-          Predicates.<Entry<String, String>> not((e) -> (e != null) && pKey.equals(e.getKey())
-            && pValue.equals(e.getValue()))))
-        .put(pKey, pValue).build(),
-      mAutoIncrementStart, mAutoIncrementBy);
+          Predicates.<Entry<String, String>>not((e) -> (e != null) && pKey.equals(e.getKey())
+            && pValue.equals(e.getValue()))
+        ))
+        .put(pKey, pValue)
+        .build(),
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   /**
@@ -478,13 +665,28 @@ public class GenericPropertyDefinition implements PropertyDefinition {
    */
   @Override
   public PropertyDefinition removeKeyword(String pKey, String pValue) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
       mPropertyPattern,
       Multimaps.filterEntries(mKeywords,
-        Predicates
-          .<Entry<String, String>> not((e) -> (e != null) && pKey.equals(e.getKey()) && pValue.equals(e.getValue()))),
-      mAutoIncrementStart, mAutoIncrementBy);
+        Predicates.<Entry<String, String>>not((e) -> (e != null) && pKey.equals(e.getKey())
+          && pValue.equals(e.getValue()))
+      ),
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   /**
@@ -500,9 +702,25 @@ public class GenericPropertyDefinition implements PropertyDefinition {
    */
   @Override
   public PropertyDefinition setPrimaryKeyOrder(int pOrder) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, pOrder, mType, mValidationScript,
-      mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal, mPropertyPattern,
-      mKeywords, mAutoIncrementStart, mAutoIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      pOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   /**
@@ -523,13 +741,29 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   /**
    * @see com.diamondq.common.model.interfaces.PropertyDefinition#setAutoIncrement(java.math.BigDecimal,
-   *      java.math.BigDecimal)
+   *   java.math.BigDecimal)
    */
   @Override
   public PropertyDefinition setAutoIncrement(@Nullable BigDecimal pStart, @Nullable BigDecimal pIncrementBy) {
-    return new GenericPropertyDefinition(mScope, mName, mLabel, mIsPrimaryKey, mPrimaryKeyOrder, mType,
-      mValidationScript, mDefaultValue, mDefaultValueScript, mReferenceTypes, mMinValue, mMaxValue, mMaxLength, mFinal,
-      mPropertyPattern, mKeywords, pStart, pIncrementBy);
+    return new GenericPropertyDefinition(mScope,
+      mName,
+      mLabel,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mType,
+      mValidationScript,
+      mDefaultValue,
+      mDefaultValueScript,
+      mReferenceTypes,
+      mMinValue,
+      mMaxValue,
+      mMaxLength,
+      mFinal,
+      mPropertyPattern,
+      mKeywords,
+      pStart,
+      pIncrementBy
+    );
   }
 
   /**
@@ -550,8 +784,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
       /* mLabel */
       byte[] labelBytes = null;
-      if (mLabel != null)
-        labelBytes = mLabel.getKey().getBytes("UTF-8");
+      if (mLabel != null) labelBytes = mLabel.getKey().getBytes("UTF-8");
       size = size + 4 + (labelBytes == null ? 0 : labelBytes.length);
 
       /* mIsPrimaryKey */
@@ -564,18 +797,15 @@ public class GenericPropertyDefinition implements PropertyDefinition {
       size = size + 4;
 
       /* mValidationScript */
-      if (mValidationScript != null)
-        throw new UnsupportedOperationException();
+      if (mValidationScript != null) throw new UnsupportedOperationException();
 
       /* mDefaultValue */
       byte[] defaultValueBytes = null;
-      if (mDefaultValue != null)
-        defaultValueBytes = mDefaultValue.getBytes("UTF-8");
+      if (mDefaultValue != null) defaultValueBytes = mDefaultValue.getBytes("UTF-8");
       size = size + 4 + (defaultValueBytes == null ? 0 : defaultValueBytes.length);
 
       /* mDefaultValueScript */
-      if (mDefaultValueScript != null)
-        throw new UnsupportedOperationException();
+      if (mDefaultValueScript != null) throw new UnsupportedOperationException();
 
       /* mReferenceTypes */
       List<byte[]> referenceTypesBytes = new ArrayList<>();
@@ -588,14 +818,12 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
       /* mMinValue */
       byte[] minValueBytes = null;
-      if (mMinValue != null)
-        minValueBytes = mMinValue.toString().getBytes("UTF-8");
+      if (mMinValue != null) minValueBytes = mMinValue.toString().getBytes("UTF-8");
       size = size + 4 + (minValueBytes == null ? 0 : minValueBytes.length);
 
       /* mMaxValue */
       byte[] maxValueBytes = null;
-      if (mMaxValue != null)
-        maxValueBytes = mMaxValue.toString().getBytes("UTF-8");
+      if (mMaxValue != null) maxValueBytes = mMaxValue.toString().getBytes("UTF-8");
       size = size + 4 + (maxValueBytes == null ? 0 : maxValueBytes.length);
 
       /* mMaxLength */
@@ -624,14 +852,12 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
       /* mAutoIncrementStart */
       byte[] autoIncrementStartBytes = null;
-      if (mAutoIncrementStart != null)
-        autoIncrementStartBytes = mAutoIncrementStart.toString().getBytes("UTF-8");
+      if (mAutoIncrementStart != null) autoIncrementStartBytes = mAutoIncrementStart.toString().getBytes("UTF-8");
       size = size + 4 + (autoIncrementStartBytes == null ? 0 : autoIncrementStartBytes.length);
 
       /* mAutoIncrementBy */
       byte[] autoIncrementByBytes = null;
-      if (mAutoIncrementBy != null)
-        autoIncrementByBytes = mAutoIncrementBy.toString().getBytes("UTF-8");
+      if (mAutoIncrementBy != null) autoIncrementByBytes = mAutoIncrementBy.toString().getBytes("UTF-8");
       size = size + 4 + (autoIncrementByBytes == null ? 0 : autoIncrementByBytes.length);
 
       ByteBuffer buffer = ByteBuffer.allocate(size);
@@ -647,8 +873,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
       /* mLabel */
       buffer.putInt(labelBytes == null ? 0 : labelBytes.length);
-      if (labelBytes != null)
-        buffer.put(labelBytes);
+      if (labelBytes != null) buffer.put(labelBytes);
 
       /* mIsPrimaryKey */
       buffer.put((byte) (mIsPrimaryKey == true ? 1 : 0));
@@ -660,17 +885,14 @@ public class GenericPropertyDefinition implements PropertyDefinition {
       buffer.putInt(mType.getValue());
 
       /* mValidationScript */
-      if (mValidationScript != null)
-        throw new UnsupportedOperationException();
+      if (mValidationScript != null) throw new UnsupportedOperationException();
 
       /* mDefaultValue */
       buffer.putInt(defaultValueBytes == null ? 0 : defaultValueBytes.length);
-      if (defaultValueBytes != null)
-        buffer.put(defaultValueBytes);
+      if (defaultValueBytes != null) buffer.put(defaultValueBytes);
 
       /* mDefaultValueScript */
-      if (mDefaultValueScript != null)
-        throw new UnsupportedOperationException();
+      if (mDefaultValueScript != null) throw new UnsupportedOperationException();
 
       /* mReferenceTypes */
       buffer.putInt(referenceTypesBytes.size());
@@ -681,13 +903,11 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
       /* mMinValue */
       buffer.putInt(minValueBytes == null ? 0 : minValueBytes.length);
-      if (minValueBytes != null)
-        buffer.put(minValueBytes);
+      if (minValueBytes != null) buffer.put(minValueBytes);
 
       /* mMaxValue */
       buffer.putInt(maxValueBytes == null ? 0 : maxValueBytes.length);
-      if (maxValueBytes != null)
-        buffer.put(maxValueBytes);
+      if (maxValueBytes != null) buffer.put(maxValueBytes);
 
       /* mMaxLength */
       Integer maxLength = mMaxLength;
@@ -715,14 +935,12 @@ public class GenericPropertyDefinition implements PropertyDefinition {
       /* mAutoIncrementStart */
 
       buffer.putInt(autoIncrementStartBytes == null ? 0 : autoIncrementStartBytes.length);
-      if (autoIncrementStartBytes != null)
-        buffer.put(autoIncrementStartBytes);
+      if (autoIncrementStartBytes != null) buffer.put(autoIncrementStartBytes);
 
       /* mAutoIncrementBy */
 
       buffer.putInt(autoIncrementByBytes == null ? 0 : autoIncrementByBytes.length);
-      if (autoIncrementByBytes != null)
-        buffer.put(autoIncrementByBytes);
+      if (autoIncrementByBytes != null) buffer.put(autoIncrementByBytes);
 
       buffer.flip();
       return buffer.array();
@@ -737,9 +955,24 @@ public class GenericPropertyDefinition implements PropertyDefinition {
    */
   @Override
   public int hashCode() {
-    return Objects.hash(mScope, mDefaultValue, mDefaultValueScript, mFinal, mIsPrimaryKey, mPrimaryKeyOrder,
-      mPropertyPattern, mLabel, mMaxValue, mMinValue, mName, mReferenceTypes, mType, mValidationScript, mKeywords,
-      mAutoIncrementStart, mAutoIncrementBy);
+    return Objects.hash(mScope,
+      mDefaultValue,
+      mDefaultValueScript,
+      mFinal,
+      mIsPrimaryKey,
+      mPrimaryKeyOrder,
+      mPropertyPattern,
+      mLabel,
+      mMaxValue,
+      mMinValue,
+      mName,
+      mReferenceTypes,
+      mType,
+      mValidationScript,
+      mKeywords,
+      mAutoIncrementStart,
+      mAutoIncrementBy
+    );
   }
 
   /**
@@ -747,21 +980,24 @@ public class GenericPropertyDefinition implements PropertyDefinition {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     GenericPropertyDefinition other = (GenericPropertyDefinition) pObj;
-    return Objects.equals(mScope, other.mScope) && Objects.equals(mDefaultValue, other.mDefaultValue)
-      && Objects.equals(mDefaultValueScript, other.mDefaultValueScript) && Objects.equals(mFinal, other.mFinal)
-      && Objects.equals(mIsPrimaryKey, other.mIsPrimaryKey) && Objects.equals(mPrimaryKeyOrder, other.mPrimaryKeyOrder)
-      && Objects.equals(mPropertyPattern, other.mPropertyPattern) && Objects.equals(mLabel, other.mLabel)
-      && Objects.equals(mMaxValue, other.mMaxValue) && Objects.equals(mMinValue, other.mMinValue)
-      && Objects.equals(mName, other.mName) && Objects.equals(mReferenceTypes, other.mReferenceTypes)
-      && Objects.equals(mType, other.mType) && Objects.equals(mValidationScript, other.mValidationScript)
-      && Objects.equals(mKeywords, other.mKeywords) && Objects.equals(mAutoIncrementStart, other.mAutoIncrementStart)
+    return Objects.equals(mScope, other.mScope) && Objects.equals(mDefaultValue, other.mDefaultValue) && Objects.equals(
+      mDefaultValueScript,
+      other.mDefaultValueScript
+    ) && Objects.equals(mFinal, other.mFinal) && Objects.equals(mIsPrimaryKey, other.mIsPrimaryKey) && Objects.equals(
+      mPrimaryKeyOrder,
+      other.mPrimaryKeyOrder
+    ) && Objects.equals(mPropertyPattern, other.mPropertyPattern) && Objects.equals(mLabel, other.mLabel)
+      && Objects.equals(mMaxValue, other.mMaxValue) && Objects.equals(mMinValue, other.mMinValue) && Objects.equals(
+      mName,
+      other.mName
+    ) && Objects.equals(mReferenceTypes, other.mReferenceTypes) && Objects.equals(mType, other.mType) && Objects.equals(
+      mValidationScript,
+      other.mValidationScript
+    ) && Objects.equals(mKeywords, other.mKeywords) && Objects.equals(mAutoIncrementStart, other.mAutoIncrementStart)
       && Objects.equals(mAutoIncrementBy, other.mAutoIncrementBy);
   }
 }

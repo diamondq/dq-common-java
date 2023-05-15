@@ -1,13 +1,13 @@
 package com.diamondq.common.security.acl.api;
 
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.List;
 
 public interface AuthenticationEngine {
 
-  public boolean decide(Object @Nullable... pObjects);
+  public boolean decide(Object @Nullable ... pObjects);
 
-  public boolean[] bulkDecide(List<?> pAssociations, Object @Nullable... pCommonObjects);
+  public boolean[] bulkDecide(List<?> pAssociations, Object @Nullable ... pCommonObjects);
 
 }

@@ -5,16 +5,15 @@ import com.diamondq.common.model.interfaces.ModelQuery;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.storage.kv.WhereInfo;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
-
 public class CombinedQuery implements ModelQuery {
 
-  private ModelQuery                        mFirstQuery;
+  private ModelQuery mFirstQuery;
 
   private Map<PersistenceLayer, ModelQuery> mMappedQueries;
 

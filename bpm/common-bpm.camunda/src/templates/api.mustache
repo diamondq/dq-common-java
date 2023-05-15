@@ -4,7 +4,7 @@ package {{package}};
 {{/imports}}
 
 {{#useSwaggerAnnotations}}
-import io.swagger.annotations.*;
+  import io.swagger.annotations.*;
 {{/useSwaggerAnnotations}}
 
 import io.micronaut.http.client.annotation.Client;
@@ -20,7 +20,7 @@ import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Part;
 import io.micronaut.http.annotation.Body;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.util.List;
@@ -35,15 +35,15 @@ import com.diamondq.common.injection.micronaut.auth.AuthInfo;
 * {{appDescriptionWithNewLines}}
 */{{/appDescriptionWithNewLines}}
 @Client(id="{{serviceDiscoveryId}}", path="{{contextPath}}"){{#useSwaggerAnnotations}}
-@Api(description = "the {{{baseName}}} API"){{/useSwaggerAnnotations}}{{#hasConsumes}}
-@Consumes({ {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
-@Produces({ {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}} }){{/hasProduces}}
+  @Api(description = "the {{{baseName}}} API"){{/useSwaggerAnnotations}}{{#hasConsumes}}
+  @Consumes({ {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
+  @Produces({ {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}} }){{/hasProduces}}
 {{>generatedAnnotation}}
 public {{#interfaceOnly}}interface{{/interfaceOnly}}{{^interfaceOnly}}class{{/interfaceOnly}} {{classname}} {
 {{#operations}}
-{{#operation}}
+  {{#operation}}
 
-{{#interfaceOnly}}{{>apiInterface}}{{/interfaceOnly}}{{^interfaceOnly}}{{>apiMethod}}{{/interfaceOnly}}
-{{/operation}}
-}
+    {{#interfaceOnly}}{{>apiInterface}}{{/interfaceOnly}}{{^interfaceOnly}}{{>apiMethod}}{{/interfaceOnly}}
+  {{/operation}}
+  }
 {{/operations}}

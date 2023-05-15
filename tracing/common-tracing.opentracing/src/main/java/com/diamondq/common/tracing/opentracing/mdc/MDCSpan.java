@@ -1,20 +1,18 @@
 package com.diamondq.common.tracing.opentracing.mdc;
 
 import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
-
-import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.MDC;
-
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.tag.Tag;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.MDC;
+
+import java.util.Map;
 
 public class MDCSpan implements Span {
 
-  private final Span               mDelegate;
+  private final Span mDelegate;
 
   protected final TraceIdExtractor mExtractor;
 
@@ -22,8 +20,7 @@ public class MDCSpan implements Span {
     mDelegate = pDelegate;
     mExtractor = pExtractor;
     String traceId = pExtractor.getTraceId(mDelegate);
-    if (traceId != null)
-      MDC.put("traceId", traceId);
+    if (traceId != null) MDC.put("traceId", traceId);
   }
 
   @Override
@@ -47,12 +44,12 @@ public class MDCSpan implements Span {
   }
 
   @Override
-  public Span log(@Nullable Map<String, @NonNull ?> pFields) {
+  public Span log(@Nullable Map<String, @NotNull ?> pFields) {
     return mDelegate.log(pFields);
   }
 
   @Override
-  public Span log(long pTimestampMicroseconds, @Nullable Map<String, @NonNull ?> pFields) {
+  public Span log(long pTimestampMicroseconds, @Nullable Map<String, @NotNull ?> pFields) {
     return mDelegate.log(pTimestampMicroseconds, pFields);
   }
 

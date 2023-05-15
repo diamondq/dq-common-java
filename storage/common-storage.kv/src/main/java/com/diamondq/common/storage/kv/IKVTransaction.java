@@ -1,13 +1,12 @@
 package com.diamondq.common.storage.kv;
 
 import com.google.common.collect.Iterators;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents an ongoing, synchronous, transaction
@@ -16,7 +15,7 @@ public interface IKVTransaction {
 
   /**
    * Attempts to get the object stored at the given table/key1/key2 location.
-   * 
+   *
    * @param pTable the table
    * @param pKey1 the first key
    * @param pKey2 the second key (can be null, but is effectively the same as if it was __NULL__).
@@ -27,7 +26,7 @@ public interface IKVTransaction {
 
   /**
    * Stores a new value
-   * 
+   *
    * @param pTable the table
    * @param pKey1 the first key
    * @param pKey2 the second key (can be null, but is effectively the same as if it was __NULL__).
@@ -37,7 +36,7 @@ public interface IKVTransaction {
 
   /**
    * Removes a value
-   * 
+   *
    * @param pTable the table
    * @param pKey1 the first key
    * @param pKey2 the second key (can be null, but is effectively the same as if it was __NULL__).
@@ -50,34 +49,34 @@ public interface IKVTransaction {
    * the iterator is fully consumed, otherwise, some implementations may leak heavily (ie. not closing a
    * PreparedStatement or ResultSet). Use {@link Iterators#size(Iterator)} or something similar to consume if it isn't
    * already consumed by your code.
-   * 
+   *
    * @param pTable the table
    * @return an iterator of keys
    */
-  public Iterator<@NonNull String> keyIterator(String pTable);
+  public Iterator<@NotNull String> keyIterator(String pTable);
 
   /**
    * Returns an iterator that returns all the distinct key 2's within the table/key1. NOTE: It is critically important
    * that the iterator is fully consumed, otherwise, some implementations may leak heavily (ie. not closing a
    * PreparedStatement or ResultSet). Use {@link Iterators#size(Iterator)} or something similar to consume if it isn't
    * already consumed by your code.
-   * 
+   *
    * @param pTable the table
    * @param pKey1 the key 1
    * @return an iterator of keys
    */
-  public Iterator<@NonNull String> keyIterator2(String pTable, String pKey1);
+  public Iterator<@NotNull String> keyIterator2(String pTable, String pKey1);
 
   /**
    * Clears all the contents of the table
-   * 
+   *
    * @param pTable the table
    */
   public void clear(String pTable);
 
   /**
    * Returns the number of entries in the table
-   * 
+   *
    * @param pTable the table
    * @return the count
    */
@@ -85,10 +84,10 @@ public interface IKVTransaction {
 
   /**
    * Returns the list of tables
-   * 
+   *
    * @return the tables
    */
-  public Iterator<@NonNull String> getTableList();
+  public Iterator<@NotNull String> getTableList();
 
   /**
    * Commits the changes in this transaction
@@ -102,7 +101,7 @@ public interface IKVTransaction {
 
   /**
    * Executes the given query
-   * 
+   *
    * @param pQuery the query
    * @param pClass the result class
    * @param pParamValues the parameters
@@ -112,7 +111,7 @@ public interface IKVTransaction {
 
   /**
    * Executes the given query but returns the count of records
-   * 
+   *
    * @param pQuery the query
    * @param pParamValues the parameters
    * @return the count

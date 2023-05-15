@@ -7,7 +7,7 @@ import com.diamondq.common.converters.impl.I18NStringToMapConverter;
 import com.diamondq.common.converters.impl.MapToI18NStringConverter;
 import com.diamondq.common.i18n.I18NString;
 import com.diamondq.common.types.Types;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.Collections;

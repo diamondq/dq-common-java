@@ -1,10 +1,10 @@
 package com.diamondq.common.utils.scxml.impl;
 
-import java.util.Map;
-
 import org.apache.commons.scxml2.Context;
 import org.apache.commons.scxml2.env.jexl.JexlContext;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 public class DQJexlContext extends JexlContext {
 
@@ -19,7 +19,7 @@ public class DQJexlContext extends JexlContext {
 
   /**
    * Constructor with initial vars.
-   * 
+   *
    * @param parent The parent context
    * @param initialVars The initial set of variables.
    */

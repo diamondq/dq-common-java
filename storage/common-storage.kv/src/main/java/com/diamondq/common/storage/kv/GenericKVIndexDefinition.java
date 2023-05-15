@@ -1,30 +1,29 @@
 package com.diamondq.common.storage.kv;
 
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Generic implementation of an Index Definition
  */
 public class GenericKVIndexDefinition implements IKVIndexDefinition {
 
-  private final String                        mTableName;
+  private final String mTableName;
 
-  private final String                        mName;
+  private final String mName;
 
-  private final List<@NonNull IKVIndexColumn> mColumns;
+  private final List<@NotNull IKVIndexColumn> mColumns;
 
   /**
    * Default constructor
-   * 
+   *
    * @param pTableName the table name
    * @param pName the name
    * @param pColumns the list of columns
    */
-  public GenericKVIndexDefinition(String pTableName, String pName, List<@NonNull IKVIndexColumn> pColumns) {
+  public GenericKVIndexDefinition(String pTableName, String pName, List<@NotNull IKVIndexColumn> pColumns) {
     super();
     mTableName = pTableName;
     mName = pName;
@@ -51,7 +50,7 @@ public class GenericKVIndexDefinition implements IKVIndexDefinition {
    * @see com.diamondq.common.storage.kv.IKVIndexDefinition#getColumns()
    */
   @Override
-  public List<@NonNull IKVIndexColumn> getColumns() {
+  public List<@NotNull IKVIndexColumn> getColumns() {
     return mColumns;
   }
 

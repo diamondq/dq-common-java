@@ -1,20 +1,5 @@
 package com.diamondq.common.tracing.jaeger;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.annotation.Priority;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.jaegertracing.Configuration;
 import io.jaegertracing.internal.propagation.B3TextMapCodec;
 import io.jaegertracing.internal.reporters.CompositeReporter;
@@ -28,13 +13,26 @@ import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
 import io.opentracing.util.GlobalTracer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Priority;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @ApplicationScoped
 @Alternative
 @Priority(100)
 public class JaegerTracer implements Tracer {
 
-  private static final Logger                    sLogger = LoggerFactory.getLogger(JaegerTracer.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(JaegerTracer.class);
 
   private io.jaegertracing.internal.JaegerTracer mDelegate;
 
@@ -59,21 +57,20 @@ public class JaegerTracer implements Tracer {
 
       }
     });
-    for (@SuppressWarnings("null")
-    Iterator<@Nullable Reporter> i = pReporters.iterator(); i.hasNext();) {
+    for (@SuppressWarnings("null") Iterator<@Nullable Reporter> i = pReporters.iterator(); i.hasNext(); ) {
       Reporter r = i.next();
-      if (r != null)
-        reporters.add(r);
+      if (r != null) reporters.add(r);
     }
     Reporter[] reporterArray = reporters.toArray(new Reporter[0]);
     Reporter remoteReporter = new CompositeReporter(reporterArray);
     Sampler sampler = new ConstSampler(true);
     String appName = System.getProperty("application.name");
-    if (appName == null)
-      appName = "Unknown_Application_Name";
+    if (appName == null) appName = "Unknown_Application_Name";
     mDelegate = new io.jaegertracing.internal.JaegerTracer.Builder(appName).withReporter(remoteReporter)
-      .withSampler(sampler).registerInjector(Format.Builtin.HTTP_HEADERS, b3Codec)
-      .registerExtractor(Format.Builtin.HTTP_HEADERS, b3Codec).build();
+      .withSampler(sampler)
+      .registerInjector(Format.Builtin.HTTP_HEADERS, b3Codec)
+      .registerExtractor(Format.Builtin.HTTP_HEADERS, b3Codec)
+      .build();
     GlobalTracer.register(this);
   }
 
@@ -105,7 +102,7 @@ public class JaegerTracer implements Tracer {
    * @see io.opentracing.Tracer#inject(io.opentracing.SpanContext, io.opentracing.propagation.Format, java.lang.Object)
    */
   @Override
-  public <C> void inject(SpanContext pSpanContext, Format<C> pFormat, @NonNull C pCarrier) {
+  public <C> void inject(SpanContext pSpanContext, Format<C> pFormat, @NotNull C pCarrier) {
     mDelegate.inject(pSpanContext, pFormat, pCarrier);
   }
 
@@ -113,7 +110,7 @@ public class JaegerTracer implements Tracer {
    * @see io.opentracing.Tracer#extract(io.opentracing.propagation.Format, java.lang.Object)
    */
   @Override
-  public <C> SpanContext extract(Format<C> pFormat, @NonNull C pCarrier) {
+  public <C> SpanContext extract(Format<C> pFormat, @NotNull C pCarrier) {
     return mDelegate.extract(pFormat, pCarrier);
   }
 

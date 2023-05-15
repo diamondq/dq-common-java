@@ -2,12 +2,12 @@ package com.diamondq.common.lambda.future;
 
 import com.diamondq.common.tracing.opentracing.testhelpers.MockTracing;
 import com.diamondq.common.tracing.opentracing.testhelpers.TracingAssertions;
-
-import java.util.concurrent.Executor;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import io.opentracing.mock.MockTracer;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.junit4.WeldInitiator;
+import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,19 +16,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentracing.Scope;
-import io.opentracing.Span;
-import io.opentracing.mock.MockTracer;
+import java.util.concurrent.Executor;
 
 public class ExtendedCompletionStageTest {
 
   private static final Logger sLogger = LoggerFactory.getLogger(ExtendedCompletionStageTest.class);
 
-  @Rule
-  public WeldInitiator        weld    = WeldInitiator.of(new Weld());
+  @Rule public WeldInitiator weld = WeldInitiator.of(new Weld());
 
-  @SuppressWarnings("null")
-  private MockTracer          mockTracker;
+  @SuppressWarnings("null") private MockTracer mockTracker;
 
   @Before
   public void setup() {
@@ -133,8 +129,7 @@ public class ExtendedCompletionStageTest {
       }, executor), (a) -> a);
       TracingAssertions.assertCompletedSpans("Span should not have completed", 0, mockTracker);
     }
-    finally
-    {
+    finally {
       span.finish();
     }
     TracingAssertions.assertNoActiveSpan("No active span after block");

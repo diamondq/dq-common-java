@@ -1,10 +1,10 @@
 package com.diamondq.common.model.interfaces;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EditorPropertyDefinition extends EditorComponentDefinition<EditorPropertyDefinition> {
 
@@ -51,7 +51,7 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
   /**
    * The ValueMap Script is responsible for mapping between a 'key' and a 'display value'. The script must return a List
    * of <Key,TranslatableString> pairs.
-   * 
+   *
    * @return the Script or null
    */
   public @Nullable Script getValueMapScript();
@@ -63,7 +63,7 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
   /**
    * The Simple ValueMap is a Map of Key,TranslatableString pairs used for mapping between a 'key' and a 'display
    * value'. If null, then this is not used for mapping.
-   * 
+   *
    * @return the map or null
    */
   public @Nullable Map<String, TranslatableString> getSimpleValueMap();
@@ -77,7 +77,7 @@ public interface EditorPropertyDefinition extends EditorComponentDefinition<Edit
   /**
    * Returns a PropertyDefinitionRef used to find the property within the given StructureDefinition that will contain
    * the display name for mapping.
-   * 
+   *
    * @return the PropertyDefinitionRef or null
    */
   public @Nullable PropertyDefinitionRef getValueMapProperty();

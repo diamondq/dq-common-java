@@ -1,8 +1,8 @@
 package com.diamondq.common.xmpp;
 
-import java.util.SortedSet;
+import org.jetbrains.annotations.Nullable;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.SortedSet;
 
 public interface XMPPServerLookup {
 

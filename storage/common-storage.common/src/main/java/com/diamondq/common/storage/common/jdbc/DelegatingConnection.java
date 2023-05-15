@@ -20,27 +20,28 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A wrapper for an existing Connection that always calls a callback when the Connection is closed
  */
 public class DelegatingConnection implements Connection {
 
-  private final Connection                                           mDelegate;
+  private final Connection mDelegate;
 
-  private int                                                        mReferenceCount = 1;
+  private int mReferenceCount = 1;
 
-  private final BiConsumer<@NonNull Connection, @NonNull Connection> mCallback;
+  private final BiConsumer<@NotNull Connection, @NotNull Connection> mCallback;
 
   /**
    * The constructor
-   * 
+   *
    * @param pDelegate the delegated Connection
    * @param pCallback the callback to call
    */
-  public DelegatingConnection(Connection pDelegate, BiConsumer<@NonNull Connection, @NonNull Connection> pCallback) {
+  public DelegatingConnection(Connection pDelegate, BiConsumer<@NotNull Connection, @NotNull Connection> pCallback) {
     super();
     mDelegate = pDelegate;
     mCallback = pCallback;
@@ -88,23 +89,20 @@ public class DelegatingConnection implements Connection {
 
   @Override
   public void commit() throws SQLException {
-    if (mReferenceCount > 1)
-      return;
+    if (mReferenceCount > 1) return;
     mDelegate.commit();
   }
 
   @Override
   public void rollback() throws SQLException {
-    if (mReferenceCount > 1)
-      return;
+    if (mReferenceCount > 1) return;
     mDelegate.rollback();
   }
 
   @Override
   public void close() throws SQLException {
     mReferenceCount--;
-    if (mReferenceCount > 0)
-      return;
+    if (mReferenceCount > 0) return;
     mDelegate.close();
     mCallback.accept(this, mDelegate);
   }

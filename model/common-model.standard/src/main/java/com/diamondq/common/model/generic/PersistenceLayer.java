@@ -18,16 +18,15 @@ import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
 
 public interface PersistenceLayer {
 
@@ -44,7 +43,7 @@ public interface PersistenceLayer {
   /**
    * Only called by the CombinedPeristenceLayer to enable the StructureDefinition on layers that don't persist the
    * structure.
-   * 
+   *
    * @param pToolkit
    * @param pScope
    * @param pValue
@@ -175,7 +174,7 @@ public interface PersistenceLayer {
     String pSerialized);
 
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Toolkit pToolkit, Scope pScope,
-    StandardMigrations pMigrationType, @NonNull Object @Nullable [] pParams);
+    StandardMigrations pMigrationType, @NotNull Object @Nullable [] pParams);
 
   public void addMigration(Toolkit pToolkit, Scope pScope, String pStructureDefinitionName, int pFromRevision,
     int pToRevision, BiFunction<Structure, Structure, Structure> pMigrationFunction);

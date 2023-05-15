@@ -1,19 +1,19 @@
 package com.diamondq.common.jaxrs.model;
 
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class AbstractConstructorJAXRSApplicationInfo implements JAXRSApplicationInfo {
-  private static final Logger       sLogger = LoggerFactory.getLogger(AbstractConstructorJAXRSApplicationInfo.class);
+  private static final Logger sLogger = LoggerFactory.getLogger(AbstractConstructorJAXRSApplicationInfo.class);
 
-  private final Set<Class<?>>       mClasses;
+  private final Set<Class<?>> mClasses;
 
-  private final Set<Object>         mSingletons;
+  private final Set<Object> mSingletons;
 
   private final Map<String, Object> mProperties;
 

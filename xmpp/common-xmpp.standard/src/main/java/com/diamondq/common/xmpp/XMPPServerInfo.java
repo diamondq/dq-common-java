@@ -2,23 +2,22 @@ package com.diamondq.common.xmpp;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Information about a specific XMPP Server. Generally provided via DNS SRV lookups or a configuration lookup
  */
 public class XMPPServerInfo implements Comparable<XMPPServerInfo> {
 
-  public final String                   domain;
+  public final String domain;
 
-  public final String                   hostname;
+  public final String hostname;
 
-  public final int                      port;
+  public final int port;
 
-  public final int                      weight;
+  public final int weight;
 
-  public final int                      priority;
+  public final int priority;
 
   public final Multimap<String, String> info;
 
@@ -39,16 +38,13 @@ public class XMPPServerInfo implements Comparable<XMPPServerInfo> {
   @Override
   public int compareTo(XMPPServerInfo pOther) {
     int compare = priority - pOther.priority;
-    if (compare != 0)
-      return compare;
+    if (compare != 0) return compare;
 
     compare = pOther.weight - weight;
-    if (compare != 0)
-      return compare;
+    if (compare != 0) return compare;
 
     compare = hostname.compareTo(pOther.hostname);
-    if (compare != 0)
-      return compare;
+    if (compare != 0) return compare;
 
     return domain.compareTo(pOther.domain);
   }
@@ -97,25 +93,16 @@ public class XMPPServerInfo implements Comparable<XMPPServerInfo> {
    */
   @Override
   public boolean equals(@Nullable Object pObj) {
-    if (this == pObj)
-      return true;
-    if (pObj == null)
-      return false;
-    if (getClass() != pObj.getClass())
-      return false;
+    if (this == pObj) return true;
+    if (pObj == null) return false;
+    if (getClass() != pObj.getClass()) return false;
     XMPPServerInfo other = (XMPPServerInfo) pObj;
-    if (domain.equals(other.domain) == false)
-      return false;
-    if (hostname.equals(other.hostname) == false)
-      return false;
-    if (port != other.port)
-      return false;
-    if (priority != other.priority)
-      return false;
-    if (weight != other.weight)
-      return false;
-    if (info.equals(other.info) == false)
-      return false;
+    if (domain.equals(other.domain) == false) return false;
+    if (hostname.equals(other.hostname) == false) return false;
+    if (port != other.port) return false;
+    if (priority != other.priority) return false;
+    if (weight != other.weight) return false;
+    if (info.equals(other.info) == false) return false;
     return true;
   }
 }

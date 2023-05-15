@@ -3,8 +3,8 @@ package com.diamondq.common.context;
 import com.diamondq.common.context.impl.ContextFactoryImpl;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -40,7 +40,7 @@ public interface ContextFactory {
   }
 
   static <T> ContextExtendedCompletableFuture<List<T>> listOf(
-    List<@NonNull ? extends @NonNull ExtendedCompletionStage<T>> pList) {
+    List<@NotNull ? extends @NotNull ExtendedCompletionStage<T>> pList) {
     return FutureUtils.listOf(pList);
   }
 

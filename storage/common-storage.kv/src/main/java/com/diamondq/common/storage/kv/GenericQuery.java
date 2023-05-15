@@ -3,27 +3,26 @@ package com.diamondq.common.storage.kv;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
+import org.javatuples.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Pair;
-
 public class GenericQuery implements Query {
 
-  protected final String                               mDefinitionName;
+  protected final String mDefinitionName;
 
-  protected final String                               mQueryName;
+  protected final String mQueryName;
 
-  protected final ImmutableList<WhereInfo>             mWhereList;
+  protected final ImmutableList<WhereInfo> mWhereList;
 
-  protected final @Nullable String                     mParentParamKey;
+  protected final @Nullable String mParentParamKey;
 
-  protected final @Nullable String                     mParentName;
+  protected final @Nullable String mParentName;
 
   protected final ImmutableList<Pair<String, Boolean>> mSortList;
 
-  protected final @Nullable String                     mLimitKey;
+  protected final @Nullable String mLimitKey;
 
   public GenericQuery(String pDefinitionName, String pQueryName, @Nullable List<WhereInfo> pWhereList,
     @Nullable String pParentParamKey, @Nullable String pParentName, @Nullable List<Pair<String, Boolean>> pSortList,

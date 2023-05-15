@@ -30,7 +30,46 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.servicediscovery.Record;
+import io.vertx.servicediscovery.ServiceDiscovery;
+import io.vertx.servicediscovery.Status;
+import org.javatuples.Decade;
+import org.javatuples.Ennead;
+import org.javatuples.Octet;
+import org.javatuples.Pair;
+import org.javatuples.Quartet;
+import org.javatuples.Quintet;
+import org.javatuples.Septet;
+import org.javatuples.Sextet;
+import org.javatuples.Triplet;
+import org.javatuples.Unit;
+import org.jetbrains.annotations.Nullable;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
+import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
@@ -49,52 +88,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
-import javax.tools.JavaFileObject;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.javatuples.Decade;
-import org.javatuples.Ennead;
-import org.javatuples.Octet;
-import org.javatuples.Pair;
-import org.javatuples.Quartet;
-import org.javatuples.Quintet;
-import org.javatuples.Septet;
-import org.javatuples.Sextet;
-import org.javatuples.Triplet;
-import org.javatuples.Unit;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.Message;
-import io.vertx.core.eventbus.MessageConsumer;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.servicediscovery.Record;
-import io.vertx.servicediscovery.ServiceDiscovery;
-import io.vertx.servicediscovery.Status;
-
 public class ProxyGenerator implements Generator {
 
-  @SuppressWarnings("unused")
-  private static final Logger sLogger = LoggerFactory.getLogger(ProxyGenerator.class);
+  @SuppressWarnings("unused") private static final Logger sLogger = LoggerFactory.getLogger(ProxyGenerator.class);
 
   public ProxyGenerator() {
   }
@@ -110,7 +106,7 @@ public class ProxyGenerator implements Generator {
   /**
    * @throws IOException
    * @see com.diamondq.common.vertx.processor.Generator#process(javax.lang.model.element.TypeElement,
-   *      javax.annotation.processing.ProcessingEnvironment, javax.annotation.processing.RoundEnvironment)
+   *   javax.annotation.processing.ProcessingEnvironment, javax.annotation.processing.RoundEnvironment)
    */
   @Override
   public void process(TypeElement pElement, ProcessingEnvironment pProcessingEnv, RoundEnvironment pRoundEnv)
@@ -118,9 +114,10 @@ public class ProxyGenerator implements Generator {
 
     /* Make sure that they are only associated with interfaces */
 
-    if (pElement.getKind() != ElementKind.INTERFACE)
-      throw new ElementIllegalArgumentException(pElement, Messages.PROXYGENERATOR_ONLYINTERFACES,
-        ProxyGen.class.getSimpleName());
+    if (pElement.getKind() != ElementKind.INTERFACE) throw new ElementIllegalArgumentException(pElement,
+      Messages.PROXYGENERATOR_ONLYINTERFACES,
+      ProxyGen.class.getSimpleName()
+    );
 
     /* Build a model around the class */
 
@@ -152,10 +149,12 @@ public class ProxyGenerator implements Generator {
   private TypeSpec.Builder generateProxyOsgi(ProxyClass pProxyClass, TypeSpec.Builder pTypeSpecBuilder) {
 
     // (m) -> {
-    MethodSpec.Builder announceMethod = MethodSpec.methodBuilder("handle").addModifiers(Modifier.PUBLIC)
+    MethodSpec.Builder announceMethod = MethodSpec.methodBuilder("handle")
+      .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
-      .addParameter(ParameterSpec
-        .builder(ParameterizedTypeName.get(ClassName.get(Message.class), ClassName.get(JsonObject.class)), "m").build())
+      .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Message.class),
+        ClassName.get(JsonObject.class)
+      ), "m").build())
       // Record record = Verify.notNull(m.body());
       .addStatement("$T record = new $T($T.notNull(m.body()))", Record.class, Record.class, Verify.class)
       // String interfaceStr = record.getMetadata().getString("service.interface");
@@ -163,8 +162,11 @@ public class ProxyGenerator implements Generator {
       // if ("x".equals(interfaceStr) == true) {
       .beginControlFlow("if ($S.equals(interfaceStr))", pProxyClass.getBaseQualifiedName())
       // String address = Verify.notNull(Verify.notNull(record.getLocation()).getString("endpoint"));
-      .addStatement("String address = $T.notNull($T.notNull(record.getLocation()).getString($S))", Verify.class,
-        Verify.class, "endpoint")
+      .addStatement("String address = $T.notNull($T.notNull(record.getLocation()).getString($S))",
+        Verify.class,
+        Verify.class,
+        "endpoint"
+      )
       // if (record.getStatus() == Status.UP) {
       .beginControlFlow("if (record.getStatus() == $T.UP)", Status.class)
       //
@@ -176,14 +178,17 @@ public class ProxyGenerator implements Generator {
         // Engine instance = new EngineProxy(mContextFactory, mVertx, address);
         .addStatement(
           "$T instance = new $T(mContextFactory, mConverterManager, mSecurityContextManager, mVertx, address, mDeliveryTimeout)",
-          pProxyClass.getBaseQualifiedTypeName(), pProxyClass.getProxyQualifiedTypeName());
-    }
-    else {
+          pProxyClass.getBaseQualifiedTypeName(),
+          pProxyClass.getProxyQualifiedTypeName()
+        );
+    } else {
       announceMethod = announceMethod
         // Engine instance = new EngineProxy(mContextFactory, mVertx, address);
         .addStatement(
           "$T instance = new $T(mContextFactory, mSecurityContextManager, mVertx, address, mDeliveryTimeout)",
-          pProxyClass.getBaseQualifiedTypeName(), pProxyClass.getProxyQualifiedTypeName());
+          pProxyClass.getBaseQualifiedTypeName(),
+          pProxyClass.getProxyQualifiedTypeName()
+        );
     }
     announceMethod = announceMethod
       // Dictionary<String, ?> properties = new Hashtable<>();
@@ -191,7 +196,10 @@ public class ProxyGenerator implements Generator {
       // ServiceRegistration<Engine> registration = pContext.getBundleContext().registerService(Engine.class,
       // instance, properties);
       .addStatement("$T<$T> registration = pContext.getBundleContext().registerService($T.class, instance, properties)",
-        ServiceRegistration.class, pProxyClass.getBaseQualifiedTypeName(), pProxyClass.getBaseQualifiedTypeName())
+        ServiceRegistration.class,
+        pProxyClass.getBaseQualifiedTypeName(),
+        pProxyClass.getBaseQualifiedTypeName()
+      )
       // mRegistrations.put(address, registration);
       .addStatement("mRegistrations.put(address, registration)")
       // } else {
@@ -201,8 +209,10 @@ public class ProxyGenerator implements Generator {
       //
       .addCode("\n/* The record has been removed. Remove any existing proxy */\n\n")
       // ServiceRegistration<Engine> registration = mRegistrations.remove(address);
-      .addStatement("$T<$T> registration = mRegistrations.remove(address)", ServiceRegistration.class,
-        pProxyClass.getBaseQualifiedTypeName())
+      .addStatement("$T<$T> registration = mRegistrations.remove(address)",
+        ServiceRegistration.class,
+        pProxyClass.getBaseQualifiedTypeName()
+      )
       // if (registration != null) {
       .beginControlFlow("if (registration != null)")
       // registration.unregister();
@@ -218,47 +228,56 @@ public class ProxyGenerator implements Generator {
 
     TypeSpec announceHandler = TypeSpec.anonymousClassBuilder("")
       .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class),
-        ParameterizedTypeName.get(ClassName.get(Message.class), ClassName.get(JsonObject.class))))
+        ParameterizedTypeName.get(ClassName.get(Message.class), ClassName.get(JsonObject.class))
+      ))
       .addMethod(announceMethod.build()) //
       .build();
 
     // (ar) -> {
-    MethodSpec.Builder unregisterMethod =
-      MethodSpec.methodBuilder("handle").addModifiers(Modifier.PUBLIC).addAnnotation(Override.class)
-        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())), "ar").build())
-        // try (Context ctx2 = ctx.activateOnThread("")) {
-        .beginControlFlow("try ($T ctx2 = ctx.activateOnThread($S))", Context.class, "")
-        // if (ar.failed() == true) {
-        .beginControlFlow("if (ar.failed() == true)")
-        // ctx2.reportThrowable(Verify.notNull(ar.cause()));
-        .addStatement("ctx2.reportThrowable($T.notNull(ar.cause()))", Verify.class)
-        // }
-        .endControlFlow()
-        //
-        // /* Now deregister any remaining registrations */
-        //
-        .addCode("\n/* Now deregister any remaining registrations */\n\n")
-        // Collection<ServiceRegistration<Engine>> regs = new ArrayList<>(mRegistrations.values());
-        .addStatement("$T<$T<$T>> regs = new $T<>(mRegistrations.values())", Collection.class,
-          ServiceRegistration.class, pProxyClass.getBaseQualifiedTypeName(), ArrayList.class)
-        // mRegistrations.clear();
-        .addStatement("mRegistrations.clear()")
-        // for (ServiceRegistration<Engine> reg : regs) {
-        .beginControlFlow("for ($T<$T> reg : regs)", ServiceRegistration.class, pProxyClass.getBaseQualifiedTypeName())
-        // reg.unregister();
-        .addStatement("reg.unregister()")
-        // }
-        .endControlFlow()
-        // }
-        .endControlFlow()
-    // });
-    ;
+    MethodSpec.Builder unregisterMethod = MethodSpec.methodBuilder("handle")
+      .addModifiers(Modifier.PUBLIC)
+      .addAnnotation(Override.class)
+      .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
+        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+      ), "ar").build())
+      // try (Context ctx2 = ctx.activateOnThread("")) {
+      .beginControlFlow("try ($T ctx2 = ctx.activateOnThread($S))", Context.class, "")
+      // if (ar.failed() == true) {
+      .beginControlFlow("if (ar.failed() == true)")
+      // ctx2.reportThrowable(Verify.notNull(ar.cause()));
+      .addStatement("ctx2.reportThrowable($T.notNull(ar.cause()))", Verify.class)
+      // }
+      .endControlFlow()
+      //
+      // /* Now deregister any remaining registrations */
+      //
+      .addCode("\n/* Now deregister any remaining registrations */\n\n")
+      // Collection<ServiceRegistration<Engine>> regs = new ArrayList<>(mRegistrations.values());
+      .addStatement("$T<$T<$T>> regs = new $T<>(mRegistrations.values())",
+        Collection.class,
+        ServiceRegistration.class,
+        pProxyClass.getBaseQualifiedTypeName(),
+        ArrayList.class
+      )
+      // mRegistrations.clear();
+      .addStatement("mRegistrations.clear()")
+      // for (ServiceRegistration<Engine> reg : regs) {
+      .beginControlFlow("for ($T<$T> reg : regs)", ServiceRegistration.class, pProxyClass.getBaseQualifiedTypeName())
+      // reg.unregister();
+      .addStatement("reg.unregister()")
+      // }
+      .endControlFlow()
+      // }
+      .endControlFlow()
+      // });
+      ;
 
     TypeSpec unregisterHandler = TypeSpec.anonymousClassBuilder("")
       .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class),
         ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build()))))
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+        )
+      ))
       .addMethod(unregisterMethod.build()) //
       .build();
 
@@ -269,8 +288,8 @@ public class ProxyGenerator implements Generator {
       .addField(FieldSpec.builder(ContextFactory.class, "mContextFactory", Modifier.PRIVATE).build());
 
     if (pProxyClass.isNeedsConverter())
-      builder =
-        builder.addField(FieldSpec.builder(ConverterManager.class, "mConverterManager", Modifier.PRIVATE).build());
+      builder = builder.addField(FieldSpec.builder(ConverterManager.class, "mConverterManager", Modifier.PRIVATE)
+        .build());
 
     builder = builder
       //
@@ -287,22 +306,23 @@ public class ProxyGenerator implements Generator {
       .addField(FieldSpec.builder(Long.TYPE, "mDeliveryTimeout", Modifier.PRIVATE).build())
       //
       // private @Nullable MessageConsumer<Record> mListener;
-      .addField(FieldSpec
-        .builder(ParameterizedTypeName.get(ClassName.get(MessageConsumer.class), ClassName.get(JsonObject.class))
-          .annotated(AnnotationSpec.builder(Nullable.class).build()), "mListener", Modifier.PRIVATE)
-        .build())
+      .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(MessageConsumer.class),
+        ClassName.get(JsonObject.class)
+      ).annotated(AnnotationSpec.builder(Nullable.class).build()), "mListener", Modifier.PRIVATE).build())
       //
       // private final ConcurrentMap<String, ServiceRegistration<Engine>> mRegistrations;
-      .addField(FieldSpec.builder(
-        ParameterizedTypeName.get(ClassName.get(ConcurrentMap.class), ClassName.get(String.class),
-          ParameterizedTypeName.get(ClassName.get(ServiceRegistration.class), pProxyClass.getBaseQualifiedTypeName())),
-        "mRegistrations", Modifier.PRIVATE, Modifier.FINAL).build())
+      .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(ConcurrentMap.class),
+        ClassName.get(String.class),
+        ParameterizedTypeName.get(ClassName.get(ServiceRegistration.class), pProxyClass.getBaseQualifiedTypeName())
+      ), "mRegistrations", Modifier.PRIVATE, Modifier.FINAL).build())
       //
       // @SuppressWarnings("null")
       // public OsgiManager() {
-      .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC)
-        .addAnnotation(
-          AnnotationSpec.builder(SuppressWarnings.class).addMember("value", CodeBlock.of("$S", "null")).build())
+      .addMethod(MethodSpec.constructorBuilder()
+        .addModifiers(Modifier.PUBLIC)
+        .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
+          .addMember("value", CodeBlock.of("$S", "null"))
+          .build())
         // mRegistrations = new ConcurrentHashMap<>();
         .addStatement("mRegistrations = new $T<>()", ConcurrentHashMap.class)
         // }
@@ -312,33 +332,38 @@ public class ProxyGenerator implements Generator {
       .addMethod(MethodSpec.methodBuilder("setContextFactory")
         .addParameter(ParameterSpec.builder(ContextFactory.class, "pContextFactory").build())
         // ContextFactory.staticReportTrace(EngineProxy.OsgiManager.class, this, pContextFactory);
-        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pContextFactory)", ContextFactory.class,
-          pProxyClass.getProxySimpleName())
+        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pContextFactory)",
+          ContextFactory.class,
+          pProxyClass.getProxySimpleName()
+        )
         // mContextFactory = pContextFactory;
         .addStatement("mContextFactory = pContextFactory")
         // }
         .build());
-    if (pProxyClass.isNeedsConverter())
-      builder = builder
-        //
-        // public void setConverterManager(ConverterManager pConverterManager) {
-        .addMethod(MethodSpec.methodBuilder("setConverterManager")
-          .addParameter(ParameterSpec.builder(ConverterManager.class, "pConverterManager").build())
-          // ContextFactory.staticReportTrace(EngineProxy.OsgiManager.class, this, pConverterManager);
-          .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pConverterManager)", ContextFactory.class,
-            pProxyClass.getProxySimpleName())
-          // mConverterManager = pConverterManager;
-          .addStatement("mConverterManager = pConverterManager")
-          // }
-          .build());
+    if (pProxyClass.isNeedsConverter()) builder = builder
+      //
+      // public void setConverterManager(ConverterManager pConverterManager) {
+      .addMethod(MethodSpec.methodBuilder("setConverterManager")
+        .addParameter(ParameterSpec.builder(ConverterManager.class, "pConverterManager").build())
+        // ContextFactory.staticReportTrace(EngineProxy.OsgiManager.class, this, pConverterManager);
+        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pConverterManager)",
+          ContextFactory.class,
+          pProxyClass.getProxySimpleName()
+        )
+        // mConverterManager = pConverterManager;
+        .addStatement("mConverterManager = pConverterManager")
+        // }
+        .build());
     builder = builder
       //
       // public void setSecurityContextManager(SecurityContextManager pSecurityContextManager) {
       .addMethod(MethodSpec.methodBuilder("setSecurityContextManager")
         .addParameter(ParameterSpec.builder(SecurityContextManager.class, "pSecurityContextManager").build())
         // ContextFactory.staticReportTrace(EngineProxy.OsgiManager.class, this, pSecurityContextManager);
-        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pSecurityContextManager)", ContextFactory.class,
-          pProxyClass.getProxySimpleName())
+        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pSecurityContextManager)",
+          ContextFactory.class,
+          pProxyClass.getProxySimpleName()
+        )
         // mSecurityContextManager = pSecurityContextManager;
         .addStatement("mSecurityContextManager = pSecurityContextManager")
         // }
@@ -348,8 +373,10 @@ public class ProxyGenerator implements Generator {
       // public void setVertx(Vertx pVertx) {
       .addMethod(MethodSpec.methodBuilder("setVertx").addParameter(ParameterSpec.builder(Vertx.class, "pVertx").build())
         // ContextFactory.staticReportTrace(EngineProxy.OsgiManager.class, this, pVertx);
-        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pVertx)", ContextFactory.class,
-          pProxyClass.getProxySimpleName())
+        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pVertx)",
+          ContextFactory.class,
+          pProxyClass.getProxySimpleName()
+        )
         // mVertx = pVertx;
         .addStatement("mVertx = pVertx")
         // }
@@ -359,8 +386,10 @@ public class ProxyGenerator implements Generator {
       .addMethod(MethodSpec.methodBuilder("setServiceDiscovery")
         .addParameter(ParameterSpec.builder(ServiceDiscovery.class, "pServiceDiscovery").build())
         // ContextFactory.staticReportTrace(EngineProxy.OsgiManager.class, this, pServiceDiscovery);
-        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pServiceDiscovery)", ContextFactory.class,
-          pProxyClass.getProxySimpleName())
+        .addStatement("$T.staticReportTrace($N.OsgiManager.class, this, pServiceDiscovery)",
+          ContextFactory.class,
+          pProxyClass.getProxySimpleName()
+        )
         // mServiceDiscovery = pServiceDiscovery;
         .addStatement("mServiceDiscovery = pServiceDiscovery")
         // }
@@ -374,27 +403,43 @@ public class ProxyGenerator implements Generator {
       // Object servicePid = contextProperties.get(Constants.SERVICE_PID);
       .addStatement("Object servicePid = contextProperties.get($T.SERVICE_PID)", Constants.class)
       // Verify.notNullArg(mContextFactory, UtilMessages.VERIFY_DEPENDENCY_MISSING, "contextFactory", servicePid);
-      .addStatement("$T.notNullArg(mContextFactory, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
-        UtilMessages.class, "contextFactory")
+      .addStatement("$T.notNullArg(mContextFactory, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)",
+        Verify.class,
+        UtilMessages.class,
+        "contextFactory"
+      )
       // try (Context ctx = mContextFactory.newContext(EngineProxy.OsgiManager.class, this)) {
-      .beginControlFlow("try ($T ctx = mContextFactory.newContext($N.OsgiManager.class, this))", Context.class,
-        pProxyClass.getProxySimpleName());
-    if (pProxyClass.isNeedsConverter())
-      methodBuilder = methodBuilder //
-        // Verify.notNullArg(mConverterManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", servicePid);
-        .addStatement("$T.notNullArg(mConverterManager, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
-          UtilMessages.class, "converterManager");
+      .beginControlFlow("try ($T ctx = mContextFactory.newContext($N.OsgiManager.class, this))",
+        Context.class,
+        pProxyClass.getProxySimpleName()
+      );
+    if (pProxyClass.isNeedsConverter()) methodBuilder = methodBuilder //
+      // Verify.notNullArg(mConverterManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "converterManager", servicePid);
+      .addStatement("$T.notNullArg(mConverterManager, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)",
+        Verify.class,
+        UtilMessages.class,
+        "converterManager"
+      );
     methodBuilder = methodBuilder
       // Verify.notNullArg(mVertx, UtilMessages.VERIFY_DEPENDENCY_MISSING, "vertx", servicePid);
-      .addStatement("$T.notNullArg(mVertx, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
-        UtilMessages.class, "vertx")
+      .addStatement("$T.notNullArg(mVertx, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)",
+        Verify.class,
+        UtilMessages.class,
+        "vertx"
+      )
       // Verify.notNullArg(mServiceDiscovery, UtilMessages.VERIFY_DEPENDENCY_MISSING, "serviceDiscovery", servicePid);
-      .addStatement("$T.notNullArg(mServiceDiscovery, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)", Verify.class,
-        UtilMessages.class, "serviceDiscovery")
+      .addStatement("$T.notNullArg(mServiceDiscovery, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)",
+        Verify.class,
+        UtilMessages.class,
+        "serviceDiscovery"
+      )
       // Verify.notNullArg(mSecurityContextManager, UtilMessages.VERIFY_DEPENDENCY_MISSING, "securityContextManager",
       // servicePid);
       .addStatement("$T.notNullArg(mSecurityContextManager, $T.VERIFY_DEPENDENCY_MISSING, $S, servicePid)",
-        Verify.class, UtilMessages.class, "securityContextManager")
+        Verify.class,
+        UtilMessages.class,
+        "securityContextManager"
+      )
       //
       // /* Parse configuration properties */
       //
@@ -403,12 +448,22 @@ public class ProxyGenerator implements Generator {
       // Long.parseLong(System.getProperty("vertx-delivery-timeout", "30")));
       .addStatement(
         "long deliveryTime = $T.getNonNullLong(contextProperties, $S, Long.parseLong(System.getProperty($S, $S)))",
-        PropertiesParsing.class, ".delivery-timeout", "vertx-delivery-timeout", "30")
+        PropertiesParsing.class,
+        ".delivery-timeout",
+        "vertx-delivery-timeout",
+        "30"
+      )
       // TimeUnit deliveryUnit = TimeUnit.valueOf(PropertiesParsing.getNonNullString(contextProperties,
       // ".delivery-timeout-unit", "SECONDS").toUpperCase(Locale.ENGLISH));
       .addStatement(
         "$T deliveryUnit = $T.valueOf($T.getNonNullString(contextProperties, $S, $S).toUpperCase($T.ENGLISH))",
-        TimeUnit.class, TimeUnit.class, PropertiesParsing.class, ".delivery-timeout-unit", "SECONDS", Locale.class)
+        TimeUnit.class,
+        TimeUnit.class,
+        PropertiesParsing.class,
+        ".delivery-timeout-unit",
+        "SECONDS",
+        Locale.class
+      )
       // mDeliveryTimeout = TimeUnit.MILLISECONDS.convert(deliveryTime, deliveryUnit);
       .addStatement("mDeliveryTimeout = $T.MILLISECONDS.convert(deliveryTime, deliveryUnit)", TimeUnit.class)
       //
@@ -425,8 +480,10 @@ public class ProxyGenerator implements Generator {
       // public void onDeactivate() {
       .addMethod(MethodSpec.methodBuilder("onDeactivate").addModifiers(Modifier.PUBLIC)
         // try (Context ctx = mContextFactory.newContext(EngineProxy.OsgiManager.class, this)) {
-        .beginControlFlow("try ($T ctx = mContextFactory.newContext($N.OsgiManager.class, this))", Context.class,
-          pProxyClass.getProxySimpleName())
+        .beginControlFlow("try ($T ctx = mContextFactory.newContext($N.OsgiManager.class, this))",
+          Context.class,
+          pProxyClass.getProxySimpleName()
+        )
         //
         // /* First, unregister the consumer so we can't get any additional registrations */
         //
@@ -470,17 +527,25 @@ public class ProxyGenerator implements Generator {
     /* **** ContextFactory */
 
     ClassName contextFactoryName = ClassName.get("com.diamondq.common.context", "ContextFactory");
-    builder = builder
-      .addField(FieldSpec.builder(contextFactoryName, "mContextFactory", Modifier.PRIVATE, Modifier.FINAL).build());
+    builder = builder.addField(FieldSpec.builder(contextFactoryName,
+      "mContextFactory",
+      Modifier.PRIVATE,
+      Modifier.FINAL
+    ).build());
 
-    if (pAnnotatedClass.isNeedsConverter() == true)
-      builder = builder.addField(
-        FieldSpec.builder(ConverterManager.class, "mConverterManager", Modifier.PROTECTED, Modifier.FINAL).build());
+    if (pAnnotatedClass.isNeedsConverter() == true) builder = builder.addField(FieldSpec.builder(ConverterManager.class,
+      "mConverterManager",
+      Modifier.PROTECTED,
+      Modifier.FINAL
+    ).build());
 
     /* **** SecurityContextManager */
 
-    builder = builder.addField(FieldSpec.builder(ClassName.get(SecurityContextManager.class), "mSecurityContextManager",
-      Modifier.PROTECTED, Modifier.FINAL).build());
+    builder = builder.addField(FieldSpec.builder(ClassName.get(SecurityContextManager.class),
+      "mSecurityContextManager",
+      Modifier.PROTECTED,
+      Modifier.FINAL
+    ).build());
 
     /* **** Vertx */
 
@@ -489,13 +554,13 @@ public class ProxyGenerator implements Generator {
 
     /* **** Delivery Timeout */
 
-    builder =
-      builder.addField(FieldSpec.builder(Long.TYPE, "mDeliveryTimeout", Modifier.PRIVATE, Modifier.FINAL).build());
+    builder = builder.addField(FieldSpec.builder(Long.TYPE, "mDeliveryTimeout", Modifier.PRIVATE, Modifier.FINAL)
+      .build());
 
     /* **** Address */
 
-    builder =
-      builder.addField(FieldSpec.builder(String.class, "mAddress", Modifier.PRIVATE, Modifier.VOLATILE).build());
+    builder = builder.addField(FieldSpec.builder(String.class, "mAddress", Modifier.PRIVATE, Modifier.VOLATILE)
+      .build());
 
     /* Add a constructor */
 
@@ -509,9 +574,8 @@ public class ProxyGenerator implements Generator {
       .addParameter(String.class, "pAddress")//
       .addParameter(Long.TYPE, "pDeliveryTimeout") //
       .addStatement("mContextFactory = $T.notNull(pContextFactory)", Verify.class);
-    if (pAnnotatedClass.isNeedsConverter())
-      constructorBuilder = constructorBuilder //
-        .addStatement("mConverterManager = $T.notNull(pConverterManager)", Verify.class);
+    if (pAnnotatedClass.isNeedsConverter()) constructorBuilder = constructorBuilder //
+      .addStatement("mConverterManager = $T.notNull(pConverterManager)", Verify.class);
     constructorBuilder = constructorBuilder //
       .addStatement("mSecurityContextManager = $T.notNull(pSecurityContextManager)", Verify.class)
       .addStatement("mVertx = $T.notNull(pVertx)", Verify.class)
@@ -525,8 +589,8 @@ public class ProxyGenerator implements Generator {
     MethodSpec.Builder getAddressBuilder = MethodSpec.methodBuilder("getAddress").addModifiers(Modifier.PUBLIC) //
       .returns(ClassName.get(String.class)) //
       .addStatement("return mAddress")
-    //
-    ;
+      //
+      ;
     builder = builder.addMethod(getAddressBuilder.build());
 
     return builder;
@@ -539,14 +603,12 @@ public class ProxyGenerator implements Generator {
       TypeName typeName = type.getTypeName();
       if ((TypeName.BOOLEAN.equals(typeName)) || (TypeName.BOOLEAN.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
-      }
-      else if ((TypeName.BYTE.equals(typeName)) || (TypeName.BYTE.box().equals(typeName))) {
+      } else if ((TypeName.BYTE.equals(typeName)) || (TypeName.BYTE.box().equals(typeName))) {
         pBuilder = pBuilder //
           .addStatement("byte[] $N_array = new byte[1]", param.getName()) //
           .addStatement("$N_array[0] = $N", param.getName(), param.getName()) //
           .addStatement("message.put($S, $N_array)", param.getName(), param.getName());
-      }
-      else if (TypeName.BYTE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+      } else if (TypeName.BYTE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
         pBuilder = pBuilder //
           .beginControlFlow("if ($N != null)", param.getName()) //
           .addStatement("byte[] $N_array = new byte[1]", param.getName()) //
@@ -555,13 +617,11 @@ public class ProxyGenerator implements Generator {
           .nextControlFlow("else") //
           .addStatement("message.put($S, (byte[])null)", param.getName()) //
           .endControlFlow();
-      }
-      else if ((TypeName.CHAR.equals(typeName)) || (TypeName.CHAR.box().equals(typeName))) {
+      } else if ((TypeName.CHAR.equals(typeName)) || (TypeName.CHAR.box().equals(typeName))) {
         pBuilder = pBuilder //
           .addStatement("String $N_string = Character.toString($N)", param.getName(), param.getName()) //
           .addStatement("message.put($S, $N_string)", param.getName(), param.getName());
-      }
-      else if (TypeName.CHAR.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+      } else if (TypeName.CHAR.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
         pBuilder = pBuilder //
           .beginControlFlow("if ($N != null)", param.getName()) //
           .addStatement("String $N_string = Character.toString($N)", param.getName(), param.getName()) //
@@ -569,25 +629,19 @@ public class ProxyGenerator implements Generator {
           .nextControlFlow("else") //
           .addStatement("message.put($S, (String) null)", param.getName()) //
           .endControlFlow();
-      }
-      else if ((TypeName.DOUBLE.equals(typeName)) || (TypeName.DOUBLE.box().equals(typeName.withoutAnnotations()))) {
+      } else if ((TypeName.DOUBLE.equals(typeName)) || (TypeName.DOUBLE.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
-      }
-      else if ((TypeName.FLOAT.equals(typeName)) || (TypeName.FLOAT.box().equals(typeName.withoutAnnotations()))) {
+      } else if ((TypeName.FLOAT.equals(typeName)) || (TypeName.FLOAT.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
-      }
-      else if ((TypeName.INT.equals(typeName)) || (TypeName.INT.box().equals(typeName.withoutAnnotations()))) {
+      } else if ((TypeName.INT.equals(typeName)) || (TypeName.INT.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
-      }
-      else if ((TypeName.LONG.equals(typeName)) || (TypeName.LONG.box().equals(typeName.withoutAnnotations()))) {
+      } else if ((TypeName.LONG.equals(typeName)) || (TypeName.LONG.box().equals(typeName.withoutAnnotations()))) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
-      }
-      else if ((TypeName.SHORT.equals(typeName)) || (TypeName.DOUBLE.box().equals(typeName))) {
+      } else if ((TypeName.SHORT.equals(typeName)) || (TypeName.DOUBLE.box().equals(typeName))) {
         pBuilder = pBuilder //
           .addStatement("int $N_int = $N", param.getName(), param.getName()) //
           .addStatement("message.put($S, $N_int)", param.getName(), param.getName());
-      }
-      else if (TypeName.SHORT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+      } else if (TypeName.SHORT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
         pBuilder = pBuilder //
           .beginControlFlow("if ($N != null)", param.getName()) //
           .addStatement("int $N_int = $N", param.getName(), param.getName()) //
@@ -607,22 +661,31 @@ public class ProxyGenerator implements Generator {
 
       else if (ClassName.get(String.class).equals(typeName)) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
-      }
-      else if (ClassName.get(String.class).annotated(AnnotationSpec.builder(Nullable.class).build()).equals(typeName)) {
+      } else if (ClassName.get(String.class)
+        .annotated(AnnotationSpec.builder(Nullable.class).build())
+        .equals(typeName)) {
         pBuilder = pBuilder.addStatement("message.put($S, $N)", param.getName(), param.getName());
       }
 
       /* Handle UUID */
 
       else if (ClassName.get(UUID.class).equals(typeName.withoutAnnotations())) {
-        if (type.isNullable() == true)
-          pBuilder = pBuilder //
-            .addStatement("@$T String $N_str = ($N == null ? null : $N.toString())", Nullable.class, param.getName(),
-              param.getName(), param.getName());
-        else
-          pBuilder = pBuilder //
-            .addStatement("@$T($S) @$T String $N_str = ($N == null ? null : $N.toString())", SuppressWarnings.class,
-              "null", Nullable.class, param.getName(), param.getName(), param.getName());
+        if (type.isNullable() == true) pBuilder = pBuilder //
+          .addStatement("@$T String $N_str = ($N == null ? null : $N.toString())",
+            Nullable.class,
+            param.getName(),
+            param.getName(),
+            param.getName()
+          );
+        else pBuilder = pBuilder //
+          .addStatement("@$T($S) @$T String $N_str = ($N == null ? null : $N.toString())",
+            SuppressWarnings.class,
+            "null",
+            Nullable.class,
+            param.getName(),
+            param.getName(),
+            param.getName()
+          );
         pBuilder = pBuilder //
           .addStatement("message.put($S, $N_str)", param.getName(), param.getName());
       }
@@ -631,9 +694,14 @@ public class ProxyGenerator implements Generator {
 
       else if (ClassName.get(Buffer.class).equals(typeName.withoutAnnotations())) {
         pBuilder = pBuilder //
-          .addStatement("@$T($S) byte @$T[] $N_bytes = ($N == null ? null : $N.getBytes())", SuppressWarnings.class,
-            "null", Nullable.class, param.getName(), param.getName(), param.getName())
-          .addStatement("message.put($S, $N_bytes)", param.getName(), param.getName());
+          .addStatement("@$T($S) byte @$T[] $N_bytes = ($N == null ? null : $N.getBytes())",
+            SuppressWarnings.class,
+            "null",
+            Nullable.class,
+            param.getName(),
+            param.getName(),
+            param.getName()
+          ).addStatement("message.put($S, $N_bytes)", param.getName(), param.getName());
       }
 
       /* Handle list, set, collection */
@@ -648,31 +716,24 @@ public class ProxyGenerator implements Generator {
           pBuilder = pBuilder.beginControlFlow("for ($T item : $N)", itemType.getTypeName(), param.getName());
           if (TypeName.BOOLEAN.equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item)", param.getName());
-          }
-          else if (TypeName.BYTE.equals(itemTypeName)) {
+          } else if (TypeName.BYTE.equals(itemTypeName)) {
             pBuilder = pBuilder //
               .addStatement("byte[] $N_byte_array = new byte[1]", param.getName()) //
               .addStatement("$N_byte_array[0] = item", param.getName()) //
               .addStatement("$N_array.add($N_byte_array)", param.getName(), param.getName());
-          }
-          else if (TypeName.CHAR.equals(itemTypeName)) {
+          } else if (TypeName.CHAR.equals(itemTypeName)) {
             pBuilder = pBuilder //
               .addStatement("String $N_string = Character.toString(item)", param.getName()) //
               .addStatement("$N_array.add($N_string)", param.getName(), param.getName());
-          }
-          else if (TypeName.DOUBLE.equals(itemTypeName)) {
+          } else if (TypeName.DOUBLE.equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item)", param.getName());
-          }
-          else if (TypeName.FLOAT.equals(itemTypeName)) {
+          } else if (TypeName.FLOAT.equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item)", param.getName());
-          }
-          else if (TypeName.INT.equals(itemTypeName)) {
+          } else if (TypeName.INT.equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item)", param.getName());
-          }
-          else if (TypeName.LONG.equals(itemTypeName)) {
+          } else if (TypeName.LONG.equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item)", param.getName());
-          }
-          else if (TypeName.SHORT.equals(itemTypeName)) {
+          } else if (TypeName.SHORT.equals(itemTypeName)) {
             pBuilder = pBuilder //
               .addStatement("int $N_int = item", param.getName()) //
               .addStatement("$N_array.add($N_int)", param.getName(), param.getName());
@@ -682,8 +743,8 @@ public class ProxyGenerator implements Generator {
 
           else if (ClassName.get(String.class).equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item)", param.getName());
-          }
-          else if (ClassName.get(String.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+          } else if (ClassName.get(String.class)
+            .annotated(AnnotationSpec.builder(Nullable.class).build())
             .equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item)", param.getName());
           }
@@ -692,44 +753,58 @@ public class ProxyGenerator implements Generator {
 
           else if (ClassName.get(UUID.class).equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item.toString())", param.getName());
-          }
-          else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+          } else if (ClassName.get(UUID.class)
+            .annotated(AnnotationSpec.builder(Nullable.class).build())
             .equals(itemTypeName)) {
             pBuilder = pBuilder.addStatement("$N_array.add(item == null ? null : item.toString())", param.getName());
-          }
-          else if (itemType.isConverterAvailable() == true) {
+          } else if (itemType.isConverterAvailable() == true) {
             pBuilder = pBuilder //
               .addStatement(
                 "@$T($S) @$T $T $N_jsonobject = item == null ? null : mConverterManager.convert(item, $T.class)",
-                SuppressWarnings.class, "null", Nullable.class, JsonObject.class, param.getName(), JsonObject.class)
-              .addStatement("$N_array.add($N_jsonobject)", param.getName(), param.getName()) //
+                SuppressWarnings.class,
+                "null",
+                Nullable.class,
+                JsonObject.class,
+                param.getName(),
+                JsonObject.class
+              ).addStatement("$N_array.add($N_jsonobject)", param.getName(), param.getName()) //
             ;
-          }
-          else
-            throw new UnsupportedOperationException(
-              "Method: " + pProxyMethod.toString() + " Param: " + param.toString());
+          } else throw new UnsupportedOperationException(
+            "Method: " + pProxyMethod.toString() + " Param: " + param.toString());
           pBuilder = pBuilder.endControlFlow();
           pBuilder = pBuilder.addStatement("message.put($S, $N_array)", param.getName(), param.getName());
 
-        }
-        else
+        } else
           throw new UnsupportedOperationException("Method: " + pProxyMethod.toString() + " Param: " + param.toString());
-      }
-
-      else if (type.isProxyType() == true) {
+      } else if (type.isProxyType() == true) {
         pBuilder = pBuilder //
           .addStatement("$T $N_jsonobject = new $T()", JsonObject.class, param.getName(), JsonObject.class)
           .beginControlFlow("if ($N instanceof $TProxy)", param.getName(), type.getTypeName()) //
-          .addStatement("$N_jsonobject.put($S, (($TProxy)$N).getAddress())", param.getName(), "address",
-            type.getTypeName(), param.getName())
+          .addStatement("$N_jsonobject.put($S, (($TProxy)$N).getAddress())",
+            param.getName(),
+            "address",
+            type.getTypeName(),
+            param.getName()
+          )
           .nextControlFlow("else if ($N instanceof $TAbstractImpl)", param.getName(), type.getTypeName()) //
-          .addStatement("$N_jsonobject.put($S, (($TAbstractImpl)$N).getAddress())", param.getName(), "address",
-            type.getTypeName(), param.getName())
+          .addStatement("$N_jsonobject.put($S, (($TAbstractImpl)$N).getAddress())",
+            param.getName(),
+            "address",
+            type.getTypeName(),
+            param.getName()
+          )
           .endControlFlow() //
           // @SuppressWarnings("null")
           // JsonObject pStorageServer_nullable = (pStorageServer == null ? null : pStorageServer_jsonobject);
-          .addStatement("@$T($S) @$T $T $N_nullable = ($N == null ? null : $N_jsonobject)", SuppressWarnings.class,
-            "null", Nullable.class, JsonObject.class, param.getName(), param.getName(), param.getName())
+          .addStatement("@$T($S) @$T $T $N_nullable = ($N == null ? null : $N_jsonobject)",
+            SuppressWarnings.class,
+            "null",
+            Nullable.class,
+            JsonObject.class,
+            param.getName(),
+            param.getName(),
+            param.getName()
+          )
           .addStatement("message.put($S, $N_nullable)", param.getName(), param.getName());
       }
 
@@ -737,21 +812,30 @@ public class ProxyGenerator implements Generator {
 
       else if (type.isConverterAvailable() == true) {
         // JsonObject obj = mConverterManager.convert(pObj, JsonObject.class)
-        if (type.isNullable() == true)
-          pBuilder =
-            pBuilder.addStatement("@$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
-              Nullable.class, JsonObject.class, param.getName(), param.getName(), param.getName(), JsonObject.class);
-        else
-          pBuilder = pBuilder.addStatement(
-            "@$T($S) @$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
-            SuppressWarnings.class, "null", Nullable.class, JsonObject.class, param.getName(), param.getName(),
-            param.getName(), JsonObject.class);
+        if (type.isNullable() == true) pBuilder = pBuilder.addStatement(
+          "@$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
+          Nullable.class,
+          JsonObject.class,
+          param.getName(),
+          param.getName(),
+          param.getName(),
+          JsonObject.class
+        );
+        else pBuilder = pBuilder.addStatement(
+          "@$T($S) @$T $T $N_jsonobject = $N == null ? null : mConverterManager.convert($N, $T.class)",
+          SuppressWarnings.class,
+          "null",
+          Nullable.class,
+          JsonObject.class,
+          param.getName(),
+          param.getName(),
+          param.getName(),
+          JsonObject.class
+        );
         pBuilder = pBuilder.addStatement("message.put($S, $N_jsonobject)", param.getName(), param.getName());
-      }
-
-      else
-        throw new UnsupportedOperationException("TypeName: " + typeName.toString() + " Param: |" + param.toString()
-          + "| Method: |" + pProxyMethod.toString() + "|");
+      } else throw new UnsupportedOperationException(
+        "TypeName: " + typeName.toString() + " Param: |" + param.toString() + "| Method: |" + pProxyMethod.toString()
+          + "|");
     }
 
     /* Handle the special ContextExtendableStage return type */
@@ -769,15 +853,17 @@ public class ProxyGenerator implements Generator {
         MethodSpec.Builder replyMethod = MethodSpec.methodBuilder("handle") //
           .addAnnotation(Override.class) //
           .addModifiers(Modifier.PUBLIC) //
-          .addParameter(ParameterSpec
-            .builder(ParameterizedTypeName.get(ClassName.get(Message.class), actualTypeName), "pEvent").build()) //
+          .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Message.class), actualTypeName),
+            "pEvent"
+          ).build()) //
           .addStatement("$T body = pEvent.body()", actualTypeName) //
           .addStatement("finalResult.complete(body)");
         ;
 
         TypeSpec replyHandler = TypeSpec.anonymousClassBuilder("")
           .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class),
-            ParameterizedTypeName.get(ClassName.get(Message.class), actualTypeName))) //
+            ParameterizedTypeName.get(ClassName.get(Message.class), actualTypeName)
+          )) //
           .addMethod(replyMethod.build()) //
           .build();
 
@@ -787,11 +873,16 @@ public class ProxyGenerator implements Generator {
           // message.put("__replyAddress", returnReplyAddress);
           .addStatement("message.put($S, returnReplyAddress)", "__replyAddress")
           // ContextExtendedCompletableFuture<@Nullable Void> finalResult = FutureUtils.newCompletableFuture();
-          .addStatement("$T<$T> finalResult = $T.newCompletableFuture()", ContextExtendedCompletableFuture.class,
-            actualTypeName, FutureUtils.class)
+          .addStatement("$T<$T> finalResult = $T.newCompletableFuture()",
+            ContextExtendedCompletableFuture.class,
+            actualTypeName,
+            FutureUtils.class
+          )
           // MessageConsumer<@Nullable Void> replyConsumer = mVertx.eventBus().consumer(returnReplyAddress);
-          .addStatement("$T<$T> replyConsumer = mVertx.eventBus().consumer(returnReplyAddress)", MessageConsumer.class,
-            actualTypeName)
+          .addStatement("$T<$T> replyConsumer = mVertx.eventBus().consumer(returnReplyAddress)",
+            MessageConsumer.class,
+            actualTypeName
+          )
           // replyConsumer.handler(new Handler<Message<@Nullable Void>>() {
           .addStatement("replyConsumer.handler($L)", replyHandler)
         // @Override
@@ -817,8 +908,10 @@ public class ProxyGenerator implements Generator {
       MethodSpec.Builder builder = override(pProxyMethod)
 
         // try (Context ctx = mContextFactory.newContext(SimpleProxyProxy.class, this)) {
-        .beginControlFlow("try ($T ctx = mContextFactory.newContext($T.class, this))", Context.class,
-          pProxyClass.getProxyQualifiedTypeName())
+        .beginControlFlow("try ($T ctx = mContextFactory.newContext($T.class, this))",
+          Context.class,
+          pProxyClass.getProxyQualifiedTypeName()
+        )
 
         // JsonObject message = new JsonObject();
         .addStatement("$T message = new $T()", JsonObject.class, JsonObject.class);
@@ -826,9 +919,12 @@ public class ProxyGenerator implements Generator {
       builder = addParameters(pProxyMethod, builder);
 
       // DeliveryOptions options = new DeliveryOptions().addHeader("action", "getName");
-      builder = builder
-        .addStatement("$T options = new $T().addHeader($S, $S).setSendTimeout(mDeliveryTimeout)", DeliveryOptions.class,
-          DeliveryOptions.class, "action", pProxyMethod.getMethodName()) //
+      builder = builder.addStatement("$T options = new $T().addHeader($S, $S).setSendTimeout(mDeliveryTimeout)",
+          DeliveryOptions.class,
+          DeliveryOptions.class,
+          "action",
+          pProxyMethod.getMethodName()
+        ) //
 
         // mVertx.eventBus().<String> send(mAddress, message, options,
         .addStatement("$N.eventBus().send($N, $N, $N)", "mVertx", "mAddress", "message", "options")
@@ -837,8 +933,7 @@ public class ProxyGenerator implements Generator {
         .endControlFlow();
 
       return builder.build();
-    }
-    else {
+    } else {
       BaseType actualReturnType = returnType.getParameterizedType(0);
       TypeName returnTypeName = actualReturnType.getTypeName();
       TypeName replyReturnType;
@@ -848,52 +943,39 @@ public class ProxyGenerator implements Generator {
 
       if (ClassName.get("java.lang", "Void").equals(returnTypeName.withoutAnnotations())) {
         replyReturnType = returnTypeName;
-      }
-      else if (TypeName.INT.box().equals(returnTypeName)) {
+      } else if (TypeName.INT.box().equals(returnTypeName)) {
         replyReturnType = returnTypeName;
-      }
-      else if (TypeName.LONG.box().equals(returnTypeName)) {
+      } else if (TypeName.LONG.box().equals(returnTypeName)) {
         replyReturnType = returnTypeName;
-      }
-      else if (TypeName.FLOAT.box().equals(returnTypeName)) {
+      } else if (TypeName.FLOAT.box().equals(returnTypeName)) {
         replyReturnType = returnTypeName;
-      }
-      else if (TypeName.DOUBLE.box().equals(returnTypeName)) {
+      } else if (TypeName.DOUBLE.box().equals(returnTypeName)) {
         replyReturnType = returnTypeName;
-      }
-      else if (TypeName.BOOLEAN.box().equals(returnTypeName)) {
+      } else if (TypeName.BOOLEAN.box().equals(returnTypeName)) {
         replyReturnType = returnTypeName;
-      }
-      else if (TypeName.SHORT.box().equals(returnTypeName)) {
+      } else if (TypeName.SHORT.box().equals(returnTypeName)) {
         replyReturnType = returnTypeName;
-      }
-      else if (TypeName.CHAR.box().equals(returnTypeName)) {
+      } else if (TypeName.CHAR.box().equals(returnTypeName)) {
         replyReturnType = returnTypeName;
-      }
-      else if (TypeName.BYTE.box().equals(returnTypeName)) {
+      } else if (TypeName.BYTE.box().equals(returnTypeName)) {
         replyReturnType = returnTypeName;
-      }
-      else if (ClassName.get(String.class).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ClassName.get(String.class).equals(returnTypeName.withoutAnnotations())) {
         replyReturnType = returnTypeName;
-      }
-      else if (ClassName.get(Buffer.class).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ClassName.get(Buffer.class).equals(returnTypeName.withoutAnnotations())) {
         replyReturnType = returnTypeName;
-      }
-      else if (ClassName.get(JsonObject.class).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ClassName.get(JsonObject.class).equals(returnTypeName.withoutAnnotations())) {
         replyReturnType = returnTypeName;
-      }
-      else if (ClassName.get(JsonArray.class).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ClassName.get(JsonArray.class).equals(returnTypeName.withoutAnnotations())) {
         replyReturnType = returnTypeName;
-      }
-      else if (ArrayTypeName.of(TypeName.BYTE).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ArrayTypeName.of(TypeName.BYTE).equals(returnTypeName.withoutAnnotations())) {
         replyReturnType = returnTypeName;
       }
       /* Handle UUID */
 
       else if (ClassName.get(UUID.class).equals(returnTypeName)) {
         replyReturnType = TypeName.get(String.class);
-      }
-      else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+      } else if (ClassName.get(UUID.class)
+        .annotated(AnnotationSpec.builder(Nullable.class).build())
         .equals(returnTypeName)) {
         replyReturnType = TypeName.get(String.class).annotated(AnnotationSpec.builder(Nullable.class).build());
       }
@@ -905,46 +987,31 @@ public class ProxyGenerator implements Generator {
         if (("java.util.List".equals(basicTypeName) == true) || ("java.util.Collection".equals(basicTypeName) == true)
           || ("java.util.Set".equals(basicTypeName) == true)) {
           replyReturnType = TypeName.get(JsonArray.class);
-        }
-        else if ("com.diamondq.common.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+        } else if ("com.diamondq.common.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
           replyReturnType = TypeName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build());
           isReturnTypeNullable = true;
           isReplyUsed = false;
-        }
-        else if (basicTypeName.startsWith("org.javatuples.")) {
+        } else if (basicTypeName.startsWith("org.javatuples.")) {
           replyReturnType = TypeName.get(JsonArray.class);
-        }
-        else
-          throw new UnsupportedOperationException(
-            "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
-      }
-
-      else if (actualReturnType.isProxyType() == true) {
-        replyReturnType = TypeName.get(JsonObject.class);
-      }
-
-      else if (actualReturnType.isConverterAvailable() == true) {
-        replyReturnType = TypeName.get(JsonObject.class);
-      }
-
-      else
-        throw new UnsupportedOperationException(
+        } else throw new UnsupportedOperationException(
           "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
+      } else if (actualReturnType.isProxyType() == true) {
+        replyReturnType = TypeName.get(JsonObject.class);
+      } else if (actualReturnType.isConverterAvailable() == true) {
+        replyReturnType = TypeName.get(JsonObject.class);
+      } else throw new UnsupportedOperationException(
+        "Method: " + pProxyMethod.toString() + " Return: " + actualReturnType.toString());
 
       if (actualReturnType.isNullable()) {
-        if (isReturnTypeNullable == null)
-          isReturnTypeNullable = true;
+        if (isReturnTypeNullable == null) isReturnTypeNullable = true;
         boolean needsNullable = true;
         for (AnnotationSpec spec : replyReturnType.annotations) {
-          if (spec.type.equals(TypeName.get(Nullable.class)))
-            needsNullable = false;
+          if (spec.type.equals(TypeName.get(Nullable.class))) needsNullable = false;
         }
         if (needsNullable == true)
           replyReturnType = replyReturnType.annotated(AnnotationSpec.builder(Nullable.class).build());
-      }
-      else {
-        if (isReturnTypeNullable == null)
-          isReturnTypeNullable = false;
+      } else {
+        if (isReturnTypeNullable == null) isReturnTypeNullable = false;
       }
 
       // (ar) -> {
@@ -953,7 +1020,8 @@ public class ProxyGenerator implements Generator {
         .addAnnotation(Override.class) //
         .returns(Void.TYPE) //
         .addParameter(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-          ParameterizedTypeName.get(ClassName.get(Message.class), replyReturnType)), "ar") //
+          ParameterizedTypeName.get(ClassName.get(Message.class), replyReturnType)
+        ), "ar") //
         // try (Context ctx2 = ctx.activateOnThread("")) {
         .beginControlFlow("try (Context ctx2 = ctx.activateOnThread($S))", "")
         // try {
@@ -982,44 +1050,31 @@ public class ProxyGenerator implements Generator {
 
       if (ClassName.get("java.lang", "Void").equals(returnTypeName.withoutAnnotations())) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (TypeName.INT.box().equals(returnTypeName)) {
+      } else if (TypeName.INT.box().equals(returnTypeName)) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (TypeName.LONG.box().equals(returnTypeName)) {
+      } else if (TypeName.LONG.box().equals(returnTypeName)) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (TypeName.FLOAT.box().equals(returnTypeName)) {
+      } else if (TypeName.FLOAT.box().equals(returnTypeName)) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (TypeName.DOUBLE.box().equals(returnTypeName)) {
+      } else if (TypeName.DOUBLE.box().equals(returnTypeName)) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (TypeName.BOOLEAN.box().equals(returnTypeName)) {
+      } else if (TypeName.BOOLEAN.box().equals(returnTypeName)) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (TypeName.SHORT.box().equals(returnTypeName)) {
+      } else if (TypeName.SHORT.box().equals(returnTypeName)) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (TypeName.CHAR.box().equals(returnTypeName)) {
+      } else if (TypeName.CHAR.box().equals(returnTypeName)) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (TypeName.BYTE.box().equals(returnTypeName)) {
+      } else if (TypeName.BYTE.box().equals(returnTypeName)) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (ClassName.get(String.class).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ClassName.get(String.class).equals(returnTypeName.withoutAnnotations())) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (ClassName.get(Buffer.class).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ClassName.get(Buffer.class).equals(returnTypeName.withoutAnnotations())) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (ClassName.get(JsonObject.class).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ClassName.get(JsonObject.class).equals(returnTypeName.withoutAnnotations())) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (ClassName.get(JsonArray.class).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ClassName.get(JsonArray.class).equals(returnTypeName.withoutAnnotations())) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
-      }
-      else if (ArrayTypeName.of(TypeName.BYTE).equals(returnTypeName.withoutAnnotations())) {
+      } else if (ArrayTypeName.of(TypeName.BYTE).equals(returnTypeName.withoutAnnotations())) {
         methodBuilder = methodBuilder.addStatement("result.complete(replyResult)");
       }
 
@@ -1029,13 +1084,14 @@ public class ProxyGenerator implements Generator {
         methodBuilder = methodBuilder //
           .addStatement("$T replyResult_obj = $T.fromString(replyResult)", returnTypeName, UUID.class)
           .addStatement("result.complete(replyResult_obj)");
-      }
-      else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+      } else if (ClassName.get(UUID.class)
+        .annotated(AnnotationSpec.builder(Nullable.class).build())
         .equals(returnTypeName)) {
         methodBuilder = methodBuilder //
           .addStatement("$T replyResult_obj = (replyResult == null ? null : $T.fromString(replyResult))",
-            returnTypeName, UUID.class)
-          .addStatement("result.complete(replyResult_obj)");
+            returnTypeName,
+            UUID.class
+          ).addStatement("result.complete(replyResult_obj)");
       }
 
       /* Handle list, set, collection */
@@ -1046,77 +1102,80 @@ public class ProxyGenerator implements Generator {
           || ("java.util.Set".equals(basicTypeName) == true)) {
 
           TypeName concreteTypeName;
-          if (("java.util.List".equals(basicTypeName) == true)
-            || ("java.util.Collection".equals(basicTypeName) == true))
-            concreteTypeName = ClassName.get(ArrayList.class);
-          else
-            concreteTypeName = ClassName.get(HashSet.class);
+          if (("java.util.List".equals(basicTypeName) == true) || ("java.util.Collection".equals(basicTypeName)
+            == true)) concreteTypeName = ClassName.get(ArrayList.class);
+          else concreteTypeName = ClassName.get(HashSet.class);
 
           BaseType itemType = actualReturnType.getParameterizedType(0);
           TypeName itemTypeName = itemType.getTypeName();
-          if (actualReturnType.isNullable() == true)
-            methodBuilder = methodBuilder.addStatement("$T r_array = (replyResult == null ? null : new $T<>())",
-              returnTypeName, concreteTypeName);
-          else
-            methodBuilder = methodBuilder.addStatement("$T r_array = new $T<>()", returnTypeName, concreteTypeName);
-          if (actualReturnType.isNullable())
-            methodBuilder = methodBuilder.beginControlFlow("if (replyResult != null)");
+          if (actualReturnType.isNullable() == true) methodBuilder = methodBuilder.addStatement(
+            "$T r_array = (replyResult == null ? null : new $T<>())",
+            returnTypeName,
+            concreteTypeName
+          );
+          else methodBuilder = methodBuilder.addStatement("$T r_array = new $T<>()", returnTypeName, concreteTypeName);
+          if (actualReturnType.isNullable()) methodBuilder = methodBuilder.beginControlFlow("if (replyResult != null)");
           methodBuilder = methodBuilder.addStatement("int r_size = replyResult.size()");
           methodBuilder = methodBuilder.beginControlFlow("if (r_size > 0)");
           methodBuilder = methodBuilder.beginControlFlow("for (int i=0;i<r_size;i++)");
 
-          methodBuilder = handleElement(pProxyMethod, actualReturnType, methodBuilder, itemType, itemTypeName,
-            "r_array.add(", ")", "replyResult", "i");
+          methodBuilder = handleElement(pProxyMethod,
+            actualReturnType,
+            methodBuilder,
+            itemType,
+            itemTypeName,
+            "r_array.add(",
+            ")",
+            "replyResult",
+            "i"
+          );
 
           methodBuilder = methodBuilder.endControlFlow();
           methodBuilder = methodBuilder.endControlFlow();
-          if (actualReturnType.isNullable())
-            methodBuilder = methodBuilder.endControlFlow();
+          if (actualReturnType.isNullable()) methodBuilder = methodBuilder.endControlFlow();
           methodBuilder = methodBuilder.addStatement("result.complete(r_array)");
 
-        }
-        else if ("com.diamondq.common.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
+        } else if ("com.diamondq.common.context.ContextExtendedCompletionStage".equals(basicTypeName)) {
           methodBuilder = methodBuilder //
             // result.complete(finalResult);
             .addStatement("result.complete(finalResult)");
-        }
-        else if (basicTypeName.startsWith("org.javatuples.")) {
+        } else if (basicTypeName.startsWith("org.javatuples.")) {
 
           int typeSize = actualReturnType.getParameterizedTypeSize();
           Class<?> tupleClass;
           switch (typeSize) {
-          case 1:
-            tupleClass = Unit.class;
-            break;
-          case 2:
-            tupleClass = Pair.class;
-            break;
-          case 3:
-            tupleClass = Triplet.class;
-            break;
-          case 4:
-            tupleClass = Quartet.class;
-            break;
-          case 5:
-            tupleClass = Quintet.class;
-            break;
-          case 6:
-            tupleClass = Sextet.class;
-            break;
-          case 7:
-            tupleClass = Septet.class;
-            break;
-          case 8:
-            tupleClass = Octet.class;
-            break;
-          case 9:
-            tupleClass = Ennead.class;
-            break;
-          case 10:
-            tupleClass = Decade.class;
-            break;
-          default:
-            throw new UnsupportedOperationException();
+            case 1:
+              tupleClass = Unit.class;
+              break;
+            case 2:
+              tupleClass = Pair.class;
+              break;
+            case 3:
+              tupleClass = Triplet.class;
+              break;
+            case 4:
+              tupleClass = Quartet.class;
+              break;
+            case 5:
+              tupleClass = Quintet.class;
+              break;
+            case 6:
+              tupleClass = Sextet.class;
+              break;
+            case 7:
+              tupleClass = Septet.class;
+              break;
+            case 8:
+              tupleClass = Octet.class;
+              break;
+            case 9:
+              tupleClass = Ennead.class;
+              break;
+            case 10:
+              tupleClass = Decade.class;
+              break;
+            default:
+              throw new UnsupportedOperationException();
           }
 
           /* Define the variables */
@@ -1138,8 +1197,16 @@ public class ProxyGenerator implements Generator {
             TypeName varTypeName = varType.getTypeName();
             methodBuilder = methodBuilder //
               .beginControlFlow("");
-            methodBuilder = handleElement(pProxyMethod, actualReturnType, methodBuilder, varType, varTypeName,
-              argNames.get(i) + " = ", "", "replyResult", String.valueOf(i));
+            methodBuilder = handleElement(pProxyMethod,
+              actualReturnType,
+              methodBuilder,
+              varType,
+              varTypeName,
+              argNames.get(i) + " = ",
+              "",
+              "replyResult",
+              String.valueOf(i)
+            );
             methodBuilder = methodBuilder //
               .endControlFlow();
           }
@@ -1153,50 +1220,41 @@ public class ProxyGenerator implements Generator {
           methodBuilder = methodBuilder //
             .addStatement(sb.toString(), ClassName.get(tupleClass));
 
-        }
-        else
-          throw new UnsupportedOperationException("Unrecognized Return of ??<??> -> Method: |" + pProxyMethod.toString()
-            + "| Return: |" + actualReturnType.toString() + "|");
-      }
-
-      else if (actualReturnType.isProxyType() == true) {
+        } else throw new UnsupportedOperationException(
+          "Unrecognized Return of ??<??> -> Method: |" + pProxyMethod.toString() + "| Return: |"
+            + actualReturnType.toString() + "|");
+      } else if (actualReturnType.isProxyType() == true) {
         TypeElement typeElement = actualReturnType.getDeclaredTypeElement();
-        if (typeElement == null)
-          throw new IllegalStateException();
+        if (typeElement == null) throw new IllegalStateException();
         ProxyClass returnProxy = new ProxyClass(typeElement, pProcessingEnv);
-        if (actualReturnType.isNullable() == true)
-          methodBuilder = methodBuilder //
-            .beginControlFlow("if (replyResult != null)");
+        if (actualReturnType.isNullable() == true) methodBuilder = methodBuilder //
+          .beginControlFlow("if (replyResult != null)");
         methodBuilder = methodBuilder //
           .addStatement("String address = $T.notNull(replyResult.getString($S))", Verify.class, "address") //
-          .addStatement(returnProxy.isNeedsConverter() == true
-            ? "result.complete(new $TProxy(mContextFactory, mConverterManager, mSecurityContextManager, mVertx, address, mDeliveryTimeout))"
-            : "result.complete(new $TProxy(mContextFactory, mSecurityContextManager, mVertx, address, mDeliveryTimeout))",
-            returnTypeName.withoutAnnotations());
-        if (actualReturnType.isNullable() == true)
-          methodBuilder = methodBuilder //
-            .nextControlFlow("else") //
-            .addStatement("result.complete(null)") //
-            .endControlFlow();
-      }
-
-      else if (actualReturnType.isConverterAvailable() == true) {
+          .addStatement(returnProxy.isNeedsConverter()
+              == true ? "result.complete(new $TProxy(mContextFactory, mConverterManager, mSecurityContextManager, mVertx, address, mDeliveryTimeout))" : "result.complete(new $TProxy(mContextFactory, mSecurityContextManager, mVertx, address, mDeliveryTimeout))",
+            returnTypeName.withoutAnnotations()
+          );
+        if (actualReturnType.isNullable() == true) methodBuilder = methodBuilder //
+          .nextControlFlow("else") //
+          .addStatement("result.complete(null)") //
+          .endControlFlow();
+      } else if (actualReturnType.isConverterAvailable() == true) {
         if (actualReturnType.isNullable() == true) {
           methodBuilder = methodBuilder //
             .addStatement(
               "result.complete((replyResult == null ? null : mConverterManager.convert(replyResult, $T.class)))",
-              returnTypeName.withoutAnnotations());
-        }
-        else {
+              returnTypeName.withoutAnnotations()
+            );
+        } else {
           methodBuilder = methodBuilder //
             .addStatement("result.complete(mConverterManager.convert(replyResult, $T.class))",
-              returnTypeName.withoutAnnotations());
+              returnTypeName.withoutAnnotations()
+            );
         }
-      }
-
-      else
-        throw new UnsupportedOperationException("Unrecognized Return of ?? -> Method: |" + pProxyMethod.toString()
-          + "| Return: |" + actualReturnType.toString() + "|");
+      } else throw new UnsupportedOperationException(
+        "Unrecognized Return of ?? -> Method: |" + pProxyMethod.toString() + "| Return: |" + actualReturnType.toString()
+          + "|");
 
       if (isReturnTypeNullable == false) {
         methodBuilder = methodBuilder.endControlFlow();
@@ -1233,7 +1291,9 @@ public class ProxyGenerator implements Generator {
       TypeSpec handler = TypeSpec.anonymousClassBuilder("")
         .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class),
           ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-            ParameterizedTypeName.get(ClassName.get(Message.class), replyReturnType)))) //
+            ParameterizedTypeName.get(ClassName.get(Message.class), replyReturnType)
+          )
+        )) //
         .addMethod(methodBuilder.build()) //
         .build();
 
@@ -1244,8 +1304,10 @@ public class ProxyGenerator implements Generator {
         .addCode("\n/* Create a new context */\n\n")
 
         // try (Context ctx = mContextFactory.newContext(SimpleProxyProxy.class, this)) {
-        .beginControlFlow("try ($T ctx = mContextFactory.newContext($T.class, this))", Context.class,
-          pProxyClass.getProxyQualifiedTypeName())
+        .beginControlFlow("try ($T ctx = mContextFactory.newContext($T.class, this))",
+          Context.class,
+          pProxyClass.getProxyQualifiedTypeName()
+        )
 
         .addCode("\n/* Define the message to send */\n\n")
         // JsonObject message = new JsonObject();
@@ -1255,12 +1317,19 @@ public class ProxyGenerator implements Generator {
 
       // DeliveryOptions options = new DeliveryOptions().addHeader("action", "getName");
       builder = builder.addCode("\n/* Add the options including the method to call */\n\n")
-        .addStatement("$T options = new $T().addHeader($S, $S).setSendTimeout(mDeliveryTimeout)", DeliveryOptions.class,
-          DeliveryOptions.class, "action", pProxyMethod.getMethodName()) //
+        .addStatement("$T options = new $T().addHeader($S, $S).setSendTimeout(mDeliveryTimeout)",
+          DeliveryOptions.class,
+          DeliveryOptions.class,
+          "action",
+          pProxyMethod.getMethodName()
+        ) //
 
         // SecurityContext securityContext = ctx.getData("securityContext", true, SecurityContext.class);
-        .addStatement("$T securityContext = ctx.getData($S, true, $T.class)", SecurityContext.class, "securityContext",
-          SecurityContext.class)
+        .addStatement("$T securityContext = ctx.getData($S, true, $T.class)",
+          SecurityContext.class,
+          "securityContext",
+          SecurityContext.class
+        )
 
         // if (securityContext != null) {
         .beginControlFlow("if (securityContext != null)")
@@ -1268,7 +1337,9 @@ public class ProxyGenerator implements Generator {
         // Base64.getEncoder().encodeToString(mSecurityContextManager.serialize(securityContext)));
         .addStatement(
           "options = options.addHeader($S, $T.getEncoder().encodeToString(mSecurityContextManager.serialize(securityContext)))",
-          "securityContext", Base64.class)
+          "securityContext",
+          Base64.class
+        )
         // }
         .endControlFlow()
         //
@@ -1276,8 +1347,11 @@ public class ProxyGenerator implements Generator {
         .addCode("\n/* Define the return future */\n\n")
 
         // ContextExtendedCompletableFuture<String> result = FutureUtils.newCompletableFuture();
-        .addStatement("$T<$T> result = $T.newCompletableFuture()", ContextExtendedCompletableFuture.class,
-          returnTypeName, FutureUtils.class) //
+        .addStatement("$T<$T> result = $T.newCompletableFuture()",
+          ContextExtendedCompletableFuture.class,
+          returnTypeName,
+          FutureUtils.class
+        ) //
 
         .addCode("\n/* Inform the context to extend beyond this method call */\n\n")
 
@@ -1287,8 +1361,14 @@ public class ProxyGenerator implements Generator {
         .addCode("\n/* Send the message */\n\n")
 
         // mVertx.eventBus().<String> send(mAddress, message, options,
-        .addStatement("$N.eventBus().<$T>request($N, $N, $N, $L)", "mVertx", replyReturnType, "mAddress", "message",
-          "options", handler)
+        .addStatement("$N.eventBus().<$T>request($N, $N, $N, $L)",
+          "mVertx",
+          replyReturnType,
+          "mAddress",
+          "message",
+          "options",
+          handler
+        )
 
         // return result;
         .addStatement("return result")
@@ -1306,65 +1386,52 @@ public class ProxyGenerator implements Generator {
     String pResultName, String pOffset) {
     if (TypeName.BOOLEAN.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
       methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getBoolean(" + pOffset + ")" + pSuffix);
-    }
-    else if (TypeName.BOOLEAN.box().equals(itemTypeName)) {
-      methodBuilder = methodBuilder
-        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getBoolean(" + pOffset + "))" + pSuffix, Verify.class);
-    }
-    else if (TypeName.BYTE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+    } else if (TypeName.BOOLEAN.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(
+        pPrefix + "$T.notNull(" + pResultName + ".getBoolean(" + pOffset + "))" + pSuffix, Verify.class);
+    } else if (TypeName.BYTE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
       methodBuilder = methodBuilder //
         .addStatement("byte[] r_byte_array = " + pResultName + ".getBinary(" + pOffset + ")") //
         .addStatement(pPrefix + "r_byte_array[0]" + pSuffix);
-    }
-    else if (TypeName.BYTE.box().equals(itemTypeName)) {
+    } else if (TypeName.BYTE.box().equals(itemTypeName)) {
       methodBuilder = methodBuilder //
-        .addStatement("byte[] r_byte_array = $T.notNull(" + pResultName + ".getBinary(" + pOffset + "))", Verify.class) //
+        .addStatement("byte[] r_byte_array = $T.notNull(" + pResultName + ".getBinary(" + pOffset + "))",
+          Verify.class
+        ) //
         .addStatement(pPrefix + "r_byte_array[0]" + pSuffix);
-    }
-    else if (TypeName.CHAR.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+    } else if (TypeName.CHAR.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
       methodBuilder = methodBuilder //
         .addStatement("String r_string = " + pResultName + ".getString(" + pOffset + ")") //
         .addStatement(pPrefix + "r_string.charAt(0)" + pSuffix);
-    }
-    else if (TypeName.CHAR.box().equals(itemTypeName)) {
+    } else if (TypeName.CHAR.box().equals(itemTypeName)) {
       methodBuilder = methodBuilder //
         .addStatement("String r_string = $T.notNull(" + pResultName + ".getString(" + pOffset + "))", Verify.class) //
         .addStatement(pPrefix + "r_string.charAt(0)" + pSuffix);
-    }
-    else if (TypeName.DOUBLE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+    } else if (TypeName.DOUBLE.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
       methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getDouble(" + pOffset + ")" + pSuffix);
-    }
-    else if (TypeName.DOUBLE.box().equals(itemTypeName)) {
-      methodBuilder = methodBuilder
-        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getDouble(" + pOffset + "))" + pSuffix, Verify.class);
-    }
-    else if (TypeName.FLOAT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+    } else if (TypeName.DOUBLE.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(
+        pPrefix + "$T.notNull(" + pResultName + ".getDouble(" + pOffset + "))" + pSuffix, Verify.class);
+    } else if (TypeName.FLOAT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
       methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getFloat(" + pOffset + ")" + pSuffix);
-    }
-    else if (TypeName.FLOAT.box().equals(itemTypeName)) {
-      methodBuilder = methodBuilder
-        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getFloat(" + pOffset + "))" + pSuffix, Verify.class);
-    }
-    else if (TypeName.INT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+    } else if (TypeName.FLOAT.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(
+        pPrefix + "$T.notNull(" + pResultName + ".getFloat(" + pOffset + "))" + pSuffix, Verify.class);
+    } else if (TypeName.INT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
       methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getInteger(" + pOffset + ")" + pSuffix);
-    }
-    else if (TypeName.INT.box().equals(itemTypeName)) {
-      methodBuilder = methodBuilder
-        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getInteger(" + pOffset + "))" + pSuffix, Verify.class);
-    }
-    else if (TypeName.LONG.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+    } else if (TypeName.INT.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(
+        pPrefix + "$T.notNull(" + pResultName + ".getInteger(" + pOffset + "))" + pSuffix, Verify.class);
+    } else if (TypeName.LONG.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
       methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getLong(" + pOffset + ")" + pSuffix);
-    }
-    else if (TypeName.LONG.box().equals(itemTypeName)) {
-      methodBuilder = methodBuilder
-        .addStatement(pPrefix + "$T.notNull(" + pResultName + ".getLong(" + pOffset + "))" + pSuffix, Verify.class);
-    }
-    else if (TypeName.SHORT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+    } else if (TypeName.LONG.box().equals(itemTypeName)) {
+      methodBuilder = methodBuilder.addStatement(
+        pPrefix + "$T.notNull(" + pResultName + ".getLong(" + pOffset + "))" + pSuffix, Verify.class);
+    } else if (TypeName.SHORT.box().annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
       methodBuilder = methodBuilder //
         .addStatement("Integer r_int = " + pResultName + ".getInt(" + pOffset + ")") //
         .addStatement(pPrefix + "r_int.shortValue()" + pSuffix);
-    }
-    else if (TypeName.SHORT.box().equals(itemTypeName)) {
+    } else if (TypeName.SHORT.box().equals(itemTypeName)) {
       methodBuilder = methodBuilder //
         .addStatement("Integer r_int = $T.notNull(" + pResultName + ".getInt(" + pOffset + "))", Verify.class) //
         .addStatement(pPrefix + "r_int.shortValue()" + pSuffix);
@@ -1379,8 +1446,8 @@ public class ProxyGenerator implements Generator {
         .addStatement("throw new $T()", IllegalStateException.class) //
         .endControlFlow() //
         .addStatement(pPrefix + "r_obj" + pSuffix);
-    }
-    else if (ClassName.get(String.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+    } else if (ClassName.get(String.class)
+      .annotated(AnnotationSpec.builder(Nullable.class).build())
       .equals(itemTypeName)) {
       methodBuilder = methodBuilder.addStatement(pPrefix + "" + pResultName + ".getString(" + pOffset + ")" + pSuffix);
     }
@@ -1394,8 +1461,9 @@ public class ProxyGenerator implements Generator {
         .addStatement("throw new $T()", IllegalStateException.class) //
         .endControlFlow() //
         .addStatement(pPrefix + "$T.fromString(r_obj)" + pSuffix, UUID.class);
-    }
-    else if (ClassName.get(UUID.class).annotated(AnnotationSpec.builder(Nullable.class).build()).equals(itemTypeName)) {
+    } else if (ClassName.get(UUID.class)
+      .annotated(AnnotationSpec.builder(Nullable.class).build())
+      .equals(itemTypeName)) {
       methodBuilder = methodBuilder //
         .addStatement("$T r_obj = " + pResultName + ".getString(" + pOffset + ")", String.class) //
         .addStatement(pPrefix + "r_obj == null ? null : $T.fromString(r_obj)" + pSuffix, UUID.class);
@@ -1411,8 +1479,7 @@ public class ProxyGenerator implements Generator {
         TypeName concreteTypeName;
         if (("java.util.List".equals(basicTypeName) == true) || ("java.util.Collection".equals(basicTypeName) == true))
           concreteTypeName = ClassName.get(ArrayList.class);
-        else
-          concreteTypeName = ClassName.get(HashSet.class);
+        else concreteTypeName = ClassName.get(HashSet.class);
 
         BaseType collItemType = itemType.getParameterizedType(0);
         TypeName collItemTypeName = collItemType.getTypeName();
@@ -1420,62 +1487,64 @@ public class ProxyGenerator implements Generator {
           methodBuilder = methodBuilder //
             .addStatement("$T replyArray = " + pResultName + ".getJsonArray(" + pOffset + ")", JsonArray.class)
             .addStatement("$T r_array = (replyArray == null ? null : new $T<>())", itemTypeName, concreteTypeName);
-        }
-        else {
+        } else {
           methodBuilder = methodBuilder //
             .addStatement("$T replyArray = $T.notNull(" + pResultName + ".getJsonArray(" + pOffset + "))",
-              JsonArray.class, Verify.class)
-            .addStatement("$T r_array = new $T<>()", itemTypeName, concreteTypeName);
+              JsonArray.class,
+              Verify.class
+            ).addStatement("$T r_array = new $T<>()", itemTypeName, concreteTypeName);
         }
-        if (itemType.isNullable())
-          methodBuilder = methodBuilder.beginControlFlow("if (replyArray != null)");
+        if (itemType.isNullable()) methodBuilder = methodBuilder.beginControlFlow("if (replyArray != null)");
         methodBuilder = methodBuilder.addStatement("int r_size = replyArray.size()");
         methodBuilder = methodBuilder.beginControlFlow("if (r_size > 0)");
         methodBuilder = methodBuilder.beginControlFlow("for (int i=0;i<r_size;i++)");
 
-        methodBuilder = handleElement(pProxyMethod, actualReturnType, methodBuilder, collItemType, collItemTypeName,
-          "r_array.add(", ")", "replyArray", "i");
+        methodBuilder = handleElement(pProxyMethod,
+          actualReturnType,
+          methodBuilder,
+          collItemType,
+          collItemTypeName,
+          "r_array.add(",
+          ")",
+          "replyArray",
+          "i"
+        );
 
         methodBuilder = methodBuilder.endControlFlow();
         methodBuilder = methodBuilder.endControlFlow();
-        if (itemType.isNullable())
-          methodBuilder = methodBuilder.endControlFlow();
+        if (itemType.isNullable()) methodBuilder = methodBuilder.endControlFlow();
         methodBuilder = methodBuilder.addStatement(pPrefix + "r_array" + pSuffix);
 
-      }
-      else
-        throw new UnsupportedOperationException("Unrecognized Return of ??<??> -> Method: |" + pProxyMethod.toString()
-          + "| Return: |" + actualReturnType.toString() + "|");
-    }
-
-    else if (itemType.isConverterAvailable() == true) {
+      } else throw new UnsupportedOperationException(
+        "Unrecognized Return of ??<??> -> Method: |" + pProxyMethod.toString() + "| Return: |"
+          + actualReturnType.toString() + "|");
+    } else if (itemType.isConverterAvailable() == true) {
       if (itemType.isNullable() == true) {
         methodBuilder = methodBuilder //
           .addStatement("$T r_obj = " + pResultName + ".getJsonObject(" + pOffset + ")", JsonObject.class) //
           .addStatement(pPrefix + "r_obj == null ? null : mConverterManager.convert(r_obj, $T.class)" + pSuffix,
-            itemTypeName.withoutAnnotations());
-      }
-      else {
+            itemTypeName.withoutAnnotations()
+          );
+      } else {
         methodBuilder = methodBuilder //
           .addStatement("$T r_obj = " + pResultName + ".getJsonObject(" + pOffset + ")", JsonObject.class) //
           .beginControlFlow("if (r_obj == null)") //
           .addStatement("throw new $T()", IllegalStateException.class) //
           .endControlFlow() //
           .addStatement(pPrefix + "mConverterManager.convert(" + pResultName + ", $T.class)" + pSuffix,
-            itemTypeName.withoutAnnotations());
+            itemTypeName.withoutAnnotations()
+          );
       }
-    }
-
-    else
-      throw new UnsupportedOperationException("Unrecognized Return of List<??> -> Method: |" + pProxyMethod.toString()
-        + "| Return: |" + actualReturnType.toString() + "|");
+    } else throw new UnsupportedOperationException(
+      "Unrecognized Return of List<??> -> Method: |" + pProxyMethod.toString() + "| Return: |"
+        + actualReturnType.toString() + "|");
     return methodBuilder;
   }
 
   /**
    * This is a modification of the MethodSpec.overriding method because it explicitly does not put annotations on the
    * parameters or return types, but we need the @Nullable annotations to be passed along
-   * 
+   *
    * @param method the method
    * @return the builder
    */

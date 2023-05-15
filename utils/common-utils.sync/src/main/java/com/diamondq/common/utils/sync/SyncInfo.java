@@ -1,9 +1,9 @@
 package com.diamondq.common.utils.sync;
 
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -108,7 +108,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    *
    * @return the future Map of key/frag for the A source
    */
-  ExtendedCompletionStage<@NonNull Map<@NonNull A_KEY, @NonNull A_FRAG>> getASource();
+  ExtendedCompletionStage<@NotNull Map<@NotNull A_KEY, @NotNull A_FRAG>> getASource();
 
   /**
    * Returns an optional hash representing the B source data. If it's present, and the A hash is present, they can be
@@ -125,7 +125,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    *
    * @return the future Map of key/frag for the B source
    */
-  ExtendedCompletionStage<@NonNull Map<@NonNull B_KEY, @NonNull B_FRAG>> getBSource();
+  ExtendedCompletionStage<@NotNull Map<@NotNull B_KEY, @NotNull B_FRAG>> getBSource();
 
   /**
    * Return's the deleted status for a key

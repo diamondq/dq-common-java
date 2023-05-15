@@ -3,17 +3,16 @@ package com.diamondq.common.errors;
 import com.diamondq.common.i18n.I18N;
 import com.diamondq.common.i18n.I18NString;
 import com.diamondq.common.i18n.MessagesEnum;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Locale;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class ExtendedRuntimeException extends RuntimeException {
 
-  private static final long          serialVersionUID = 4769451435817098743L;
+  private static final long serialVersionUID = 4769451435817098743L;
 
-  protected final MessagesEnum       mCode;
+  protected final MessagesEnum mCode;
 
   protected final @Nullable Object[] mParams;
 
@@ -21,41 +20,31 @@ public class ExtendedRuntimeException extends RuntimeException {
     super(pStrAndEx.getThrowable());
     I18NString message = pStrAndEx.getMessage();
     mCode = message.message;
-    @Nullable
-    Object @Nullable [] params = message.params;
-    if (params == null)
-      mParams = new String[0];
-    else
-      mParams = Arrays.copyOf(params, params.length);
+    @Nullable Object @Nullable [] params = message.params;
+    if (params == null) mParams = new String[0];
+    else mParams = Arrays.copyOf(params, params.length);
   }
 
   public ExtendedRuntimeException(I18NString pString) {
     super();
     mCode = pString.message;
-    @Nullable
-    Object @Nullable [] params = pString.params;
-    if (params == null)
-      mParams = new String[0];
-    else
-      mParams = Arrays.copyOf(params, params.length);
+    @Nullable Object @Nullable [] params = pString.params;
+    if (params == null) mParams = new String[0];
+    else mParams = Arrays.copyOf(params, params.length);
   }
 
-  public ExtendedRuntimeException(MessagesEnum pCode, @Nullable Object @Nullable... pParams) {
+  public ExtendedRuntimeException(MessagesEnum pCode, @Nullable Object @Nullable ... pParams) {
     super();
     mCode = pCode;
-    if (pParams == null)
-      mParams = new String[0];
-    else
-      mParams = Arrays.copyOf(pParams, pParams.length);
+    if (pParams == null) mParams = new String[0];
+    else mParams = Arrays.copyOf(pParams, pParams.length);
   }
 
-  public ExtendedRuntimeException(Throwable pCause, MessagesEnum pCode, @Nullable Object @Nullable... pParams) {
+  public ExtendedRuntimeException(Throwable pCause, MessagesEnum pCode, @Nullable Object @Nullable ... pParams) {
     super(null, pCause);
     mCode = pCode;
-    if (pParams == null)
-      mParams = new String[0];
-    else
-      mParams = Arrays.copyOf(pParams, pParams.length);
+    if (pParams == null) mParams = new String[0];
+    else mParams = Arrays.copyOf(pParams, pParams.length);
   }
 
   public MessagesEnum getCode() {
@@ -84,7 +73,7 @@ public class ExtendedRuntimeException extends RuntimeException {
 
   /**
    * Returns the error message localized for the given locale
-   * 
+   *
    * @param pLocale the locale
    * @return the message
    */

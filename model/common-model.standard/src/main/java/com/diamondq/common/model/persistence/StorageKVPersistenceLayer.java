@@ -37,6 +37,8 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -50,9 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 /**
  * A Persistence Layer that stores the information in a Storage KV store
  */
@@ -63,11 +62,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
    */
   public static class StorageKVPersistenceLayerBuilder implements IBuilder<PersistenceLayer> {
 
-    protected @Nullable IKVStore           kvStore;
+    protected @Nullable IKVStore kvStore;
 
     protected @Nullable IBuilder<IKVStore> kvStoreBuilder;
 
-    protected @Nullable ContextFactory     contextFactory;
+    protected @Nullable ContextFactory contextFactory;
 
     /**
      * Sets the store
@@ -111,8 +110,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         localStore = localBuilder.build();
       }
       ContextFactory localContextFactory = contextFactory;
-      if (localContextFactory == null)
-        throw new IllegalArgumentException("The contextFactory must be set");
+      if (localContextFactory == null) throw new IllegalArgumentException("The contextFactory must be set");
       return new StorageKVPersistenceLayer(localContextFactory, localStore);
     }
   }
@@ -130,8 +128,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
     public static ContainerAndPrimaryKey parse(String pKey) {
       int slashOffset = pKey.lastIndexOf('/');
-      if (slashOffset == -1)
-        throw new IllegalArgumentException("Key is not in the valid format: " + pKey);
+      if (slashOffset == -1) throw new IllegalArgumentException("Key is not in the valid format: " + pKey);
       int prevSlashOffset = pKey.lastIndexOf('/', slashOffset - 1);
       String container = (prevSlashOffset == -1 ? "__ROOT__" : pKey.substring(0, prevSlashOffset));
       String primaryKey = pKey.substring(slashOffset + 1);
@@ -139,11 +136,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
     }
   }
 
-  private final IKVStore                                  mStructureStore;
+  private final IKVStore mStructureStore;
 
   private final @Nullable IKVTableDefinitionSupport<?, ?> mTableDefinitionSupport;
 
-  private final Map<String, String>                       mConfiguredTableDefinitions;
+  private final Map<String, String> mConfiguredTableDefinitions;
 
   /**
    * Default constructor
@@ -184,8 +181,10 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           if (mConfiguredTableDefinitions.putIfAbsent(pTableName, "") == null) {
             KVTableDefinitionBuilder<?> builder = tableDefinitionSupport.createTableDefinitionBuilder();
             builder = builder.tableName(pTableName);
-            builder.addColumn(tableDefinitionSupport.createColumnDefinitionBuilder().name("dateCreated")
-              .type(KVColumnType.Timestamp).build());
+            builder.addColumn(tableDefinitionSupport.createColumnDefinitionBuilder()
+              .name("dateCreated")
+              .type(KVColumnType.Timestamp)
+              .build());
             tableDefinitionSupport.addTableDefinition(builder.build());
           }
         }
@@ -210,8 +209,9 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
               /* Determine if there is multiple primary keys */
 
-              int primaryKeyCount =
-                Iterables.size(Iterables.filter(allProperties.values(), (pd) -> (pd != null) && pd.isPrimaryKey()));
+              int primaryKeyCount = Iterables.size(Iterables.filter(allProperties.values(),
+                (pd) -> (pd != null) && pd.isPrimaryKey()
+              ));
 
               for (PropertyDefinition pd : allProperties.values()) {
 
@@ -253,94 +253,82 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
                 String colName = pd.getName();
                 colBuilder = colBuilder.name(colName);
 
-                if (pd.isPrimaryKey())
-                  colBuilder = colBuilder.primaryKey();
+                if (pd.isPrimaryKey()) colBuilder = colBuilder.primaryKey();
 
                 switch (pd.getType()) {
-                case String: {
-                  colBuilder = colBuilder.type(KVColumnType.String);
-                  Integer maxLength = pd.getMaxLength();
-                  if (maxLength != null)
-                    colBuilder = colBuilder.maxLength(maxLength);
-                  break;
-                }
-                case Binary: {
-                  colBuilder = colBuilder.type(KVColumnType.Binary);
-                  Integer maxLength = pd.getMaxLength();
-                  if (maxLength != null)
-                    colBuilder = colBuilder.maxLength(maxLength);
-                  break;
-                }
-                case Boolean: {
-                  colBuilder = colBuilder.type(KVColumnType.Boolean);
-                  break;
-                }
-                case Decimal: {
-                  colBuilder = colBuilder.type(KVColumnType.Decimal);
-                  BigDecimal minValue = pd.getMinValue();
-                  if (minValue != null)
-                    colBuilder = colBuilder.minValue(minValue);
-                  BigDecimal maxValue = pd.getMaxValue();
-                  if (maxValue != null)
-                    colBuilder = colBuilder.maxValue(maxValue);
-                  BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
-                  if (autoIncrementStart != null)
-                    colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
-                  BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
-                  if (autoIncrementBy != null)
-                    colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
-                  break;
-                }
-                case EmbeddedStructureList:
-                  throw new UnsupportedOperationException();
-                case Image:
-                  throw new UnsupportedOperationException();
-                case Integer: {
-                  colBuilder = colBuilder.type(KVColumnType.Integer);
-                  BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
-                  if (autoIncrementStart != null)
-                    colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
-                  BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
-                  if (autoIncrementBy != null)
-                    colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
-                  break;
-                }
-                case Long: {
-                  colBuilder = colBuilder.type(KVColumnType.Long);
-                  BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
-                  if (autoIncrementStart != null)
-                    colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
-                  BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
-                  if (autoIncrementBy != null)
-                    colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
-                  break;
-                }
-                case PropertyRef: {
-                  colBuilder = colBuilder.type(KVColumnType.String);
-                  break;
-                }
-                case StructureRef: {
-                  colBuilder = colBuilder.type(KVColumnType.String);
-                  break;
-                }
-                case StructureRefList: {
-                  colBuilder = colBuilder.type(KVColumnType.String);
-                  break;
-                }
-                case Timestamp: {
-                  colBuilder = colBuilder.type(KVColumnType.Timestamp);
-                  break;
-                }
-                case UUID: {
-                  colBuilder = colBuilder.type(KVColumnType.UUID);
-                  break;
-                }
+                  case String: {
+                    colBuilder = colBuilder.type(KVColumnType.String);
+                    Integer maxLength = pd.getMaxLength();
+                    if (maxLength != null) colBuilder = colBuilder.maxLength(maxLength);
+                    break;
+                  }
+                  case Binary: {
+                    colBuilder = colBuilder.type(KVColumnType.Binary);
+                    Integer maxLength = pd.getMaxLength();
+                    if (maxLength != null) colBuilder = colBuilder.maxLength(maxLength);
+                    break;
+                  }
+                  case Boolean: {
+                    colBuilder = colBuilder.type(KVColumnType.Boolean);
+                    break;
+                  }
+                  case Decimal: {
+                    colBuilder = colBuilder.type(KVColumnType.Decimal);
+                    BigDecimal minValue = pd.getMinValue();
+                    if (minValue != null) colBuilder = colBuilder.minValue(minValue);
+                    BigDecimal maxValue = pd.getMaxValue();
+                    if (maxValue != null) colBuilder = colBuilder.maxValue(maxValue);
+                    BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
+                    if (autoIncrementStart != null) colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
+                    BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
+                    if (autoIncrementBy != null) colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
+                    break;
+                  }
+                  case EmbeddedStructureList:
+                    throw new UnsupportedOperationException();
+                  case Image:
+                    throw new UnsupportedOperationException();
+                  case Integer: {
+                    colBuilder = colBuilder.type(KVColumnType.Integer);
+                    BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
+                    if (autoIncrementStart != null) colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
+                    BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
+                    if (autoIncrementBy != null) colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
+                    break;
+                  }
+                  case Long: {
+                    colBuilder = colBuilder.type(KVColumnType.Long);
+                    BigDecimal autoIncrementStart = pd.getAutoIncrementStart();
+                    if (autoIncrementStart != null) colBuilder = colBuilder.autoIncrementStart(autoIncrementStart);
+                    BigDecimal autoIncrementBy = pd.getAutoIncrementBy();
+                    if (autoIncrementBy != null) colBuilder = colBuilder.autoIncrementBy(autoIncrementBy);
+                    break;
+                  }
+                  case PropertyRef: {
+                    colBuilder = colBuilder.type(KVColumnType.String);
+                    break;
+                  }
+                  case StructureRef: {
+                    colBuilder = colBuilder.type(KVColumnType.String);
+                    break;
+                  }
+                  case StructureRefList: {
+                    colBuilder = colBuilder.type(KVColumnType.String);
+                    break;
+                  }
+                  case Timestamp: {
+                    colBuilder = colBuilder.type(KVColumnType.Timestamp);
+                    break;
+                  }
+                  case UUID: {
+                    colBuilder = colBuilder.type(KVColumnType.UUID);
+                    break;
+                  }
                 }
 
                 builder = builder.addColumn(colBuilder.build());
               }
-              if (singlePrimaryKey.isEmpty() == false)
-                builder = builder.singlePrimaryKeyName(singlePrimaryKey);
+              if (singlePrimaryKey.isEmpty() == false) builder = builder.singlePrimaryKeyName(singlePrimaryKey);
               tableDefinitionSupport.addTableDefinition(builder.build());
             }
             catch (RuntimeException ex) {
@@ -356,7 +344,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#enableStructureDefinition(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue) {
@@ -380,27 +368,31 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
    * The provided key must be in the format of [PARENT_DEF/PARENT_KEY/]DEF/PRIMARY_KEY.
    *
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#loadStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, boolean)
    */
   @Override
   protected @Nullable Map<String, Object> loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
     String pKey, boolean pCreateIfMissing) {
-    try (Context context =
-      mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pDefName, pKey, pCreateIfMissing)) {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class,
+      this,
+      pDefName,
+      pKey,
+      pCreateIfMissing
+    )) {
       IKVTransaction transaction = mStructureStore.startTransaction();
       boolean success = false;
       try {
         validateKVStoreTableSetup(pToolkit, pScope, pDefName);
         ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> configMap =
-          transaction.getByKey(pDefName, containerAndPrimaryKey.container, containerAndPrimaryKey.primary, Map.class);
-        if ((configMap == null) && (pCreateIfMissing == true))
-          configMap = Maps.newHashMap();
+        @SuppressWarnings("unchecked") Map<String, Object> configMap = transaction.getByKey(pDefName,
+          containerAndPrimaryKey.container,
+          containerAndPrimaryKey.primary,
+          Map.class
+        );
+        if ((configMap == null) && (pCreateIfMissing == true)) configMap = Maps.newHashMap();
         if (configMap != null) {
           Integer revision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, pDefName);
-          if (revision == null)
-            throw new IllegalArgumentException();
+          if (revision == null) throw new IllegalArgumentException();
           configMap.put("structureDef", new StringBuilder(pDefName).append(':').append(revision).toString());
           String primaryKey = mConfiguredTableDefinitions.get(pDefName);
           if ((primaryKey != null) && (primaryKey.isEmpty() == false))
@@ -410,98 +402,84 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         return context.exit(configMap);
       }
       finally {
-        if (success == true)
-          transaction.commit();
-        else
-          transaction.rollback();
+        if (success == true) transaction.commit();
+        else transaction.rollback();
       }
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#getStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
   protected <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
     boolean pIsMeta, String pKey, PropertyType pType) {
     Object value = pConfig.get(pKey);
     switch (pType) {
-    case String: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? "" : (String) value);
-      return result;
-    }
-    case Boolean: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? Boolean.FALSE : (Boolean) value);
-      return result;
-    }
-    case Integer: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? Integer.valueOf(0) : (Integer) value);
-      return result;
-    }
-    case Long: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? Long.valueOf(0) : (Long) value);
-      return result;
-    }
-    case Decimal: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? new BigDecimal(0.0)
-        : (value instanceof String ? new BigDecimal((String) value) : (BigDecimal) value));
-      return result;
-    }
-    case PropertyRef: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? "" : (String) value);
-      return result;
-    }
-    case StructureRef: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? "" : (String) value);
-      return result;
-    }
-    case StructureRefList: {
-      @NonNull
-      String[] strings = (value == null ? "" : (String) value).split(",");
-      for (int i = 0; i < strings.length; i++)
-        strings[i] = unescape(strings[i]);
-      @SuppressWarnings("unchecked")
-      R result = (R) strings;
-      return result;
-    }
-    case Binary: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? null : (byte[]) value);
-      return result;
-    }
-    case EmbeddedStructureList: {
-      throw new UnsupportedOperationException();
-    }
-    case Image: {
-      throw new UnsupportedOperationException();
-    }
-    case Timestamp: {
-      @SuppressWarnings("unchecked")
-      R result = (R) (value == null ? Long.valueOf(0) : (Long) value);
-      return result;
-    }
-    case UUID: {
-      @SuppressWarnings("unchecked")
-      R result =
-        (R) (value == null ? null : (value instanceof String ? UUID.fromString((String) value) : (UUID) value));
-      return result;
-    }
+      case String: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? "" : (String) value);
+        return result;
+      }
+      case Boolean: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? Boolean.FALSE : (Boolean) value);
+        return result;
+      }
+      case Integer: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? Integer.valueOf(0) : (Integer) value);
+        return result;
+      }
+      case Long: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? Long.valueOf(0) : (Long) value);
+        return result;
+      }
+      case Decimal: {
+        @SuppressWarnings("unchecked") R result = (R) (value
+          == null ? new BigDecimal(0.0) : (value instanceof String ? new BigDecimal((String) value) : (BigDecimal) value));
+        return result;
+      }
+      case PropertyRef: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? "" : (String) value);
+        return result;
+      }
+      case StructureRef: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? "" : (String) value);
+        return result;
+      }
+      case StructureRefList: {
+        @NotNull String[] strings = (value == null ? "" : (String) value).split(",");
+        for (int i = 0; i < strings.length; i++)
+          strings[i] = unescape(strings[i]);
+        @SuppressWarnings("unchecked") R result = (R) strings;
+        return result;
+      }
+      case Binary: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? null : (byte[]) value);
+        return result;
+      }
+      case EmbeddedStructureList: {
+        throw new UnsupportedOperationException();
+      }
+      case Image: {
+        throw new UnsupportedOperationException();
+      }
+      case Timestamp: {
+        @SuppressWarnings("unchecked") R result = (R) (value == null ? Long.valueOf(0) : (Long) value);
+        return result;
+      }
+      case UUID: {
+        @SuppressWarnings("unchecked") R result = (R) (
+          value == null ? null : (value instanceof String ? UUID.fromString((String) value) : (UUID) value));
+        return result;
+      }
     }
     throw new IllegalArgumentException();
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#isStructureConfigChanged(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object)
    */
   @Override
   protected boolean isStructureConfigChanged(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig) {
@@ -510,8 +488,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#removeStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
   protected boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
@@ -521,23 +499,21 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#hasStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String)
    */
   @Override
   protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
     boolean pIsMeta, String pKey) {
-    if (pConfig.containsKey(pKey) == false)
-      return false;
+    if (pConfig.containsKey(pKey) == false) return false;
     Object value = pConfig.get(pKey);
-    if (value == null)
-      return false;
+    if (value == null) return false;
     return true;
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#persistContainerProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
-   *      com.diamondq.common.model.interfaces.Property)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure,
+   *   com.diamondq.common.model.interfaces.Property)
    */
   @Override
   protected boolean persistContainerProp(Toolkit pToolkit, Scope pScope, Structure pStructure, Property<?> pProp) {
@@ -546,77 +522,75 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#setStructureConfigObjectProp(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object, boolean, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
    */
   @Override
-  protected <@NonNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
+  protected <@NotNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
     boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
     switch (pType) {
-    case String: {
-      pConfig.put(pKey, pValue);
-      break;
-    }
-    case Boolean: {
-      pConfig.put(pKey, pValue);
-      break;
-    }
-    case Integer: {
-      pConfig.put(pKey, pValue);
-      break;
-    }
-    case Long: {
-      pConfig.put(pKey, pValue);
-      break;
-    }
-    case Decimal: {
-      pConfig.put(pKey, pValue.toString());
-      break;
-    }
-    case PropertyRef: {
-      pConfig.put(pKey, pValue.toString());
-      break;
-    }
-    case StructureRef: {
-      pConfig.put(pKey, pValue.toString());
-      break;
-    }
-    case StructureRefList: {
-      @NonNull
-      String[] strings = (@NonNull String[]) pValue;
-      @NonNull
-      String @NonNull [] escaped = new @NonNull String[strings.length];
-      for (int i = 0; i < strings.length; i++)
-        escaped[i] = escape(strings[i]);
-      String escapedStr = String.join(",", escaped);
-      pConfig.put(pKey, escapedStr);
-      break;
-    }
-    case Binary: {
-      pConfig.put(pKey, pValue);
-      break;
-    }
-    case EmbeddedStructureList: {
-      throw new UnsupportedOperationException();
-    }
-    case Image: {
-      throw new UnsupportedOperationException();
-    }
-    case Timestamp: {
-      pConfig.put(pKey, pValue);
-      break;
-    }
-    case UUID: {
-      pConfig.put(pKey, pValue);
-      break;
-    }
+      case String: {
+        pConfig.put(pKey, pValue);
+        break;
+      }
+      case Boolean: {
+        pConfig.put(pKey, pValue);
+        break;
+      }
+      case Integer: {
+        pConfig.put(pKey, pValue);
+        break;
+      }
+      case Long: {
+        pConfig.put(pKey, pValue);
+        break;
+      }
+      case Decimal: {
+        pConfig.put(pKey, pValue.toString());
+        break;
+      }
+      case PropertyRef: {
+        pConfig.put(pKey, pValue.toString());
+        break;
+      }
+      case StructureRef: {
+        pConfig.put(pKey, pValue.toString());
+        break;
+      }
+      case StructureRefList: {
+        @NotNull String[] strings = (@NotNull String[]) pValue;
+        @NotNull String @NotNull [] escaped = new @NotNull String[strings.length];
+        for (int i = 0; i < strings.length; i++)
+          escaped[i] = escape(strings[i]);
+        String escapedStr = String.join(",", escaped);
+        pConfig.put(pKey, escapedStr);
+        break;
+      }
+      case Binary: {
+        pConfig.put(pKey, pValue);
+        break;
+      }
+      case EmbeddedStructureList: {
+        throw new UnsupportedOperationException();
+      }
+      case Image: {
+        throw new UnsupportedOperationException();
+      }
+      case Timestamp: {
+        pConfig.put(pKey, pValue);
+        break;
+      }
+      case UUID: {
+        pConfig.put(pKey, pValue);
+        break;
+      }
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#constructOptimisticObj(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   protected @Nullable String constructOptimisticObj(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -628,14 +602,20 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
    * The provided key must be in the format of [PARENT_DEF/PARENT_KEY/]DEF/PRIMARY_KEY.
    *
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#saveStructureConfigObject(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
-   *      java.lang.Object)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String, java.lang.Object, boolean,
+   *   java.lang.Object)
    */
   @Override
   protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Map<String, Object> pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
-    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pDefName, pKey, pConfig,
-      pMustMatchOptimisticObj, pOptimisticObj)) {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class,
+      this,
+      pDefName,
+      pKey,
+      pConfig,
+      pMustMatchOptimisticObj,
+      pOptimisticObj
+    )) {
       IKVTransaction transaction = mStructureStore.startTransaction();
       boolean success = false;
       try {
@@ -658,10 +638,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
             StringBuilder leftKeyBuilder = new StringBuilder();
             boolean isFirst = true;
             for (int o = 0; o <= (i + 1); o++) {
-              if (isFirst == true)
-                isFirst = false;
-              else
-                leftKeyBuilder.append('/');
+              if (isFirst == true) isFirst = false;
+              else leftKeyBuilder.append('/');
               leftKeyBuilder.append(parts[o]);
             }
 
@@ -671,21 +649,24 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
             validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
 
-            @SuppressWarnings("unchecked")
-            Map<String, Object> lookupDate = transaction.getByKey(tableName, leftKey, rightKey, Map.class);
-            if (lookupDate == null)
-              transaction.putByKey(tableName, leftKey, rightKey,
-                Collections.singletonMap("dateCreated", new Date().getTime()));
+            @SuppressWarnings("unchecked") Map<String, Object> lookupDate = transaction.getByKey(tableName,
+              leftKey,
+              rightKey,
+              Map.class
+            );
+            if (lookupDate == null) transaction.putByKey(tableName,
+              leftKey,
+              rightKey,
+              Collections.singletonMap("dateCreated", new Date().getTime())
+            );
           }
         }
 
         success = true;
       }
       finally {
-        if (success == true)
-          transaction.commit();
-        else
-          transaction.rollback();
+        if (success == true) transaction.commit();
+        else transaction.rollback();
       }
       return context.exit(true);
     }
@@ -711,8 +692,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * @see com.diamondq.common.model.generic.AbstractCachingPersistenceLayer#internalDeleteStructure(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.Structure)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
   protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
@@ -741,10 +722,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
             StringBuilder leftKeyBuilder = new StringBuilder();
             boolean isFirst = true;
             for (int o = 0; o <= (i + 1); o++) {
-              if (isFirst == true)
-                isFirst = false;
-              else
-                leftKeyBuilder.append('/');
+              if (isFirst == true) isFirst = false;
+              else leftKeyBuilder.append('/');
               leftKeyBuilder.append(parts[o]);
             }
 
@@ -761,10 +740,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         success = true;
       }
       finally {
-        if (success == true)
-          transaction.commit();
-        else
-          transaction.rollback();
+        if (success == true) transaction.commit();
+        else transaction.rollback();
       }
       return context.exit(true);
     }
@@ -772,16 +749,23 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * @see com.diamondq.common.model.generic.AbstractDocumentPersistenceLayer#internalPopulateChildStructureList(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, java.lang.Object,
-   *      com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String, java.lang.String,
-   *      com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
+   *   com.diamondq.common.model.interfaces.Scope, java.lang.Object,
+   *   com.diamondq.common.model.interfaces.StructureDefinition, java.lang.String, java.lang.String,
+   *   com.diamondq.common.model.interfaces.PropertyDefinition, com.google.common.collect.ImmutableList.Builder)
    */
   @Override
   protected void internalPopulateChildStructureList(Toolkit pToolkit, Scope pScope,
     @Nullable Map<String, Object> pConfig, StructureDefinition pStructureDefinition, String pStructureDefName,
     @Nullable String pKey, @Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
-    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pConfig,
-      pStructureDefinition, pStructureDefName, pKey, pPropDef, pStructureRefListBuilder)) {
+    try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class,
+      this,
+      pConfig,
+      pStructureDefinition,
+      pStructureDefName,
+      pKey,
+      pPropDef,
+      pStructureRefListBuilder
+    )) {
       IKVTransaction transaction = mStructureStore.startTransaction();
       boolean success = false;
       try {
@@ -795,30 +779,25 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           List<String> containerKeys = Lists.newArrayList(transaction.keyIterator(pStructureDefName));
           for (String containerKey : containerKeys) {
             StringBuilder refBuilder = new StringBuilder();
-            if ("__ROOT__".equals(containerKey) == false)
-              refBuilder.append(containerKey).append('/');
+            if ("__ROOT__".equals(containerKey) == false) refBuilder.append(containerKey).append('/');
             refBuilder.append(pStructureDefName).append('/');
             int refOffset = refBuilder.length();
-            for (Iterator<String> i = transaction.keyIterator2(pStructureDefName, containerKey); i.hasNext();) {
+            for (Iterator<String> i = transaction.keyIterator2(pStructureDefName, containerKey); i.hasNext(); ) {
               String primaryKey = i.next();
               refBuilder.setLength(refOffset);
               refBuilder.append(primaryKey);
-              pStructureRefListBuilder
-                .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
+              pStructureRefListBuilder.add(pScope.getToolkit()
+                .createStructureRefFromSerialized(pScope, refBuilder.toString()));
 
             }
           }
-        }
-        else {
+        } else {
           StringBuilder tableNameBuilder = new StringBuilder();
           int lastSlash = pKey.lastIndexOf('/');
-          if (lastSlash == -1)
-            throw new IllegalArgumentException("The key isn't in the right format: " + pKey);
+          if (lastSlash == -1) throw new IllegalArgumentException("The key isn't in the right format: " + pKey);
           int nextLastSlash = pKey.lastIndexOf('/', lastSlash - 1);
-          if (nextLastSlash == -1)
-            tableNameBuilder.append(pKey.substring(0, lastSlash));
-          else
-            tableNameBuilder.append(pKey.substring(nextLastSlash + 1, lastSlash));
+          if (nextLastSlash == -1) tableNameBuilder.append(pKey.substring(0, lastSlash));
+          else tableNameBuilder.append(pKey.substring(nextLastSlash + 1, lastSlash));
           tableNameBuilder.append('_');
           tableNameBuilder.append(pPropDef.getName()).append('_');
           Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
@@ -829,8 +808,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           int refBuilderLength = refBuilder.length();
           for (StructureDefinitionRef sdr : referenceTypes) {
             StructureDefinition sd = sdr.resolve();
-            if (sd == null)
-              continue;
+            if (sd == null) continue;
             tableNameBuilder.setLength(builderLength);
             tableNameBuilder.append(sd.getName());
             refBuilder.setLength(refBuilderLength);
@@ -839,13 +817,13 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
             int finalRefBuilderLength = refBuilder.length();
             String tableName = tableNameBuilder.toString();
             validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
-            for (Iterator<String> iterator = transaction.keyIterator2(tableName, pKey); iterator.hasNext();) {
+            for (Iterator<String> iterator = transaction.keyIterator2(tableName, pKey); iterator.hasNext(); ) {
               String childKey = iterator.next();
 
               refBuilder.setLength(finalRefBuilderLength);
               refBuilder.append(childKey);
-              pStructureRefListBuilder
-                .add(pScope.getToolkit().createStructureRefFromSerialized(pScope, refBuilder.toString()));
+              pStructureRefListBuilder.add(pScope.getToolkit()
+                .createStructureRefFromSerialized(pScope, refBuilder.toString()));
             }
 
           }
@@ -853,24 +831,21 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         success = true;
       }
       finally {
-        if (success == true)
-          transaction.commit();
-        else
-          transaction.rollback();
+        if (success == true) transaction.commit();
+        else transaction.rollback();
       }
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#writeQueryBuilder(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.QueryBuilder)
    */
   @Override
   public ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder) {
     ModelQuery result = super.writeQueryBuilder(pToolkit, pScope, pQueryBuilder);
 
-    IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support =
-      mStructureStore.getIndexSupport();
+    IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support = mStructureStore.getIndexSupport();
 
     if (support != null) {
       /*
@@ -884,8 +859,9 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
        * Primary keys are already included in the KV's primary key, so skip those. However, if there is multiple primary
        * keys, then include them, so that they can be accessed independently of the primary key
        */
-      int primaryKeyCount =
-        Iterables.size(Iterables.filter(sd.getAllProperties().values(), (pd) -> (pd != null) && pd.isPrimaryKey()));
+      int primaryKeyCount = Iterables.size(Iterables.filter(sd.getAllProperties().values(),
+        (pd) -> (pd != null) && pd.isPrimaryKey()
+      ));
 
       List<WhereInfo> whereList = result.getWhereList();
       KVIndexDefinitionBuilder<?> idb = support.createIndexDefinitionBuilder();
@@ -894,66 +870,64 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       boolean onlyPrimary = true;
       for (WhereInfo gwi : whereList) {
         PropertyDefinition pd = sd.lookupPropertyDefinitionByName(gwi.key);
-        if (pd == null)
-          throw new IllegalArgumentException();
+        if (pd == null) throw new IllegalArgumentException();
         String colName = gwi.key;
         if (pd.isPrimaryKey() == true) {
-          if (primaryKeyCount == 1)
-            continue;
+          if (primaryKeyCount == 1) continue;
         }
         onlyPrimary = false;
         KVColumnType colType;
         switch (pd.getType()) {
-        case String: {
-          colType = KVColumnType.String;
-          break;
-        }
-        case Binary: {
-          colType = KVColumnType.Binary;
-          break;
-        }
-        case Boolean: {
-          colType = KVColumnType.Boolean;
-          break;
-        }
-        case Decimal: {
-          colType = KVColumnType.Decimal;
-          break;
-        }
-        case EmbeddedStructureList:
-          throw new UnsupportedOperationException();
-        case Image:
-          throw new UnsupportedOperationException();
-        case Integer: {
-          colType = KVColumnType.Integer;
-          break;
-        }
-        case Long: {
-          colType = KVColumnType.Long;
-          break;
-        }
-        case PropertyRef: {
-          colType = KVColumnType.String;
-          break;
-        }
-        case StructureRef: {
-          colType = KVColumnType.String;
-          break;
-        }
-        case StructureRefList: {
-          colType = KVColumnType.String;
-          break;
-        }
-        case Timestamp: {
-          colType = KVColumnType.Timestamp;
-          break;
-        }
-        case UUID: {
-          colType = KVColumnType.UUID;
-          break;
-        }
-        default:
-          throw new UnsupportedOperationException();
+          case String: {
+            colType = KVColumnType.String;
+            break;
+          }
+          case Binary: {
+            colType = KVColumnType.Binary;
+            break;
+          }
+          case Boolean: {
+            colType = KVColumnType.Boolean;
+            break;
+          }
+          case Decimal: {
+            colType = KVColumnType.Decimal;
+            break;
+          }
+          case EmbeddedStructureList:
+            throw new UnsupportedOperationException();
+          case Image:
+            throw new UnsupportedOperationException();
+          case Integer: {
+            colType = KVColumnType.Integer;
+            break;
+          }
+          case Long: {
+            colType = KVColumnType.Long;
+            break;
+          }
+          case PropertyRef: {
+            colType = KVColumnType.String;
+            break;
+          }
+          case StructureRef: {
+            colType = KVColumnType.String;
+            break;
+          }
+          case StructureRefList: {
+            colType = KVColumnType.String;
+            break;
+          }
+          case Timestamp: {
+            colType = KVColumnType.Timestamp;
+            break;
+          }
+          case UUID: {
+            colType = KVColumnType.UUID;
+            break;
+          }
+          default:
+            throw new UnsupportedOperationException();
         }
 
         IKVIndexColumn ic = support.createIndexColumnBuilder().name(colName).type(colType).build();
@@ -972,7 +946,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#lookupStructuresByQuery(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
   public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
@@ -982,8 +956,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
       String defName = gq.getDefinitionName();
       Integer revision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, defName);
-      if (revision == null)
-        throw new IllegalArgumentException();
+      if (revision == null) throw new IllegalArgumentException();
       List<String> propNames = gq.getStructureDefinition().lookupPrimaryKeyNames();
 
       IKVTransaction transaction = mStructureStore.startTransaction();
@@ -991,9 +964,12 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       try {
         validateKVStoreTableSetup(pToolkit, pScope, defName);
 
-        @SuppressWarnings({"unchecked", "cast", "rawtypes"})
-        List<Map<String, Object>> queryResults = (List<Map<String, Object>>) (List) transaction.executeQuery(gq,
-          Map.class, (pParamValues == null ? Collections.emptyMap() : pParamValues));
+        @SuppressWarnings(
+          { "unchecked", "cast", "rawtypes" }) List<Map<String, Object>> queryResults = (List<Map<String, Object>>) (List) transaction.executeQuery(
+          gq,
+          Map.class,
+          (pParamValues == null ? Collections.emptyMap() : pParamValues)
+        );
         ImmutableList.Builder<Structure> builder = ImmutableList.builder();
         for (Map<String, Object> queryResult : queryResults) {
 
@@ -1007,8 +983,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           primaryKeyBuilder.append('/');
 
           List<@Nullable Object> names = Lists.transform(propNames, (n) -> {
-            if (n == null)
-              throw new IllegalArgumentException("The name must not be null");
+            if (n == null) throw new IllegalArgumentException("The name must not be null");
             return queryResult.get(n);
           });
           primaryKeyBuilder.append(pToolkit.collapsePrimaryKeys(pScope, names));
@@ -1023,17 +998,15 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         return context.exit(builder.build());
       }
       finally {
-        if (success == true)
-          transaction.commit();
-        else
-          transaction.rollback();
+        if (success == true) transaction.commit();
+        else transaction.rollback();
       }
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.AbstractPersistenceLayer#countByQuery(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.ModelQuery, java.util.Map)
    */
   @Override
   public int countByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
@@ -1054,17 +1027,15 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         return context.exit(queryResults);
       }
       finally {
-        if (success == true)
-          transaction.commit();
-        else
-          transaction.rollback();
+        if (success == true) transaction.commit();
+        else transaction.rollback();
       }
     }
   }
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#inferStructureDefinitions(com.diamondq.common.model.generic.GenericToolkit,
-   *      com.diamondq.common.model.interfaces.Scope)
+   *   com.diamondq.common.model.interfaces.Scope)
    */
   @Override
   public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope) {
@@ -1073,7 +1044,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
   /**
    * @see com.diamondq.common.model.generic.PersistenceLayer#clearStructures(com.diamondq.common.model.interfaces.Toolkit,
-   *      com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
+   *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
   public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef) {
@@ -1090,10 +1061,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         success = true;
       }
       finally {
-        if (success == true)
-          transaction.commit();
-        else
-          transaction.rollback();
+        if (success == true) transaction.commit();
+        else transaction.rollback();
       }
     }
 

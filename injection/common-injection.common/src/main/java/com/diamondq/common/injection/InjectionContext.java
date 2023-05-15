@@ -1,13 +1,13 @@
 package com.diamondq.common.injection;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Closeable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This represents the injection context that is being used
@@ -23,16 +23,26 @@ public interface InjectionContext extends Closeable {
        * MANIFEST.MF clean
        */
       StringBuilder sb = new StringBuilder();
-      sb.append("com").append(".").append("diamondq").append(".").append("common").append(".").append("injection")
-        .append(".").append("impl").append(".").append("InjectionStartupBuilderImpl");
-      @SuppressWarnings("unchecked")
-      final Class<InjectionStartupBuilder> startupClass = (Class<InjectionStartupBuilder>) Class.forName(sb.toString());
+      sb.append("com")
+        .append(".")
+        .append("diamondq")
+        .append(".")
+        .append("common")
+        .append(".")
+        .append("injection")
+        .append(".")
+        .append("impl")
+        .append(".")
+        .append("InjectionStartupBuilderImpl");
+      @SuppressWarnings(
+        "unchecked") final Class<InjectionStartupBuilder> startupClass = (Class<InjectionStartupBuilder>) Class.forName(
+        sb.toString());
       Constructor<InjectionStartupBuilder> constructor = startupClass.getConstructor((Class<?>[]) null);
       final InjectionStartupBuilder instance = constructor.newInstance((Object[]) null);
       return instance;
     }
-    catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
-      | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+    catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException |
+           IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
       throw new RuntimeException(ex);
     }
   }

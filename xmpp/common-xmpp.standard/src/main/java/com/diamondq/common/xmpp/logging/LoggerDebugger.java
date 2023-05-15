@@ -1,21 +1,19 @@
 package com.diamondq.common.xmpp.logging;
 
 import com.diamondq.common.tracing.opentracing.xmpp.OpenTracingExtender;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.Tracer.SpanBuilder;
 import io.opentracing.util.GlobalTracer;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rocks.xmpp.core.session.XmppSession;
 import rocks.xmpp.core.session.debug.XmppDebugger;
 import rocks.xmpp.core.stanza.model.IQ;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class LoggerDebugger implements XmppDebugger {
 

@@ -7,7 +7,7 @@ import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
 import com.diamondq.common.context.spi.SPIContextFactory;
 import io.micronaut.context.annotation.Secondary;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.PostConstruct;
 import java.util.Stack;

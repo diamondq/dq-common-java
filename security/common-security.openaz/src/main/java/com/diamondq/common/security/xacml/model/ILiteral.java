@@ -1,6 +1,6 @@
 package com.diamondq.common.security.xacml.model;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface ILiteral extends IFunctionArgument {
 

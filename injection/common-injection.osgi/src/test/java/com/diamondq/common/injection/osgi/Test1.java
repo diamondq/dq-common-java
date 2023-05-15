@@ -7,15 +7,9 @@ import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.injection.osgi.testmodel.TestClassWithObjConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestDep;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 import org.apache.sling.testing.mock.osgi.MockOsgi;
 import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,12 +21,16 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 public class Test1 {
 
   private static final Logger sLogger = LoggerFactory.getLogger(Test1.class);
 
-  @Rule
-  public final OsgiContext    context = new OsgiContext();
+  @Rule public final OsgiContext context = new OsgiContext();
 
   /**
    * If we've required a filter, but no filter is passed, then we should fail.
@@ -74,8 +72,8 @@ public class Test1 {
     MockOsgi.injectServices(service, context.bundleContext());
     MockOsgi.activate(service, context.bundleContext());
 
-    Collection<@NonNull ServiceReference<@NonNull TestClassWithObjConstructor>> refs =
-      context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
+    Collection<@NotNull ServiceReference<@NotNull TestClassWithObjConstructor>> refs = context.bundleContext()
+      .getServiceReferences(TestClassWithObjConstructor.class, null);
     Assert.assertEquals(0, refs.size());
 
     /* Now register the dependency */
@@ -92,7 +90,7 @@ public class Test1 {
 
   /**
    * Register the dependency and then remove it, making sure that the final object comes and then goes.
-   * 
+   *
    * @throws IOException
    * @throws InvalidSyntaxException
    */
@@ -111,8 +109,8 @@ public class Test1 {
     MockOsgi.injectServices(service, context.bundleContext());
     MockOsgi.activate(service, context.bundleContext());
 
-    Collection<@NonNull ServiceReference<@NonNull TestClassWithObjConstructor>> refs =
-      context.bundleContext().getServiceReferences(TestClassWithObjConstructor.class, null);
+    Collection<@NotNull ServiceReference<@NotNull TestClassWithObjConstructor>> refs = context.bundleContext()
+      .getServiceReferences(TestClassWithObjConstructor.class, null);
     Assert.assertEquals(0, refs.size());
 
     /* Now register the dependency */

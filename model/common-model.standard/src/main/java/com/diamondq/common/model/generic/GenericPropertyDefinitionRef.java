@@ -4,8 +4,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StructureDefinition;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class GenericPropertyDefinitionRef extends AbstractRef<PropertyDefinition> implements PropertyDefinitionRef {
 
@@ -21,8 +20,7 @@ public class GenericPropertyDefinitionRef extends AbstractRef<PropertyDefinition
     int offset = mId.indexOf('#');
     StructureDefinition sd;
     sd = mScope.getToolkit().lookupStructureDefinitionByName(mScope, mId.substring(0, offset));
-    if (sd == null)
-      return null;
+    if (sd == null) return null;
     return sd.lookupPropertyDefinitionByName(mId.substring(offset + 1));
   }
 

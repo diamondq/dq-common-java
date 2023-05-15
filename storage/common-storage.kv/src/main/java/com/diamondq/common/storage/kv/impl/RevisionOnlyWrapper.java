@@ -2,8 +2,7 @@ package com.diamondq.common.storage.kv.impl;
 
 import com.diamondq.common.storage.kv.IObjectWithId;
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A wrapper that adds revision information
@@ -12,11 +11,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class RevisionOnlyWrapper<P> implements IObjectWithIdAndRev<RevisionOnlyWrapper<P>> {
 
-  @Nullable
-  private String _rev;
+  @Nullable private String _rev;
 
-  @Nullable
-  private P      data;
+  @Nullable private P data;
 
   /**
    * Default constructor
@@ -48,8 +45,7 @@ public class RevisionOnlyWrapper<P> implements IObjectWithIdAndRev<RevisionOnlyW
   @Override
   public @Nullable String getObjectId() {
     IObjectWithId<?> dataAsObjectWithId = (IObjectWithId<?>) data;
-    if (dataAsObjectWithId == null)
-      return null;
+    if (dataAsObjectWithId == null) return null;
     return dataAsObjectWithId.getObjectId();
   }
 
@@ -59,15 +55,14 @@ public class RevisionOnlyWrapper<P> implements IObjectWithIdAndRev<RevisionOnlyW
   @Override
   public RevisionOnlyWrapper<P> setObjectId(String pObjectId) {
     IObjectWithId<?> dataAsObjectWithId = (IObjectWithId<?>) data;
-    if (dataAsObjectWithId == null)
-      return this;
+    if (dataAsObjectWithId == null) return this;
     dataAsObjectWithId.setObjectId(pObjectId);
     return this;
   }
 
   /**
    * Returns the data
-   * 
+   *
    * @return the data
    */
   public @Nullable P getData() {
@@ -76,7 +71,7 @@ public class RevisionOnlyWrapper<P> implements IObjectWithIdAndRev<RevisionOnlyW
 
   /**
    * Sets the data
-   * 
+   *
    * @param pValue the data
    * @return the wrapper
    */

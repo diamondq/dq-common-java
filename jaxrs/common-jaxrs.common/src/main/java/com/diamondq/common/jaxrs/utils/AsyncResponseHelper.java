@@ -1,15 +1,13 @@
 package com.diamondq.common.jaxrs.utils;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
-
-import java.util.Locale;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.container.AsyncResponse;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Locale;
 
 /**
  * A JAX-RS helper that will take a AsyncResponse (from the JAX-RS system), and a Completable Future, and when the
@@ -28,7 +26,7 @@ public class AsyncResponseHelper {
 
   /**
    * Defer the result until the future completes or errors
-   * 
+   *
    * @param pLocale the locale (for error handling)
    * @param pResponse the AsyncResponse
    * @param pFuture the future
@@ -41,9 +39,7 @@ public class AsyncResponseHelper {
         if (error != null) {
           sLogger.debug("Resuming error {}", error);
           pResponse.resume(error);
-        }
-        else
-          pResponse.resume(response);
+        } else pResponse.resume(response);
       }
       catch (RuntimeException ex) {
         sLogger.error("", ex);

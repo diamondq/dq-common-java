@@ -2,10 +2,9 @@ package com.diamondq.common.storage.jdbc;
 
 import com.diamondq.common.storage.kv.GenericKVTableDefinition;
 import com.diamondq.common.storage.kv.IKVColumnDefinition;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class JDBCTableDefinition extends GenericKVTableDefinition {
 

@@ -2,10 +2,9 @@ package com.diamondq.common.model.generic;
 
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.Structure;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StandardSetValueMigration implements BiFunction<Structure, Structure, Structure> {
 

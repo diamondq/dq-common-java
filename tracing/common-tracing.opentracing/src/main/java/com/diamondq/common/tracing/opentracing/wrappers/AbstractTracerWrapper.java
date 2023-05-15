@@ -1,14 +1,13 @@
 package com.diamondq.common.tracing.opentracing.wrappers;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractTracerWrapper implements AbortableContinuation {
 
-  protected final ScopeManager   mScopeManager;
+  protected final ScopeManager mScopeManager;
 
   protected final @Nullable Span mSpan;
 
@@ -22,7 +21,6 @@ public abstract class AbstractTracerWrapper implements AbortableContinuation {
    */
   @Override
   public void abortContinuation() {
-    if (mSpan != null)
-      mScopeManager.activate(mSpan).close();
+    if (mSpan != null) mScopeManager.activate(mSpan).close();
   }
 }

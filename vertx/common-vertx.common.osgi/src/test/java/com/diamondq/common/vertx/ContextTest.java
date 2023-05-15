@@ -1,7 +1,5 @@
 package com.diamondq.common.vertx;
 
-import static org.junit.Assert.assertNotNull;
-
 import com.diamondq.common.context.Context;
 import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.context.impl.ContextFactoryImpl;
@@ -11,6 +9,10 @@ import com.diamondq.common.injection.osgi.impl.ScheduledExecutorServiceProvider;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.metrics.micrometer.SLF4JReporter;
 import com.diamondq.common.metrics.micrometer.SimpleMeterRegistryProvider;
+import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
+import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
 
 public class ContextTest {
 

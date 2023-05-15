@@ -8,16 +8,6 @@ import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.errors.Verify;
 import com.diamondq.common.injection.Constants;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
-
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
@@ -25,36 +15,43 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.types.EventBusService;
 import io.vertx.serviceproxy.ServiceBinder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerticle {
 
-  protected ContextFactory                mContextFactory;
+  protected ContextFactory mContextFactory;
 
-  protected ConverterManager              mConverterManager;
+  protected ConverterManager mConverterManager;
 
-  protected SecurityContextManager        mSecurityContextManager;
+  protected SecurityContextManager mSecurityContextManager;
 
-  protected ServiceDiscovery              mServiceDiscovery;
+  protected ServiceDiscovery mServiceDiscovery;
 
-  protected Vertx                         mVertx;
+  protected Vertx mVertx;
 
-  private final int                       mInstanceCount;
+  private final int mInstanceCount;
 
-  private final String                    mName;
+  private final String mName;
 
-  private final @Nullable String          mAddress;
+  private final @Nullable String mAddress;
 
-  private final Class<@NonNull INTERFACE> mInterfaceClass;
+  private final Class<@NotNull INTERFACE> mInterfaceClass;
 
-  private @Nullable Record                mPublishedRecord;
+  private @Nullable Record mPublishedRecord;
 
-  private @Nullable ServiceBinder         mServiceBinder;
+  private @Nullable ServiceBinder mServiceBinder;
 
-  private MessageConsumer<JsonObject>     mConsumer;
+  private MessageConsumer<JsonObject> mConsumer;
 
   @SuppressWarnings("null")
-  public AbstractVerticleMicronaut(int pInstanceCount, String pName, @Nullable
-  String pAddress, Class<INTERFACE> pInterfaceClass) {
+  public AbstractVerticleMicronaut(int pInstanceCount, String pName, @Nullable String pAddress,
+    Class<INTERFACE> pInterfaceClass) {
     mInstanceCount = pInstanceCount;
     mName = pName;
     mAddress = pAddress;
@@ -101,9 +98,7 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
       Verify.notNullArg(mVertx, UtilMessages.VERIFY_DEPENDENCY_MISSING, "vertx", pid);
       try {
 
-        @SuppressWarnings("null")
-        @NonNull
-        String address = (mAddress == null ? mName : mAddress);
+        @SuppressWarnings("null") @NotNull String address = (mAddress == null ? mName : mAddress);
 
         /* Start by deploying the instance to Vertx */
 
@@ -118,8 +113,7 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
             ServiceBinder binder = new ServiceBinder(mVertx);
             mServiceBinder = binder;
             binder.setAddress(address);
-            @SuppressWarnings("unchecked")
-            INTERFACE itf = (INTERFACE) this;
+            @SuppressWarnings("unchecked") INTERFACE itf = (INTERFACE) this;
             mConsumer = binder.register(mInterfaceClass, itf);
             // mVertx.eventBus().<String> consumer(pPid).completionHandler(wrap.getValue1());
             ; // .handler(ScanController.this::scan);
@@ -129,8 +123,9 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
             ctx2.trace("Publishing the record");
 
             Record record = EventBusService.createRecord(mName, address, mInterfaceClass);
-            ContextExtendedCompletionStage<Record> publishedRecord =
-              VertxUtils.<Record, Record> call(mServiceDiscovery::publish, record);
+            ContextExtendedCompletionStage<Record> publishedRecord = VertxUtils.<Record, Record>call(mServiceDiscovery::publish,
+              record
+            );
             return publishedRecord;
           })
 
@@ -155,14 +150,13 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
         if (mPublishedRecord != null) {
           String registrationId = mPublishedRecord.getRegistration();
           if (registrationId != null) {
-            VertxUtils.<String, Void> callReturnsNullable(mServiceDiscovery::unpublish, registrationId)
+            VertxUtils.<String, Void>callReturnsNullable(mServiceDiscovery::unpublish, registrationId)
 
               /* Wait for it to complete */
 
               .thenApply((v) -> {
                 ServiceBinder b = mServiceBinder;
-                if (b != null)
-                  b.unregister(mConsumer);
+                if (b != null) b.unregister(mConsumer);
                 return null;
               })
 

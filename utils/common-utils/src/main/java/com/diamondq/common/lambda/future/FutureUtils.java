@@ -1,5 +1,7 @@
 package com.diamondq.common.lambda.future;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -7,19 +9,17 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 public class FutureUtils {
 
-  private static volatile Method   ofFutureMethod;
+  private static volatile Method ofFutureMethod;
 
-  private static volatile Method   newCompletableFutureMethod;
+  private static volatile Method newCompletableFutureMethod;
 
-  private static volatile Method   completedFutureMethod;
+  private static volatile Method completedFutureMethod;
 
-  private static volatile Method   failedFutureMethod;
+  private static volatile Method failedFutureMethod;
 
-  private static volatile Method   listOfFutureMethod;
+  private static volatile Method listOfFutureMethod;
 
   private static volatile Class<?> completedClass;
 
@@ -42,8 +42,7 @@ public class FutureUtils {
     Set<Class<?>> pValidReplacements) {
 
     synchronized (FutureUtils.class) {
-      if (pValidReplacements.contains(completedClass) == false)
-        return false;
+      if (pValidReplacements.contains(completedClass) == false) return false;
       ofFutureMethod = pOfFutureMethod;
       newCompletableFutureMethod = pNewCompletabledFutureMethod;
       completedFutureMethod = pCompletedFutureMethod;
@@ -58,15 +57,14 @@ public class FutureUtils {
    * Returns a completed future with the given value. NOTE: This is the best class to use to create futures, since more
    * enhanced versions can be inserted into the creation cycle (such as ContextExtendedCompletedFuture or
    * VertxContextExtendedCompletedFuture)
-   * 
+   *
    * @param pValue the value
    * @return the future
    */
   public static <T, U extends ExtendedCompletableFuture<T>> U completedFuture(T pValue) {
     try {
       Object resultObj = completedFutureMethod.invoke(null, pValue);
-      @SuppressWarnings("unchecked")
-      U result = (U) resultObj;
+      @SuppressWarnings("unchecked") U result = (U) resultObj;
       return result;
     }
     catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -78,15 +76,14 @@ public class FutureUtils {
    * Returns a completed future with the given value. NOTE: This is the best class to use to create futures, since more
    * enhanced versions can be inserted into the creation cycle (such as ContextExtendedCompletedFuture or
    * VertxContextExtendedCompletedFuture)
-   * 
+   *
    * @param pValue the value
    * @return the future
    */
   public static <T, U extends ExtendedCompletableFuture<T>> U completedFailure(Throwable pValue) {
     try {
       Object resultObj = failedFutureMethod.invoke(null, pValue);
-      @SuppressWarnings("unchecked")
-      U result = (U) resultObj;
+      @SuppressWarnings("unchecked") U result = (U) resultObj;
       return result;
     }
     catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -97,21 +94,18 @@ public class FutureUtils {
   /**
    * Returns a completable future for the given CompletionStage. NOTE: This is the best class to wrap an existing
    * CompletionStage/CompletableFuture since more enhanced versions can be inserted into the creation cycle.
-   * 
+   *
    * @param <T> the type
    * @param pFuture the existing future
    * @return the extended future
    */
   public static <T, U extends ExtendedCompletableFuture<T>> U of(CompletionStage<T> pFuture) {
     CompletableFuture<T> future;
-    if (pFuture instanceof CompletableFuture)
-      future = (CompletableFuture<T>) pFuture;
-    else
-      future = pFuture.toCompletableFuture();
+    if (pFuture instanceof CompletableFuture) future = (CompletableFuture<T>) pFuture;
+    else future = pFuture.toCompletableFuture();
     try {
       Object resultObj = ofFutureMethod.invoke(null, future);
-      @SuppressWarnings("unchecked")
-      U result = (U) resultObj;
+      @SuppressWarnings("unchecked") U result = (U) resultObj;
       return result;
     }
     catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -122,8 +116,7 @@ public class FutureUtils {
   public static <T, U extends ExtendedCompletableFuture<T>> U newCompletableFuture() {
     try {
       Object resultObj = newCompletableFutureMethod.invoke(null);
-      @SuppressWarnings("unchecked")
-      U result = (U) resultObj;
+      @SuppressWarnings("unchecked") U result = (U) resultObj;
       return result;
     }
     catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -131,12 +124,11 @@ public class FutureUtils {
     }
   }
 
-  public static <T, @NonNull U extends @NonNull ExtendedCompletionStage<@NonNull List<T>>> U listOf(
-    List<@NonNull ? extends @NonNull ExtendedCompletionStage<T>> pList) {
+  public static <T, @NotNull U extends @NotNull ExtendedCompletionStage<@NotNull List<T>>> U listOf(
+    List<@NotNull ? extends @NotNull ExtendedCompletionStage<T>> pList) {
     try {
       Object resultObj = listOfFutureMethod.invoke(null, pList);
-      @SuppressWarnings("unchecked")
-      U result = (U) resultObj;
+      @SuppressWarnings("unchecked") U result = (U) resultObj;
       return result;
     }
     catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
