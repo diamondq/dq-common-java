@@ -54,12 +54,12 @@
       <dependency>
         <groupId>io.jaegertracing</groupId>
         <artifactId>jaeger-core</artifactId>
-        <version>1.6.0</version>
+        <version>1.8.1</version>
       </dependency>
       <dependency>
         <groupId>io.jaegertracing</groupId>
         <artifactId>jaeger-zipkin</artifactId>
-        <version>1.6.0</version>
+        <version>1.8.1</version>
       </dependency>
       <dependency>
         <groupId>org.datanucleus</groupId>
@@ -158,7 +158,7 @@
       <dependency>
         <groupId>com.esotericsoftware</groupId>
         <artifactId>kryo</artifactId>
-        <version>5.2.0</version>
+        <version>5.5.0</version>
       </dependency>
       <dependency>
         <groupId>rocks.xmpp</groupId>
@@ -193,7 +193,7 @@
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-bpmn-model</artifactId>
-        <version>7.15.0</version>
+        <version>7.17.0</version>
       </dependency>
       <dependency>
         <groupId>de.odysseus.juel</groupId>
