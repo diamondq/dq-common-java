@@ -3,16 +3,15 @@ package com.diamondq.common.jaxrs.osgi;
 import com.diamondq.common.context.Context;
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
 
 public class JaxrsClientFactory extends AbstractOSGiConstructor {
 
   public JaxrsClientFactory() {
     super(ConstructorInfoBuilder.builder().register(Client.class) //
-      .constructorClass(JaxrsClientFactory.class).factoryMethod("onCreate").factoryDelete("onDelete") //
-    //
+        .constructorClass(JaxrsClientFactory.class).factoryMethod("onCreate").factoryDelete("onDelete") //
+      //
     );
   }
 

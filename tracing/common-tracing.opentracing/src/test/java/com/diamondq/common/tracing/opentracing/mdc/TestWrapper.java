@@ -2,27 +2,24 @@ package com.diamondq.common.tracing.opentracing.mdc;
 
 import com.diamondq.common.tracing.opentracing.testhelpers.MockTracing;
 import com.diamondq.common.tracing.opentracing.testhelpers.TracingAssertions;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.GlobalTracer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestWrapper {
 
-  @SuppressWarnings("null")
-  private MockTracer mockTracker;
+  @SuppressWarnings("null") private MockTracer mockTracker;
 
-  @Before
+  @BeforeEach
   public void setup() {
     mockTracker = MockTracing.before();
   }
 
-  @After
+  @AfterEach
   public void cleanup() {
     MockTracing.after();
   }

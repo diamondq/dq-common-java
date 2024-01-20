@@ -3,13 +3,12 @@ package com.diamondq.common.tracing.opentracing.mdc;
 import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
+import jakarta.annotation.Priority;
+import jakarta.decorator.Decorator;
+import jakarta.decorator.Delegate;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
 import org.jetbrains.annotations.Nullable;
-
-import javax.annotation.Priority;
-import javax.decorator.Decorator;
-import javax.decorator.Delegate;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
 
 @Decorator
 @Priority(1)

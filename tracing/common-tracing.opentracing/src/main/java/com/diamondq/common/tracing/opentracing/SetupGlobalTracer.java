@@ -1,21 +1,19 @@
 package com.diamondq.common.tracing.opentracing;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Initialized;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
+import io.opentracing.Tracer;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Initialized;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.opentracing.Tracer;
 
 @ApplicationScoped
 public class SetupGlobalTracer {
 
   private static final Logger sLogger = LoggerFactory.getLogger(SetupGlobalTracer.class);
 
-  private final Tracer        mTracer;
+  private final Tracer mTracer;
 
   @Inject
   public SetupGlobalTracer(Tracer pTracer) {

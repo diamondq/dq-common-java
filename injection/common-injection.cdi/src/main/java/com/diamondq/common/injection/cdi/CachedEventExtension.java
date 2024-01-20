@@ -1,21 +1,21 @@
 package com.diamondq.common.injection.cdi;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Destroyed;
+import jakarta.enterprise.context.Initialized;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
+import jakarta.enterprise.inject.spi.AfterDeploymentValidation;
+import jakarta.enterprise.inject.spi.AfterTypeDiscovery;
+import jakarta.enterprise.inject.spi.BeforeBeanDiscovery;
+import jakarta.enterprise.inject.spi.BeforeShutdown;
+import jakarta.enterprise.inject.spi.Extension;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Destroyed;
-import javax.enterprise.context.Initialized;
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
-import javax.enterprise.inject.spi.AfterTypeDiscovery;
-import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.BeforeShutdown;
-import javax.enterprise.inject.spi.Extension;
 
 /**
  * This extension is used to cache and fire events that happen in the CDI environment without coupling the class to the
@@ -25,27 +25,25 @@ import javax.enterprise.inject.spi.Extension;
  */
 public class CachedEventExtension implements Extension {
 
-  private final Set<String>                        mFiredEvents                        = new HashSet<>();
+  private final Set<String> mFiredEvents = new HashSet<>();
 
-  private final Map<String, Set<Consumer<String>>> mCallbacks                          = new HashMap<>();
+  private final Map<String, Set<Consumer<String>>> mCallbacks = new HashMap<>();
 
-  public static final String                       APPLICATION_SCOPED_INITIALIZED      =
-    "APPLICATION_SCOPED_INITIALIZED";
+  public static final String APPLICATION_SCOPED_INITIALIZED = "APPLICATION_SCOPED_INITIALIZED";
 
-  public static final String                       APPLICATION_SCOPED_BEFORE_DESTROYED =
-    "APPLICATION_SCOPED_BEFORE_DESTROYED";
+  public static final String APPLICATION_SCOPED_BEFORE_DESTROYED = "APPLICATION_SCOPED_BEFORE_DESTROYED";
 
-  public static final String                       APPLICATION_SCOPED_DESTROYED        = "APPLICATION_SCOPED_DESTROYED";
+  public static final String APPLICATION_SCOPED_DESTROYED = "APPLICATION_SCOPED_DESTROYED";
 
-  public static final String                       BEFORE_BEAN_DISCOVERY               = "BEFORE_BEAN_DISCOVERY";
+  public static final String BEFORE_BEAN_DISCOVERY = "BEFORE_BEAN_DISCOVERY";
 
-  public static final String                       AFTER_TYPE_DISCOVERY                = "AFTER_TYPE_DISCOVERY";
+  public static final String AFTER_TYPE_DISCOVERY = "AFTER_TYPE_DISCOVERY";
 
-  public static final String                       AFTER_BEAN_DISCOVERY                = "AFTER_BEAN_DISCOVERY";
+  public static final String AFTER_BEAN_DISCOVERY = "AFTER_BEAN_DISCOVERY";
 
-  public static final String                       AFTER_DEPLOYMENT_VALIDATION         = "AFTER_DEPLOYMENT_VALIDATION";
+  public static final String AFTER_DEPLOYMENT_VALIDATION = "AFTER_DEPLOYMENT_VALIDATION";
 
-  public static final String                       BEFORE_SHUTDOWN                     = "BEFORE_SHUTDOWN";
+  public static final String BEFORE_SHUTDOWN = "BEFORE_SHUTDOWN";
 
   /**
    * Checks whether an event has been fired
@@ -68,8 +66,7 @@ public class CachedEventExtension implements Extension {
    */
   public void registerEventListener(String pEvent, Consumer<String> pEventCallback) {
     synchronized (this) {
-      if (mFiredEvents.contains(pEvent))
-        pEventCallback.accept(pEvent);
+      if (mFiredEvents.contains(pEvent)) pEventCallback.accept(pEvent);
       else {
         Set<Consumer<String>> set = mCallbacks.get(pEvent);
         if (set == null) {
@@ -90,8 +87,7 @@ public class CachedEventExtension implements Extension {
     synchronized (this) {
       mFiredEvents.add(pEvent);
       Set<Consumer<String>> set = mCallbacks.remove(pEvent);
-      if (set != null)
-        set.forEach((c) -> c.accept(pEvent));
+      if (set != null) set.forEach((c) -> c.accept(pEvent));
     }
   }
 

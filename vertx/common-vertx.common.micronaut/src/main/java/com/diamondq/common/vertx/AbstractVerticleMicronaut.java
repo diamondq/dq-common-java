@@ -15,11 +15,11 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.types.EventBusService;
 import io.vertx.serviceproxy.ServiceBinder;
+import jakarta.annotation.PreDestroy;
+import jakarta.inject.Inject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 

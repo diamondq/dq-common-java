@@ -5,9 +5,9 @@ import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.types.Types;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.jetbrains.annotations.Nullable;
 
-import javax.inject.Singleton;
 import java.util.Optional;
 
 @Singleton

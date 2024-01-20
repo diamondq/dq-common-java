@@ -6,6 +6,10 @@ package {{package}};
 {{#useSwaggerAnnotations}}
   import io.swagger.annotations.*;
 {{/useSwaggerAnnotations}}
+{{#supportAsync}}
+  import java.util.concurrent.CompletionStage;
+  import java.util.concurrent.CompletableFuture;
+{{/supportAsync}}
 
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.annotation.Consumes;
@@ -27,8 +31,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-{{#useBeanValidation}}import javax.validation.constraints.*;
-import javax.validation.Valid;
+{{#useBeanValidation}}import {{javaxPackage}}.validation.constraints.*;
+import {{javaxPackage}}.validation.Valid;
 import io.micronaut.core.annotation.Nullable;{{/useBeanValidation}}
 import com.diamondq.common.injection.micronaut.auth.AuthInfo;
 import com.diamondq.common.bpm.camunda.CamundaRetryPredicate;
@@ -36,10 +40,11 @@ import com.diamondq.common.bpm.camunda.CamundaRetryPredicate;
 {{#appDescriptionWithNewLines}}/**
 * {{appDescriptionWithNewLines}}
 */{{/appDescriptionWithNewLines}}
-@Client(id="{{serviceDiscoveryId}}", path="{{contextPath}}"){{#useSwaggerAnnotations}}
+@Client(id="{{serviceDiscoveryId}}", path="{{contextPath}}")
+{{#useSwaggerAnnotations}}
   @Api(description = "the {{{baseName}}} API"){{/useSwaggerAnnotations}}{{#hasConsumes}}
-  @Consumes({ {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
-  @Produces({ {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}} }){{/hasProduces}}
+  @Consumes({ {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
+  @Produces({ {{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}} }){{/hasProduces}}
 @Retryable(predicate=CamundaRetryPredicate.class)
 {{>generatedAnnotation}}
 public {{#interfaceOnly}}interface{{/interfaceOnly}}{{^interfaceOnly}}class{{/interfaceOnly}} {{classname}} {

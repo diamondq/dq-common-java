@@ -6,32 +6,35 @@ import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.mock.MockTracer;
 import org.jboss.weld.environment.se.Weld;
-import org.jboss.weld.junit4.WeldInitiator;
+import org.jboss.weld.junit5.WeldInitiator;
+import org.jboss.weld.junit5.WeldJunit5Extension;
+import org.jboss.weld.junit5.WeldSetup;
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
 
+@ExtendWith(WeldJunit5Extension.class)
 public class ExtendedCompletableFutureTest {
 
   private static final Logger sLogger = LoggerFactory.getLogger(ExtendedCompletableFutureTest.class);
 
-  @Rule public WeldInitiator weld = WeldInitiator.of(new Weld());
+  @WeldSetup public WeldInitiator weld = WeldInitiator.of(new Weld());
 
   @SuppressWarnings("null") private MockTracer mockTracker;
 
-  @Before
+  @BeforeEach
   public void setup() {
     mockTracker = MockTracing.before();
   }
 
-  @After
+  @AfterEach
   public void cleanup() {
     MockTracing.afterNoCDI();
   }
@@ -71,8 +74,8 @@ public class ExtendedCompletableFutureTest {
       f2 = new ExtendedCompletableFuture<>();
       f3 = f1.thenCombine(f2, (b1, b2) -> {
         sLogger.info("   +++ Inside combine");
-        Assert.assertEquals(true, b1);
-        Assert.assertEquals(true, b2);
+        Assertions.assertEquals(true, b1);
+        Assertions.assertEquals(true, b2);
         TracingAssertions.assertActiveSpan("Should have active span");
         sLogger.info("   --- Inside combine");
         return false;
@@ -90,7 +93,7 @@ public class ExtendedCompletableFutureTest {
     // mockTracker.scopeManager().activate(capturedSpan, true).close();
     capturedSpan.finish();
     TracingAssertions.assertCompletedSpans("Span should have completed", 1, mockTracker);
-    Assert.assertEquals("Should have gotten the combine", false, result);
+    Assertions.assertEquals(false, result, "Should have gotten the combine");
     sLogger.info("----- testThenCombine");
   }
 
@@ -101,9 +104,9 @@ public class ExtendedCompletableFutureTest {
     try (Scope scope = mockTracker.scopeManager().activate(span)) {
       try {
         ExtendedCompletableFuture.runAsync(() -> {
-          Assert.fail("Should never reach here");
+          Assertions.fail("Should never reach here");
         }, null);
-        Assert.fail("An exception should have occurred");
+        Assertions.fail("An exception should have occurred");
       }
       catch (RuntimeException ex) {
       }
@@ -124,7 +127,7 @@ public class ExtendedCompletableFutureTest {
       final String threadName = Thread.currentThread().getName();
       f = ExtendedCompletableFuture.runAsync(() -> {
         TracingAssertions.assertActiveSpan("Should be within the span");
-        Assert.assertNotEquals("Threads should be different", threadName, Thread.currentThread().getName());
+        Assertions.assertNotEquals("Threads should be different", threadName, Thread.currentThread().getName());
       }, executor);
       TracingAssertions.assertCompletedSpans("Span should not have completed", 0, mockTracker);
     }

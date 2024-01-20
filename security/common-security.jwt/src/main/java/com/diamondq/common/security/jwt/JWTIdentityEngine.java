@@ -4,6 +4,8 @@ import com.diamondq.common.config.Config;
 import com.diamondq.common.security.acl.api.IdentityEngine;
 import com.diamondq.common.security.acl.model.UserInfo;
 import com.diamondq.common.security.jwt.model.JWTConfigProperties;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.jetbrains.annotations.Nullable;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwt.JwtClaims;
@@ -13,8 +15,6 @@ import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.lang.JoseException;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.List;

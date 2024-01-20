@@ -7,9 +7,9 @@ import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
 import com.diamondq.common.context.spi.SPIContextFactory;
 import io.micronaut.context.annotation.Secondary;
+import jakarta.annotation.PostConstruct;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.PostConstruct;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;

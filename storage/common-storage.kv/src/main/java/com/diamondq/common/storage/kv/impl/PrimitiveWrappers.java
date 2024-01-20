@@ -4,6 +4,8 @@ import com.diamondq.common.storage.kv.IObjectWithId;
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Helper for Primitive Wrappers
  */
@@ -84,7 +86,7 @@ public class PrimitiveWrappers {
   public static <O> @Nullable Object wrap(@Nullable O pObj, Class<?> pPrimitiveWrapperClass, String pKey,
     @Nullable String pRevision) {
     try {
-      Object obj = pPrimitiveWrapperClass.newInstance();
+      Object obj = pPrimitiveWrapperClass.getDeclaredConstructor().newInstance();
       if (IObjectWithId.class.isAssignableFrom(pPrimitiveWrapperClass)) {
         obj = ((IObjectWithId<O>) obj).setObjectId(pKey);
         if (obj == null) throw new IllegalStateException();
@@ -105,7 +107,7 @@ public class PrimitiveWrappers {
       else if (IdWrapper.class.isAssignableFrom(pPrimitiveWrapperClass)) obj = ((IdWrapper<O>) obj).setData(pObj);
       return obj;
     }
-    catch (InstantiationException | IllegalAccessException ex) {
+    catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
       throw new RuntimeException(ex);
     }
   }

@@ -7,11 +7,11 @@ import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.googlecode.gentyref.GenericTypeReflector;
 import com.googlecode.gentyref.TypeFactory;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;

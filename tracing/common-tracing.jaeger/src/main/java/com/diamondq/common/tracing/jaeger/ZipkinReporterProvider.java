@@ -4,12 +4,11 @@ import com.diamondq.common.config.Config;
 import io.jaegertracing.internal.reporters.RemoteReporter;
 import io.jaegertracing.spi.Reporter;
 import io.jaegertracing.zipkin.ZipkinSender;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Instance;
+import jakarta.enterprise.inject.Produces;
 import org.jetbrains.annotations.Nullable;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.Produces;
 
 @ApplicationScoped
 public class ZipkinReporterProvider {

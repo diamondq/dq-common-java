@@ -2,11 +2,10 @@ package com.diamondq.common.servers.undertow;
 
 import com.diamondq.common.config.Config;
 import com.diamondq.common.config.core.std.StandardBootstrap;
-
-import javax.enterprise.inject.spi.CDI;
-import javax.ws.rs.core.Application;
-
+import jakarta.enterprise.inject.spi.CDI;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import javax.ws.rs.core.Application;
 
 public class LaunchServer {
 
@@ -30,10 +29,9 @@ public class LaunchServer {
        */
 
       Config config = new StandardBootstrap().bootstrap();
-      @SuppressWarnings("unused")
-      UndertowRESTEasyWeldServer server = new UndertowRESTEasyWeldServer(config, pAppClass);
+      @SuppressWarnings("unused") UndertowRESTEasyWeldServer server = new UndertowRESTEasyWeldServer(config, pAppClass);
 
-      CDI.current().getBeanManager().fireEvent(new JAXRSServerLaunched());
+      CDI.current().getBeanManager().getEvent().fire(new JAXRSServerLaunched());
 
       /* Wait forever */
 

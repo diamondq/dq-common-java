@@ -1,10 +1,10 @@
 package com.diamondq.common.injection.micronaut;
 
+import jakarta.enterprise.inject.Instance;
+import jakarta.enterprise.util.TypeLiteral;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.enterprise.inject.Instance;
-import javax.enterprise.util.TypeLiteral;
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +35,7 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
   }
 
   /**
-   * @see javax.enterprise.inject.Instance#select(java.lang.annotation.Annotation[])
+   * @see jakarta.enterprise.inject.Instance#select(java.lang.annotation.Annotation[])
    */
   @Override
   public Instance<@Nullable T> select(Annotation @Nullable ... pQualifiers) {
@@ -43,7 +43,7 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
   }
 
   /**
-   * @see javax.enterprise.inject.Instance#select(java.lang.Class, java.lang.annotation.Annotation[])
+   * @see jakarta.enterprise.inject.Instance#select(java.lang.Class, java.lang.annotation.Annotation[])
    */
   @Override
   public <U extends @Nullable T> Instance<U> select(Class<U> pSubtype, Annotation @Nullable ... pQualifiers) {
@@ -51,7 +51,8 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
   }
 
   /**
-   * @see javax.enterprise.inject.Instance#select(javax.enterprise.util.TypeLiteral, java.lang.annotation.Annotation[])
+   * @see jakarta.enterprise.inject.Instance#select(javax.enterprise.util.TypeLiteral,
+   *   java.lang.annotation.Annotation[])
    */
   @Override
   public <U extends T> Instance<U> select(@SuppressWarnings("null") TypeLiteral<U> pSubtype,
@@ -60,7 +61,7 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
   }
 
   /**
-   * @see javax.enterprise.inject.Instance#isUnsatisfied()
+   * @see jakarta.enterprise.inject.Instance#isUnsatisfied()
    */
   @Override
   public boolean isUnsatisfied() {
@@ -68,7 +69,7 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
   }
 
   /**
-   * @see javax.enterprise.inject.Instance#isAmbiguous()
+   * @see jakarta.enterprise.inject.Instance#isAmbiguous()
    */
   @Override
   public boolean isAmbiguous() {
@@ -76,10 +77,19 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
   }
 
   /**
-   * @see javax.enterprise.inject.Instance#destroy(java.lang.Object)
+   * @see jakarta.enterprise.inject.Instance#destroy(java.lang.Object)
    */
   @Override
   public void destroy(@Nullable T pInstance) {
   }
 
+  @Override
+  public Iterable<? extends Handle<@Nullable T>> handles() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Handle<@Nullable T> getHandle() {
+    throw new UnsupportedOperationException();
+  }
 }

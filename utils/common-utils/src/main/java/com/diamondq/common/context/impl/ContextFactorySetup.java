@@ -6,10 +6,10 @@ import com.diamondq.common.context.impl.logging.LoggingContextHandler;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.FutureUtils;
 import io.micronaut.context.annotation.Factory;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import javax.inject.Singleton;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;

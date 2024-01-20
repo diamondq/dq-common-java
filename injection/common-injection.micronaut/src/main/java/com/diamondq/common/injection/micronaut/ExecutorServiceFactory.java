@@ -1,10 +1,10 @@
 package com.diamondq.common.injection.micronaut;
 
 import io.micronaut.context.annotation.Factory;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.jetbrains.annotations.Nullable;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

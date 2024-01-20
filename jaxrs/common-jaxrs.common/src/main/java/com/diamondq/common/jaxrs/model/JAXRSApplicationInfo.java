@@ -3,10 +3,6 @@ package com.diamondq.common.jaxrs.model;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Feature;
-
 /**
  * This represents a service that needs to inject JAXRS application features. This is the equivalent of the
  * javax.ws.rs.core.Application but for multiple services that need appear under a single JAXRS Application. NOTE:
@@ -16,7 +12,8 @@ public interface JAXRSApplicationInfo {
 
   /**
    * Get a set of root resource, provider and {@link Feature feature} classes. The default life-cycle for resource class
-   * instances is per-request. The default life-cycle for providers (registered directly or via a feature) is singleton.
+   * instances is per-request. The default life-cycle for providers (registered directly or via a feature) is
+   * singleton.
    * <p>
    * Implementations should warn about and ignore classes that do not conform to the requirements of root resource or
    * provider/feature classes. Implementations should warn about and ignore classes for which {@link #getSingletons()}
@@ -27,7 +24,7 @@ public interface JAXRSApplicationInfo {
    * </p>
    *
    * @return a set of root resource and provider classes. Returning {@code null} is equivalent to returning an empty
-   *         set.
+   *   set.
    */
   public Set<Class<?>> getClasses();
 
@@ -44,7 +41,7 @@ public interface JAXRSApplicationInfo {
    * </p>
    *
    * @return a set of root resource and provider instances. Returning {@code null} is equivalent to returning an empty
-   *         set.
+   *   set.
    */
   public Set<Object> getSingletons();
 
@@ -65,7 +62,7 @@ public interface JAXRSApplicationInfo {
    * </p>
    *
    * @return a map of custom application-wide properties. Returning {@code null} is equivalent to returning an empty
-   *         set.
+   *   set.
    * @since 2.0
    */
   public Map<String, Object> getProperties();

@@ -1,12 +1,11 @@
 package com.diamondq.common.vertx;
 
-import javax.inject.Singleton;
-
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.vertx.core.Vertx;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceDiscoveryOptions;
+import jakarta.inject.Singleton;
 
 @Factory
 public class ServiceDiscoveryFactory {

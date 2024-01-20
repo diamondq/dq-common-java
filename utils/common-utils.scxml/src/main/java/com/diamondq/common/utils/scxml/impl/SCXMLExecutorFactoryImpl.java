@@ -3,12 +3,8 @@ package com.diamondq.common.utils.scxml.impl;
 import com.diamondq.common.injection.InjectionContext;
 import com.diamondq.common.utils.scxml.InvokerInjector;
 import com.diamondq.common.utils.scxml.SCXMLExecutorFactory;
-
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.commons.scxml2.Context;
 import org.apache.commons.scxml2.ErrorReporter;
 import org.apache.commons.scxml2.Evaluator;
@@ -23,12 +19,14 @@ import org.apache.commons.scxml2.model.ModelException;
 import org.apache.commons.scxml2.model.SCXML;
 import org.javatuples.Pair;
 
+import java.util.List;
+
 @Singleton
 public class SCXMLExecutorFactoryImpl implements SCXMLExecutorFactory {
 
   private List<InvokerInjector> mInjectors;
 
-  private InjectionContext      mInjectionContext;
+  private InjectionContext mInjectionContext;
 
   @Inject
   public SCXMLExecutorFactoryImpl(InjectionContext pInjectionContext, List<InvokerInjector> pInjectors) {

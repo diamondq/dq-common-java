@@ -1,14 +1,13 @@
 package com.diamondq.common.tracing.opentracing;
 
-import java.lang.reflect.Field;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.BeforeShutdown;
-import javax.inject.Inject;
-
 import io.opentracing.noop.NoopTracerFactory;
 import io.opentracing.util.GlobalTracer;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.BeforeShutdown;
+import jakarta.inject.Inject;
+
+import java.lang.reflect.Field;
 
 @ApplicationScoped
 public class CleanupGlobalTracer {
@@ -26,7 +25,7 @@ public class CleanupGlobalTracer {
       Field field = GlobalTracer.class.getDeclaredField("tracer");
       field.setAccessible(true);
       field.set(null, NoopTracerFactory.create());
-      
+
       Field registeredField = GlobalTracer.class.getDeclaredField("isRegistered");
       registeredField.setAccessible(true);
       registeredField.set(null, false);

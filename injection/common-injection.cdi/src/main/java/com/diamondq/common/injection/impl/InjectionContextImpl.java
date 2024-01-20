@@ -1,11 +1,11 @@
 package com.diamondq.common.injection.impl;
 
 import com.diamondq.common.injection.InjectionContext;
+import jakarta.enterprise.inject.Instance;
+import jakarta.enterprise.inject.literal.NamedLiteral;
+import jakarta.enterprise.inject.se.SeContainer;
 import org.jetbrains.annotations.Nullable;
 
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.literal.NamedLiteral;
-import javax.enterprise.inject.se.SeContainer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;

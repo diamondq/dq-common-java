@@ -5,10 +5,9 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.client.bind.ClientRequestUriContext;
 import io.micronaut.http.client.bind.TypedClientArgumentRequestBinder;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Connects to Micronauts Argument Binder so that when an AuthInfo is detected in the parameters, the current

@@ -2,10 +2,9 @@ package com.diamondq.common.security.acme;
 
 import com.diamondq.common.config.Config;
 import com.diamondq.common.security.acme.model.ACMEConfig;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
 import org.jetbrains.annotations.Nullable;
-
-import javax.enterprise.inject.Produces;
-import javax.inject.Singleton;
 
 /**
  * Factory provider that produces the ACMEConfig object on demand

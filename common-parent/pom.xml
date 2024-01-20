@@ -13,7 +13,7 @@
   <properties>
     <datanucleus.version>5.2.9</datanucleus.version>
     <datanucleus-query.version>5.0.9</datanucleus-query.version>
-    <weld.version>3.1.8.Final</weld.version>
+    <weld.version>5.1.2.Final</weld.version>
     <openaz.version>0.0.1-SNAPSHOT</openaz.version>
     <rocks.xmpp.version>0.8.0-DQ-SNAPSHOT</rocks.xmpp.version>
     <rocks.precis.version>1.1.0-DQ-SNAPSHOT</rocks.precis.version>
@@ -30,7 +30,7 @@
       <dependency>
         <groupId>jakarta.platform</groupId>
         <artifactId>jakarta.jakartaee-bom</artifactId>
-        <version>8.0.0</version>
+        <version>11.0.0-M1</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -48,8 +48,8 @@
       </dependency>
       <dependency>
         <groupId>org.jboss.weld</groupId>
-        <artifactId>weld-junit4</artifactId>
-        <version>2.0.1.Final</version>
+        <artifactId>weld-junit5</artifactId>
+        <version>4.0.1.Final</version>
       </dependency>
       <dependency>
         <groupId>io.jaegertracing</groupId>
@@ -224,13 +224,4 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <dependencies>
-    <!-- Temporary add of the javax.inject only as a compile dependency as we migrate to jakarta.inject -->
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
 </project>

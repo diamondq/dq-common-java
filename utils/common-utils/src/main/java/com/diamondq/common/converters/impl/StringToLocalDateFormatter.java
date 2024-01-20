@@ -1,8 +1,8 @@
 package com.diamondq.common.converters.impl;
 
 import com.diamondq.common.converters.AbstractConverter;
+import jakarta.inject.Singleton;
 
-import javax.inject.Singleton;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;

@@ -20,11 +20,11 @@ import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.TranslatableString;
 import com.google.common.collect.Maps;
+import jakarta.enterprise.inject.Vetoed;
 import org.javatuples.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.enterprise.inject.Vetoed;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;

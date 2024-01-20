@@ -1,12 +1,12 @@
 package com.diamondq.common.jaxrs.utils;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.container.AsyncResponse;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.container.AsyncResponse;
 import java.util.Locale;
 
 /**

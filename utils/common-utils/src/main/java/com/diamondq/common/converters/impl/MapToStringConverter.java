@@ -4,10 +4,10 @@ import com.diamondq.common.TypeReference;
 import com.diamondq.common.converters.AbstractConverter;
 import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.types.Types;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import java.util.Map;
 
 @Singleton

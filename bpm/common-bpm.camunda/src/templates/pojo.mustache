@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.core.annotation.Introspected;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,43 +13,117 @@ import org.jetbrains.annotations.Nullable;
 * {{description}}
 **/{{/description}}
 @Introspected
-{{#useSwaggerAnnotations}}{{#description}}@ApiModel(description = "{{{description}}}"){{/description}}{{/useSwaggerAnnotations}}
-{{>generatedAnnotation}}{{>additionalModelTypeAnnotations}}public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}} {{#serializableModel}}implements Serializable{{/serializableModel}} {
-{{#vars}}{{#isEnum}}{{^isContainer}}
+{{#useSwaggerAnnotations}}{{#description}}@ApiModel(description = "{{{.}}}"){{/description}}{{/useSwaggerAnnotations}}{{#useMicroProfileOpenAPIAnnotations}}
+  @org.eclipse.microprofile.openapi.annotations.media.Schema({{#title}}title="{{{.}}}", {{/title}}{{#description}}description="{{{.}}}"{{/description}}{{^description}}description=""{{/description}}){{/useMicroProfileOpenAPIAnnotations}}
+@JsonTypeName("{{name}}")
+{{>generatedAnnotation}}{{>additionalModelTypeAnnotations}}
+{{#vendorExtensions.x-class-extra-annotation}}
+  {{{vendorExtensions.x-class-extra-annotation}}}
+{{/vendorExtensions.x-class-extra-annotation}}
+public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}} {{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
+{{#vars}}
+  {{#isEnum}}
+    {{^isContainer}}
+      {{>enumClass}}
+    {{/isContainer}}
+    {{#isContainer}}
+      {{#mostInnerItems}}
+        {{>enumClass}}
+      {{/mostInnerItems}}
+    {{/isContainer}}
+  {{/isEnum}}
+  {{#vendorExtensions.x-field-extra-annotation}}
+    {{{vendorExtensions.x-field-extra-annotation}}}
+  {{/vendorExtensions.x-field-extra-annotation}}
+  private {{#useBeanValidation}}@Valid {{/useBeanValidation}}{{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+{{/vars}}
+{{#generateBuilders}}
+  {{^additionalProperties}}
 
-  {{>enumClass}}{{/isContainer}}{{#isContainer}}{{#mostInnerItems}}
+    protected {{classname}}({{classname}}Builder<?, ?> b) {
+    {{#parent}}
+      super(b);
+    {{/parent}}
+    {{#vars}}
+      this.{{name}} = b.{{name}};
+    {{/vars}}
+    }
 
-  {{>enumClass}}{{/mostInnerItems}}{{/isContainer}}{{/isEnum}}
-private {{#useBeanValidation}}@Valid {{/useBeanValidation}}{{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};{{/vars}}
+    public {{classname}}() {
+    }
+  {{/additionalProperties}}
+{{/generateBuilders}}
 
-{{#vars}}/**
-{{#description}}
-  * {{description}}
-{{/description}}
-{{#minimum}}
-  * minimum: {{minimum}}
-{{/minimum}}
-{{#maximum}}
-  * maximum: {{maximum}}
-{{/maximum}}
-* @param p{{nameInCamelCase}} {{description}}
-* @return this
-**/
-public {{classname}} {{name}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
-{{name}} = p{{nameInCamelCase}};
-return this;
-}
+{{#vars}}
+  /**
+  {{#description}}
+    * {{.}}
+  {{/description}}
+  {{#minimum}}
+    * minimum: {{.}}
+  {{/minimum}}
+  {{#maximum}}
+    * maximum: {{.}}
+  {{/maximum}}
+  * @param p{{nameInCamelCase}} {{description}}
+  * @return this
+  **/
+  public {{classname}} {{name}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
+  {{name}} = p{{nameInCamelCase}};
+  return this;
+  }
 
-{{#vendorExtensions.x-extra-annotation}}{{{vendorExtensions.x-extra-annotation}}}{{/vendorExtensions.x-extra-annotation}}{{#useSwaggerAnnotations}}
-  @ApiModelProperty({{#example}}example = "{{{example}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}value = "{{{description}}}"){{/useSwaggerAnnotations}}
-@JsonProperty("{{baseName}}")
-{{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}} public {{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} {{getter}}() {
-return {{name}};
-}
+  {{#vendorExtensions.x-extra-annotation}}{{{vendorExtensions.x-extra-annotation}}}{{/vendorExtensions.x-extra-annotation}}{{#useSwaggerAnnotations}}
+    @ApiModelProperty({{#example}}example = "{{{.}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}value = "{{{description}}}"){{/useSwaggerAnnotations}}{{#useMicroProfileOpenAPIAnnotations}}
+    @org.eclipse.microprofile.openapi.annotations.media.Schema({{#example}}example = "{{{.}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}description = "{{{description}}}"){{/useMicroProfileOpenAPIAnnotations}}
+  @JsonProperty("{{baseName}}")
+  {{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}} public {{^required}}@Nullable {{/required}}{{>beanValidatedType}} {{getter}}() {
+  return {{name}};
+  }
 
-public void {{setter}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
-{{name}} = p{{nameInCamelCase}};
-}
+  @JsonProperty("{{baseName}}")
+  {{#vendorExtensions.x-setter-extra-annotation}}{{{vendorExtensions.x-setter-extra-annotation}}}
+  {{/vendorExtensions.x-setter-extra-annotation}}public void {{setter}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
+  {{name}} = p{{nameInCamelCase}};
+  }
+
+
+  {{#isArray}}
+    public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    if (this.{{name}} == null) {
+    this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}};
+    }
+
+    this.{{name}}.add({{name}}Item);
+    return this;
+    }
+
+    public {{classname}} remove{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    if ({{name}}Item != null && this.{{name}} != null) {
+    this.{{name}}.remove({{name}}Item);
+    }
+
+    return this;
+    }
+  {{/isArray}}
+  {{#isMap}}
+    public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
+    if (this.{{name}} == null) {
+    this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new HashMap<>(){{/defaultValue}};
+    }
+
+    this.{{name}}.put(key, {{name}}Item);
+    return this;
+    }
+
+    public {{classname}} remove{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    if ({{name}}Item != null && this.{{name}} != null) {
+    this.{{name}}.remove({{name}}Item);
+    }
+
+    return this;
+    }
+  {{/isMap}}
 {{/vars}}
 
 {{#generateBuilders}}@JsonCreator
@@ -67,7 +142,7 @@ if (o == null || getClass() != o.getClass()) {
 return false;
 }{{#hasVars}}
   {{classname}} {{classVarName}} = ({{classname}}) o;
-  return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{^-last}} &&
+  return {{#vars}}{{#isByteArray}}Arrays{{/isByteArray}}{{^isByteArray}}Objects{{/isByteArray}}.equals(this.{{name}}, {{classVarName}}.{{name}}){{^-last}} &&
   {{/-last}}{{/vars}}{{#parent}} &&
   super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
   return {{#parent}}super.equals(o){{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
@@ -75,7 +150,7 @@ return false;
 
 @Override
 public int hashCode() {
-return Objects.hash({{#vars}}{{name}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
+return Objects.hash({{#vars}}{{^isByteArray}}{{name}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{name}}){{/isByteArray}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
 }
 
 @Override
@@ -83,7 +158,7 @@ public String toString() {
 StringBuilder sb = new StringBuilder();
 sb.append("class {{classname}} {\n");
 {{#parent}}sb.append("    ").append(toIndentedString(super.toString())).append("\n");{{/parent}}
-{{#vars}}sb.append("    {{name}}: ").append(toIndentedString({{name}})).append("\n");
+{{#vars}}sb.append("    {{name}}: ").append({{#isPassword}}"*"{{/isPassword}}{{^isPassword}}toIndentedString({{name}}){{/isPassword}}).append("\n");
 {{/vars}}sb.append("}");
 return sb.toString();
 }
@@ -99,38 +174,42 @@ return "null";
 return o.toString().replace("\n", "\n    ");
 }
 
-{{#generateBuilders}}
-  public static Builder builder() {
-  return new Builder();
+{{#generateBuilders}}{{^additionalProperties}}
+  public static {{classname}}Builder<?, ?> builder() {
+  return new {{classname}}BuilderImpl();
   }
 
-  public static class Builder {
+  private static final class {{classname}}BuilderImpl extends {{classname}}Builder<{{classname}}, {{classname}}BuilderImpl> {
+
+  @Override
+  protected {{classname}}BuilderImpl self() {
+  return this;
+  }
+
+  @Override
+  public {{classname}} build() {
+  return new {{classname}}(this);
+  }
+  }
+
+  public static abstract class {{classname}}Builder
+  <C extends {{classname}}, B extends {{classname}}Builder
+  <C, B>> {{#parent}}extends {{{.}}}Builder
+  <C, B>{{/parent}} {
   {{#vars}}
-    private {{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+    private {{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
   {{/vars}}
+  {{^parent}}
+    protected abstract B self();
+
+    public abstract C build();
+  {{/parent}}
 
   {{#vars}}
-    /**
-    {{#description}}
-      * {{description}}
-    {{/description}}
-    {{#minimum}}
-      * minimum: {{minimum}}
-    {{/minimum}}
-    {{#maximum}}
-      * maximum: {{maximum}}
-    {{/maximum}}
-    * @param p{{nameInCamelCase}} {{description}}
-    * @return the builder
-    **/
-    public Builder {{name}}({{^required}}@Nullable {{/required}}{{{datatypeWithEnum}}} p{{nameInCamelCase}}) {
-    {{name}} = p{{nameInCamelCase}};
-    return this;
+    public B {{name}}({{{datatypeWithEnum}}} {{name}}) {
+    this.{{name}} = {{name}};
+    return self();
     }
   {{/vars}}
-
-  public {{classname}} build() {
-  return new {{classname}}({{#vars}}{{name}}{{^-last}}, {{/-last}}{{/vars}});
-  }
-  }{{/generateBuilders}}
+  }{{/additionalProperties}}{{/generateBuilders}}
 }

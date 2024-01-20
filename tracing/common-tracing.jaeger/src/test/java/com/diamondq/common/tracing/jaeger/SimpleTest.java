@@ -1,29 +1,30 @@
 package com.diamondq.common.tracing.jaeger;
 
-import static org.junit.Assert.assertNotNull;
-
-import org.jboss.weld.environment.se.Weld;
-import org.jboss.weld.junit4.WeldInitiator;
-import org.junit.Rule;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.junit5.WeldInitiator;
+import org.jboss.weld.junit5.WeldJunit5Extension;
+import org.jboss.weld.junit5.WeldSetup;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@ExtendWith(WeldJunit5Extension.class)
 
 public class SimpleTest {
 
   private static final Logger sLogger = LoggerFactory.getLogger(SimpleTest.class);
 
-  @Rule
-  public WeldInitiator        weld    = WeldInitiator.of(new Weld());
+  @WeldSetup public WeldInitiator weld = WeldInitiator.of(new Weld());
 
   @Test
   public void testFoo() {
     Tracer tracer = weld.select(Tracer.class).get();
-    assertNotNull(tracer);
+    Assertions.assertNotNull(tracer);
     Span span = tracer.buildSpan("testFoo").start();
     try (Scope scope = tracer.scopeManager().activate(span)) {
       sLogger.info("Test logging First");

@@ -4,10 +4,10 @@ import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Singleton;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Singleton;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;

@@ -9,6 +9,11 @@ import com.diamondq.common.security.acl.ACLMessages;
 import com.diamondq.common.security.acl.api.SecurityContext;
 import com.diamondq.common.security.acl.api.SecurityContextManager;
 import com.diamondq.common.security.acl.spi.SecurityContextSerializer;
+import io.micronaut.context.annotation.Property;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.osgi.framework.Constants;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -18,20 +23,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.osgi.framework.Constants;
-
-import io.micronaut.context.annotation.Property;
-
 @Singleton
 public class SecurityContextManagerImpl implements SecurityContextManager {
 
   private static final String PID = "security-context-manager";
 
-  private ContextFactory                                   mContextFactory;
+  private ContextFactory mContextFactory;
 
   private ConcurrentMap<String, SecurityContextSerializer> mSerializers = new ConcurrentHashMap<>();
 
@@ -70,8 +67,7 @@ public class SecurityContextManagerImpl implements SecurityContextManager {
       LinkedHashMap<String, byte[]> byteMap = new LinkedHashMap<>();
       for (SecurityContextSerializer ser : mSerializers.values()) {
         byte[] bytes = ser.serialize(pContext);
-        if (bytes != null)
-          byteMap.put(ser.getSerializerId(), bytes);
+        if (bytes != null) byteMap.put(ser.getSerializerId(), bytes);
       }
       if (byteMap.isEmpty() == true)
         throw new ExtendedIllegalStateException(ACLMessages.NO_SUCH_SERIALIZER, pContext.getClass().getName());
@@ -131,8 +127,7 @@ public class SecurityContextManagerImpl implements SecurityContextManager {
         byte[] dataBytes = new byte[dataLen];
         buffer.get(dataBytes);
         SecurityContextSerializer serializer = mSerializers.get(keyId);
-        if (serializer == null)
-          throw new ExtendedIllegalStateException(ACLMessages.NO_SUCH_SERIALIZER, keyId);
+        if (serializer == null) throw new ExtendedIllegalStateException(ACLMessages.NO_SUCH_SERIALIZER, keyId);
         context = serializer.deserialize(context, dataBytes);
       }
       return Verify.notNull(context);

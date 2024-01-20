@@ -47,5 +47,9 @@
       <groupId>com.diamondq.common.config</groupId>
       <artifactId>config-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jakarta.inject</groupId>
+      <artifactId>jakarta.inject-api</artifactId>
+    </dependency>
   </dependencies>
 </project>

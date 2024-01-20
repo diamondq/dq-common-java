@@ -1,9 +1,8 @@
 package com.diamondq.common.tracing.opentracing.testhelpers;
 
-import org.junit.Assert;
-
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.GlobalTracer;
+import org.junit.jupiter.api.Assertions;
 
 public class TracingAssertions {
 
@@ -13,7 +12,7 @@ public class TracingAssertions {
    * @param pMessage the identifying message for the {@link AssertionError} (<code>null</code> okay)
    */
   public static void assertNoActiveSpan(String pMessage) {
-    Assert.assertNull(pMessage, GlobalTracer.get().activeSpan());
+    Assertions.assertNull(GlobalTracer.get().activeSpan(), pMessage);
   }
 
   /**
@@ -22,10 +21,10 @@ public class TracingAssertions {
    * @param pMessage the identifying message for the {@link AssertionError} (<code>null</code> okay)
    */
   public static void assertActiveSpan(String pMessage) {
-    Assert.assertNotNull(pMessage, GlobalTracer.get().activeSpan());
+    Assertions.assertNotNull(GlobalTracer.get().activeSpan(), pMessage);
   }
 
   public static void assertCompletedSpans(String pMessage, int pExpected, MockTracer pTracker) {
-    Assert.assertEquals(pMessage, pExpected, pTracker.finishedSpans().size());
+    Assertions.assertEquals(pExpected, pTracker.finishedSpans().size(), pMessage);
   }
 }

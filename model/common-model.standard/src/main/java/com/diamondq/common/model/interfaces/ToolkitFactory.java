@@ -2,6 +2,7 @@ package com.diamondq.common.model.interfaces;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -90,10 +91,11 @@ public abstract class ToolkitFactory {
 
       /* Create a new instance */
 
-      Object instance = providerClass.newInstance();
+      Object instance = providerClass.getDeclaredConstructor().newInstance();
       return pClass.cast(instance);
     }
-    catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+    catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException |
+           InvocationTargetException ex) {
       throw new RuntimeException(ex);
     }
   }

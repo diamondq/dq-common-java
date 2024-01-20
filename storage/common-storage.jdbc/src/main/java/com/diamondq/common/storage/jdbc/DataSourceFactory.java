@@ -24,7 +24,7 @@ public class DataSourceFactory {
       try {
         @SuppressWarnings(
           "unchecked") Class<? extends DataSource> sourceClass = (Class<? extends DataSource>) Class.forName(type);
-        DataSource source = sourceClass.newInstance();
+        DataSource source = sourceClass.getDeclaredConstructor().newInstance();
 
         param:
         for (Map.Entry<@NotNull Object, Object> pair : mParams.entrySet()) {
@@ -49,7 +49,8 @@ public class DataSourceFactory {
 
         return source;
       }
-      catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+      catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException |
+             InvocationTargetException ex) {
         throw new RuntimeException(ex);
       }
     }

@@ -3,16 +3,6 @@ package com.diamondq.common.vertx;
 import com.diamondq.common.context.ContextExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.FutureUtils;
-
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Singleton;
-
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Value;
@@ -22,6 +12,14 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.logging.SLF4JLogDelegateFactory;
+import jakarta.inject.Singleton;
+
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("deprecation")
 @Factory
@@ -36,21 +34,27 @@ public class VertxFactory {
     /* Assign the Vertx future as the primary future */
 
     try {
-      Method ofFuture =
-        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("of", CompletableFuture.class);
-      Method newCompletableFuture =
-        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
-      Method completedFuture =
-        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFuture", Object.class);
-      Method completedFailure =
-        VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFailure", Throwable.class);
+      Method ofFuture = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("of", CompletableFuture.class);
+      Method newCompletableFuture = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("newCompletableFuture");
+      Method completedFuture = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFuture",
+        Object.class
+      );
+      Method completedFailure = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("completedFailure",
+        Throwable.class
+      );
       Method listOf = VertxContextExtendedCompletableFuture.class.getDeclaredMethod("listOf", List.class);
       Set<Class<?>> replacements = new HashSet<>();
       replacements.add(ContextExtendedCompletableFuture.class);
       replacements.add(ExtendedCompletableFuture.class);
 
-      FutureUtils.setMethods(ofFuture, newCompletableFuture, completedFuture, completedFailure, listOf,
-        VertxContextExtendedCompletableFuture.class, replacements);
+      FutureUtils.setMethods(ofFuture,
+        newCompletableFuture,
+        completedFuture,
+        completedFailure,
+        listOf,
+        VertxContextExtendedCompletableFuture.class,
+        replacements
+      );
     }
     catch (NoSuchMethodException | SecurityException ex) {
       throw new RuntimeException(ex);
@@ -59,8 +63,9 @@ public class VertxFactory {
     // options.setAddressResolverOptions(addressResolverOptions);
     if (pBlockedThreadCheckInterval.isEmpty() == false) {
       long blockedThreadCheckIntervalTime = Long.parseLong(pBlockedThreadCheckInterval);
-      TimeUnit blockedThreadCheckIntervalUnit = pBlockedThreadCheckIntervalUnit.isEmpty() == true
-        ? TimeUnit.MILLISECONDS : TimeUnit.valueOf(pBlockedThreadCheckIntervalUnit);
+      TimeUnit blockedThreadCheckIntervalUnit =
+        pBlockedThreadCheckIntervalUnit.isEmpty() == true ? TimeUnit.MILLISECONDS : TimeUnit.valueOf(
+          pBlockedThreadCheckIntervalUnit);
       options.setBlockedThreadCheckIntervalUnit(blockedThreadCheckIntervalUnit);
       options.setBlockedThreadCheckInterval(blockedThreadCheckIntervalTime);
     }

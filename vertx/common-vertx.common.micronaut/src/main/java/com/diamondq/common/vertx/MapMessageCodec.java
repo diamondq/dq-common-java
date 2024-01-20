@@ -1,12 +1,11 @@
 package com.diamondq.common.vertx;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Singleton;
-
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
+import jakarta.inject.Singleton;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapMessageCodec implements MessageCodec<Map<Object, Object>, Map<Object, Object>> {
 

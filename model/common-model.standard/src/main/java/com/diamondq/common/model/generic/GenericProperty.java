@@ -187,7 +187,7 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
             break;
           }
           if (pValue instanceof Short) {
-            pValue = (TYPE) (Integer) new Short((Short) pValue).intValue();
+            pValue = (TYPE) (Integer) ((Short) pValue).intValue();
             break;
           }
           if (pValue instanceof String) {

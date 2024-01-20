@@ -3,9 +3,8 @@ package com.diamondq.common.tracing.jaeger;
 import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.jetbrains.annotations.Nullable;
-
-import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class JaegarExtractor implements TraceIdExtractor {

@@ -1,17 +1,24 @@
-    /**
-     * {{summary}}
-     * {{notes}} {{#allParams}}
-     * @param {{paramName}} {{description}}{{/allParams}}
-     */    
-    @{{#lambda.titlecase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.titlecase}}(value="{{{commonPath}}}{{{path}}}"){{#hasConsumes}}
-    @Produces({ {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
-    @Consumes({ {{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}} }){{/hasProduces}}{{#useSwaggerAnnotations}}
-    @ApiOperation(value = "{{{summary}}}", notes = "{{{notes}}}"{{#hasAuthMethods}}, authorizations = {
-        {{#authMethods}}{{#isOAuth}}@Authorization(value = "{{name}}", scopes = {
-            {{#scopes}}@AuthorizationScope(scope = "{{scope}}", description = "{{description}}"){{^-last}},
-            {{/-last}}{{/scopes}} }){{^-last}},{{/-last}}{{/isOAuth}}
-        {{^isOAuth}}@Authorization(value = "{{name}}"){{^-last}},{{/-last}}
-        {{/isOAuth}}{{/authMethods}} }{{/hasAuthMethods}}, tags={ {{#vendorExtensions.x-tags}}"{{tag}}"{{^-last}}, {{/-last}}{{/vendorExtensions.x-tags}} })
-    @ApiResponses(value = { {{#responses}}
-        @ApiResponse(code = {{{code}}}, message = "{{{message}}}", response = {{{baseType}}}.class{{#returnContainer}}, responseContainer = "{{{returnContainer}}}"{{/returnContainer}}){{^-last}},{{/-last}}{{/responses}} }){{/useSwaggerAnnotations}}
-    {{#returnResponse}}Response{{/returnResponse}}{{^returnResponse}}{{>returnTypeInterface}}{{/returnResponse}} {{nickname}}(AuthInfo authInfo{{#hasParams}}, {{/hasParams}}{{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{^-last}},{{/-last}}{{/allParams}});
+/**
+* {{summary}}
+* {{notes}} {{#allParams}}
+  * @param {{paramName}} {{description}}{{/allParams}}
+*/
+@{{#lambda.titlecase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.titlecase}}(value="{{{commonPath}}}{{{path}}}"){{#hasConsumes}}
+  @Consumes({ {{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
+  @Produces({ {{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}} }){{/hasProduces}}{{#useSwaggerAnnotations}}
+  @ApiOperation(value = "{{{summary}}}", notes = "{{{notes}}}"{{#hasAuthMethods}}, authorizations = {
+  {{#authMethods}}{{#isOAuth}}@Authorization(value = "{{name}}", scopes = {
+  {{#scopes}}@AuthorizationScope(scope = "{{scope}}", description = "{{description}}"){{^-last}},
+  {{/-last}}{{/scopes}} }){{^-last}},{{/-last}}{{/isOAuth}}
+  {{^isOAuth}}@Authorization(value = "{{name}}"){{^-last}},{{/-last}}
+  {{/isOAuth}}{{/authMethods}} }{{/hasAuthMethods}}, tags={ {{#vendorExtensions.x-tags}}"{{tag}}"{{^-last}}, {{/-last}}{{/vendorExtensions.x-tags}} })
+  {{#implicitHeadersParams.0}}
+    @io.swagger.annotations.ApiImplicitParams({
+    {{#implicitHeadersParams}}
+      @io.swagger.annotations.ApiImplicitParam(name = "{{{baseName}}}", value = "{{{description}}}", {{#required}}required = true,{{/required}} dataType = "{{{dataType}}}", paramType = "header"){{^-last}},{{/-last}}
+    {{/implicitHeadersParams}}
+    })
+  {{/implicitHeadersParams.0}}
+  @ApiResponses(value = { {{#responses}}
+    @ApiResponse(code = {{{code}}}, message = "{{{message}}}", response = {{{baseType}}}.class{{#returnContainer}}, responseContainer = "{{{.}}}"{{/returnContainer}}){{^-last}},{{/-last}}{{/responses}} }){{/useSwaggerAnnotations}}
+  {{#supportAsync}}{{>returnAsyncTypeInterface}}{{/supportAsync}}{{^supportAsync}}{{#returnResponse}}Response{{/returnResponse}}{{^returnResponse}}{{>returnTypeInterface}}{{/returnResponse}}{{/supportAsync}} {{nickname}}(AuthInfo authInfo{{#hasParams}}, {{/hasParams}}{{#allParams}}{{>queryParams}}{{>pathParams}}{{>cookieParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{^-last}},{{/-last}}{{/allParams}});
