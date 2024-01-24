@@ -39,15 +39,44 @@
         <module name="common-injection.common" />
         <module name="common-storage.hibernate.ogm" />
       </profile>
-      <profile name="Annotation profile for common-security.acme" enabled="true">
+      <profile name="Annotation profile for DiamondQ Common: Root" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processor name="org.immutables.processor.ProxyProcessor" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.0/value-2.10.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.2/micronaut-inject-java-4.2.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.2/micronaut-core-processor-4.2.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.0/micronaut-inject-4.2.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.0/micronaut-core-4.2.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.2/micronaut-aop-4.2.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.0/micronaut-core-reactive-4.2.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/validation/micronaut-validation/4.2.0/micronaut-validation-4.2.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/reactor/micronaut-reactor/3.1.0/micronaut-reactor-3.1.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/projectreactor/reactor-core/3.5.11/reactor-core-3.5.11.jar" />
         </processorPath>
-        <module name="common-security.acme" />
+        <module name="common-model.standard" />
+        <module name="common-bpm.camunda" />
+        <module name="common-utils.sync" />
+        <module name="common-injection.micronaut" />
+        <module name="common-security.acl" />
+        <module name="common-injection.micronaut.utils" />
+        <module name="common-utils" />
+        <module name="common-utils.scxml" />
+      </profile>
+      <profile name="Annotation profile for common-lambda.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-lambda.test" />
       </profile>
       <profile name="Annotation profile for common-jaxrs.common" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -59,7 +88,17 @@
         </processorPath>
         <module name="common-jaxrs.common" />
       </profile>
-      <profile name="Annotation profile for common-vertx.common.osgi" enabled="true">
+      <profile name="Annotation profile for common-security.acme" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processor name="org.immutables.processor.ProxyProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.0/value-2.10.0.jar" />
+        </processorPath>
+        <module name="common-security.acme" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.common" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -95,7 +134,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
         </processorPath>
-        <module name="common-vertx.common.osgi" />
+        <module name="common-vertx.common" />
       </profile>
       <profile name="Annotation profile for common-vertx.common.micronaut" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -154,7 +193,7 @@
         </processorPath>
         <module name="common-vertx.common.micronaut" />
       </profile>
-      <profile name="Annotation profile for common-vertx.common" enabled="true">
+      <profile name="Annotation profile for common-vertx.common.osgi" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -190,46 +229,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
         </processorPath>
-        <module name="common-vertx.common" />
-      </profile>
-      <profile name="Annotation profile for common-lambda.test" enabled="true">
-        <sourceOutputDir name="../generated-sources/annotations" />
-        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
-        <module name="common-lambda.test" />
-      </profile>
-      <profile name="Annotation profile for DiamondQ Common: Root" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.2/micronaut-inject-java-4.2.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.2/micronaut-core-processor-4.2.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.0/micronaut-inject-4.2.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.0/micronaut-core-4.2.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.2/micronaut-aop-4.2.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.0/micronaut-core-reactive-4.2.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/validation/micronaut-validation/4.2.0/micronaut-validation-4.2.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/reactor/micronaut-reactor/3.1.0/micronaut-reactor-3.1.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/projectreactor/reactor-core/3.5.11/reactor-core-3.5.11.jar" />
-        </processorPath>
-        <module name="common-model.standard" />
-        <module name="common-bpm.camunda" />
-        <module name="common-utils.sync" />
-        <module name="common-injection.micronaut" />
-        <module name="common-security.acl" />
-        <module name="common-injection.micronaut.utils" />
-        <module name="common-utils" />
-        <module name="common-utils.scxml" />
+        <module name="common-vertx.common.osgi" />
       </profile>
     </annotationProcessing>
   </component>
