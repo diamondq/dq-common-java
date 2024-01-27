@@ -282,4 +282,82 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @return future to indicate success or failure
    */
   ExtendedCompletionStage<@Nullable Void> complete();
+
+  enum ActionType {
+    /**
+     * Getting the hash of the A data
+     */
+    GET_A_HASH,
+    /**
+     * Getting the hash of the B data
+     */
+    GET_B_HASH,
+    /**
+     * Getting the actual A data
+     */
+    GET_A_SOURCE,
+    /**
+     * Getting the actual B data
+     */
+    GET_B_SOURCE,
+    /**
+     * Calling the completion
+     */
+    COMPLETE,
+    /**
+     * Process A data
+     */
+    CATEGORIZE_A,
+    /**
+     * Process B data
+     */
+    CATEGORIZE_B,
+    /**
+     * Delete A
+     */
+    DELETE_A,
+    /**
+     * Delete B
+     */
+    DELETE_B,
+    /**
+     * Create A
+     */
+    CREATE_A,
+    /**
+     * Create B
+     */
+    CREATE_B,
+    /**
+     * Modify A
+     */
+    MODIFY_A,
+    /**
+     * Modify B
+     */
+    MODIFY_B
+  }
+
+  /**
+   * Called to report either starting or ending a particular action
+   *
+   * @param pIsStart true if starting or false if ending
+   * @param pType the type
+   */
+  default void reportSyncStatus(boolean pIsStart, ActionType pType) {}
+
+  /**
+   * Called to set the total (used for progress bars) on an action
+   *
+   * @param pType the action
+   * @param pTotal the total number of steps
+   */
+  default void reportSyncStatusTotal(ActionType pType, int pTotal) {}
+
+  /**
+   * Called to increment the completion of a step on an action
+   *
+   * @param pType the action
+   */
+  default void reportIncrementStatus(ActionType pType) {}
 }
