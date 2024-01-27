@@ -278,7 +278,7 @@ public class SyncEngine {
 
         /* Anything left in B has to be processed */
 
-        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_A, bMap.size());
+        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_B, bMap.size());
         for (Map.Entry<B_KEY, B_FRAG> bPair : bMap.entrySet()) {
 
           pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_B);
