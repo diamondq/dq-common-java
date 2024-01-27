@@ -279,9 +279,10 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
   /**
    * Called after all the creation/modify/deletes are complete.
    *
+   * @param pThrowable the optional throwable if there was an error during processing
    * @return future to indicate success or failure
    */
-  ExtendedCompletionStage<@Nullable Void> complete();
+  ExtendedCompletionStage<@Nullable Void> complete(@Nullable Throwable pThrowable);
 
   enum ActionType {
     /**

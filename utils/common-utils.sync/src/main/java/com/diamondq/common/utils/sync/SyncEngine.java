@@ -130,356 +130,368 @@ public class SyncEngine {
     SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> pInfo) {
 
     SyncResult result = new SyncResult();
+    try {
 
-    long startTimer = System.currentTimeMillis();
+      long startTimer = System.currentTimeMillis();
 
-    /* First, let's check if there is a hash to shortcut this */
+      /* First, let's check if there is a hash to shortcut this */
 
-    pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_A_HASH);
-    long aHashStartTimer = System.currentTimeMillis();
-    Optional<String> aHashOpt = pInfo.getAHash();
-    result.aHashElapsedTime = System.currentTimeMillis() - aHashStartTimer;
-    pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_A_HASH);
+      pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_A_HASH);
+      long aHashStartTimer = System.currentTimeMillis();
+      Optional<String> aHashOpt = pInfo.getAHash();
+      result.aHashElapsedTime = System.currentTimeMillis() - aHashStartTimer;
+      pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_A_HASH);
 
-    if (aHashOpt.isPresent()) {
+      if (aHashOpt.isPresent()) {
 
-      pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_B_HASH);
-      long bHashStartTimer = System.currentTimeMillis();
-      Optional<String> bHashOpt = pInfo.getBHash();
-      result.bHashElapsedTime = System.currentTimeMillis() - bHashStartTimer;
-      pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_B_HASH);
+        pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_B_HASH);
+        long bHashStartTimer = System.currentTimeMillis();
+        Optional<String> bHashOpt = pInfo.getBHash();
+        result.bHashElapsedTime = System.currentTimeMillis() - bHashStartTimer;
+        pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_B_HASH);
 
-      if (bHashOpt.isPresent()) {
+        if (bHashOpt.isPresent()) {
 
-        /* If the hashes match, then we're done */
+          /* If the hashes match, then we're done */
 
-        if (aHashOpt.get().equals(bHashOpt.get())) {
-          result.totalElapsedTime = System.currentTimeMillis() - startTimer;
-          pInfo.reportSyncStatus(true, SyncInfo.ActionType.COMPLETE);
-          return pInfo.complete().thenApply((ignored) -> {
-            pInfo.reportSyncStatus(false, SyncInfo.ActionType.COMPLETE);
-            return result;
-          });
+          if (aHashOpt.get().equals(bHashOpt.get())) {
+            result.totalElapsedTime = System.currentTimeMillis() - startTimer;
+            pInfo.reportSyncStatus(true, SyncInfo.ActionType.COMPLETE);
+            return pInfo.complete(null).thenApply((ignored) -> {
+              pInfo.reportSyncStatus(false, SyncInfo.ActionType.COMPLETE);
+              return result;
+            });
+          }
         }
       }
-    }
 
-    /* Stream the data into a set of data */
+      /* Stream the data into a set of data */
 
-    pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_A_SOURCE);
-    long aSourceStartTimer = System.currentTimeMillis();
-    ExtendedCompletionStage<@NotNull Map<@NotNull A_KEY, @NotNull A_FRAG>> aSourceFuture = pInfo.getASource()
-      .thenApply((source) -> {
-        result.aSourceLoadElapsedTime = System.currentTimeMillis() - aSourceStartTimer;
-        pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_A_SOURCE);
-        return source;
-      });
+      pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_A_SOURCE);
+      long aSourceStartTimer = System.currentTimeMillis();
+      ExtendedCompletionStage<@NotNull Map<@NotNull A_KEY, @NotNull A_FRAG>> aSourceFuture = pInfo.getASource()
+        .thenApply((source) -> {
+          result.aSourceLoadElapsedTime = System.currentTimeMillis() - aSourceStartTimer;
+          pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_A_SOURCE);
+          return source;
+        });
 
-    pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_B_SOURCE);
-    long bSourceStartTimer = System.currentTimeMillis();
-    ExtendedCompletionStage<@NotNull Map<@NotNull B_KEY, @NotNull B_FRAG>> bSourceFuture = pInfo.getBSource()
-      .thenApply((source) -> {
-        result.bSourceLoadElapsedTime = System.currentTimeMillis() - bSourceStartTimer;
-        pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_B_SOURCE);
-        return source;
-      });
+      pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_B_SOURCE);
+      long bSourceStartTimer = System.currentTimeMillis();
+      ExtendedCompletionStage<@NotNull Map<@NotNull B_KEY, @NotNull B_FRAG>> bSourceFuture = pInfo.getBSource()
+        .thenApply((source) -> {
+          result.bSourceLoadElapsedTime = System.currentTimeMillis() - bSourceStartTimer;
+          pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_B_SOURCE);
+          return source;
+        });
 
-    boolean keyTypesEqual = pInfo.isKeyTypesEqual();
-    boolean aFragTypeComplete = pInfo.isAFragTypeComplete();
-    boolean bFragTypeComplete = pInfo.isBFragTypeComplete();
-    boolean typesEqual = pInfo.isTypesEqual();
+      boolean keyTypesEqual = pInfo.isKeyTypesEqual();
+      boolean aFragTypeComplete = pInfo.isAFragTypeComplete();
+      boolean bFragTypeComplete = pInfo.isBFragTypeComplete();
+      boolean typesEqual = pInfo.isTypesEqual();
 
-    return aSourceFuture.thenCombine(bSourceFuture, (origAMap, origBMap) -> {
+      return aSourceFuture.thenCombine(bSourceFuture, (origAMap, origBMap) -> {
 
-      pInfo.reportSyncStatus(true, SyncInfo.ActionType.CATEGORIZE_A);
+        pInfo.reportSyncStatus(true, SyncInfo.ActionType.CATEGORIZE_A);
 
-      long categorizationStartTimer = System.currentTimeMillis();
+        long categorizationStartTimer = System.currentTimeMillis();
 
-      result.aSourceCount = origAMap.size();
-      result.bSourceCount = origBMap.size();
+        result.aSourceCount = origAMap.size();
+        result.bSourceCount = origBMap.size();
 
-      Map<A_KEY, A_FRAG> aMap = new HashMap<>(origAMap);
-      Map<B_KEY, B_FRAG> bMap = new HashMap<>(origBMap);
-      Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = new HashSet<>();
-      Set<Pair<B_KEY, B_FRAG>> aToBeCreated = new HashSet<>();
-      Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = new HashSet<>();
+        Map<A_KEY, A_FRAG> aMap = new HashMap<>(origAMap);
+        Map<B_KEY, B_FRAG> bMap = new HashMap<>(origBMap);
+        Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = new HashSet<>();
+        Set<Pair<B_KEY, B_FRAG>> aToBeCreated = new HashSet<>();
+        Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = new HashSet<>();
 
-      Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = new HashSet<>();
-      Set<Pair<A_KEY, A_FRAG>> bToBeCreated = new HashSet<>();
-      Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = new HashSet<>();
+        Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = new HashSet<>();
+        Set<Pair<A_KEY, A_FRAG>> bToBeCreated = new HashSet<>();
+        Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = new HashSet<>();
 
-      boolean aModSupported = pInfo.isAModificationSupported();
-      boolean bModSupported = pInfo.isBModificationSupported();
+        boolean aModSupported = pInfo.isAModificationSupported();
+        boolean bModSupported = pInfo.isBModificationSupported();
 
-      pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_A, result.aSourceCount);
-      for (Map.Entry<A_KEY, A_FRAG> aPair : aMap.entrySet()) {
+        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_A, result.aSourceCount);
+        for (Map.Entry<A_KEY, A_FRAG> aPair : aMap.entrySet()) {
 
-        pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_A);
+          pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_A);
 
-        A_KEY aKey = aPair.getKey();
-        @SuppressWarnings("unchecked") B_KEY bKey = (keyTypesEqual ? (B_KEY) aKey : pInfo.convertAKeyToBKey(aKey));
+          A_KEY aKey = aPair.getKey();
+          @SuppressWarnings("unchecked") B_KEY bKey = (keyTypesEqual ? (B_KEY) aKey : pInfo.convertAKeyToBKey(aKey));
 
-        /* See if the item exists in the other side */
+          /* See if the item exists in the other side */
 
-        @Nullable B_FRAG bItem = bMap.remove(bKey);
+          @Nullable B_FRAG bItem = bMap.remove(bKey);
 
-        if (bItem == null) {
+          if (bItem == null) {
 
-          /* b is missing. Was b deleted or does b not yet exist */
+            /* b is missing. Was b deleted or does b not yet exist */
 
-          boolean wasDeleted = pInfo.getBStatus(bKey);
-          if (wasDeleted) {
+            boolean wasDeleted = pInfo.getBStatus(bKey);
+            if (wasDeleted) {
 
-            /* B was deleted, so A should be deleted as well */
+              /* B was deleted, so A should be deleted as well */
 
-            aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
-          } else {
+              aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
+            } else {
 
-            /* B doesn't yet exist, so A should be added to B */
+              /* B doesn't yet exist, so A should be added to B */
 
-            bToBeCreated.add(Pair.with(aKey, aPair.getValue()));
-          }
-        } else {
-
-          /* Compare to see if the two are the same */
-
-          int compare = pInfo.compare(aPair.getValue(), bItem);
-          //noinspection StatementWithEmptyBody
-          if (compare == 0) {
-            /* They are the same */
-          } else if (compare < 0) {
-
-            /* A is newer */
-
-            if (bModSupported) bToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
-            else {
-              bToBeDeleted.add(Pair.with(bKey, bItem));
               bToBeCreated.add(Pair.with(aKey, aPair.getValue()));
             }
-
           } else {
 
-            /* B is newer */
+            /* Compare to see if the two are the same */
 
-            if (aModSupported) aToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
-            else {
-              aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
-              aToBeCreated.add(Pair.with(bKey, bItem));
+            int compare = pInfo.compare(aPair.getValue(), bItem);
+            //noinspection StatementWithEmptyBody
+            if (compare == 0) {
+              /* They are the same */
+            } else if (compare < 0) {
+
+              /* A is newer */
+
+              if (bModSupported) bToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
+              else {
+                bToBeDeleted.add(Pair.with(bKey, bItem));
+                bToBeCreated.add(Pair.with(aKey, aPair.getValue()));
+              }
+
+            } else {
+
+              /* B is newer */
+
+              if (aModSupported) aToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
+              else {
+                aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
+                aToBeCreated.add(Pair.with(bKey, bItem));
+              }
+
             }
 
           }
+        }
+
+        pInfo.reportSyncStatus(false, SyncInfo.ActionType.CATEGORIZE_A);
+        pInfo.reportSyncStatus(true, SyncInfo.ActionType.CATEGORIZE_B);
+
+        /* Anything left in B has to be processed */
+
+        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_A, bMap.size());
+        for (Map.Entry<B_KEY, B_FRAG> bPair : bMap.entrySet()) {
+
+          pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_B);
+
+          B_KEY bKey = bPair.getKey();
+          @SuppressWarnings("unchecked") A_KEY aKey = (keyTypesEqual ? (A_KEY) bKey : pInfo.convertBKeyToAKey(bKey));
+          boolean wasDeleted = pInfo.getAStatus(aKey);
+          if (wasDeleted) {
+
+            /* A was deleted, so B should be deleted as well */
+
+            bToBeDeleted.add(Pair.with(bKey, bPair.getValue()));
+
+          } else {
+
+            /* A doesn't yet exist, so B should be added to A */
+
+            aToBeCreated.add(Pair.with(bKey, bPair.getValue()));
+          }
 
         }
-      }
 
-      pInfo.reportSyncStatus(false, SyncInfo.ActionType.CATEGORIZE_A);
-      pInfo.reportSyncStatus(true, SyncInfo.ActionType.CATEGORIZE_B);
+        result.categorizationElapsedTime = System.currentTimeMillis() - categorizationStartTimer;
+        pInfo.reportSyncStatus(false, SyncInfo.ActionType.CATEGORIZE_B);
 
-      /* Anything left in B has to be processed */
+        return Sextet.with(aToBeCreated, aToBeDeleted, aToBeModified, bToBeCreated, bToBeDeleted, bToBeModified);
+      }).thenCompose((sextet) -> {
 
-      pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_A, bMap.size());
-      for (Map.Entry<B_KEY, B_FRAG> bPair : bMap.entrySet()) {
+        Set<Pair<B_KEY, B_FRAG>> aToBeCreated = sextet.getValue0();
+        Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = sextet.getValue1();
+        Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = sextet.getValue2();
 
-        pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_B);
+        Set<Pair<A_KEY, A_FRAG>> bToBeCreated = sextet.getValue3();
+        Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = sextet.getValue4();
+        Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = sextet.getValue5();
 
-        B_KEY bKey = bPair.getKey();
-        @SuppressWarnings("unchecked") A_KEY aKey = (keyTypesEqual ? (A_KEY) bKey : pInfo.convertBKeyToAKey(bKey));
-        boolean wasDeleted = pInfo.getAStatus(aKey);
-        if (wasDeleted) {
+        result.aToBeCreatedCount = aToBeCreated.size();
+        result.aToBeDeletedCount = aToBeDeleted.size();
+        result.aToBeModifiedCount = aToBeModified.size();
+        result.bToBeCreatedCount = bToBeCreated.size();
+        result.bToBeDeletedCount = bToBeDeleted.size();
+        result.bToBeModifiedCount = bToBeModified.size();
 
-          /* A was deleted, so B should be deleted as well */
+        Collection<ExtendedCompletionStage<?>> futures = new ArrayList<>();
 
-          bToBeDeleted.add(Pair.with(bKey, bPair.getValue()));
+        /* Now start processing the changes */
+
+        if (pInfo.isADeleteBeforeCreate()) {
+
+          /* Delete A records */
+
+          pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_A, result.aToBeDeletedCount);
+          pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_A);
+          long aDeletedStartTimer = System.currentTimeMillis();
+          futures.add(pInfo.deleteA(aToBeDeleted.stream()
+            .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_A))).thenCompose((unused) -> {
+
+            result.aToBeDeletedElapsedTime = System.currentTimeMillis() - aDeletedStartTimer;
+            pInfo.reportSyncStatus(false, SyncInfo.ActionType.DELETE_A);
+
+            /* Add A records */
+
+            pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_A);
+            pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_A, result.aToBeCreatedCount);
+            long aCreatedStartTimer = System.currentTimeMillis();
+            return pInfo.createA(aToBeCreated.stream()
+                .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_A))
+                .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual)))
+              .<@Nullable Void>thenApply((ignored) -> {
+                result.aToBeCreatedElapsedTime = System.currentTimeMillis() - aCreatedStartTimer;
+                pInfo.reportSyncStatus(false, SyncInfo.ActionType.CREATE_A);
+                return null;
+              });
+
+          }));
 
         } else {
-
-          /* A doesn't yet exist, so B should be added to A */
-
-          aToBeCreated.add(Pair.with(bKey, bPair.getValue()));
-        }
-
-      }
-
-      result.categorizationElapsedTime = System.currentTimeMillis() - categorizationStartTimer;
-      pInfo.reportSyncStatus(false, SyncInfo.ActionType.CATEGORIZE_B);
-
-      return Sextet.with(aToBeCreated, aToBeDeleted, aToBeModified, bToBeCreated, bToBeDeleted, bToBeModified);
-    }).thenCompose((sextet) -> {
-
-      Set<Pair<B_KEY, B_FRAG>> aToBeCreated = sextet.getValue0();
-      Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = sextet.getValue1();
-      Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = sextet.getValue2();
-
-      Set<Pair<A_KEY, A_FRAG>> bToBeCreated = sextet.getValue3();
-      Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = sextet.getValue4();
-      Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = sextet.getValue5();
-
-      result.aToBeCreatedCount = aToBeCreated.size();
-      result.aToBeDeletedCount = aToBeDeleted.size();
-      result.aToBeModifiedCount = aToBeModified.size();
-      result.bToBeCreatedCount = bToBeCreated.size();
-      result.bToBeDeletedCount = bToBeDeleted.size();
-      result.bToBeModifiedCount = bToBeModified.size();
-
-      Collection<ExtendedCompletionStage<?>> futures = new ArrayList<>();
-
-      /* Now start processing the changes */
-
-      if (pInfo.isADeleteBeforeCreate()) {
-
-        /* Delete A records */
-
-        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_A, result.aToBeDeletedCount);
-        pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_A);
-        long aDeletedStartTimer = System.currentTimeMillis();
-        futures.add(pInfo.deleteA(aToBeDeleted.stream()
-          .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_A))).thenCompose((unused) -> {
-
-          result.aToBeDeletedElapsedTime = System.currentTimeMillis() - aDeletedStartTimer;
-          pInfo.reportSyncStatus(false, SyncInfo.ActionType.DELETE_A);
 
           /* Add A records */
 
-          pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_A);
           pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_A, result.aToBeCreatedCount);
+          pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_A);
           long aCreatedStartTimer = System.currentTimeMillis();
-          return pInfo.createA(aToBeCreated.stream()
+          futures.add(pInfo.createA(aToBeCreated.stream()
               .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_A))
               .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual)))
             .<@Nullable Void>thenApply((ignored) -> {
               result.aToBeCreatedElapsedTime = System.currentTimeMillis() - aCreatedStartTimer;
               pInfo.reportSyncStatus(false, SyncInfo.ActionType.CREATE_A);
               return null;
-            });
+            }));
 
-        }));
+          /* Delete A records */
 
-      } else {
+          pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_A, result.aToBeDeletedCount);
+          pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_A);
+          long aDeletedStartTimer = System.currentTimeMillis();
+          futures.add(pInfo.deleteA(aToBeDeleted.stream()
+              .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_A)))
+            .<@Nullable Void>thenApply((ignored) -> {
+              result.aToBeDeletedElapsedTime = System.currentTimeMillis() - aDeletedStartTimer;
+              pInfo.reportSyncStatus(false, SyncInfo.ActionType.DELETE_A);
+              return null;
+            }));
+        }
 
-        /* Add A records */
+        /* Modify A records */
 
-        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_A, result.aToBeCreatedCount);
-        pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_A);
-        long aCreatedStartTimer = System.currentTimeMillis();
-        futures.add(pInfo.createA(aToBeCreated.stream()
-            .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_A))
-            .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual)))
+        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.MODIFY_A, result.aToBeModifiedCount);
+        pInfo.reportSyncStatus(true, SyncInfo.ActionType.MODIFY_A);
+        long aModifiedStartTimer = System.currentTimeMillis();
+        futures.add(pInfo.modifyA(aToBeModified.stream()
+            .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.MODIFY_A))
+            .map(SyncEngine.modifyA(pInfo, aFragTypeComplete, bFragTypeComplete)))
           .<@Nullable Void>thenApply((ignored) -> {
-            result.aToBeCreatedElapsedTime = System.currentTimeMillis() - aCreatedStartTimer;
-            pInfo.reportSyncStatus(false, SyncInfo.ActionType.CREATE_A);
+            result.aToBeModifiedElapsedTime = System.currentTimeMillis() - aModifiedStartTimer;
+            pInfo.reportSyncStatus(false, SyncInfo.ActionType.MODIFY_A);
             return null;
           }));
 
-        /* Delete A records */
+        if (pInfo.isBDeleteBeforeCreate()) {
 
-        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_A, result.aToBeDeletedCount);
-        pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_A);
-        long aDeletedStartTimer = System.currentTimeMillis();
-        futures.add(pInfo.deleteA(aToBeDeleted.stream()
-            .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_A)))
-          .<@Nullable Void>thenApply((ignored) -> {
-            result.aToBeDeletedElapsedTime = System.currentTimeMillis() - aDeletedStartTimer;
-            pInfo.reportSyncStatus(false, SyncInfo.ActionType.DELETE_A);
-            return null;
+          /* Delete B records */
+
+          pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_B, result.bToBeDeletedCount);
+          pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_B);
+          long bDeletedStartTimer = System.currentTimeMillis();
+          futures.add(pInfo.deleteB(bToBeDeleted.stream()
+            .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_B))).thenCompose((unused) -> {
+
+            result.bToBeDeletedElapsedTime = System.currentTimeMillis() - bDeletedStartTimer;
+            pInfo.reportSyncStatus(false, SyncInfo.ActionType.DELETE_B);
+
+            /* Add B records */
+
+            pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_B, result.bToBeCreatedCount);
+            pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_B);
+            long bCreatedStartTimer = System.currentTimeMillis();
+            return pInfo.createB(bToBeCreated.stream()
+                .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_B))
+                .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual)))
+              .<@Nullable Void>thenApply((ignored) -> {
+                result.bToBeCreatedElapsedTime = System.currentTimeMillis() - bCreatedStartTimer;
+                pInfo.reportSyncStatus(false, SyncInfo.ActionType.CREATE_B);
+                return null;
+              });
+
           }));
-      }
 
-      /* Modify A records */
-
-      pInfo.reportSyncStatusTotal(SyncInfo.ActionType.MODIFY_A, result.aToBeModifiedCount);
-      pInfo.reportSyncStatus(true, SyncInfo.ActionType.MODIFY_A);
-      long aModifiedStartTimer = System.currentTimeMillis();
-      futures.add(pInfo.modifyA(aToBeModified.stream()
-        .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.MODIFY_A))
-        .map(SyncEngine.modifyA(pInfo, aFragTypeComplete, bFragTypeComplete))).<@Nullable Void>thenApply((ignored) -> {
-        result.aToBeModifiedElapsedTime = System.currentTimeMillis() - aModifiedStartTimer;
-        pInfo.reportSyncStatus(false, SyncInfo.ActionType.MODIFY_A);
-        return null;
-      }));
-
-      if (pInfo.isBDeleteBeforeCreate()) {
-
-        /* Delete B records */
-
-        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_B, result.bToBeDeletedCount);
-        pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_B);
-        long bDeletedStartTimer = System.currentTimeMillis();
-        futures.add(pInfo.deleteB(bToBeDeleted.stream()
-          .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_B))).thenCompose((unused) -> {
-
-          result.bToBeDeletedElapsedTime = System.currentTimeMillis() - bDeletedStartTimer;
-          pInfo.reportSyncStatus(false, SyncInfo.ActionType.DELETE_B);
+        } else {
 
           /* Add B records */
 
           pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_B, result.bToBeCreatedCount);
           pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_B);
           long bCreatedStartTimer = System.currentTimeMillis();
-          return pInfo.createB(bToBeCreated.stream()
+          futures.add(pInfo.createB(bToBeCreated.stream()
               .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_B))
               .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual)))
             .<@Nullable Void>thenApply((ignored) -> {
               result.bToBeCreatedElapsedTime = System.currentTimeMillis() - bCreatedStartTimer;
               pInfo.reportSyncStatus(false, SyncInfo.ActionType.CREATE_B);
               return null;
-            });
+            }));
 
-        }));
+          /* Delete B records */
 
-      } else {
+          pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_B, result.bToBeDeletedCount);
+          pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_B);
+          long bDeletedStartTimer = System.currentTimeMillis();
+          futures.add(pInfo.deleteB(bToBeDeleted.stream()
+              .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_B)))
+            .<@Nullable Void>thenApply((ignored) -> {
+              result.bToBeDeletedElapsedTime = System.currentTimeMillis() - bDeletedStartTimer;
+              pInfo.reportSyncStatus(false, SyncInfo.ActionType.DELETE_B);
+              return null;
+            }));
 
-        /* Add B records */
+        }
 
-        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_B, result.bToBeCreatedCount);
-        pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_B);
-        long bCreatedStartTimer = System.currentTimeMillis();
-        futures.add(pInfo.createB(bToBeCreated.stream()
-            .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_B))
-            .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual)))
+        /* Modify B records */
+
+        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.MODIFY_B, result.bToBeModifiedCount);
+        pInfo.reportSyncStatus(true, SyncInfo.ActionType.MODIFY_B);
+        long bModifiedStartTimer = System.currentTimeMillis();
+        futures.add(pInfo.modifyB(bToBeModified.stream()
+            .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.MODIFY_B))
+            .map(SyncEngine.modifyB(pInfo, aFragTypeComplete, bFragTypeComplete)))
           .<@Nullable Void>thenApply((ignored) -> {
-            result.bToBeCreatedElapsedTime = System.currentTimeMillis() - bCreatedStartTimer;
-            pInfo.reportSyncStatus(false, SyncInfo.ActionType.CREATE_B);
+            result.bToBeModifiedElapsedTime = System.currentTimeMillis() - bModifiedStartTimer;
+            pInfo.reportSyncStatus(false, SyncInfo.ActionType.MODIFY_B);
             return null;
           }));
 
-        /* Delete B records */
+        /* Now set up a future for all these */
 
-        pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_B, result.bToBeDeletedCount);
-        pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_B);
-        long bDeletedStartTimer = System.currentTimeMillis();
-        futures.add(pInfo.deleteB(bToBeDeleted.stream()
-            .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_B)))
-          .<@Nullable Void>thenApply((ignored) -> {
-            result.bToBeDeletedElapsedTime = System.currentTimeMillis() - bDeletedStartTimer;
-            pInfo.reportSyncStatus(false, SyncInfo.ActionType.DELETE_B);
-            return null;
-          }));
-
-      }
-
-      /* Modify B records */
-
-      pInfo.reportSyncStatusTotal(SyncInfo.ActionType.MODIFY_B, result.bToBeModifiedCount);
-      pInfo.reportSyncStatus(true, SyncInfo.ActionType.MODIFY_B);
-      long bModifiedStartTimer = System.currentTimeMillis();
-      futures.add(pInfo.modifyB(bToBeModified.stream()
-        .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.MODIFY_B))
-        .map(SyncEngine.modifyB(pInfo, aFragTypeComplete, bFragTypeComplete))).<@Nullable Void>thenApply((ignored) -> {
-        result.bToBeModifiedElapsedTime = System.currentTimeMillis() - bModifiedStartTimer;
-        pInfo.reportSyncStatus(false, SyncInfo.ActionType.MODIFY_B);
-        return null;
-      }));
-
-      /* Now set up a future for all these */
-
-      return ExtendedCompletableFuture.newCompletableFuture().relatedAllOf(futures);
-    }).thenCompose((ignored) -> {
+        return ExtendedCompletableFuture.newCompletableFuture().relatedAllOf(futures);
+      }).handle((ignored, error) -> {
+        pInfo.reportSyncStatus(true, SyncInfo.ActionType.COMPLETE);
+        return pInfo.complete(error);
+      }).thenApply((ignored) -> {
+        result.totalElapsedTime = System.currentTimeMillis() - startTimer;
+        pInfo.reportSyncStatus(false, SyncInfo.ActionType.COMPLETE);
+        return result;
+      });
+    }
+    catch (Throwable ex) {
+      if (ex instanceof ThreadDeath td) throw td;
       pInfo.reportSyncStatus(true, SyncInfo.ActionType.COMPLETE);
-      return pInfo.complete();
-    }).thenApply((ignored) -> {
-      result.totalElapsedTime = System.currentTimeMillis() - startTimer;
-      pInfo.reportSyncStatus(false, SyncInfo.ActionType.COMPLETE);
-      return result;
-    });
+      return pInfo.complete(ex).thenApply((ignored) -> {
+        pInfo.reportSyncStatus(false, SyncInfo.ActionType.COMPLETE);
+        return result;
+      });
+    }
   }
 }

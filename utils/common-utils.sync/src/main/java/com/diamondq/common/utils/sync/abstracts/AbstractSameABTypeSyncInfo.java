@@ -83,7 +83,7 @@ public abstract class AbstractSameABTypeSyncInfo<T, T_KEY, T_FRAG>
   }
 
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> complete() {
+  public ExtendedCompletableFuture<@Nullable Void> complete(@Nullable Throwable pError) {
     return ExtendedCompletableFuture.completedFuture(null);
   }
 }
