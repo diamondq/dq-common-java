@@ -303,8 +303,8 @@ public class LoggingContextHandler implements ContextHandler {
    * @param pLogger the logger
    * @param pMarker the marker
    * @param pThis the object representing 'this'
-   * @param pMethodName the method name (if null, then it's calculated)
-   * @param pWithMeta true if there is meta data in the arguments or false if there isn't.
+   * @param pMethodName the method name (if null, then it is calculated)
+   * @param pWithMeta true if there is metadata in the arguments or false if there isn't.
    * @param pMatchEntryExit true if there must be matching exit or false if this is a standalone entry
    * @param pArgs any arguments to display
    */
@@ -316,9 +316,7 @@ public class LoggingContextHandler implements ContextHandler {
     if (argsLen < sENTRY_MESSAGE_ARRAY_LEN) messagePattern = sENTRY_MESSAGE_ARRAY[argsLen];
     else messagePattern = buildMessagePattern(argsLen);
 
-    int expandedLen;
-    if (argsLen == 0) expandedLen = 2;
-    else expandedLen = argsLen + 2;
+    int expandedLen = argsLen + 2;
     @Nullable Object @NotNull [] expandedArgs = new Object[expandedLen];
     @Nullable Object @NotNull [] filteredArgs;
 
@@ -330,7 +328,7 @@ public class LoggingContextHandler implements ContextHandler {
 
       if (!pWithMeta) {
 
-        /* Copy the arguments (skipping the final throwable if it's present */
+        /* Copy the arguments (skipping the final throwable if it is present */
 
         System.arraycopy(pArgs, 0, expandedArgs, 1, (lastEntry instanceof Throwable ? argsLen - 1 : argsLen));
         filteredArgs = pArgs;
@@ -365,12 +363,20 @@ public class LoggingContextHandler implements ContextHandler {
 
     /* Add the caller object */
 
-    if ("<init>".equals(pMethodName)) expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] =
-      pThis == null ? null : pThis.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(pThis));
-    else expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] = pThis;
+    @Nullable Object caller = "<init>".equals(pMethodName) ? (
+      pThis == null ? null :
+        pThis.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(pThis))) : pThis;
+
+    expandedArgs[expandedArgs.length - (lastEntry instanceof Throwable ? 2 : 1)] = caller;
 
     FormattingTuple tp = MessageFormatter.arrayFormat(messagePattern, expandedArgs);
-    pLogger.trace(pMarker, tp.getMessage(), filteredArgs);
+
+    /* Now escape any {} present within the message so that it doesn't get injected again by SLF4J */
+
+    String message = tp.getMessage();
+    message = message.replace("{}", "\\{}");
+
+    pLogger.trace(pMarker, message, filteredArgs);
 
   }
 
@@ -389,13 +395,7 @@ public class LoggingContextHandler implements ContextHandler {
     if (pThrowable != null) pLogger.error(sEXIT_MARKER, sEXIT_MESSAGE_ERROR, methodName, pThis, pThrowable);
 
     else if (pWithResult) {
-      if (pMeta != null) {
-        @Nullable Object newResult = pMeta.apply(pResult);
-        pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_1, methodName, newResult, pThis);
-      } else {
-        pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_1, methodName, pResult, pThis);
-
-      }
+      pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_1, methodName, pMeta != null ? pMeta.apply(pResult) : pResult, pThis);
     } else {
       if (pWithDetach) pLogger.trace(sEXIT_MARKER, sDETACH_MESSAGE_0, methodName, pThis);
       else pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_0, methodName, pThis);
