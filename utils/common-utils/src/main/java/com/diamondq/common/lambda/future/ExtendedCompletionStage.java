@@ -31,6 +31,13 @@ import java.util.function.Predicate;
  */
 public interface ExtendedCompletionStage<T> {
 
+  /**
+   * Converts the ExtendedCompletionStage back into a CompletionStage
+   *
+   * @return the completion stage
+   */
+  CompletionStage<T> toCompletionStage();
+
   public <U> ExtendedCompletionStage<U> thenApply(Function1<T, U> fn);
 
   public <U> ExtendedCompletionStage<U> thenApplyAsync(Function1<T, U> fn);

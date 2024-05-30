@@ -206,6 +206,11 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @Override
+  public CompletionStage<T> toCompletionStage() {
+    return decomposeToCompletionStage(this);
+  }
+
+  @Override
   public int hashCode() {
     return mDelegate.hashCode();
   }
