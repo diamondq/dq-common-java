@@ -20,9 +20,9 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   private static final Object sNULL_EXIT_VALUE = new Object();
 
-  public static volatile ContextFactory sINSTANCE = new ContextFactoryImpl();
-
   private static Function<ContextFactory, Stack<ContextClass>> sPROPAGATOR = (factory) -> ((ContextFactoryImpl) factory).mThreadLocalContexts.get();
+
+  public static volatile ContextFactory sINSTANCE = new ContextFactoryImpl();
 
   private final CopyOnWriteArrayList<ContextHandler> mHandlers = new CopyOnWriteArrayList<>();
 
