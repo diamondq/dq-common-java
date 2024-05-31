@@ -1,13 +1,16 @@
 package com.diamondq.common.context;
 
 import com.diamondq.common.context.impl.ContextFactoryImpl;
+import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 
 public interface ContextFactory {
 
@@ -94,7 +97,8 @@ public interface ContextFactory {
    *
    * @return the context
    */
-  @Nullable Context getNullableCurrentContext();
+  @Nullable
+  Context getNullableCurrentContext();
 
   /**
    * Report an exception outside a context. It will automatically create a context, report the exception and then end
@@ -161,4 +165,11 @@ public interface ContextFactory {
    */
   void reportWarn(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
 
+  /**
+   * Register a new context propagator used to retrieve the Context stack for a given thread. NOTE: This registration is
+   * stored globally, and is used for all Context Factories.
+   *
+   * @param pPropagator the supplier that returns the current thread's Context Class Stack.
+   */
+  void registerContextPropagator(Function<ContextFactory, Stack<ContextClass>> pPropagator);
 }

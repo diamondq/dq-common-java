@@ -10,6 +10,7 @@ import io.micronaut.context.annotation.Secondary;
 import jakarta.annotation.PostConstruct;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -21,9 +22,11 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   public static volatile ContextFactory sINSTANCE = new ContextFactoryImpl();
 
+  private static Function<ContextFactory, Stack<ContextClass>> sPROPAGATOR = (factory) -> ((ContextFactoryImpl) factory).mThreadLocalContexts.get();
+
   private final CopyOnWriteArrayList<ContextHandler> mHandlers = new CopyOnWriteArrayList<>();
 
-  private volatile LoggingContextHandler mLoggingHandler;
+  private volatile @Nullable LoggingContextHandler mLoggingHandler;
 
   private final ThreadLocal<Stack<ContextClass>> mThreadLocalContexts = ThreadLocal.withInitial(Stack::new);
 
@@ -32,12 +35,17 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @SuppressWarnings("null")
   public ContextFactoryImpl() {
     mNOOP_CONTEXT = new NoopContext(this);
-    mThreadLocalContexts.get().add(mNOOP_CONTEXT);
+    sPROPAGATOR.apply(this).add(mNOOP_CONTEXT);
     mNOOP_CONTEXT.close();
   }
 
+  @Override
+  public void registerContextPropagator(Function<ContextFactory, Stack<ContextClass>> pPropagator) {
+    sPROPAGATOR = pPropagator;
+  }
+
   /**
-   * The onActivate is called when OSGi has finished initializing us.
+   * The onActivate is called when OSGi has finished initializing this class.
    */
   @PostConstruct
   public void onActivate() {
@@ -63,7 +71,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public Context newContextWithMeta(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
 
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
@@ -90,7 +98,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
 
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
@@ -138,7 +146,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
     pContext.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, null);
 
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass oldContext;
     if (contextStack.isEmpty()) oldContext = null;
     else oldContext = contextStack.peek();
@@ -158,7 +166,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   public void detachContextFromThread(ContextClass pContext) {
     for (ContextHandler handler : mHandlers)
       handler.executeOnDetachContextToThread(pContext);
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass oldContext;
     if (contextStack.isEmpty()) oldContext = null;
     else oldContext = contextStack.peek();
@@ -175,7 +183,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
    */
   @Override
   public void attachContextToThread(ContextClass pContext) {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     contextStack.add(pContext);
     for (ContextHandler handler : mHandlers)
       handler.executeOnAttachContextToThread(pContext);
@@ -186,14 +194,14 @@ public class ContextFactoryImpl implements SPIContextFactory {
    */
   @Override
   public Context getCurrentContext() {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     if (!contextStack.isEmpty()) return contextStack.peek();
     return mNOOP_CONTEXT;
   }
 
   @Override
   public @Nullable Context getNullableCurrentContext() {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     if (!contextStack.isEmpty()) return contextStack.peek();
     return null;
   }
@@ -204,7 +212,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
    */
   @Override
   public RuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
@@ -219,7 +227,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   @Override
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
@@ -239,7 +247,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
@@ -259,7 +267,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
@@ -275,7 +283,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void reportInfo(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
@@ -291,7 +299,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void reportWarn(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = mThreadLocalContexts.get();
+    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     @Nullable ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
@@ -361,7 +369,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   @Override
   public boolean internalIsTraceEnabled(ContextClass pContext) {
-    return mLoggingHandler.isTraceEnabled(pContext);
+    return Objects.requireNonNull(mLoggingHandler).isTraceEnabled(pContext);
   }
 
   @Override
@@ -380,7 +388,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   @Override
   public boolean internalIsDebugEnabled(ContextClass pContext) {
-    return mLoggingHandler.isDebugEnabled(pContext);
+    return Objects.requireNonNull(mLoggingHandler).isDebugEnabled(pContext);
   }
 
   @Override
@@ -392,7 +400,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   @Override
   public boolean internalIsInfoEnabled(ContextClass pContext) {
-    return mLoggingHandler.isInfoEnabled(pContext);
+    return Objects.requireNonNull(mLoggingHandler).isInfoEnabled(pContext);
   }
 
   @Override
@@ -404,7 +412,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   @Override
   public boolean internalIsWarnEnabled(ContextClass pContext) {
-    return mLoggingHandler.isWarnEnabled(pContext);
+    return Objects.requireNonNull(mLoggingHandler).isWarnEnabled(pContext);
   }
 
   @Override
@@ -424,7 +432,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   @Override
   public boolean internalIsErrorEnabled(ContextClass pContext) {
-    return mLoggingHandler.isErrorEnabled(pContext);
+    return Objects.requireNonNull(mLoggingHandler).isErrorEnabled(pContext);
   }
 
   @Override
