@@ -64,7 +64,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>${project.basedir}/src/openapi/camunda_openapi_modified.json</inputSpec>
+              <inputSpec>${project.basedir}/src/openapi/camunda_openapi_7.20.json</inputSpec>
               <generatorName>jaxrs-spec</generatorName>
               <output>${project.build.directory}/openapi</output>
               <templateDirectory>${project.basedir}/src/templates</templateDirectory>
