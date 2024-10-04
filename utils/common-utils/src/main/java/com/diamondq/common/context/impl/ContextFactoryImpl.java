@@ -11,8 +11,10 @@ import jakarta.annotation.PostConstruct;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Function;
 
 @Secondary
@@ -32,6 +34,8 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
   private final ContextClass mNOOP_CONTEXT;
 
+  private final Set<String> mIgnoreStackMethods = new CopyOnWriteArraySet<>();
+
   @SuppressWarnings("null")
   public ContextFactoryImpl() {
     mNOOP_CONTEXT = new NoopContext(this);
@@ -42,6 +46,16 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void registerContextPropagator(Function<ContextFactory, Stack<ContextClass>> pPropagator) {
     sPROPAGATOR = pPropagator;
+  }
+
+  @Override
+  public void registerStackMethodIgnores(Set<String> pClassPatternSet) {
+    mIgnoreStackMethods.addAll(pClassPatternSet);
+  }
+
+  @Override
+  public Set<String> getStackMethodIgnores() {
+    return mIgnoreStackMethods;
   }
 
   /**

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -97,8 +98,7 @@ public interface ContextFactory {
    *
    * @return the context
    */
-  @Nullable
-  Context getNullableCurrentContext();
+  @Nullable Context getNullableCurrentContext();
 
   /**
    * Report an exception outside a context. It will automatically create a context, report the exception and then end
@@ -172,4 +172,13 @@ public interface ContextFactory {
    * @param pPropagator the supplier that returns the current thread's Context Class Stack.
    */
   void registerContextPropagator(Function<ContextFactory, Stack<ContextClass>> pPropagator);
+
+  /**
+   * Register internal class patterns (run as a startsWith against the classname) that should be ignored when attempting
+   * to determine the method that actually issued the log request. This is useful if languages (such as Groovy) inject
+   * their own methods between the Groovy code and the actual ContextFactory code.
+   *
+   * @param pClassPatternSet the set of class patterns to ignore
+   */
+  void registerStackMethodIgnores(Set<String> pClassPatternSet);
 }

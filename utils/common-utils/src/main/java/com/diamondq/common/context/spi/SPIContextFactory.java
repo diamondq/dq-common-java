@@ -3,6 +3,7 @@ package com.diamondq.common.context.spi;
 import com.diamondq.common.context.ContextFactory;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -51,5 +52,7 @@ public interface SPIContextFactory extends ContextFactory {
   boolean internalIsErrorEnabled(ContextClass pContext);
 
   RuntimeException internalReportThrowable(ContextClass pContext, Throwable pThrowable);
+
+  Set<String> getStackMethodIgnores();
 
 }

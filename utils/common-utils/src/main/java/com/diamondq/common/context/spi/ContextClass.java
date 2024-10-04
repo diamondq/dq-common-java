@@ -217,6 +217,14 @@ public class ContextClass implements Context {
             if (className.equals("java.lang.reflect.Method")) continue;
             if (className.startsWith("org.jboss.weld.bean.proxy.")) continue;
             if (className.contains("**$$_WeldClientProxy")) continue;
+            boolean ignore = false;
+            for (var testIgnore : mFactory.getStackMethodIgnores()) {
+              if (className.startsWith(testIgnore)) {
+                ignore = true;
+                break;
+              }
+            }
+            if (ignore) continue;
             mLatestStackMethod = stackTrace[i].getMethodName();
             break;
           }
