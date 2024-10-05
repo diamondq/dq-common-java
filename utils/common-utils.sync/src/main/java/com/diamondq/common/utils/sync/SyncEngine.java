@@ -366,8 +366,8 @@ public class SyncEngine {
 
               /* Delete A records */
 
-              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_A, result.aToBeDeletedCount);
               pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_A);
+              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_A, result.aToBeDeletedCount);
               long aDeletedStartTimer = System.currentTimeMillis();
               ctx2.trace("Starting {} A Deletions", result.aToBeDeletedCount);
               ctx2.prepareForAlternateThreads();
@@ -403,8 +403,8 @@ public class SyncEngine {
 
               /* Add A records */
 
-              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_A, result.aToBeCreatedCount);
               pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_A);
+              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_A, result.aToBeCreatedCount);
               long aCreatedStartTimer = System.currentTimeMillis();
               ctx2.trace("Starting {} A Creations", result.aToBeCreatedCount);
               ctx2.prepareForAlternateThreads();
@@ -419,8 +419,8 @@ public class SyncEngine {
 
                     /* Delete A records */
 
-                    pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_A, result.aToBeDeletedCount);
                     pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_A);
+                    pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_A, result.aToBeDeletedCount);
                     ctx3.trace("Starting {} A Deletions", result.aToBeDeletedCount);
                     ctx3.prepareForAlternateThreads();
                     long aDeletedStartTimer = System.currentTimeMillis();
@@ -440,8 +440,8 @@ public class SyncEngine {
 
             /* Modify A records */
 
-            pInfo.reportSyncStatusTotal(SyncInfo.ActionType.MODIFY_A, result.aToBeModifiedCount);
             pInfo.reportSyncStatus(true, SyncInfo.ActionType.MODIFY_A);
+            pInfo.reportSyncStatusTotal(SyncInfo.ActionType.MODIFY_A, result.aToBeModifiedCount);
             ctx2.trace("Starting {} A Modifications", result.aToBeModifiedCount);
             ctx2.prepareForAlternateThreads();
             long aModifiedStartTimer = System.currentTimeMillis();
@@ -461,8 +461,8 @@ public class SyncEngine {
 
               /* Delete B records */
 
-              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_B, result.bToBeDeletedCount);
               pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_B);
+              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_B, result.bToBeDeletedCount);
               ctx2.trace("Starting {} B Deletions", result.bToBeDeletedCount);
               ctx2.prepareForAlternateThreads();
               long bDeletedStartTimer = System.currentTimeMillis();
@@ -475,8 +475,8 @@ public class SyncEngine {
 
                   /* Add B records */
 
-                  pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_B, result.bToBeCreatedCount);
                   pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_B);
+                  pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_B, result.bToBeCreatedCount);
                   ctx3.trace("Starting {} B Creations", result.bToBeCreatedCount);
                   ctx3.prepareForAlternateThreads();
                   long bCreatedStartTimer = System.currentTimeMillis();
@@ -497,8 +497,8 @@ public class SyncEngine {
 
               /* Add B records */
 
-              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_B, result.bToBeCreatedCount);
               pInfo.reportSyncStatus(true, SyncInfo.ActionType.CREATE_B);
+              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CREATE_B, result.bToBeCreatedCount);
               ctx2.trace("Starting {} B Creations", result.bToBeCreatedCount);
               ctx2.prepareForAlternateThreads();
               long bCreatedStartTimer = System.currentTimeMillis();
@@ -513,8 +513,8 @@ public class SyncEngine {
 
                     /* Delete B records */
 
-                    pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_B, result.bToBeDeletedCount);
                     pInfo.reportSyncStatus(true, SyncInfo.ActionType.DELETE_B);
+                    pInfo.reportSyncStatusTotal(SyncInfo.ActionType.DELETE_B, result.bToBeDeletedCount);
                     ctx3.trace("Starting {} B Deletions", result.bToBeDeletedCount);
                     ctx3.prepareForAlternateThreads();
                     long bDeletedStartTimer = System.currentTimeMillis();
@@ -534,8 +534,8 @@ public class SyncEngine {
 
             /* Modify B records */
 
-            pInfo.reportSyncStatusTotal(SyncInfo.ActionType.MODIFY_B, result.bToBeModifiedCount);
             pInfo.reportSyncStatus(true, SyncInfo.ActionType.MODIFY_B);
+            pInfo.reportSyncStatusTotal(SyncInfo.ActionType.MODIFY_B, result.bToBeModifiedCount);
             ctx2.trace("Starting {} B Modifications", result.bToBeModifiedCount);
             ctx2.prepareForAlternateThreads();
             long bModifiedStartTimer = System.currentTimeMillis();
