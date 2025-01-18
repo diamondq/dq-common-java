@@ -99,8 +99,19 @@ public class ContextFactoryImpl implements SPIContextFactory {
     /* Execute the start */
 
     context.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, true);
-    for (ContextHandler handler : mHandlers)
-      handler.executeOnContextStart(context);
+    try {
+      for (ContextHandler handler : mHandlers)
+        handler.executeOnContextStart(context);
+    }
+    catch (Throwable ex) {
+      /* Something has gone badly wrong.
+         It's unclear what the state of the logging system is at this point, thus, we'll write to the console
+         as well as try to log it.
+       */
+      //noinspection CallToPrintStackTrace
+      ex.printStackTrace();
+      throw reportThrowable(ContextFactoryImpl.class, this, ex);
+    }
     context.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, null);
 
     return context;
@@ -126,8 +137,19 @@ public class ContextFactoryImpl implements SPIContextFactory {
     /* Execute the start */
 
     context.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, true);
-    for (ContextHandler handler : mHandlers)
-      handler.executeOnContextStart(context);
+    try {
+      for (ContextHandler handler : mHandlers)
+        handler.executeOnContextStart(context);
+    }
+    catch (Throwable ex) {
+      /* Something has gone badly wrong.
+         It's unclear what the state of the logging system is at this point, thus, we'll write to the console
+         as well as try to log it.
+       */
+      //noinspection CallToPrintStackTrace
+      ex.printStackTrace();
+      throw reportThrowable(ContextFactoryImpl.class, this, ex);
+    }
     context.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, null);
 
     return context;
@@ -143,7 +165,8 @@ public class ContextFactoryImpl implements SPIContextFactory {
     if (exitValue == sNULL_EXIT_VALUE) {
       exitValue = null;
       exitSet = true;
-    } else if (exitValue != null) exitSet = true;
+    } else //noinspection VariableNotUsedInsideIf
+      if (exitValue != null) exitSet = true;
     @Nullable Function<@Nullable Object, @Nullable Object> exitFunc;
     @Nullable Object exitFuncObj = pContext.getHandlerData(ContextHandler.sEXIT_FUNC, false, Object.class);
     if (exitFuncObj == sNULL_EXIT_VALUE) exitFunc = null;
@@ -155,20 +178,34 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
     pContext.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, true);
 
-    for (ContextHandler handler : mHandlers)
-      handler.executeOnContextClose(pContext, exitSet, exitValue, exitFunc);
+    try {
+      for (ContextHandler handler : mHandlers)
+        handler.executeOnContextClose(pContext, exitSet, exitValue, exitFunc);
+    }
+    catch (Throwable ex) {
+      /* Something has gone badly wrong.
+         It's unclear what the state of the logging system is at this point, thus, we'll write to the console
+         as well as try to log it.
+       */
+      //noinspection CallToPrintStackTrace
+      ex.printStackTrace();
+      throw reportThrowable(ContextFactoryImpl.class, this, ex);
+    }
+    finally {
+      pContext.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, null);
 
-    pContext.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, null);
-
-    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass oldContext;
-    if (contextStack.isEmpty()) oldContext = null;
-    else oldContext = contextStack.peek();
-    if (pContext.equals(oldContext)) {
-      contextStack.pop();
-    } else {
-      internalReportError(pContext, "Incorrect context found on stack", (Throwable) null);
-      throw new IllegalStateException();
+      Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
+      @Nullable ContextClass oldContext;
+      if (contextStack.isEmpty()) oldContext = null;
+      else oldContext = contextStack.peek();
+      if (pContext.equals(oldContext)) {
+        //noinspection resource
+        contextStack.pop();
+      } else {
+        internalReportError(pContext, "Incorrect context found on stack", (Throwable) null);
+        //noinspection ThrowFromFinallyBlock
+        throw new IllegalStateException("Incorrect context found on stack");
+      }
     }
 
   }
@@ -185,6 +222,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
     if (contextStack.isEmpty()) oldContext = null;
     else oldContext = contextStack.peek();
     if (pContext.equals(oldContext)) {
+      //noinspection resource
       contextStack.pop();
     } else {
       internalReportError(pContext, "Incorrect context found on stack", (Throwable) null);
