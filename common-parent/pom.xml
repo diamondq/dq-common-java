@@ -193,7 +193,12 @@
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-bpmn-model</artifactId>
-        <version>7.17.0</version>
+        <version>7.20.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.juel</groupId>
+        <artifactId>camunda-juel</artifactId>
+        <version>7.20.0</version>
       </dependency>
       <dependency>
         <groupId>de.odysseus.juel</groupId>

@@ -1,10 +1,10 @@
 package com.diamondq.common.bpm.camunda;
 
+import org.camunda.bpm.impl.juel.ExpressionNode;
+import org.camunda.bpm.impl.juel.TreeValueExpression;
+
 import java.lang.reflect.Field;
 import java.util.Objects;
-
-import de.odysseus.el.TreeValueExpression;
-import de.odysseus.el.tree.ExpressionNode;
 
 public class ExpressionUtil {
 
@@ -23,8 +23,7 @@ public class ExpressionUtil {
 
   public static ExpressionNode getExpressionNode(TreeValueExpression pExpression) {
     try {
-      ExpressionNode node = (ExpressionNode) Objects.requireNonNull(nodeField.get(pExpression));
-      return node;
+      return (ExpressionNode) Objects.requireNonNull(nodeField.get(pExpression));
     }
     catch (IllegalArgumentException | IllegalAccessException ex) {
       throw new IllegalStateException(ex);
