@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="Osmorc" url="file://$PROJECT_DIR$/injection/common-injection.osgi" />
     <file type="Osmorc" url="file://$PROJECT_DIR$/utils/common-utils" />
   </component>
   <component name="MavenProjectsManager">
