@@ -8,13 +8,19 @@
     <relativePath>../../common-parent</relativePath>
   </parent>
   <artifactId>common-utils</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>DiamondQ Common: Utils</name>
+  <properties>
+    <osgi.extra.import.packages>com.diamondq.common.tracing.opentracing.wrappers;resolution:=optional,
+    </osgi.extra.import.packages>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <!--suppress NonOsgiMavenDependency -->
+    <!-- This is only listed so it can be embedded directly, since it doesn't support OSGi -->
     <dependency>
       <groupId>com.googlecode.gentyref</groupId>
       <artifactId>gentyref</artifactId>
@@ -58,6 +64,22 @@
                   </excludes>
                 </fileSet>
               </fileSets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-bundle</id>
+            <configuration>
+              <instructions>
+                <Embed-Dependency>
+                  *;groupId=com.googlecode.gentyref
+                </Embed-Dependency>
+              </instructions>
             </configuration>
           </execution>
         </executions>
