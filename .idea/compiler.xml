@@ -9,226 +9,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="common-xmpp.standard" />
-        <module name="common-servers.undertow.resteasy.weld" />
-        <module name="common-injection.cdi" />
-        <module name="common-storage.kv" />
-        <module name="common-metrics.micrometer" />
-        <module name="common-utils.log4j2" />
-        <module name="common-utils.janino.fragment" />
-        <module name="common-servers.undertow" />
-        <module name="common-security.acl.noop" />
         <module name="common-tracing.opentracing" />
-        <module name="common-utils.parsing" />
-        <module name="common-security.jcasbin" />
-        <module name="common-security.jwt" />
-        <module name="common-injection.cdi.weld" />
-        <module name="common-utils.logback" />
-        <module name="common-storage.jdbc" />
-        <module name="common-deployment.basic" />
-        <module name="common-xmpp.eclipse.system.fragment" />
-        <module name="common-injection.osgi" />
-        <module name="common-servers.paxweb.jersey" />
-        <module name="common-utils.logback.fragment" />
-        <module name="common-vertx.processor" />
-        <module name="common-jaxrs.resteasy" />
-        <module name="common-storage.cloudant" />
-        <module name="common-vertx.processor.tests" />
-        <module name="common-tracing.jaeger" />
-        <module name="common-storage.jdo.datanucleus" />
-        <module name="common-injection.common" />
-        <module name="common-storage.hibernate.ogm" />
-      </profile>
-      <profile name="Annotation profile for common-lambda.test" enabled="true">
-        <sourceOutputDir name="../generated-sources/annotations" />
-        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
         <module name="common-lambda.test" />
-      </profile>
-      <profile name="Annotation profile for common-jaxrs.common" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processor name="org.immutables.processor.ProxyProcessor" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
-        </processorPath>
-        <module name="common-jaxrs.common" />
-      </profile>
-      <profile name="Annotation profile for common-security.acme" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processor name="org.immutables.processor.ProxyProcessor" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
-        </processorPath>
-        <module name="common-security.acme" />
-      </profile>
-      <profile name="Annotation profile for common-vertx.common" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processor name="io.vertx.codegen.CodeGenProcessor" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
-        </processorPath>
-        <module name="common-vertx.common" />
-      </profile>
-      <profile name="Annotation profile for common-vertx.common.micronaut" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processor name="io.vertx.codegen.CodeGenProcessor" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
-        </processorPath>
-        <module name="common-vertx.common.micronaut" />
+        <module name="common-xmpp.standard" />
+        <module name="common-tracing.jaeger" />
+        <module name="common-injection.osgi" />
+        <module name="common-storage.cloudant" />
+        <module name="common-security.jcasbin" />
       </profile>
       <profile name="Annotation profile for common-vertx.common.osgi" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -297,6 +84,1034 @@
         </processorPath>
         <module name="common-vertx.common.osgi" />
       </profile>
+      <profile name="Annotation profile for common-deployment.basic.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-deployment.basic.main" />
+      </profile>
+      <profile name="Annotation profile for common-deployment.basic.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-deployment.basic.test" />
+      </profile>
+      <profile name="Annotation profile for common-injection.cdi.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-injection.cdi.main" />
+      </profile>
+      <profile name="Annotation profile for common-injection.cdi.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-injection.cdi.test" />
+      </profile>
+      <profile name="Annotation profile for common-injection.cdi.weld.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-injection.cdi.weld.main" />
+      </profile>
+      <profile name="Annotation profile for common-injection.cdi.weld.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-injection.cdi.weld.test" />
+      </profile>
+      <profile name="Annotation profile for common-injection.common.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-injection.common.main" />
+      </profile>
+      <profile name="Annotation profile for common-injection.common.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-injection.common.test" />
+      </profile>
+      <profile name="Annotation profile for common-injection.micronaut.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-injection.micronaut.main" />
+      </profile>
+      <profile name="Annotation profile for common-injection.micronaut.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-injection.micronaut.test" />
+      </profile>
+      <profile name="Annotation profile for common-injection.micronaut.utils.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-injection.micronaut.utils.main" />
+      </profile>
+      <profile name="Annotation profile for common-injection.micronaut.utils.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-injection.micronaut.utils.test" />
+      </profile>
+      <profile name="Annotation profile for common-jaxrs.common.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processor name="org.immutables.processor.ProxyProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
+        </processorPath>
+        <module name="common-jaxrs.common.main" />
+      </profile>
+      <profile name="Annotation profile for common-jaxrs.common.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processor name="org.immutables.processor.ProxyProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
+        </processorPath>
+        <module name="common-jaxrs.common.test" />
+      </profile>
+      <profile name="Annotation profile for common-jaxrs.resteasy.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-jaxrs.resteasy.main" />
+      </profile>
+      <profile name="Annotation profile for common-jaxrs.resteasy.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-jaxrs.resteasy.test" />
+      </profile>
+      <profile name="Annotation profile for common-metrics.micrometer.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-metrics.micrometer.main" />
+      </profile>
+      <profile name="Annotation profile for common-metrics.micrometer.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-metrics.micrometer.test" />
+      </profile>
+      <profile name="Annotation profile for common-security.acl.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-security.acl.main" />
+      </profile>
+      <profile name="Annotation profile for common-security.acl.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-security.acl.test" />
+      </profile>
+      <profile name="Annotation profile for common-security.acl.noop.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-security.acl.noop.main" />
+      </profile>
+      <profile name="Annotation profile for common-security.acl.noop.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-security.acl.noop.test" />
+      </profile>
+      <profile name="Annotation profile for common-security.acme.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processor name="org.immutables.processor.ProxyProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
+        </processorPath>
+        <module name="common-security.acme.main" />
+      </profile>
+      <profile name="Annotation profile for common-security.acme.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processor name="org.immutables.processor.ProxyProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.10.1/value-2.10.1.jar" />
+        </processorPath>
+        <module name="common-security.acme.test" />
+      </profile>
+      <profile name="Annotation profile for common-security.jwt.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-security.jwt.main" />
+      </profile>
+      <profile name="Annotation profile for common-security.jwt.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-security.jwt.test" />
+      </profile>
+      <profile name="Annotation profile for common-servers.paxweb.jersey.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-servers.paxweb.jersey.main" />
+      </profile>
+      <profile name="Annotation profile for common-servers.paxweb.jersey.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-servers.paxweb.jersey.test" />
+      </profile>
+      <profile name="Annotation profile for common-servers.undertow.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-servers.undertow.main" />
+      </profile>
+      <profile name="Annotation profile for common-servers.undertow.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-servers.undertow.test" />
+      </profile>
+      <profile name="Annotation profile for common-servers.undertow.resteasy.weld.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-servers.undertow.resteasy.weld.main" />
+      </profile>
+      <profile name="Annotation profile for common-servers.undertow.resteasy.weld.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-servers.undertow.resteasy.weld.test" />
+      </profile>
+      <profile name="Annotation profile for common-storage.hibernate.ogm.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-storage.hibernate.ogm.main" />
+      </profile>
+      <profile name="Annotation profile for common-storage.hibernate.ogm.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-storage.hibernate.ogm.test" />
+      </profile>
+      <profile name="Annotation profile for common-storage.jdbc.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-storage.jdbc.main" />
+      </profile>
+      <profile name="Annotation profile for common-storage.jdbc.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-storage.jdbc.test" />
+      </profile>
+      <profile name="Annotation profile for common-storage.jdo.datanucleus.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-storage.jdo.datanucleus.main" />
+      </profile>
+      <profile name="Annotation profile for common-storage.jdo.datanucleus.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-storage.jdo.datanucleus.test" />
+      </profile>
+      <profile name="Annotation profile for common-storage.kv.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-storage.kv.main" />
+      </profile>
+      <profile name="Annotation profile for common-storage.kv.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-storage.kv.test" />
+      </profile>
+      <profile name="Annotation profile for common-utils.janino.fragment.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.janino.fragment.main" />
+      </profile>
+      <profile name="Annotation profile for common-utils.janino.fragment.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.janino.fragment.test" />
+      </profile>
+      <profile name="Annotation profile for common-utils.log4j2.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.log4j2.main" />
+      </profile>
+      <profile name="Annotation profile for common-utils.log4j2.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.log4j2.test" />
+      </profile>
+      <profile name="Annotation profile for common-utils.logback.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.logback.main" />
+      </profile>
+      <profile name="Annotation profile for common-utils.logback.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.logback.test" />
+      </profile>
+      <profile name="Annotation profile for common-utils.logback.fragment.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.logback.fragment.main" />
+      </profile>
+      <profile name="Annotation profile for common-utils.logback.fragment.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.logback.fragment.test" />
+      </profile>
+      <profile name="Annotation profile for common-utils.parsing.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.parsing.main" />
+      </profile>
+      <profile name="Annotation profile for common-utils.parsing.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-utils.parsing.test" />
+      </profile>
+      <profile name="Annotation profile for common-utils.scxml.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-utils.scxml.main" />
+      </profile>
+      <profile name="Annotation profile for common-utils.scxml.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-utils.scxml.test" />
+      </profile>
+      <profile name="Annotation profile for common-utils.sync.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-utils.sync.main" />
+      </profile>
+      <profile name="Annotation profile for common-utils.sync.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+        </processorPath>
+        <module name="common-utils.sync.test" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.common.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processor name="io.vertx.codegen.CodeGenProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
+        </processorPath>
+        <module name="common-vertx.common.main" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.common.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processor name="io.vertx.codegen.CodeGenProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
+        </processorPath>
+        <module name="common-vertx.common.test" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.common.micronaut.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processor name="io.vertx.codegen.CodeGenProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
+        </processorPath>
+        <module name="common-vertx.common.micronaut.main" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.common.micronaut.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processor name="io.vertx.codegen.CodeGenProcessor" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.2.3/micronaut-inject-java-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.2.3/micronaut-core-processor-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.2.3/micronaut-inject-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.2.3/micronaut-core-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.2.3/micronaut-aop-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.6/asm-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.7/javaparser-symbol-solver-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.16.1/jackson-databind-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.16.1/jackson-annotations-2.16.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-tests.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/jayway/awaitility/awaitility/1.7.0/awaitility-1.7.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/cglib/cglib-nodep/3.1/cglib-nodep-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/assertj/assertj-core/3.3.0/assertj-core-3.3.0.jar" />
+        </processorPath>
+        <module name="common-vertx.common.micronaut.test" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.processor.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/service/auto-service/1.0-rc4/auto-service-1.0-rc4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/auto-common/0.8/auto-common-0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/guava/23.5-jre/guava-23.5-jre.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/errorprone/error_prone_annotations/2.0.18/error_prone_annotations-2.0.18.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/1.1/j2objc-annotations-1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/testing/compile/compile-testing/0.12/compile-testing-0.12.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/truth/truth/0.36/truth-0.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/truth/extensions/truth-java8-extension/0.35/truth-java8-extension-0.35.jar" />
+          <entry name="$USER_HOME$/.jdks/corretto-17.0.15/../lib/tools.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/value/auto-value/1.3/auto-value-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/service/auto-service/1.0-rc4/auto-service-1.0-rc4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/auto-common/0.8/auto-common-0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/guava/23.5-jre/guava-23.5-jre.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/errorprone/error_prone_annotations/2.0.18/error_prone_annotations-2.0.18.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/1.1/j2objc-annotations-1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/testing/compile/compile-testing/0.12/compile-testing-0.12.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/truth/truth/0.36/truth-0.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/truth/extensions/truth-java8-extension/0.35/truth-java8-extension-0.35.jar" />
+          <entry name="$USER_HOME$/.jdks/corretto-17.0.15/../lib/tools.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/value/auto-value/1.3/auto-value-1.3.jar" />
+        </processorPath>
+        <module name="common-vertx.processor.main" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.processor.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/service/auto-service/1.0-rc4/auto-service-1.0-rc4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/auto-common/0.8/auto-common-0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/guava/23.5-jre/guava-23.5-jre.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/errorprone/error_prone_annotations/2.0.18/error_prone_annotations-2.0.18.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/1.1/j2objc-annotations-1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/testing/compile/compile-testing/0.12/compile-testing-0.12.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/truth/truth/0.36/truth-0.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/truth/extensions/truth-java8-extension/0.35/truth-java8-extension-0.35.jar" />
+          <entry name="$USER_HOME$/.jdks/corretto-17.0.15/../lib/tools.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/value/auto-value/1.3/auto-value-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/service/auto-service/1.0-rc4/auto-service-1.0-rc4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/auto-common/0.8/auto-common-0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/guava/23.5-jre/guava-23.5-jre.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/errorprone/error_prone_annotations/2.0.18/error_prone_annotations-2.0.18.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/1.1/j2objc-annotations-1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/testing/compile/compile-testing/0.12/compile-testing-0.12.jar" />
+          <entry name="$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/truth/truth/0.36/truth-0.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/truth/extensions/truth-java8-extension/0.35/truth-java8-extension-0.35.jar" />
+          <entry name="$USER_HOME$/.jdks/corretto-17.0.15/../lib/tools.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/auto/value/auto-value/1.3/auto-value-1.3.jar" />
+        </processorPath>
+        <module name="common-vertx.processor.test" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.processor.tests.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-vertx.processor.tests.main" />
+      </profile>
+      <profile name="Annotation profile for common-vertx.processor.tests.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-vertx.processor.tests.test" />
+      </profile>
+      <profile name="Annotation profile for common-xmpp.eclipse.system.fragment.main" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-xmpp.eclipse.system.fragment.main" />
+      </profile>
+      <profile name="Annotation profile for common-xmpp.eclipse.system.fragment.test" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="common-xmpp.eclipse.system.fragment.test" />
+      </profile>
       <profile name="Annotation profile for DiamondQ Common: Root" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -334,14 +1149,120 @@
           <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
         </processorPath>
         <module name="common-model.standard" />
-        <module name="common-bpm.camunda" />
-        <module name="common-utils.sync" />
-        <module name="common-injection.micronaut" />
-        <module name="common-security.acl" />
-        <module name="common-injection.micronaut.utils" />
         <module name="common-utils" />
-        <module name="common-utils.scxml" />
+        <module name="common-bpm.camunda" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="common-bpm.camunda" options="-parameters -Xlint:unchecked" />
+      <module name="common-deployment.basic" options="-parameters -Xlint:unchecked" />
+      <module name="common-deployment.basic.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-deployment.basic.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.cdi" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.cdi.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.cdi.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.cdi.weld" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.cdi.weld.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.cdi.weld.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.common" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.common.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.common.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.micronaut" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.micronaut.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.micronaut.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.micronaut.utils" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.micronaut.utils.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.micronaut.utils.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-injection.osgi" options="-parameters -Xlint:unchecked" />
+      <module name="common-jaxrs.common" options="-parameters -Xlint:unchecked" />
+      <module name="common-jaxrs.common.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-jaxrs.common.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-jaxrs.resteasy" options="-parameters -Xlint:unchecked" />
+      <module name="common-jaxrs.resteasy.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-jaxrs.resteasy.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-lambda.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-metrics.micrometer" options="-parameters -Xlint:unchecked" />
+      <module name="common-metrics.micrometer.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-metrics.micrometer.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-model.standard" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acl" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acl.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acl.noop" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acl.noop.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acl.noop.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acl.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acme" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acme.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.acme.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.jcasbin" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.jwt" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.jwt.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.jwt.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.paxweb.jersey" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.paxweb.jersey.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.paxweb.jersey.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.undertow" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.undertow.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.undertow.resteasy.weld" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.undertow.resteasy.weld.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.undertow.resteasy.weld.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-servers.undertow.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.cloudant" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.hibernate.ogm" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.hibernate.ogm.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.hibernate.ogm.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.jdbc" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.jdbc.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.jdbc.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.jdo.datanucleus" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.jdo.datanucleus.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.jdo.datanucleus.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.kv" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.kv.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-storage.kv.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-tracing.jaeger" options="-parameters -Xlint:unchecked" />
+      <module name="common-tracing.opentracing" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.janino.fragment" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.janino.fragment.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.janino.fragment.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.log4j2" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.log4j2.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.log4j2.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.logback" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.logback.fragment" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.logback.fragment.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.logback.fragment.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.logback.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.logback.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.parsing" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.parsing.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.parsing.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.scxml" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.scxml.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.scxml.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.sync" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.sync.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-utils.sync.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.common" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.common.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.common.micronaut" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.common.micronaut.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.common.micronaut.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.common.osgi" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.common.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.processor" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.processor.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.processor.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.processor.tests" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.processor.tests.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-vertx.processor.tests.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-xmpp.eclipse.system.fragment" options="-parameters -Xlint:unchecked" />
+      <module name="common-xmpp.eclipse.system.fragment.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-xmpp.eclipse.system.fragment.test" options="-parameters -Xlint:unchecked" />
+      <module name="common-xmpp.standard" options="-parameters -Xlint:unchecked" />
+    </option>
   </component>
 </project>
