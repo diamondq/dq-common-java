@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.diamondq.common</groupId>
@@ -66,6 +66,16 @@
       <artifactId>common-injection.osgi</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.framework</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component</artifactId>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -77,9 +87,13 @@
             <id>bundle-manifest</id>
             <configuration>
               <instructions>
-                <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
-                <Provide-Capability>osgi.serviceloader; osgi.serviceloader=rocks.xmpp.core.session.Module</Provide-Capability>
-                <Require-Bundle>rocks.xmpp.addr,rocks.xmpp.core.client,rocks.xmpp.core.common,rocks.xmpp.extensions.client,rocks.xmpp.extensions.common,rocks.xmpp.precis</Require-Bundle>
+                <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
+                </Require-Capability>
+                <Provide-Capability>osgi.serviceloader; osgi.serviceloader=rocks.xmpp.core.session.Module
+                </Provide-Capability>
+                <Require-Bundle>
+                  rocks.xmpp.addr,rocks.xmpp.core.client,rocks.xmpp.core.common,rocks.xmpp.extensions.client,rocks.xmpp.extensions.common,rocks.xmpp.precis
+                </Require-Bundle>
               </instructions>
             </configuration>
           </execution>

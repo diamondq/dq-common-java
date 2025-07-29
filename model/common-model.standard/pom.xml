@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.diamondq.common</groupId>
@@ -59,6 +59,21 @@
       <artifactId>common-injection.common</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.framework</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.resource</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -76,7 +91,8 @@
                     <exclude>com/diamondq/common/model/persistence/CombinedPersistenceLayer*.class</exclude>
                     <exclude>com/diamondq/common/model/persistence/CombinedQuery*.class</exclude>
                     <exclude>com/diamondq/common/model/persistence/CombinedReadWritePersistenceLayer*.class</exclude>
-                    <exclude>com/diamondq/common/model/persistence/DynamicPropertiesFilePersistenceLayer*.class</exclude>
+                    <exclude>com/diamondq/common/model/persistence/DynamicPropertiesFilePersistenceLayer*.class
+                    </exclude>
                     <exclude>com/diamondq/common/model/persistence/MemoryPersistenceLayer*.class</exclude>
                     <exclude>com/diamondq/common/model/persistence/NewMemoryPersistenceLayer*.class</exclude>
                     <exclude>com/diamondq/common/model/persistence/PropertiesFilePersistenceLayer*.class</exclude>
@@ -102,8 +118,11 @@
                 <Require-Capability>osgi.serviceloader;
                   filter:="(osgi.serviceloader=com.diamondq.common.model.interfaces.ToolkitFactory)";cardinality:=multiple,osgi.extender;
                   filter:="(osgi.extender=osgi.serviceloader.processor)",osgi.extender;
-                  filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
-                <Provide-Capability>osgi.serviceloader;osgi.serviceloader="com.diamondq.common.model.interfaces.ToolkitFactory"</Provide-Capability>
+                  filter:="(osgi.extender=osgi.serviceloader.registrar)"
+                </Require-Capability>
+                <Provide-Capability>
+                  osgi.serviceloader;osgi.serviceloader="com.diamondq.common.model.interfaces.ToolkitFactory"
+                </Provide-Capability>
               </instructions>
             </configuration>
           </execution>
