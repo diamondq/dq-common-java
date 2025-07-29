@@ -1,12 +1,11 @@
 package com.diamondq.common.converters.tests;
 
-import static org.junit.Assert.assertEquals;
-
 import com.diamondq.common.converters.AbstractConverter;
 import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.converters.impl.CommonConverters;
 import com.diamondq.common.converters.impl.ConverterManagerImpl;
 import com.diamondq.common.types.Types;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,13 +15,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
-import org.osgi.framework.InvalidSyntaxException;
+import static org.junit.Assert.assertEquals;
 
 public class TestBasicConverter {
 
   @Test
-  public void simpleConverter() throws IOException, InvalidSyntaxException {
+  public void simpleConverter() throws IOException {
     ConverterManager converterManager = new ConverterManagerImpl(Collections.emptyList());
     converterManager.addConverter(new CommonConverters().getStringToPathConverter());
     Path result = converterManager.convert(File.pathSeparator, Path.class);
@@ -38,7 +36,9 @@ public class TestBasicConverter {
     @Override
     public String convert(List<String> pInput) {
       return String.join(",", pInput);
-    };
+    }
+
+    ;
   }
 
   private static class ListLongConverter extends AbstractConverter<List<Long>, String> {
@@ -50,11 +50,13 @@ public class TestBasicConverter {
     @Override
     public String convert(List<Long> pInput) {
       return String.join(",", pInput.stream().map(String::valueOf).collect(Collectors.toList()));
-    };
+    }
+
+    ;
   }
 
   @Test
-  public void genericConverter() throws IOException, InvalidSyntaxException {
+  public void genericConverter() throws IOException {
     ConverterManager converterManager = new ConverterManagerImpl(Collections.emptyList());
     converterManager.addConverter(new ListStringConverter());
     converterManager.addConverter(new ListLongConverter());

@@ -41,10 +41,10 @@ public class ContextPrinters {
     sX509CertificateType = (i) -> {
       if (i instanceof X509Certificate) {
         X509Certificate cert = (X509Certificate) i;
-        return "X509Certificate[" + "Version=" + cert.getVersion() + ", Subject=" + cert.getSubjectDN().toString()
-          + ", Signature Algorithm=" + cert.getSigAlgName() + ", Issuer=" + cert.getIssuerDN().toString()
-          + ", Serial Number=" + cert.getSerialNumber().toString() + ", Validity=[From=" + cert.getNotBefore() + ", To="
-          + cert.getNotAfter() + "]" + "]";
+        return "X509Certificate[" + "Version=" + cert.getVersion() + ", Subject=" + cert.getSubjectX500Principal()
+          .toString() + ", Signature Algorithm=" + cert.getSigAlgName() + ", Issuer=" + cert.getIssuerX500Principal()
+          .toString() + ", Serial Number=" + cert.getSerialNumber().toString() + ", Validity=[From="
+          + cert.getNotBefore() + ", To=" + cert.getNotAfter() + "]" + "]";
       } else return i;
     };
     sKeyPairType = (i) -> {

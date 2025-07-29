@@ -9,6 +9,11 @@ import com.diamondq.common.context.spi.SPIContextFactory;
 import io.micronaut.context.annotation.Secondary;
 import jakarta.annotation.PostConstruct;
 import org.jetbrains.annotations.Nullable;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.util.Objects;
 import java.util.Set;
@@ -18,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Function;
 
 @Secondary
+@Component(service = { ContextFactory.class, SPIContextFactory.class })
 public class ContextFactoryImpl implements SPIContextFactory {
 
   private static final Object sNULL_EXIT_VALUE = new Object();
@@ -62,6 +68,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
    * The onActivate is called when OSGi has finished initializing this class.
    */
   @PostConstruct
+  @Activate
   public void onActivate() {
 
     /* Override the existing sINSTANCE with the fully configured one */
@@ -69,6 +76,8 @@ public class ContextFactoryImpl implements SPIContextFactory {
     sINSTANCE = this;
   }
 
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, unbind = "removeContextHandler",
+    policy = ReferencePolicy.DYNAMIC)
   public void addContextHandler(ContextHandler pHandler) {
     if (mHandlers.addIfAbsent(pHandler))
       if (pHandler instanceof LoggingContextHandler) mLoggingHandler = (LoggingContextHandler) pHandler;

@@ -5,6 +5,7 @@ import com.diamondq.common.context.spi.ContextHandler;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -17,27 +18,30 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 @Singleton
+@Component(service = { ContextHandler.class, LoggingContextHandler.class })
 public class LoggingContextHandler implements ContextHandler {
 
-  private final ConcurrentMap<Class<?>, Logger> mLoggerMap = new ConcurrentHashMap<>();
+  private static final String                          sEXIT_MESSAGE_0          = "EXIT {}() from {}";
+  private static final String                          sEXIT_MESSAGE_1          = "EXIT {}(...) with {} from {}";
+  private static final String                          sDETACH_MESSAGE_0        = "DETACH {}() from {}";
+  private static final String                          sEXIT_MESSAGE_ERROR      = "EXIT {}() from {} with error";
+  private static final String[]                        sENTRY_MESSAGE_ARRAY     = new String[] { "{}() from {}", "{}({}) from {}", "{}({}, {}) from {}", "{}({}, {}, {}) from {}", "{}({}, {}, {}, {}) from {}" };
+  private static final int                             sENTRY_MESSAGE_ARRAY_LEN = sENTRY_MESSAGE_ARRAY.length;
+  public static        Marker                          sSIMPLE_ENTRY_MARKER     = MarkerFactory.getMarker("ENTRY_S");
+  public static        Marker                          sENTRY_MARKER            = MarkerFactory.getMarker("ENTRY");
+  public static        Marker                          sEXIT_MARKER             = MarkerFactory.getMarker("EXIT");
+  private final        ConcurrentMap<Class<?>, Logger> mLoggerMap               = new ConcurrentHashMap<>();
 
-  public static Marker sSIMPLE_ENTRY_MARKER = MarkerFactory.getMarker("ENTRY_S");
-
-  public static Marker sENTRY_MARKER = MarkerFactory.getMarker("ENTRY");
-
-  public static Marker sEXIT_MARKER = MarkerFactory.getMarker("EXIT");
-
-  private static final String sEXIT_MESSAGE_0 = "EXIT {}() from {}";
-
-  private static final String sEXIT_MESSAGE_1 = "EXIT {}(...) with {} from {}";
-
-  private static final String sDETACH_MESSAGE_0 = "DETACH {}() from {}";
-
-  private static final String sEXIT_MESSAGE_ERROR = "EXIT {}() from {} with error";
-
-  private static final String[] sENTRY_MESSAGE_ARRAY = new String[] { "{}() from {}", "{}({}) from {}", "{}({}, {}) from {}", "{}({}, {}, {}) from {}", "{}({}, {}, {}, {}) from {}" };
-
-  private static final int sENTRY_MESSAGE_ARRAY_LEN = sENTRY_MESSAGE_ARRAY.length;
+  private static String buildMessagePattern(int len) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{}(");
+    for (int i = 0; i < len; i++) {
+      sb.append("{}");
+      if (i != (len - 1)) sb.append(", ");
+    }
+    sb.append(") from {}");
+    return sb.toString();
+  }
 
   /**
    * @see com.diamondq.common.context.spi.ContextHandler#executeOnContextStart(com.diamondq.common.context.spi.ContextClass)
@@ -401,16 +405,5 @@ public class LoggingContextHandler implements ContextHandler {
       else pLogger.trace(sEXIT_MARKER, sEXIT_MESSAGE_0, methodName, pThis);
     }
 
-  }
-
-  private static String buildMessagePattern(int len) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{}(");
-    for (int i = 0; i < len; i++) {
-      sb.append("{}");
-      if (i != (len - 1)) sb.append(", ");
-    }
-    sb.append(") from {}");
-    return sb.toString();
   }
 }

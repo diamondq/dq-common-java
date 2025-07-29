@@ -7,6 +7,9 @@ import io.micronaut.context.annotation.Requires;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.Nullable;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,6 +18,7 @@ import java.util.function.Function;
 
 @Singleton
 @Requires(property = "dq.logging.stacklogger.file")
+@Component(service = ContextHandler.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class StackLogger implements ContextHandler {
 
   @SuppressWarnings("NotNullFieldNotInitialized") private FileWriter mWriter;
@@ -24,6 +28,7 @@ public class StackLogger implements ContextHandler {
   }
 
   @PostConstruct
+  @Activate
   public void onActivate(@Property(name = "dq.logging.stacklogger") Map<String, Object> pProperties) {
     String fileName = (String) pProperties.get(".file");
     try {

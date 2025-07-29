@@ -11,6 +11,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -26,82 +30,42 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 @Singleton
+@Component(service = ConverterManager.class)
 public class ConverterManagerImpl implements ConverterManager {
 
-  private static class TypePair {
-    public final @Nullable String groupName;
-
-    public final Type inputType;
-
-    public final Type outputType;
-
-    public TypePair(@Nullable String pGroupName, Type pInputType, Type pOutputType) {
-      groupName = pGroupName;
-      inputType = pInputType;
-      outputType = pOutputType;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-      return Objects.hash(groupName, inputType, outputType);
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(@Nullable Object pObj) {
-      if (this == pObj) return true;
-      if (pObj == null) return false;
-      if (getClass() != pObj.getClass()) return false;
-      TypePair pOther = (TypePair) pObj;
-      if (!Objects.equals(groupName, pOther.groupName)) return false;
-      if (!Objects.equals(inputType, pOther.inputType)) return false;
-      //noinspection RedundantIfStatement
-      if (!Objects.equals(outputType, pOther.outputType)) return false;
-      return true;
-    }
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-      //noinspection StringBufferReplaceableByString
-      return new StringBuilder().append(inputType.getTypeName())
-        .append(" -> ")
-        .append(outputType.getTypeName())
-        .toString();
-    }
-  }
-
-  private static final Converter<?, ?> sIdentityConverter = new IdentityConverter();
-
-  private final ConcurrentMap<TypePair, Converter<?, ?>> mConvertersByType = new ConcurrentHashMap<>();
-
-  private final ConcurrentMap<TypePair, Converter<?, ?>> mShortcuts = new ConcurrentHashMap<>();
+  private static final Converter<?, ?>                          sIdentityConverter = new IdentityConverter();
+  private final        ConcurrentMap<TypePair, Converter<?, ?>> mConvertersByType  = new ConcurrentHashMap<>();
+  private final        ConcurrentMap<TypePair, Converter<?, ?>> mShortcuts         = new ConcurrentHashMap<>();
 
   @Inject
   public ConverterManagerImpl(List<Converter<?, ?>> pConverters) {
     for (Converter<?, ?> pConverter : pConverters) {
       mConvertersByType.put(new TypePair(pConverter.getGroupName(),
-        pConverter.getInputType(),
-        pConverter.getOutputType()
-      ), pConverter);
+          pConverter.getInputType(),
+          pConverter.getOutputType()
+        ), pConverter
+      );
     }
     mShortcuts.clear();
   }
 
   @Override
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, unbind = "removeConverter")
   public void addConverter(Converter<?, ?> pConverter) {
     mConvertersByType.put(new TypePair(pConverter.getGroupName(),
-      pConverter.getInputType(),
-      pConverter.getOutputType()
-    ), pConverter);
+        pConverter.getInputType(),
+        pConverter.getOutputType()
+      ), pConverter
+    );
     mShortcuts.clear();
+  }
+
+  public void removeConverter(Converter<?, ?> pConverter) {
+    mConvertersByType.remove(new TypePair(pConverter.getGroupName(),
+        pConverter.getInputType(),
+        pConverter.getOutputType()
+      ), pConverter
+    );
   }
 
   @Override
@@ -478,6 +442,56 @@ public class ConverterManagerImpl implements ConverterManager {
       } else throw new UnsupportedOperationException();
     } else throw new UnsupportedOperationException();
     return result;
+  }
+
+  private static class TypePair {
+    public final @Nullable String groupName;
+
+    public final Type inputType;
+
+    public final Type outputType;
+
+    public TypePair(@Nullable String pGroupName, Type pInputType, Type pOutputType) {
+      groupName = pGroupName;
+      inputType = pInputType;
+      outputType = pOutputType;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      return Objects.hash(groupName, inputType, outputType);
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(@Nullable Object pObj) {
+      if (this == pObj) return true;
+      if (pObj == null) return false;
+      if (getClass() != pObj.getClass()) return false;
+      TypePair pOther = (TypePair) pObj;
+      if (!Objects.equals(groupName, pOther.groupName)) return false;
+      if (!Objects.equals(inputType, pOther.inputType)) return false;
+      //noinspection RedundantIfStatement
+      if (!Objects.equals(outputType, pOther.outputType)) return false;
+      return true;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+      //noinspection StringBufferReplaceableByString
+      return new StringBuilder().append(inputType.getTypeName())
+        .append(" -> ")
+        .append(outputType.getTypeName())
+        .toString();
+    }
   }
 
 }
