@@ -29,6 +29,12 @@
     <dependency>
       <groupId>com.diamondq.common</groupId>
       <artifactId>common-thirdparty.jcasbin</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -39,11 +45,6 @@
       <groupId>org.apache.sling</groupId>
       <artifactId>org.apache.sling.testing.osgi-mock.junit4</artifactId>
       <version>3.5.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
