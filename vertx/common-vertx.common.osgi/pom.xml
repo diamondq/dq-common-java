@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <name>DiamondQ Common: Vert.x: Common Osgi</name>
   <properties>
-    <osgi.export.base.package>com.diamondq.common.vertx</osgi.export.base.package>
+    <osgi.base.package>com.diamondq.common.vertx</osgi.base.package>
   </properties>
   <dependencies>
     <dependency>

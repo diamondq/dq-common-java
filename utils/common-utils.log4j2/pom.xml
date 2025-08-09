@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils: Log4j2</name>
   <properties>
-    <osgi.export.base.package>com.diamondq.common.utils.log4j2</osgi.export.base.package>
+    <osgi.base.package>com.diamondq.common.utils.log4j2</osgi.base.package>
   </properties>
   <dependencies>
     <dependency>

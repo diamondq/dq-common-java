@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <name>DiamondQ Common: XMPP: Standard</name>
   <properties>
-    <osgi.export.base.package>com.diamondq.common.xmpp.*</osgi.export.base.package>
+    <osgi.base.package>com.diamondq.common.xmpp</osgi.base.package>
   </properties>
   <repositories>
     <repository>

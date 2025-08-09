@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils: Logback</name>
   <properties>
-    <osgi.export.base.package>com.diamondq.common.utils.logback</osgi.export.base.package>
+    <osgi.base.package>com.diamondq.common.utils.logback</osgi.base.package>
   </properties>
   <dependencies>
     <dependency>

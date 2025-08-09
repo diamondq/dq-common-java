@@ -11,7 +11,7 @@
   <packaging>bundle</packaging>
   <name>DiamondQ Common: Injection: OSGi</name>
   <properties>
-    <osgi.export.base.package>com.diamondq.common.injection.osgi.*</osgi.export.base.package>
+    <osgi.base.package>com.diamondq.common.injection.osgi</osgi.base.package>
   </properties>
   <dependencies>
     <dependency>

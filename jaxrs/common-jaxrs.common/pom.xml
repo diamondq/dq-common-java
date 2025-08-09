@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <name>DiamondQ Common: JAXRS: Common</name>
   <properties>
-    <osgi.export.base.package>com.diamondq.common.jaxrs.*</osgi.export.base.package>
+    <osgi.base.package>com.diamondq.common.jaxrs</osgi.base.package>
   </properties>
   <dependencies>
     <dependency>

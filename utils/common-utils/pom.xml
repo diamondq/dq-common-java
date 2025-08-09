@@ -17,6 +17,7 @@
     <osgi.manifest.directory>${project.build.outputDirectory}/META-INF</osgi.manifest.directory>
     <osgi.osgi.directory>${project.build.outputDirectory}</osgi.osgi.directory>
     <osgi.export.scr>true</osgi.export.scr>
+    <osgi.base.package>com.diamondq.common</osgi.base.package>
   </properties>
   <dependencies>
     <dependency>

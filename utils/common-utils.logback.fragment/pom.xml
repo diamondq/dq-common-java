@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.diamondq.common</groupId>
@@ -74,8 +74,9 @@
       ch.qos.logback.classic.sift;version="1.2.2";uses:="ch.qos.logback.classic.spi,ch.qos.logback.core,ch.qos.logback.core.joran.action,ch.qos.logback.core.joran.event,ch.qos.logback.core.joran.spi,ch.qos.logback.core.sift,org.xml.sax",
       ch.qos.logback.classic.spi;version="1.2.2";uses:="ch.qos.logback.classic,ch.qos.logback.classic.turbo,ch.qos.logback.core,ch.qos.logback.core.spi,org.slf4j",
       ch.qos.logback.classic.turbo;version="1.2.2";uses:="ch.qos.logback.classic,ch.qos.logback.core.spi,org.slf4j",
-      ch.qos.logback.classic.util;version="1.2.2";uses:="ch.qos.logback.classic,ch.qos.logback.classic.selector,ch.qos.logback.classic.spi,ch.qos.logback.core.joran.spi,ch.qos.logback.core.status,javax.naming,org.slf4j.spi" 
+      ch.qos.logback.classic.util;version="1.2.2";uses:="ch.qos.logback.classic,ch.qos.logback.classic.selector,ch.qos.logback.classic.spi,ch.qos.logback.core.joran.spi,ch.qos.logback.core.status,javax.naming,org.slf4j.spi"
     </osgi.export.packages>
     <osgi.fragment.host>org.ops4j.pax.logging.pax-logging-logback</osgi.fragment.host>
+    <osgi.base.package>com.diamondq</osgi.base.package>
   </properties>
 </project>

@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <name>DiamondQ Common: Servers: PAX Web + Jersey</name>
   <properties>
-    <osgi.export.base.package>com.diamondq.common.servers.paxweb.jersey</osgi.export.base.package>
+    <osgi.base.package>com.diamondq.common.servers.paxweb.jersey</osgi.base.package>
   </properties>
   <dependencies>
     <dependency>
