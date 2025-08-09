@@ -706,7 +706,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/truth/truth/0.36/truth-0.36.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/truth/extensions/truth-java8-extension/0.35/truth-java8-extension-0.35.jar" />
-          <entry name="$USER_HOME$/.jdks/corretto-17.0.15/../lib/tools.jar" />
+          <entry name="$USER_HOME$/.jdks/corretto-17.0.16/../lib/tools.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/auto/value/auto-value/1.3/auto-value-1.3.jar" />
         </processorPath>
         <module name="common-vertx.processor.main" />
@@ -728,7 +728,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/truth/truth/0.36/truth-0.36.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/truth/extensions/truth-java8-extension/0.35/truth-java8-extension-0.35.jar" />
-          <entry name="$USER_HOME$/.jdks/corretto-17.0.15/../lib/tools.jar" />
+          <entry name="$USER_HOME$/.jdks/corretto-17.0.16/../lib/tools.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/auto/value/auto-value/1.3/auto-value-1.3.jar" />
         </processorPath>
         <module name="common-vertx.processor.test" />
@@ -779,6 +779,10 @@
         <module name="common-bpm.camunda" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="common-security.jcasbin.main" target="17" />
+      <module name="common-security.jcasbin.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -823,6 +827,8 @@
       <module name="common-security.acme.main" options="-parameters -Xlint:unchecked" />
       <module name="common-security.acme.test" options="-parameters -Xlint:unchecked" />
       <module name="common-security.jcasbin" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.jcasbin.main" options="-parameters -Xlint:unchecked" />
+      <module name="common-security.jcasbin.test" options="-parameters -Xlint:all" />
       <module name="common-security.jwt" options="-parameters -Xlint:unchecked" />
       <module name="common-security.jwt.main" options="-parameters -Xlint:unchecked" />
       <module name="common-security.jwt.test" options="-parameters -Xlint:unchecked" />

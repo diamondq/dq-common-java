@@ -1,0 +1,13 @@
+<root>
+  <item name='ch.qos.logback.core.util.OptionHelper java.lang.String[] extractDefaultReplacement(java.lang.String)'>
+    <annotation name='org.jetbrains.annotations.NotNull' />
+    <type>
+      <item index='0'>
+        <annotation name='org.jetbrains.annotations.Nullable' />
+      </item>
+    </type>
+  </item>
+  <item name='ch.qos.logback.core.util.OptionHelper java.lang.String[] extractDefaultReplacement(java.lang.String) 0'>
+    <annotation name='org.jetbrains.annotations.Nullable' />
+  </item>
+</root>
