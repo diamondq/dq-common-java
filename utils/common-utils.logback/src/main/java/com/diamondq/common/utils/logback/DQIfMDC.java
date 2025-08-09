@@ -1,42 +1,39 @@
 package com.diamondq.common.utils.logback;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-
+/**
+ * This LogBack converter will output the final entry in the list if there is an MDC property that matches the property.
+ * (i.e., DQIfMDC{myKey,something} will output something if myKey exists as an MDC property).
+ */
 public class DQIfMDC extends DQMDC {
 
-  protected String mValue;
+  protected @Nullable String mValue;
 
   @SuppressWarnings("null")
   public DQIfMDC() {
   }
 
-  /**
-   * @see com.diamondq.common.utils.logback.DQMDC#start()
-   */
   @Override
   public void start() {
     List<String> optionList = getOptionList();
     if ((optionList == null) || (optionList.isEmpty())) {
       mValue = "";
       super.processOptionList(optionList);
-    }
-    else {
+    } else {
       mValue = optionList.remove(optionList.size() - 1);
       mValue = mValue.replaceAll("\\\\s", " ");
       super.processOptionList(optionList);
     }
   }
 
-  /**
-   * @see ch.qos.logback.core.pattern.Converter#convert(java.lang.Object)
-   */
   @Override
   public String convert(ILoggingEvent pEvent) {
     String result = super.convert(pEvent);
-    if (result.isEmpty() == true)
-      return "";
-    return mValue;
+    if (result.isEmpty()) return "";
+    return mValue == null ? "" : mValue;
   }
 }

@@ -1,9 +1,9 @@
 package com.diamondq.common.utils.logback;
 
-import java.util.List;
-
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+
+import java.util.List;
 
 public class DQLogger extends ClassicConverter {
 
@@ -15,10 +15,8 @@ public class DQLogger extends ClassicConverter {
   @Override
   public void start() {
     List<String> optionList = getOptionList();
-    if ((optionList == null) || (optionList.size() == 0))
-      mParts = 3;
-    else
-      mParts = Integer.parseInt(optionList.get(0));
+    if ((optionList == null) || (optionList.isEmpty())) mParts = 3;
+    else mParts = Integer.parseInt(optionList.get(0));
     super.start();
   }
 
@@ -35,13 +33,10 @@ public class DQLogger extends ClassicConverter {
       fullStart = parts.length - mParts;
       for (int i = 0; i < fullStart; i++)
         sb.append(parts[i].charAt(0)).append('.');
-    }
-    else
-      fullStart = 0;
+    } else fullStart = 0;
     for (int i = fullStart; i < parts.length; i++) {
       sb.append(parts[i]);
-      if (i < (parts.length - 1))
-        sb.append('.');
+      if (i < (parts.length - 1)) sb.append('.');
     }
     return sb.toString();
   }

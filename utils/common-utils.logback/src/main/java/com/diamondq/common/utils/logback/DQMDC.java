@@ -13,11 +13,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * This LogBack converter will output the MDC properties. The configuration is a comma-separated list of keys. If the
+ * keys start with a !, then they will be omitted. If the key is listed, then the value will be used. The key can
+ * contain a default value by using the ":-" delimiter (i.e., DQMDC{myKey:-defaultValue} )
+ */
+@SuppressWarnings("SpellCheckingInspection")
 public class DQMDC extends ClassicConverter {
 
-  protected Map<String, @Nullable String> mKeep;
+  protected @Nullable Map<String, @Nullable String> mKeep;
 
-  protected Set<String> mOmit;
+  protected @Nullable Set<String> mOmit;
 
   @SuppressWarnings("null")
   public DQMDC() {
@@ -32,7 +38,7 @@ public class DQMDC extends ClassicConverter {
     Set<String> omits = new HashSet<>();
     Map<String, @Nullable String> keeps = new LinkedHashMap<>();
     if (pOptionList != null) for (String option : pOptionList) {
-      String[] optionInfo = OptionHelper.extractDefaultReplacement(option);
+      @Nullable String[] optionInfo = OptionHelper.extractDefaultReplacement(option);
       String key = optionInfo[0];
       if (key != null) {
         if (key.startsWith("!")) omits.add(key.substring(1));
@@ -53,25 +59,27 @@ public class DQMDC extends ClassicConverter {
 
     StringBuilder sb = new StringBuilder();
     TreeSet<String> keys = new TreeSet<>();
-    if (mKeep.isEmpty() == true) keys.addAll(mdcPropertyMap.keySet());
-    else keys.addAll(mKeep.keySet());
-    mOmit.forEach((k) -> keys.remove(k));
-    boolean onlyOne = mKeep.size() == 1;
+    Map<String, @Nullable String> keep = mKeep != null ? mKeep : Collections.emptyMap();
+    Set<String> omit = mOmit != null ? mOmit : Collections.emptySet();
+    if (keep.isEmpty()) keys.addAll(mdcPropertyMap.keySet());
+    else keys.addAll(keep.keySet());
+    omit.forEach(keys::remove);
+    boolean onlyOne = keep.size() == 1;
     boolean first = true;
     for (String key : keys) {
       if (first) first = false;
       else sb.append(", ");
 
       // format: key0=value0, key1=value1
-      String r = mdcPropertyMap.get(key);
+      @Nullable String r = mdcPropertyMap.get(key);
       if ((r != null) && ("DQIndent".equals(key))) {
         String mdcThreadName = mdcPropertyMap.get("DQT");
         String threadName = Thread.currentThread().getName();
-        if (threadName.equals(mdcThreadName) == false) r = null;
+        if (!threadName.equals(mdcThreadName)) r = null;
       }
-      if (r == null) r = mKeep.get(key);
+      if (r == null) r = keep.get(key);
       if (r == null) r = "";
-      if (onlyOne == false) sb.append(key).append('=');
+      if (!onlyOne) sb.append(key).append('=');
       sb.append(r);
     }
 
