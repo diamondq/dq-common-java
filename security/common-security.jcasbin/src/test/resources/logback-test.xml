@@ -1,12 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <conversionRule conversionWord="DQLogger" converterClass="com.diamondq.common.utils.logback.DQLogger" />
-  <conversionRule conversionWord="DQMDC" converterClass="com.diamondq.common.utils.logback.DQMDC" />
-  <conversionRule conversionWord="DQIfMDC" converterClass="com.diamondq.common.utils.logback.DQIfMDC" />
-  <conversionRule conversionWord="DQContext" converterClass="com.diamondq.common.utils.logback.DQContext" />
+  <conversionRule conversionWord="DQLogger" class="com.diamondq.common.utils.logback.DQLogger" />
+  <conversionRule conversionWord="DQMDC" class="com.diamondq.common.utils.logback.DQMDC" />
+  <conversionRule conversionWord="DQIfMDC" class="com.diamondq.common.utils.logback.DQIfMDC" />
+  <conversionRule conversionWord="DQContext" class="com.diamondq.common.utils.logback.DQContext" />
+  <conversionRule conversionWord="DQTime" class="com.diamondq.common.utils.logback.DQTime" />
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <!-- %-9.9marker replaced with %-9.9DQMDC(slf4j.marker) as pax-logging-logback currently loses the marker -->
-      <pattern><![CDATA[%d{HH:mm:ss.SSS} [%-16.16thread] %-5level %-36.36logger{36} - %-30.30DQContext{30,true} - %DQContext{}%DQIfMDC{!bundle.id,!bundle.name,!bundle.version,!slf4j.marker,-\s}%DQMDC{!bundle.id,!bundle.name,!bundle.version,!slf4j.marker}%DQIfMDC{!bundle.id,!bundle.name,!bundle.version,!slf4j.marker,\s}%msg%n]]></pattern>
+      <pattern>
+        <![CDATA[%DQTime{HH:mm:ss.SSS} [%-16.16thread] %-5level %-36.36logger{36} - %-30.30DQContext{30,true} - %DQContext{}%DQIfMDC{!bundle.id,!bundle.name,!bundle.version,!slf4j.marker,-\s}%DQMDC{!bundle.id,!bundle.name,!bundle.version,!slf4j.marker}%DQIfMDC{!bundle.id,!bundle.name,!bundle.version,!slf4j.marker,\s}%msg%n]]></pattern>
     </encoder>
   </appender>
   <if condition='property("env.eclipse").equals("true") == false'>
