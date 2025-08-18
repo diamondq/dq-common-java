@@ -8,7 +8,7 @@
     <relativePath>../../common-parent</relativePath>
   </parent>
   <artifactId>common-utils</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>DiamondQ Common: Utils</name>
   <properties>
     <osgi.extra.import.packages>com.diamondq.common.tracing.opentracing.wrappers;resolution:=optional,
