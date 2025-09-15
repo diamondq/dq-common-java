@@ -1,6 +1,8 @@
 package com.diamondq.common;
 
-public class Holder<T> {
+import org.jspecify.annotations.Nullable;
+
+public class Holder<T extends @Nullable Object> {
 
   public volatile T object;
 

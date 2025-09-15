@@ -18,8 +18,7 @@ import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -94,7 +93,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public <@Nullable T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
+  public <T extends @Nullable Object> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
     Structure pContaining) {
     return mAsyncToolkit.createPropertyRef(dewrapScope(pScope), pResolvable, pContaining);
   }
@@ -129,7 +128,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
 
   @Override
   public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(Scope pScope,
-    StructureDefinition pStructureDef, @Nullable Object @NotNull ... pPrimaryKeys) {
+    StructureDefinition pStructureDef, @Nullable Object... pPrimaryKeys) {
     return mAsyncToolkit.lookupStructureByPrimaryKeys(dewrapScope(pScope), pStructureDef, pPrimaryKeys);
   }
 
@@ -155,8 +154,8 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public <@Nullable TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
-    boolean pIsValueSet, TYPE pValue) {
+  public <TYPE extends @Nullable Object> Property<TYPE> createNewProperty(Scope pScope,
+    PropertyDefinition pPropertyDefinition, boolean pIsValueSet, TYPE pValue) {
     return mAsyncToolkit.createNewProperty(dewrapScope(pScope), pPropertyDefinition, pIsValueSet, pValue);
   }
 
@@ -172,7 +171,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
+  public <T extends @Nullable Object> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
     return mAsyncToolkit.createPropertyRefFromSerialized(dewrapScope(pScope), pValue);
   }
 
@@ -200,7 +199,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
 
   @Override
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
-    StandardMigrations pMigrationType, @NotNull Object @Nullable ... pParams) {
+    StandardMigrations pMigrationType, Object @Nullable ... pParams) {
     return mAsyncToolkit.createStandardMigration(dewrapScope(pScope), pMigrationType, pParams);
   }
 
@@ -233,8 +232,9 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
     synchronized (this) {
       if (mSyncToolkit == toolkit) return Verify.notNull(mWrappedSyncToolkit);
       mSyncToolkit = toolkit;
-      mWrappedSyncToolkit = new WrappedToolkit(toolkit);
-      return mWrappedSyncToolkit;
+      var result = new WrappedToolkit(toolkit);
+      mWrappedSyncToolkit = result;
+      return result;
     }
   }
 

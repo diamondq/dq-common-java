@@ -2,13 +2,12 @@ package com.diamondq.common.storage.jdbc.dialects;
 
 import com.diamondq.common.storage.jdbc.IJDBCDialect;
 import com.google.common.collect.ImmutableSet;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
 public abstract class AbstractDialect implements IJDBCDialect {
 
-  protected static Set<@NotNull String> sSQL_2003_RESERVED_WORDS;
+  protected static Set<String> sSQL_2003_RESERVED_WORDS;
 
   static {
     String wordsStr = "add,all,allocate,alter,and,any,are,array,as,asensitive,asymmetric,at,atomic,authorization,"
@@ -29,8 +28,8 @@ public abstract class AbstractDialect implements IJDBCDialect {
       + "table,tablesample,then,time,timestamp,timezone_hour,timezone_minute,to,trailing,translation,treat,trigger,true,"
       + "undo,union,unique,unknown,unnest,until,update,user,using,"
       + "value,values,varchar,varying,when,whenever,where,while,window,with,within,without,year";
-    @NotNull String @NotNull [] words = wordsStr.split(",");
-    ImmutableSet.Builder<@NotNull String> builder = ImmutableSet.builder();
+    String[] words = wordsStr.split(",");
+    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
     for (String w : words)
       builder.add(w);
     sSQL_2003_RESERVED_WORDS = builder.build();

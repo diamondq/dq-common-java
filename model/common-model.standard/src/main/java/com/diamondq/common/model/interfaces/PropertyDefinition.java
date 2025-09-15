@@ -1,7 +1,7 @@
 package com.diamondq.common.model.interfaces;
 
 import com.google.common.collect.Multimap;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Collection;

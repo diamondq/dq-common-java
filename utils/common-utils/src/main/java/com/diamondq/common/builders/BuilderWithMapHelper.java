@@ -2,7 +2,7 @@ package com.diamondq.common.builders;
 
 import com.diamondq.common.converters.ConverterManager;
 import com.diamondq.common.lambda.interfaces.Function2;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -28,7 +28,7 @@ public abstract class BuilderWithMapHelper {
 
   public static <MAPTYPE, B extends IBuilderWithMap<B, R>, R> Mapping<MAPTYPE, B, R> of(Class<MAPTYPE> pMapTypeClass,
     String pKey, Function2<B, MAPTYPE, B> pSetter) {
-    return new Mapping<MAPTYPE, B, R>(pMapTypeClass, pKey, pSetter);
+    return new Mapping<>(pMapTypeClass, pKey, pSetter);
   }
 
   public static <B extends IBuilderWithMap<B, R>, R> B map(B pBuilder, Map<String, Object> pConfig,
@@ -50,7 +50,7 @@ public abstract class BuilderWithMapHelper {
 
         /* Does the value of the config match the expected type? */
 
-        if (m.mapTypeClass.isInstance(obj) == false) {
+        if (!m.mapTypeClass.isInstance(obj)) {
 
           /* It doesn't, so attempt to convert it */
 

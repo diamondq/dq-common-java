@@ -9,7 +9,6 @@ import com.diamondq.common.injection.osgi.testmodel.TestConstructor;
 import com.diamondq.common.injection.osgi.testmodel.TestDep;
 import org.apache.sling.testing.mock.osgi.MockOsgi;
 import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,7 +71,7 @@ public class Test1 {
     MockOsgi.injectServices(service, context.bundleContext());
     MockOsgi.activate(service, context.bundleContext());
 
-    Collection<@NotNull ServiceReference<@NotNull TestClassWithObjConstructor>> refs = context.bundleContext()
+    Collection<ServiceReference<TestClassWithObjConstructor>> refs = context.bundleContext()
       .getServiceReferences(TestClassWithObjConstructor.class, null);
     Assert.assertEquals(0, refs.size());
 
@@ -109,7 +108,7 @@ public class Test1 {
     MockOsgi.injectServices(service, context.bundleContext());
     MockOsgi.activate(service, context.bundleContext());
 
-    Collection<@NotNull ServiceReference<@NotNull TestClassWithObjConstructor>> refs = context.bundleContext()
+    Collection<ServiceReference<TestClassWithObjConstructor>> refs = context.bundleContext()
       .getServiceReferences(TestClassWithObjConstructor.class, null);
     Assert.assertEquals(0, refs.size());
 

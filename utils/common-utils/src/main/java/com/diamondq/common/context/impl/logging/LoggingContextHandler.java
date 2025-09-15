@@ -3,8 +3,7 @@ package com.diamondq.common.context.impl.logging;
 import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,7 @@ public class LoggingContextHandler implements ContextHandler {
   @Override
   public void executeOnContextStart(ContextClass pContext) {
     if (pContext.getHandlerData(ContextHandler.sSIMPLE_CONTEXT, false, Boolean.class) != null) return;
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -76,7 +75,7 @@ public class LoggingContextHandler implements ContextHandler {
   public void executeOnContextClose(ContextClass pContext, boolean pWithExitValue, @Nullable Object pExitValue,
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
     if (pContext.getHandlerData(ContextHandler.sSIMPLE_CONTEXT, false, Boolean.class) != null) return;
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -103,7 +102,7 @@ public class LoggingContextHandler implements ContextHandler {
    */
   @Override
   public void executeOnContextExplicitThrowable(ContextClass pContext, Throwable pThrowable) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -121,7 +120,7 @@ public class LoggingContextHandler implements ContextHandler {
   @Override
   public void executeOnContextReportTrace(ContextClass pContext, @Nullable String pMessage, boolean pWithMeta,
     @Nullable Object @Nullable ... pArgs) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -147,7 +146,7 @@ public class LoggingContextHandler implements ContextHandler {
   }
 
   public boolean isTraceEnabled(ContextClass pContext) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -162,7 +161,7 @@ public class LoggingContextHandler implements ContextHandler {
   @Override
   public void executeOnContextReportDebug(ContextClass pContext, @Nullable String pMessage, boolean pWithMeta,
     @Nullable Object @Nullable ... pArgs) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -173,7 +172,7 @@ public class LoggingContextHandler implements ContextHandler {
   }
 
   public boolean isDebugEnabled(ContextClass pContext) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -188,7 +187,7 @@ public class LoggingContextHandler implements ContextHandler {
   @Override
   public void executeOnContextReportInfo(ContextClass pContext, @Nullable String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -199,7 +198,7 @@ public class LoggingContextHandler implements ContextHandler {
   }
 
   public boolean isInfoEnabled(ContextClass pContext) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -214,7 +213,7 @@ public class LoggingContextHandler implements ContextHandler {
   @Override
   public void executeOnContextReportWarn(ContextClass pContext, @Nullable String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -225,7 +224,7 @@ public class LoggingContextHandler implements ContextHandler {
   }
 
   public boolean isWarnEnabled(ContextClass pContext) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -240,7 +239,7 @@ public class LoggingContextHandler implements ContextHandler {
   @Override
   public void executeOnContextReportError(ContextClass pContext, @Nullable String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -256,7 +255,7 @@ public class LoggingContextHandler implements ContextHandler {
    */
   @Override
   public void executeOnContextReportError(ContextClass pContext, @Nullable String pMessage, Throwable pThrowable) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -267,7 +266,7 @@ public class LoggingContextHandler implements ContextHandler {
   }
 
   public boolean isErrorEnabled(ContextClass pContext) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -288,7 +287,7 @@ public class LoggingContextHandler implements ContextHandler {
    */
   @Override
   public void executeOnDetachContextToThread(ContextClass pContext) {
-    @Nullable Logger logger = mLoggerMap.get(pContext.startClass);
+    Logger logger = mLoggerMap.get(pContext.startClass);
     if (logger == null) {
       Logger newLogger = LoggerFactory.getLogger(pContext.startClass);
       if ((logger = mLoggerMap.putIfAbsent(pContext.startClass, newLogger)) == null) logger = newLogger;
@@ -309,7 +308,7 @@ public class LoggingContextHandler implements ContextHandler {
    * @param pThis the object representing 'this'
    * @param pMethodName the method name (if null, then it is calculated)
    * @param pWithMeta true if there is metadata in the arguments or false if there isn't.
-   * @param pMatchEntryExit true if there must be matching exit or false if this is a standalone entry
+   * @param pMatchEntryExit true if there must be a matching exit or false if this is a standalone entry
    * @param pArgs any arguments to display
    */
   private void entryWithMetaInternal(ContextClass pContextClass, Logger pLogger, Marker pMarker, @Nullable Object pThis,
@@ -321,12 +320,12 @@ public class LoggingContextHandler implements ContextHandler {
     else messagePattern = buildMessagePattern(argsLen);
 
     int expandedLen = argsLen + 2;
-    @Nullable Object @NotNull [] expandedArgs = new Object[expandedLen];
-    @Nullable Object @NotNull [] filteredArgs;
+    @Nullable Object[] expandedArgs = new Object[expandedLen];
+    @Nullable Object[] filteredArgs;
 
     /* See if the last entry is a Throwable */
 
-    @Nullable Object lastEntry = (pArgs.length > 0 ? pArgs[pArgs.length - 1] : null);
+    Object lastEntry = (pArgs.length > 0 ? pArgs[pArgs.length - 1] : null);
 
     if (expandedLen > 2) {
 
@@ -341,7 +340,7 @@ public class LoggingContextHandler implements ContextHandler {
         for (int i = 0; i < argsLen; i++) {
           int argOffset = i * 2;
           @SuppressWarnings(
-            "unchecked") @Nullable Function<@Nullable Object, @Nullable Object> func = (Function<@Nullable Object, @Nullable Object>) pArgs[
+            "unchecked") Function<@Nullable Object, @Nullable Object> func = (Function<@Nullable Object, @Nullable Object>) pArgs[
             argOffset + 1];
           if (func == null) expandedArgs[1 + i] = pArgs[argOffset];
           else {
@@ -367,7 +366,7 @@ public class LoggingContextHandler implements ContextHandler {
 
     /* Add the caller object */
 
-    @Nullable Object caller = "<init>".equals(pMethodName) ? (
+    Object caller = "<init>".equals(pMethodName) ? (
       pThis == null ? null :
         pThis.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(pThis))) : pThis;
 

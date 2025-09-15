@@ -5,8 +5,7 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
 import org.apache.logging.log4j.core.pattern.PatternConverter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Plugin(name = "DQLoggerPatternConverter", category = PatternConverter.CATEGORY)
 @ConverterKeys({ "dqlogger" })
@@ -23,19 +22,19 @@ public class DQLogger extends LogEventPatternConverter {
    *
    * @param options options, may be null.
    */
-  private DQLogger(final @NotNull String @Nullable [] options) {
+  private DQLogger(final String @Nullable [] options) {
     super("DQLogger", null);
     if ((options == null) || (options.length == 0)) mParts = 3;
     else mParts = Integer.parseInt(options[0]);
   }
 
   /**
-   * Obtains an instance of pattern converter.
+   * Gets an instance of pattern converter.
    *
-   * @param pOptions options, may be null.
+   * @param pOptions options may be null.
    * @return instance of pattern converter.
    */
-  public static DQLogger newInstance(final @NotNull String @Nullable [] pOptions) {
+  public static DQLogger newInstance(final String @Nullable [] pOptions) {
     if ((pOptions == null) || (pOptions.length == 0)) {
       return INSTANCE;
     }

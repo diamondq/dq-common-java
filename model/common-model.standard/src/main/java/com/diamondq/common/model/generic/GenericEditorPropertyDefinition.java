@@ -14,8 +14,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -68,7 +67,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
     mIsMandatory = pIsMandatory;
     mMandatoryReason = pMandatoryReason;
     mValueMapScript = pValueMapScript;
-    mSimpleValueMap = ((pSimpleValueMap == null) || (pSimpleValueMap.isEmpty() == true)) ? null : ImmutableMap.copyOf(
+    mSimpleValueMap = ((pSimpleValueMap == null) || (pSimpleValueMap.isEmpty())) ? null : ImmutableMap.copyOf(
       pSimpleValueMap);
     mValueMapProperty = pValueMapProperty;
     mTableDisplayProperties = pTableDisplayProperties == null ? null : ImmutableList.copyOf(pTableDisplayProperties);
@@ -226,7 +225,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
   @Override
   public EditorPropertyDefinition removeEnabledIfValueEquals(String pValue) {
     Set<String> enabledIfValueEquals = mEnabledIfValueEquals;
-    @SuppressWarnings("null") @NotNull Predicate<String> equalTo = Predicates.equalTo(pValue);
+    Predicate<String> equalTo = Predicates.equalTo(pValue);
     return new GenericEditorPropertyDefinition(mLabel,
       mColumn,
       mColumnSpan,
@@ -370,7 +369,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
    */
   @Override
   public EditorPropertyDefinition putSimpleValueMapEntry(String pKey, TranslatableString pValue) {
-    @SuppressWarnings("null") @NotNull Predicate<String> equalTo = Predicates.equalTo(pKey);
+    Predicate<String> equalTo = Predicates.equalTo(pKey);
     return new GenericEditorPropertyDefinition(mLabel,
       mColumn,
       mColumnSpan,
@@ -403,7 +402,7 @@ public class GenericEditorPropertyDefinition extends GenericEditorComponentDefin
    */
   @Override
   public EditorPropertyDefinition removeSimpleValueMapEntry(String pKey) {
-    @SuppressWarnings("null") @NotNull Predicate<String> equalTo = Predicates.equalTo(pKey);
+    Predicate<String> equalTo = Predicates.equalTo(pKey);
     return new GenericEditorPropertyDefinition(mLabel,
       mColumn,
       mColumnSpan,

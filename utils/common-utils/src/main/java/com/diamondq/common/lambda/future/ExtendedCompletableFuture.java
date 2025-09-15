@@ -16,8 +16,7 @@ import com.diamondq.common.lambda.interfaces.Consumer2;
 import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Supplier;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -35,33 +34,33 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
-public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> {
+public class ExtendedCompletableFuture<T extends @Nullable Object> implements ExtendedCompletionStage<T> {
 
   private final CompletableFuture<T> mDelegate;
 
-  private static final Constructor<CancelableFunction2<?, ?, ?>> sFunction2Constructor;
+  private static final Constructor<CancelableFunction2<? extends @Nullable Object, ? extends @Nullable Object, ? extends @Nullable Object>> sFunction2Constructor;
 
-  private static final Constructor<CancelableFunction1<?, ?>> sFunction1Constructor;
+  private static final Constructor<CancelableFunction1<? extends @Nullable Object, ? extends @Nullable Object>> sFunction1Constructor;
 
-  private static final Constructor<CancelableConsumer1<?>> sConsumer1Constructor;
+  private static final Constructor<CancelableConsumer1<? extends @Nullable Object>> sConsumer1Constructor;
 
-  private static final Constructor<CancelableSupplier<?>> sSupplierConstructor;
+  private static final Constructor<CancelableSupplier<? extends @Nullable Object>> sSupplierConstructor;
 
   private static final Constructor<CancelableRunnable> sRunnableConstructor;
 
   static {
-    @NotNull Constructor<CancelableFunction2<?, ?, ?>> function2Constructor;
-    @NotNull Constructor<CancelableFunction1<?, ?>> function1Constructor;
-    @NotNull Constructor<CancelableSupplier<?>> supplierConstructor;
-    @NotNull Constructor<CancelableConsumer1<?>> consumer1Constructor;
-    @NotNull Constructor<CancelableRunnable> runnableConstructor;
+    Constructor<CancelableFunction2<? extends @Nullable Object, ? extends @Nullable Object, ? extends @Nullable Object>> function2Constructor;
+    Constructor<CancelableFunction1<? extends @Nullable Object, ? extends @Nullable Object>> function1Constructor;
+    Constructor<CancelableSupplier<? extends @Nullable Object>> supplierConstructor;
+    Constructor<CancelableConsumer1<? extends @Nullable Object>> consumer1Constructor;
+    Constructor<CancelableRunnable> runnableConstructor;
     try {
       Class<?> c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerFunction2");
 
       /* BiFunction */
 
       @SuppressWarnings(
-        { "unchecked" }) Constructor<CancelableFunction2<?, ?, ?>> cbi = (Constructor<CancelableFunction2<?, ?, ?>>) c.getConstructor(
+        { "unchecked" }) Constructor<CancelableFunction2<? extends @Nullable Object, ? extends @Nullable Object, ? extends @Nullable Object>> cbi = (Constructor<CancelableFunction2<? extends @Nullable Object, ? extends @Nullable Object, ? extends @Nullable Object>>) c.getConstructor(
         Function2.class);
       function2Constructor = cbi;
 
@@ -69,7 +68,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
 
       c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerFunction1");
       @SuppressWarnings(
-        { "unchecked" }) Constructor<CancelableFunction1<?, ?>> cf = (Constructor<CancelableFunction1<?, ?>>) c.getConstructor(
+        { "unchecked" }) Constructor<CancelableFunction1<? extends @Nullable Object, ? extends @Nullable Object>> cf = (Constructor<CancelableFunction1<? extends @Nullable Object, ? extends @Nullable Object>>) c.getConstructor(
         Function1.class);
       function1Constructor = cf;
 
@@ -77,7 +76,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
 
       c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerConsumer1");
       @SuppressWarnings(
-        { "unchecked" }) Constructor<CancelableConsumer1<?>> cc = (Constructor<CancelableConsumer1<?>>) c.getConstructor(
+        { "unchecked" }) Constructor<CancelableConsumer1<?>> cc = (Constructor<CancelableConsumer1<? extends @Nullable Object>>) c.getConstructor(
         Consumer1.class);
       consumer1Constructor = cc;
 
@@ -85,7 +84,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
 
       c = Class.forName("com.diamondq.common.tracing.opentracing.wrappers.TracerSupplier");
       @SuppressWarnings(
-        { "unchecked" }) Constructor<CancelableSupplier<?>> cs = (Constructor<CancelableSupplier<?>>) c.getConstructor(
+        { "unchecked" }) Constructor<CancelableSupplier<?>> cs = (Constructor<CancelableSupplier<? extends @Nullable Object>>) c.getConstructor(
         Supplier.class);
       supplierConstructor = cs;
 
@@ -100,22 +99,22 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
       try {
         @SuppressWarnings(
-          { "rawtypes", "unchecked" }) Constructor<CancelableFunction2<?, ?, ?>> cbi = (Constructor) NoopCancelableFunction2.class.getConstructor(
+          { "rawtypes", "unchecked" }) Constructor<CancelableFunction2<? extends @Nullable Object, ? extends @Nullable Object, ? extends @Nullable Object>> cbi = (Constructor) NoopCancelableFunction2.class.getConstructor(
           Function2.class);
         function2Constructor = cbi;
 
         @SuppressWarnings(
-          { "rawtypes", "unchecked" }) Constructor<CancelableFunction1<?, ?>> cf = (Constructor) NoopCancelableFunction1.class.getConstructor(
+          { "rawtypes", "unchecked" }) Constructor<CancelableFunction1<? extends @Nullable Object, ? extends @Nullable Object>> cf = (Constructor) NoopCancelableFunction1.class.getConstructor(
           Function1.class);
         function1Constructor = cf;
 
         @SuppressWarnings(
-          { "rawtypes", "unchecked" }) Constructor<CancelableSupplier<?>> cs = (Constructor) NoopCancelableSupplier.class.getConstructor(
+          { "rawtypes", "unchecked" }) Constructor<CancelableSupplier<? extends @Nullable Object>> cs = (Constructor) NoopCancelableSupplier.class.getConstructor(
           Supplier.class);
         supplierConstructor = cs;
 
         @SuppressWarnings(
-          { "rawtypes", "unchecked" }) Constructor<CancelableConsumer1<?>> cc = (Constructor) NoopCancelableConsumer1.class.getConstructor(
+          { "rawtypes", "unchecked" }) Constructor<CancelableConsumer1<? extends @Nullable Object>> cc = (Constructor) NoopCancelableConsumer1.class.getConstructor(
           Consumer1.class);
         consumer1Constructor = cc;
 
@@ -141,7 +140,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @SuppressWarnings("unchecked")
-  static <T, U, R> CancelableFunction2<T, U, R> wrapFunction2(Function2<T, U, R> pFn) {
+  static <T extends @Nullable Object, U extends @Nullable Object, R extends @Nullable Object> CancelableFunction2<T, U, R> wrapFunction2(
+    Function2<T, U, R> pFn) {
     try {
       return (CancelableFunction2<T, U, R>) sFunction2Constructor.newInstance(pFn);
     }
@@ -151,7 +151,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @SuppressWarnings("unchecked")
-  static <T, R> CancelableFunction1<T, R> wrapFunction1(Function1<T, R> pFn) {
+  static <T extends @Nullable Object, R extends @Nullable Object> CancelableFunction1<T, R> wrapFunction1(
+    Function1<T, R> pFn) {
     try {
       return (CancelableFunction1<T, R>) sFunction1Constructor.newInstance(pFn);
     }
@@ -161,7 +162,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @SuppressWarnings("unchecked")
-  static <T, R> CancelableConsumer1<T> wrapConsumer1(Consumer1<T> pFn) {
+  static <T extends @Nullable Object, R extends @Nullable Object> CancelableConsumer1<T> wrapConsumer1(
+    Consumer1<T> pFn) {
     try {
       return (CancelableConsumer1<T>) sConsumer1Constructor.newInstance(pFn);
     }
@@ -171,7 +173,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @SuppressWarnings("unchecked")
-  static <R> CancelableSupplier<R> wrapSupplier(Supplier<R> pFn) {
+  static <R extends @Nullable Object> CancelableSupplier<R> wrapSupplier(Supplier<R> pFn) {
     try {
       return (CancelableSupplier<R>) sSupplierConstructor.newInstance(pFn);
     }
@@ -190,16 +192,16 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @SuppressWarnings({ "null", "unused" })
-  private static <U> CompletionStage<U> decomposeToCompletionStage(ExtendedCompletionStage<U> pStage) {
-    if (pStage == null) return null;
+  private static <U extends @Nullable Object> CompletionStage<U> decomposeToCompletionStage(
+    ExtendedCompletionStage<U> pStage) {
     if (pStage instanceof ExtendedCompletableFuture) return ((ExtendedCompletableFuture<U>) pStage).mDelegate;
     /* TODO: Support ExtendedCompletionStageImpl */
     throw new UnsupportedOperationException();
   }
 
   @SuppressWarnings({ "null", "unused" })
-  protected static <U> CompletableFuture<U> decomposeToCompletableFuture(ExtendedCompletionStage<U> pFuture) {
-    if (pFuture == null) return null;
+  protected static <U extends @Nullable Object> CompletableFuture<U> decomposeToCompletableFuture(
+    ExtendedCompletionStage<U> pFuture) {
     if (pFuture instanceof ExtendedCompletableFuture) return ((ExtendedCompletableFuture<U>) pFuture).mDelegate;
     /* TODO: Support ExtendedCompletionStageImpl */
     throw new UnsupportedOperationException();
@@ -256,7 +258,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenApply(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> thenApply(Function1<T, U> pFn) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> thenApply(Function1<T, U> pFn) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
@@ -266,7 +268,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -274,7 +276,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenApplyAsync(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
@@ -284,7 +286,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -293,7 +295,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   java.util.concurrent.Executor)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn, Executor pExecutor) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> thenApplyAsync(Function1<T, U> pFn,
+    Executor pExecutor) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
@@ -303,7 +306,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -321,7 +324,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
 
   }
@@ -340,7 +343,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -359,7 +362,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -400,13 +403,14 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public ExtendedCompletableFuture<@Nullable Void> thenRunAsync(Runnable pAction, Executor pExecutor) {
     return handleAsync((t, ex) -> {
-      if (ex != null) {
-        if (ex instanceof RuntimeException) throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
-      }
-      pAction.run();
-      return null;
-    }, pExecutor);
+        if (ex != null) {
+          if (ex instanceof RuntimeException) throw (RuntimeException) ex;
+          throw new RuntimeException(ex);
+        }
+        pAction.run();
+        return null;
+      }, pExecutor
+    );
   }
 
   /**
@@ -414,7 +418,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U, V> ExtendedCompletableFuture<V> thenCombine(ExtendedCompletionStage<U> pOther, Function2<T, U, V> pFn) {
+  public <U extends @Nullable Object, V extends @Nullable Object> ExtendedCompletableFuture<V> thenCombine(
+    ExtendedCompletionStage<U> pOther, Function2<T, U, V> pFn) {
     CancelableFunction2<T, U, V> ab = wrapFunction2(pFn);
     boolean cleanupFlag = true;
     try {
@@ -424,7 +429,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -433,8 +438,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther,
-    Function2<T, U, V> pFn) {
+  public <U extends @Nullable Object, V extends @Nullable Object> ExtendedCompletableFuture<V> thenCombineAsync(
+    ExtendedCompletionStage<U> pOther, Function2<T, U, V> pFn) {
     CancelableFunction2<T, U, V> ab = wrapFunction2(pFn);
     boolean cleanupFlag = true;
     try {
@@ -446,7 +451,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -455,8 +460,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function2, java.util.concurrent.Executor)
    */
   @Override
-  public <U, V> ExtendedCompletableFuture<V> thenCombineAsync(ExtendedCompletionStage<U> pOther, Function2<T, U, V> pFn,
-    Executor pExecutor) {
+  public <U extends @Nullable Object, V extends @Nullable Object> ExtendedCompletableFuture<V> thenCombineAsync(
+    ExtendedCompletionStage<U> pOther, Function2<T, U, V> pFn, Executor pExecutor) {
     CancelableFunction2<T, U, V> ab = wrapFunction2(pFn);
     boolean cleanupFlag = true;
     try {
@@ -469,7 +474,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -478,12 +483,13 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(ExtendedCompletionStage<U> pOther,
-    Consumer2<T, U> pAction) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(
+    ExtendedCompletionStage<U> pOther, Consumer2<T, U> pAction) {
     return thenCombine(pOther, (a, b) -> {
-      pAction.accept(a, b);
-      return null;
-    });
+        pAction.accept(a, b);
+        return null;
+      }
+    );
   }
 
   /**
@@ -491,12 +497,13 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(ExtendedCompletionStage<U> pOther,
-    Consumer2<T, U> pAction) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(
+    ExtendedCompletionStage<U> pOther, Consumer2<T, U> pAction) {
     return thenCombineAsync(pOther, (a, b) -> {
-      pAction.accept(a, b);
-      return null;
-    });
+        pAction.accept(a, b);
+        return null;
+      }
+    );
   }
 
   /**
@@ -504,12 +511,13 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Consumer2, java.util.concurrent.Executor)
    */
   @Override
-  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(ExtendedCompletionStage<U> pOther,
-    Consumer2<T, U> pAction, Executor pExecutor) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(
+    ExtendedCompletionStage<U> pOther, Consumer2<T, U> pAction, Executor pExecutor) {
     return thenCombineAsync(pOther, (a, b) -> {
-      pAction.accept(a, b);
-      return null;
-    }, pExecutor);
+        pAction.accept(a, b);
+        return null;
+      }, pExecutor
+    );
   }
 
   /**
@@ -519,9 +527,10 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return thenCombine(pOther, (a, b) -> {
-      pAction.run();
-      return null;
-    });
+        pAction.run();
+        return null;
+      }
+    );
   }
 
   /**
@@ -532,9 +541,10 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther,
     Runnable pAction) {
     return thenCombineAsync(pOther, (a, b) -> {
-      pAction.run();
-      return null;
-    });
+        pAction.run();
+        return null;
+      }
+    );
   }
 
   /**
@@ -545,9 +555,10 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther,
     Runnable pAction, Executor pExecutor) {
     return thenCombineAsync(pOther, (a, b) -> {
-      pAction.run();
-      return null;
-    }, pExecutor);
+        pAction.run();
+        return null;
+      }, pExecutor
+    );
   }
 
   /**
@@ -555,7 +566,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> applyToEither(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> applyToEither(ExtendedCompletionStage<T> pOther,
+    Function1<T, U> pFn) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
@@ -565,7 +577,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -574,7 +586,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> applyToEitherAsync(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> applyToEitherAsync(ExtendedCompletionStage<T> pOther,
+    Function1<T, U> pFn) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
@@ -586,7 +599,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -595,8 +608,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function1, java.util.concurrent.Executor)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> applyToEitherAsync(ExtendedCompletionStage<T> pOther, Function1<T, U> pFn,
-    Executor pExecutor) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> applyToEitherAsync(ExtendedCompletionStage<T> pOther,
+    Function1<T, U> pFn, Executor pExecutor) {
     CancelableFunction1<T, U> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
@@ -609,7 +622,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -621,9 +634,10 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public ExtendedCompletableFuture<@Nullable Void> acceptEither(ExtendedCompletionStage<T> pOther,
     Consumer1<T> pAction) {
     return applyToEither(pOther, (t) -> {
-      pAction.accept(t);
-      return null;
-    });
+        pAction.accept(t);
+        return null;
+      }
+    );
   }
 
   /**
@@ -634,9 +648,10 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther,
     Consumer1<T> pAction) {
     return applyToEitherAsync(pOther, (t) -> {
-      pAction.accept(t);
-      return null;
-    });
+        pAction.accept(t);
+        return null;
+      }
+    );
   }
 
   /**
@@ -647,9 +662,10 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther,
     Consumer1<T> pAction, Executor pExecutor) {
     return applyToEitherAsync(pOther, (t) -> {
-      pAction.accept(t);
-      return null;
-    }, pExecutor);
+        pAction.accept(t);
+        return null;
+      }, pExecutor
+    );
   }
 
   /**
@@ -662,13 +678,14 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     boolean cleanupFlag = true;
     try {
       ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.runAfterEither(decomposeToCompletionStage(
-        pOther), ab));
+        pOther), ab
+      ));
       cleanupFlag = false;
       result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -691,7 +708,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -715,7 +732,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -723,19 +740,18 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenCompose(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> thenCompose(Function1<T, @NotNull ExtendedCompletionStage<U>> pFn) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> thenCompose(
+    Function1<T, ExtendedCompletionStage<U>> pFn) {
     CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenCompose((t) -> {
-        return decomposeToCompletionStage(ab.apply(t));
-      }));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenCompose((t) -> decomposeToCompletionStage(ab.apply(t))));
       cleanupFlag = false;
       result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -743,19 +759,19 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenComposeAsync(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> thenComposeAsync(
+    Function1<T, ExtendedCompletionStage<U>> pFn) {
     CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenComposeAsync((t) -> {
-        return decomposeToCompletionStage(ab.apply(t));
-      }));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenComposeAsync((t) -> decomposeToCompletionStage(ab.apply(
+        t))));
       cleanupFlag = false;
       result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -764,20 +780,20 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   java.util.concurrent.Executor)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> thenComposeAsync(Function1<T, ExtendedCompletionStage<U>> pFn,
-    Executor pExecutor) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> thenComposeAsync(
+    Function1<T, ExtendedCompletionStage<U>> pFn, Executor pExecutor) {
     CancelableFunction1<T, ExtendedCompletionStage<U>> ab = wrapFunction1(pFn);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenComposeAsync((t) -> {
-        return decomposeToCompletionStage(ab.apply(t));
-      }, pExecutor));
+      ExtendedCompletableFuture<U> result = relatedOf(mDelegate.thenComposeAsync((t) -> decomposeToCompletionStage(ab.apply(
+        t)), pExecutor
+      ));
       cleanupFlag = false;
       result = result.internalExceptionally(ab);
       return result;
     }
     finally {
-      if (cleanupFlag == true) ab.cancel();
+      if (cleanupFlag) ab.cancel();
     }
   }
 
@@ -820,17 +836,19 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public ExtendedCompletableFuture<T> whenCompleteAsync(Consumer2<T, @Nullable Throwable> pAction, Executor pExecutor) {
     return handleAsync((t, ex) -> {
-      @SuppressWarnings("null") T unconstraintedT = t;
-      pAction.accept(unconstraintedT, ex);
-      return unconstraintedT;
-    }, pExecutor);
+        @SuppressWarnings("null") T unconstraintedT = t;
+        pAction.accept(unconstraintedT, ex);
+        return unconstraintedT;
+      }, pExecutor
+    );
   }
 
   /**
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#handle(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> handle(Function2<@Nullable T, @Nullable Throwable, U> pFn) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> handle(
+    Function2<@Nullable T, @Nullable Throwable, U> pFn) {
     CancelableFunction2<@Nullable T, @Nullable Throwable, U> ab = wrapFunction2(pFn);
     try {
       ExtendedCompletableFuture<U> result = relatedOf(mDelegate.handle(ab));
@@ -846,7 +864,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#handleAsync(com.diamondq.common.lambda.interfaces.Function2)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> handleAsync(Function2<@Nullable T, @Nullable Throwable, U> pFn) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> handleAsync(
+    Function2<@Nullable T, @Nullable Throwable, U> pFn) {
     CancelableFunction2<@Nullable T, @Nullable Throwable, U> ab = wrapFunction2(pFn);
     try {
       ExtendedCompletableFuture<U> result = relatedOf(mDelegate.handleAsync(ab));
@@ -863,8 +882,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   java.util.concurrent.Executor)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> handleAsync(Function2<@Nullable T, @Nullable Throwable, U> pFn,
-    Executor pExecutor) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> handleAsync(
+    Function2<@Nullable T, @Nullable Throwable, U> pFn, Executor pExecutor) {
     CancelableFunction2<@Nullable T, @Nullable Throwable, U> ab = wrapFunction2(pFn);
     try {
       ExtendedCompletableFuture<U> result = relatedOf(mDelegate.handleAsync(ab, pExecutor));
@@ -906,8 +925,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   @Override
   public ExtendedCompletionStage<T> exceptionallyCompose(Function1<Throwable, ExtendedCompletionStage<T>> pFn) {
     return exceptionally((ex) -> {
-      ExceptionMarker em = new ExceptionMarker(ex);
-      Object emo = em;
+      Object emo = new ExceptionMarker(ex);
       @SuppressWarnings("unchecked") T t = (T) emo;
       return t;
     }).thenCompose((x) -> {
@@ -924,14 +942,14 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   public ExtendedCompletionStage<T> exceptionallyCompose(Function1<Throwable, ExtendedCompletionStage<T>> pFn,
     Executor pExecutor) {
     return exceptionally((ex) -> {
-      ExceptionMarker em = new ExceptionMarker(ex);
-      Object emo = em;
+      Object emo = new ExceptionMarker(ex);
       @SuppressWarnings("unchecked") T t = (T) emo;
       return t;
     }).thenComposeAsync((x) -> {
-      if (x instanceof ExceptionMarker) return pFn.apply(((ExceptionMarker) x).throwable);
-      else return relatedCompletedFuture(x);
-    }, pExecutor);
+        if (x instanceof ExceptionMarker) return pFn.apply(((ExceptionMarker) x).throwable);
+        else return relatedCompletedFuture(x);
+      }, pExecutor
+    );
   }
 
   public boolean cancel(boolean pMayInterruptIfRunning) {
@@ -974,11 +992,12 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     mDelegate = pFuture;
   }
 
-  public static <T> ExtendedCompletableFuture<T> newCompletableFuture() {
+  public static <T extends @Nullable Object> ExtendedCompletableFuture<T> newCompletableFuture() {
     return new ExtendedCompletableFuture<>();
   }
 
-  public static <T> ExtendedCompletionStage<List<T>> listOf(List<? extends ExtendedCompletionStage<T>> cfs) {
+  public static <T extends @Nullable Object> ExtendedCompletionStage<List<T>> listOf(
+    List<? extends ExtendedCompletionStage<T>> cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
     int i = 0;
     for (ExtendedCompletionStage<T> cf : cfs)
@@ -986,7 +1005,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     return of(CompletableFuture.allOf(args).thenApply((v) -> {
       List<T> results = new ArrayList<>();
       for (ExtendedCompletionStage<T> stage : cfs) {
-        if (stage instanceof ExtendedCompletableFuture) results.add(((ExtendedCompletableFuture<T>) stage).join());
+        if (stage instanceof ExtendedCompletableFuture) results.add((stage).join());
         else throw new UnsupportedOperationException();
       }
       return results;
@@ -1001,7 +1020,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @param <U> the function's return type
    * @return the new CompletableFuture
    */
-  public static <U> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier) {
+  public static <U extends @Nullable Object> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier) {
     CancelableSupplier<U> ab = wrapSupplier(supplier);
     try {
       ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(CompletableFuture.supplyAsync(ab));
@@ -1022,7 +1041,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @param <U> the function's return type
    * @return the new CompletableFuture
    */
-  public static <U> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor) {
+  public static <U extends @Nullable Object> ExtendedCompletableFuture<U> supplyAsync(Supplier<U> supplier,
+    Executor executor) {
     CancelableSupplier<U> ab = wrapSupplier(supplier);
     try {
       ExtendedCompletableFuture<U> result = ExtendedCompletableFuture.of(CompletableFuture.supplyAsync(ab, executor));
@@ -1108,8 +1128,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     }
   }
 
-  public static ExtendedCompletableFuture<@Nullable Void> allOf(@NotNull ExtendedCompletableFuture<?>... cfs) {
-    @NotNull CompletableFuture<?>[] args = new @NotNull CompletableFuture<?>[cfs.length];
+  public static ExtendedCompletableFuture<@Nullable Void> allOf(ExtendedCompletableFuture<?>... cfs) {
+    CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
     for (int i = 0; i < cfs.length; i++)
       args[i] = decomposeToCompletableFuture(cfs[i]);
     return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
@@ -1131,14 +1151,14 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
   }
 
-  public static ExtendedCompletableFuture<@Nullable Object> anyOf(@NotNull ExtendedCompletableFuture<?>... cfs) {
+  public static ExtendedCompletableFuture<@Nullable Object> anyOf(ExtendedCompletableFuture<?>... cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
     for (int i = 0; i < cfs.length; i++)
       args[i] = decomposeToCompletableFuture(cfs[i]);
     return ExtendedCompletableFuture.of(CompletableFuture.anyOf(args));
   }
 
-  public static <U> ExtendedCompletableFuture<U> completedFuture(U value) {
+  public static <U extends @Nullable Object> ExtendedCompletableFuture<U> completedFuture(U value) {
     return ExtendedCompletableFuture.of(CompletableFuture.completedFuture(value));
   }
 
@@ -1146,7 +1166,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedCompletedFuture(java.lang.Object)
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> relatedCompletedFuture(U value) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> relatedCompletedFuture(U value) {
     return relatedOf(CompletableFuture.completedFuture(value));
   }
 
@@ -1154,7 +1174,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedNewFuture()
    */
   @Override
-  public <U> ExtendedCompletableFuture<U> relatedNewFuture() {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> relatedNewFuture() {
     return new ExtendedCompletableFuture<>();
   }
 
@@ -1164,7 +1184,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @param pFuture the existing CompletableFuture
    * @return the new ExtendedCompletableFuture
    */
-  public static <U> ExtendedCompletableFuture<U> of(CompletableFuture<U> pFuture) {
+  public static <U extends @Nullable Object> ExtendedCompletableFuture<U> of(CompletableFuture<U> pFuture) {
     return new ExtendedCompletableFuture<>(pFuture);
   }
 
@@ -1172,7 +1192,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedOf(java.util.concurrent.CompletionStage)
    */
   @Override
-  public <U> ExtendedCompletionStage<U> relatedOf(CompletionStage<U> pFuture) {
+  public <U extends @Nullable Object> ExtendedCompletionStage<U> relatedOf(CompletionStage<U> pFuture) {
     if (pFuture instanceof CompletableFuture) return new ExtendedCompletableFuture<>((CompletableFuture<U>) pFuture);
     return new ExtendedCompletableFuture<>(pFuture.toCompletableFuture());
   }
@@ -1185,7 +1205,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @param pFuture the existing CompletableFuture
    * @return the new ExtendedCompletableFuture
    */
-  public <U> ExtendedCompletableFuture<U> relatedOf(CompletableFuture<U> pFuture) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> relatedOf(CompletableFuture<U> pFuture) {
     return new ExtendedCompletableFuture<>(pFuture);
   }
 
@@ -1228,7 +1248,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @param pEx the exception
    * @return the future
    */
-  public static <U> ExtendedCompletableFuture<U> completedFailure(Throwable pEx) {
+  public static <U extends @Nullable Object> ExtendedCompletableFuture<U> completedFailure(Throwable pEx) {
     CompletableFuture<U> result = new CompletableFuture<>();
     result.completeExceptionally(pEx);
     return ExtendedCompletableFuture.of(result);
@@ -1241,7 +1261,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @param pEx the exception
    * @return the future
    */
-  public <U> ExtendedCompletableFuture<U> relatedCompletedFailure(Throwable pEx) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<U> relatedCompletedFailure(Throwable pEx) {
     CompletableFuture<U> result = new CompletableFuture<>();
     result.completeExceptionally(pEx);
     return relatedOf(result);
@@ -1252,11 +1272,11 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <C, U> ExtendedCompletableFuture<?> continueComposeIf(Class<C> pClass,
-    Function1<C, ExtendedCompletionStage<U>> pFunc) {
+  public <C extends @Nullable Object, U extends @Nullable Object> ExtendedCompletableFuture<?> continueComposeIf(
+    Class<C> pClass, Function1<C, ExtendedCompletionStage<U>> pFunc) {
     @SuppressWarnings({ "null", "unchecked" }) Function1<T, ExtendedCompletionStage<Object>> fn = (result) -> {
       if (result != null) {
-        if (pClass.isInstance(result) == true) {
+        if (pClass.isInstance(result)) {
           @SuppressWarnings("unchecked") C input = (C) result;
           return (ExtendedCompletionStage<Object>) pFunc.apply(input);
         }
@@ -1271,10 +1291,11 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <C, U> ExtendedCompletableFuture<?> continueIf(Class<C> pClass, Function1<C, U> pFunc) {
+  public <C extends @Nullable Object, U extends @Nullable Object> ExtendedCompletableFuture<?> continueIf(
+    Class<C> pClass, Function1<C, U> pFunc) {
     @SuppressWarnings("unchecked") Function1<T, U> fn = (result) -> {
       if (result != null) {
-        if (pClass.isInstance(result) == true) {
+        if (pClass.isInstance(result)) {
           @SuppressWarnings("unchecked") C input = (C) result;
           return pFunc.apply(input);
         }
@@ -1288,7 +1309,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenComposeWhenNotNull(com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <U> ExtendedCompletionStage<@Nullable U> thenComposeWhenNotNull(
+  public <U extends @Nullable Object> ExtendedCompletionStage<@Nullable U> thenComposeWhenNotNull(
     Function1<T, ExtendedCompletionStage<@Nullable U>> pFunc) {
     return thenCompose((result) -> {
       if (result == null) return relatedCompletedFuture(null);
@@ -1301,10 +1322,10 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function1, com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <R> ExtendedCompletableFuture<R> splitCompose(Predicate<T> pBoolFunc,
+  public <R extends @Nullable Object> ExtendedCompletableFuture<R> splitCompose(Predicate<T> pBoolFunc,
     Function1<T, ExtendedCompletionStage<R>> pTrueFunc, Function1<T, ExtendedCompletionStage<R>> pFalseFunc) {
     Function1<T, ExtendedCompletionStage<R>> fn = (input) -> {
-      if (pBoolFunc.test(input) == true) return pTrueFunc.apply(input);
+      if (pBoolFunc.test(input)) return pTrueFunc.apply(input);
       else return pFalseFunc.apply(input);
     };
     return thenCompose(fn);
@@ -1315,10 +1336,10 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    *   com.diamondq.common.lambda.interfaces.Function1, com.diamondq.common.lambda.interfaces.Function1)
    */
   @Override
-  public <R> ExtendedCompletableFuture<R> splitApply(Predicate<T> pBoolFunc, Function1<T, R> pTrueFunc,
-    Function1<T, R> pFalseFunc) {
+  public <R extends @Nullable Object> ExtendedCompletableFuture<R> splitApply(Predicate<T> pBoolFunc,
+    Function1<T, R> pTrueFunc, Function1<T, R> pFalseFunc) {
     Function1<T, R> fn = (input) -> {
-      if (pBoolFunc.test(input) == true) return pTrueFunc.apply(input);
+      if (pBoolFunc.test(input)) return pTrueFunc.apply(input);
       else return pFalseFunc.apply(input);
     };
     return thenApply(fn);
@@ -1335,13 +1356,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     return applyToEitherAsync(result, (v) -> v, pService);
   }
 
-  /**
-   * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#completeOnTimeout​Async(java.lang.Object, long,
-   *   java.util.concurrent.TimeUnit, java.util.concurrent.ScheduledExecutorService)
-   */
-  @SuppressWarnings("javadoc")
   @Override
-  public ExtendedCompletionStage<T> completeOnTimeout​Async(T pValue, long pTimeout, TimeUnit pUnit,
+  public ExtendedCompletionStage<T> completeOnTimeoutAsync(T pValue, long pTimeout, TimeUnit pUnit,
     ScheduledExecutorService pService) {
     ExtendedCompletableFuture<T> result = relatedNewFuture();
     pService.schedule(() -> result.complete(pValue), pTimeout, pUnit);
@@ -1365,8 +1381,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedAllOf(com.diamondq.common.lambda.future.ExtendedCompletionStage[])
    */
   @Override
-  public ExtendedCompletionStage<@Nullable Void> relatedAllOf(@NotNull ExtendedCompletionStage<?>... cfs) {
-    @NotNull CompletableFuture<?>[] args = new @NotNull CompletableFuture<?>[cfs.length];
+  public ExtendedCompletionStage<@Nullable Void> relatedAllOf(ExtendedCompletionStage<?>... cfs) {
+    CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
     for (int i = 0; i < cfs.length; i++)
       args[i] = decomposeToCompletableFuture(cfs[i]);
     return relatedOf(CompletableFuture.allOf(args));
@@ -1387,7 +1403,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedAnyOf(com.diamondq.common.lambda.future.ExtendedCompletionStage[])
    */
   @Override
-  public ExtendedCompletionStage<@Nullable Object> relatedAnyOf(@NotNull ExtendedCompletionStage<?>... cfs) {
+  public ExtendedCompletionStage<@Nullable Object> relatedAnyOf(ExtendedCompletionStage<?>... cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
     for (int i = 0; i < cfs.length; i++)
       args[i] = decomposeToCompletableFuture(cfs[i]);
@@ -1395,7 +1411,8 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
   }
 
   @Override
-  public <U> ExtendedCompletionStage<List<U>> relatedListOf(Collection<? extends ExtendedCompletionStage<U>> cfs) {
+  public <U extends @Nullable Object> ExtendedCompletionStage<List<U>> relatedListOf(
+    Collection<? extends ExtendedCompletionStage<U>> cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
     int i = 0;
     for (ExtendedCompletionStage<U> cf : cfs)
@@ -1403,7 +1420,7 @@ public class ExtendedCompletableFuture<T> implements ExtendedCompletionStage<T> 
     return relatedOf(CompletableFuture.allOf(args).thenApply((v) -> {
       List<U> results = new ArrayList<>();
       for (ExtendedCompletionStage<U> stage : cfs) {
-        if (stage instanceof ExtendedCompletableFuture) results.add(((ExtendedCompletableFuture<U>) stage).join());
+        if (stage instanceof ExtendedCompletableFuture) results.add((stage).join());
         else throw new UnsupportedOperationException();
       }
       return results;

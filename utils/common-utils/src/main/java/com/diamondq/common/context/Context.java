@@ -1,8 +1,7 @@
 package com.diamondq.common.context;
 
 import com.diamondq.common.errors.I18NStringAndException;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -115,7 +114,7 @@ public interface Context extends AutoCloseable {
    * @param pKey the key
    * @param pValue the value
    */
-  <@NotNull T> void setData(String pKey, T pValue);
+  <T> void setData(String pKey, T pValue);
 
   /**
    * Retrieve data associated with the current context (or parent contexts)

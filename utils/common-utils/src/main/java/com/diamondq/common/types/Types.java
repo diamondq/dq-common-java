@@ -2,7 +2,7 @@ package com.diamondq.common.types;
 
 import com.diamondq.common.TypeReference;
 import com.diamondq.common.i18n.I18NString;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;

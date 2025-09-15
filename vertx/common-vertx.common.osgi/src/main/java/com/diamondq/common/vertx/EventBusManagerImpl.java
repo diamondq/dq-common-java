@@ -11,7 +11,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.servicediscovery.ServiceDiscovery;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,15 +68,17 @@ public class EventBusManagerImpl implements EventBusManager {
       queueSize = 0;
       inflight = 0;
       pMeterRegistry.gauge("eventbus.queueSize." + pAddress, "", (v) -> {
-        synchronized (SendQueue.this) {
-          return SendQueue.this.queueSize;
+          synchronized (SendQueue.this) {
+            return SendQueue.this.queueSize;
+          }
         }
-      });
+      );
       pMeterRegistry.gauge("eventbus.inflight." + pAddress, "", (v) -> {
-        synchronized (SendQueue.this) {
-          return SendQueue.this.inflight;
+          synchronized (SendQueue.this) {
+            return SendQueue.this.inflight;
+          }
         }
-      });
+      );
       maxInflight = pMaxInflight;
     }
 
@@ -216,20 +218,20 @@ public class EventBusManagerImpl implements EventBusManager {
 
       ctx.prepareForAlternateThreads();
       mVertx.eventBus().<Boolean>request(sendQueue.address, pToSend, options, (ar) -> {
-        try (Context ctx2 = ctx.activateOnThread("after Vertx.send: {}", ar)) {
-          synchronized (sendQueue) {
-            sendQueue.inflight--;
-          }
-          if (ar.succeeded() == false) {
-            Throwable cause = ar.cause();
-            if (cause == null) cause = new RuntimeException();
+          try (Context ctx2 = ctx.activateOnThread("after Vertx.send: {}", ar)) {
+            synchronized (sendQueue) {
+              sendQueue.inflight--;
+            }
+            if (ar.succeeded() == false) {
+              Throwable cause = ar.cause();
+              if (cause == null) cause = new RuntimeException();
 //            sendQueue.pendingResults.decrementAndGet();
 //            toProcess.processingComplete.unregister();
 //            toProcess.resultFuture.completeExceptionally(cause);
 //            ctx2.error("Received error for ({}) address {}: {}", messageId, sendQueue.address, cause);
-          }
+            }
 
-          /* At this point, if there are still jobs to process, we can trigger them */
+            /* At this point, if there are still jobs to process, we can trigger them */
 
 //          while ((sendQueue.inflight.get() < sendQueue.maxInflight) && (sendQueue.queueSize.get() > 0)) {
 //            sendOneMessage(sendQueue);
@@ -237,8 +239,9 @@ public class EventBusManagerImpl implements EventBusManager {
 
 //          ctx2.trace("end sendOneMessage -> {} in flight / {} queue size", sendQueue.inflight.get(),
 //            sendQueue.queueSize.get());
+          }
         }
-      });
+      );
       return null;
     }
 

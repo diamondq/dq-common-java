@@ -3,7 +3,7 @@ package com.diamondq.common.injection.impl;
 import com.diamondq.common.injection.InjectionContext;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.inject.qualifiers.Qualifiers;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;

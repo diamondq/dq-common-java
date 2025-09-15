@@ -33,8 +33,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -164,19 +163,20 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
   public Structure createNewTombstoneStructure(Toolkit pToolkit, Scope pScope, Structure pOldStructure) {
     Map<String, Property<?>> oldProperties = pOldStructure.getProperties();
     @SuppressWarnings("null") Map<String, Property<?>> newProps = Maps.transformEntries(oldProperties, (key, value) -> {
-      if (value == null) return null;
+        if (value == null) return null;
 
-      /* Leave primary keys alone */
+        /* Leave primary keys alone */
 
-      if (value.getDefinition().isPrimaryKey() == true) return value;
+        if (value.getDefinition().isPrimaryKey() == true) return value;
 
-      /* Leave container references alone */
+        /* Leave container references alone */
 
-      if (value.getDefinition().getKeywords().containsKey(CommonKeywordKeys.CONTAINER)) return value;
+        if (value.getDefinition().getKeywords().containsKey(CommonKeywordKeys.CONTAINER)) return value;
 
-      /* Clear out the rest */
-      return value.clearValueSet();
-    });
+        /* Clear out the rest */
+        return value.clearValueSet();
+      }
+    );
     return new GenericTombstoneStructure(pScope, pOldStructure.getDefinition(), newProps);
   }
 
@@ -699,20 +699,21 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
       List<Pair<String, Boolean>> sortList = gq.getSortList();
       if (sortList.isEmpty() == false) {
         Collections.sort(results, (s1, s2) -> {
-          int sortResult = 0;
-          for (Pair<String, Boolean> sort : sortList) {
-            Object o1 = s1.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s1);
-            Object o2 = s2.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s2);
-            if (o1 instanceof Comparable) {
-              @SuppressWarnings("unchecked") Comparable<Object> c1 = (Comparable<Object>) o1;
-              if (o2 == null) sortResult = -1;
-              else sortResult = c1.compareTo(o2);
-            } else throw new IllegalArgumentException();
-            if (sort.getValue1() == false) sortResult *= -1;
-            if (sortResult != 0) break;
+            int sortResult = 0;
+            for (Pair<String, Boolean> sort : sortList) {
+              Object o1 = s1.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s1);
+              Object o2 = s2.lookupMandatoryPropertyByName(sort.getValue0()).getValue(s2);
+              if (o1 instanceof Comparable) {
+                @SuppressWarnings("unchecked") Comparable<Object> c1 = (Comparable<Object>) o1;
+                if (o2 == null) sortResult = -1;
+                else sortResult = c1.compareTo(o2);
+              } else throw new IllegalArgumentException();
+              if (sort.getValue1() == false) sortResult *= -1;
+              if (sortResult != 0) break;
+            }
+            return sortResult;
           }
-          return sortResult;
-        });
+        );
       }
 
       return context.exit(ImmutableList.copyOf(results));
@@ -809,7 +810,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
    */
   @Override
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Toolkit pToolkit, Scope pScope,
-    StandardMigrations pMigrationType, @NotNull Object @Nullable [] pParams) {
+    StandardMigrations pMigrationType, Object @Nullable [] pParams) {
     switch (pMigrationType) {
       case RENAME_COLUMN: {
         if (pParams == null) throw new IllegalArgumentException();
@@ -822,7 +823,7 @@ public abstract class AbstractPersistenceLayer implements PersistenceLayer {
       }
       case COPY_COLUMNS: {
         if (pParams == null) pParams = new String[0];
-        @SuppressWarnings("null") @NotNull String[] sParams = new String[pParams.length];
+        String[] sParams = new String[pParams.length];
         for (int i = 0; i < sParams.length; i++) {
           if ((pParams[i] instanceof String) == false) throw new IllegalArgumentException();
           sParams[i] = (String) pParams[i];

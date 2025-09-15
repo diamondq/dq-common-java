@@ -6,7 +6,7 @@ import com.diamondq.common.i18n.MessagesEnum;
 import com.diamondq.common.types.Types;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -25,13 +25,12 @@ public class MapToI18NStringConverter extends AbstractConverter<Map<String, @Nul
     String enumName = Objects.requireNonNull((String) pInput.get("n"));
     String enumClassName = Objects.requireNonNull((String) pInput.get("c"));
     Object enumValue = getEnum(enumName, enumClassName);
-    if (!(enumValue instanceof MessagesEnum))
+    if (!(enumValue instanceof final MessagesEnum messageEnum))
       throw new IllegalArgumentException("Unable to case " + enumValue.getClass().getName() + " to MessageEnum");
-    MessagesEnum messageEnum = (MessagesEnum) enumValue;
 
     /* Get the params */
 
-    @Nullable Object @Nullable [] params;
+    @Nullable Object[] params;
     int size = Objects.requireNonNull((Integer) pInput.get("s"));
     if (size < 0) params = null;
     else if (size == 0) params = new Object[0];
@@ -41,7 +40,7 @@ public class MapToI18NStringConverter extends AbstractConverter<Map<String, @Nul
         "unchecked") List<@Nullable Object> paramList = Objects.requireNonNull((List<@Nullable Object>) pInput.get("p"));
       if (paramList.size() != size) throw new IllegalArgumentException();
       for (int i = 0; i < size; i++) {
-        @Nullable Object param = paramList.get(i);
+        Object param = paramList.get(i);
         params[i] = param;
       }
     }

@@ -10,7 +10,7 @@ import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.metrics.micrometer.SLF4JReporter;
 import com.diamondq.common.metrics.micrometer.SimpleMeterRegistryProvider;
 import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 

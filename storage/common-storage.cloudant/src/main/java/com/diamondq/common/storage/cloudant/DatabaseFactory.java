@@ -4,7 +4,7 @@ import com.cloudant.client.api.ClientBuilder;
 import com.cloudant.client.api.CloudantClient;
 import com.cloudant.client.api.Database;
 import com.google.gson.GsonBuilder;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.net.MalformedURLException;
 import java.net.URL;

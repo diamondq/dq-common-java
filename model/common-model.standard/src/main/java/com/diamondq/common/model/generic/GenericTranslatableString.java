@@ -2,7 +2,7 @@ package com.diamondq.common.model.generic;
 
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.TranslatableString;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Objects;

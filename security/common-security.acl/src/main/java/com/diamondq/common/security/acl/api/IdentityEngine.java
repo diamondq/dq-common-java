@@ -1,7 +1,7 @@
 package com.diamondq.common.security.acl.api;
 
 import com.diamondq.common.security.acl.model.UserInfo;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface IdentityEngine {
 
-  public @Nullable UserInfo getIdentity(HttpServletRequest pRequest);
+  @Nullable
+  UserInfo getIdentity(HttpServletRequest pRequest);
 
 }

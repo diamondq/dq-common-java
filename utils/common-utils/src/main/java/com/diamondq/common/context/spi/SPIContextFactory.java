@@ -1,7 +1,7 @@
 package com.diamondq.common.context.spi;
 
 import com.diamondq.common.context.ContextFactory;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 import java.util.function.Function;
@@ -18,9 +18,9 @@ public interface SPIContextFactory extends ContextFactory {
 
   void detachContextFromThread(ContextClass pContext);
 
-  <T> T internalExitValue(ContextClass pContext, T pResult);
+  <T extends @Nullable Object> T internalExitValue(ContextClass pContext, T pResult);
 
-  <T> T internalExitValueWithMeta(ContextClass pContext, T pResult,
+  <T extends @Nullable Object> T internalExitValueWithMeta(ContextClass pContext, T pResult,
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
 
   void internalReportTrace(ContextClass pContext, @Nullable Object @Nullable [] pArgs);

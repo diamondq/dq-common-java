@@ -1,7 +1,7 @@
 package com.diamondq.common.security.acl.spi;
 
 import com.diamondq.common.security.acl.api.SecurityContext;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface SecurityContextSerializer {
 
@@ -10,7 +10,7 @@ public interface SecurityContextSerializer {
    *
    * @return the id
    */
-  public String getSerializerId();
+  String getSerializerId();
 
   /**
    * Serialize the security context into a series of bytes. If this returns a null, then it's assumed that this
@@ -19,7 +19,7 @@ public interface SecurityContextSerializer {
    * @param pContext the context
    * @return the serialized bytes
    */
-  public byte @Nullable [] serialize(SecurityContext pContext);
+  byte @Nullable [] serialize(SecurityContext pContext);
 
   /**
    * Deserialize the bytes into a SecurityContext
@@ -28,5 +28,5 @@ public interface SecurityContextSerializer {
    * @param pBytes the bytes
    * @return the SecurityContext the further deserialized context
    */
-  public SecurityContext deserialize(@Nullable SecurityContext pPartialContext, byte[] pBytes);
+  SecurityContext deserialize(@Nullable SecurityContext pPartialContext, byte[] pBytes);
 }

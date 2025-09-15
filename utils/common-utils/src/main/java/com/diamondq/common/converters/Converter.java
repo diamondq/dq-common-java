@@ -1,31 +1,32 @@
 package com.diamondq.common.converters;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
-public interface Converter<I, O> {
+public interface Converter<I extends @Nullable Object, O extends @Nullable Object> {
 
   /**
    * Returns a group name to group a set of converters together
    *
    * @return the optional name. Null represents the default group
    */
-  public @Nullable String getGroupName();
+  @Nullable
+  String getGroupName();
 
   /**
-   * Returns the type (Class, ParameterizedType, etc) that this convert takes as an input
+   * Returns the type (Class, ParameterizedType, etc.) that this convert takes as an input
    *
    * @return the input type
    */
-  public Type getInputType();
+  Type getInputType();
 
   /**
-   * Returns the type (Class, ParameterizedType, etc) that this convert returns as an output
+   * Returns the type (Class, ParameterizedType, etc.) that this convert returns as an output
    *
    * @return the output type
    */
-  public Type getOutputType();
+  Type getOutputType();
 
   /**
    * Converts an input to an output
@@ -33,5 +34,5 @@ public interface Converter<I, O> {
    * @param pInput the input
    * @return the output
    */
-  public O convert(I pInput);
+  O convert(I pInput);
 }

@@ -5,7 +5,7 @@ import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer.SpanBuilder;
 import io.opentracing.tag.Tag;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class MDCSpanBuilder implements SpanBuilder {
 
@@ -94,8 +94,6 @@ public class MDCSpanBuilder implements SpanBuilder {
     if (result == mDelegate) return this;
     return new MDCSpanBuilder(result, mExtractor);
   }
-
-  ;
 
   /**
    * @see io.opentracing.Tracer.SpanBuilder#withStartTimestamp(long)

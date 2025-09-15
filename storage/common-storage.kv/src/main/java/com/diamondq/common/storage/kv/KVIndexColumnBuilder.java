@@ -1,18 +1,17 @@
 package com.diamondq.common.storage.kv;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The Index Column Builder
  *
  * @param <ICB> the actual type of the Index Column Builder
  */
-public abstract class KVIndexColumnBuilder<@NotNull ICB extends KVIndexColumnBuilder<@NotNull ICB>> {
+public abstract class KVIndexColumnBuilder<ICB extends KVIndexColumnBuilder<ICB>> {
 
-  @Nullable protected String mName;
+  protected @Nullable String mName;
 
-  @Nullable protected KVColumnType mType;
+  protected @Nullable KVColumnType mType;
 
   /**
    * Builds the actual Index Column

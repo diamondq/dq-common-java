@@ -22,8 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -77,7 +76,7 @@ public class CloudantKVStore
    * @see com.diamondq.common.storage.kv.IKVStore
    */
   @Override
-  public <TDB extends @NotNull KVTableDefinitionBuilder<@NotNull TDB>, CDB extends @NotNull KVColumnDefinitionBuilder<@NotNull CDB>> @Nullable IKVTableDefinitionSupport<@NotNull TDB, @NotNull CDB> getTableDefinitionSupport() {
+  public <TDB extends KVTableDefinitionBuilder<TDB>, CDB extends KVColumnDefinitionBuilder<CDB>> @Nullable IKVTableDefinitionSupport<TDB, CDB> getTableDefinitionSupport() {
     return null;
   }
 
@@ -86,8 +85,8 @@ public class CloudantKVStore
    */
   @SuppressWarnings("unchecked")
   @Override
-  public <ICB extends @NotNull KVIndexColumnBuilder<@NotNull ICB>, IDB extends @NotNull KVIndexDefinitionBuilder<@NotNull IDB>> @Nullable IKVIndexSupport<@NotNull ICB, @NotNull IDB> getIndexSupport() {
-    return (@Nullable IKVIndexSupport<@NotNull ICB, @NotNull IDB>) this;
+  public <ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> @Nullable IKVIndexSupport<ICB, IDB> getIndexSupport() {
+    return (@Nullable IKVIndexSupport<ICB, IDB>) this;
   }
 
   /**

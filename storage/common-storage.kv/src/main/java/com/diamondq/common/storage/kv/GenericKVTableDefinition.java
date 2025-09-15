@@ -3,8 +3,7 @@ package com.diamondq.common.storage.kv;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -19,7 +18,7 @@ public class GenericKVTableDefinition implements IKVTableDefinition {
 
   private final @Nullable String mSinglePrimaryKeyName;
 
-  private final List<@NotNull IKVColumnDefinition> mColumnDefinitions;
+  private final List<IKVColumnDefinition> mColumnDefinitions;
 
   private final Map<String, IKVColumnDefinition> mColumnDefinitionsByName;
 
@@ -31,16 +30,16 @@ public class GenericKVTableDefinition implements IKVTableDefinition {
    * @param pColumnDefinitions the list of columns
    */
   public GenericKVTableDefinition(String pTableName, @Nullable String pSinglePrimaryKeyName,
-    List<@NotNull IKVColumnDefinition> pColumnDefinitions) {
+    List<IKVColumnDefinition> pColumnDefinitions) {
     super();
     mTableName = pTableName;
     mSinglePrimaryKeyName = pSinglePrimaryKeyName;
     mColumnDefinitions = ImmutableList.copyOf(pColumnDefinitions);
-    mColumnDefinitionsByName = ImmutableMap.copyOf(Iterables.<@NotNull IKVColumnDefinition, Map.Entry<String, IKVColumnDefinition>>transform(
+    mColumnDefinitionsByName = ImmutableMap.copyOf(Iterables.<IKVColumnDefinition, Map.Entry<String, IKVColumnDefinition>>transform(
       pColumnDefinitions,
       (cd) -> {
         if (cd == null) throw new IllegalArgumentException();
-        return new AbstractMap.SimpleEntry<String, IKVColumnDefinition>(cd.getName(), cd);
+        return new AbstractMap.SimpleEntry<>(cd.getName(), cd);
       }
     ));
   }
@@ -65,7 +64,7 @@ public class GenericKVTableDefinition implements IKVTableDefinition {
    * @see com.diamondq.common.storage.kv.IKVTableDefinition#getColumnDefinitions()
    */
   @Override
-  public List<@NotNull IKVColumnDefinition> getColumnDefinitions() {
+  public List<IKVColumnDefinition> getColumnDefinitions() {
     return mColumnDefinitions;
   }
 

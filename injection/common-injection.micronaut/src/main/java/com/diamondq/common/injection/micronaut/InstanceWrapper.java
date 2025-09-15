@@ -2,8 +2,7 @@ package com.diamondq.common.injection.micronaut;
 
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.util.TypeLiteral;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
@@ -26,11 +25,8 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
     return mList.iterator();
   }
 
-  /**
-   * @see javax.inject.Provider#get()
-   */
   @Override
-  public @NotNull T get() {
+  public T get() {
     return Objects.requireNonNull(mList.get(0));
   }
 
@@ -50,10 +46,6 @@ public class InstanceWrapper<T> implements Instance<@Nullable T> {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * @see jakarta.enterprise.inject.Instance#select(javax.enterprise.util.TypeLiteral,
-   *   java.lang.annotation.Annotation[])
-   */
   @Override
   public <U extends T> Instance<U> select(@SuppressWarnings("null") TypeLiteral<U> pSubtype,
     Annotation @Nullable ... pQualifiers) {

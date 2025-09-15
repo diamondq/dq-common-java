@@ -1,20 +1,20 @@
 package com.diamondq.common.storage.kv.impl;
 
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Generic implementation of an Id and Revision wrapper
+ * Generic implementation of an ID and Revision wrapper
  *
  * @param <P> the actual type
  */
 public class IdAndRevisionWrapper<P> implements IObjectWithIdAndRev<IdAndRevisionWrapper<P>> {
 
-  @Nullable private String _id;
+  private @Nullable String _id;
 
-  @Nullable private String _rev;
+  private @Nullable String _rev;
 
-  @Nullable private P data;
+  private @Nullable P data;
 
   /**
    * Default constructor

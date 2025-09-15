@@ -6,10 +6,10 @@ import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureAndProperty;
 import com.diamondq.common.model.interfaces.StructureRef;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("rawtypes")
-public class GenericPropertyRef<@Nullable T> extends AbstractRef<Property> implements PropertyRef<T> {
+public class GenericPropertyRef<T extends @Nullable Object> extends AbstractRef<Property> implements PropertyRef<T> {
 
   public GenericPropertyRef(Scope pScope, StructureRef pStructureRef, @Nullable String pPropDefName) {
     super(pScope,

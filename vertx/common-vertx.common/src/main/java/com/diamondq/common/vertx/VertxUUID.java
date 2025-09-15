@@ -2,7 +2,7 @@ package com.diamondq.common.vertx;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -163,7 +163,7 @@ public class VertxUUID implements Comparable<VertxUUID> {
   /**
    * Returns the most significant 64 bits of this UUID's 128 bit value.
    *
-   * @return The most significant 64 bits of this UUID's 128 bit value
+   * @return The most significant 64 bits of this UUID's 128-bit value
    */
   public long getMostSignificantBits() {
     return mostSigBits;
@@ -210,7 +210,7 @@ public class VertxUUID implements Comparable<VertxUUID> {
   /**
    * The timestamp value associated with this UUID.
    * <p>
-   * The 60 bit timestamp value is constructed from the time_low, time_mid, and time_hi fields of this {@code UUID}. The
+   * The 60-bit timestamp value is constructed from the time_low, time_mid, and time_hi fields of this {@code UUID}. The
    * resulting timestamp is measured in 100-nanosecond units since midnight, October 15, 1582 UTC.
    * <p>
    * The timestamp value is only meaningful in a time-based UUID, which has version type 1. If this {@code UUID} is not
@@ -230,7 +230,7 @@ public class VertxUUID implements Comparable<VertxUUID> {
   /**
    * The clock sequence value associated with this UUID.
    * <p>
-   * The 14 bit clock sequence value is constructed from the clock sequence field of this UUID. The clock sequence field
+   * The 14-bit clock sequence value is constructed from the clock sequence field of this UUID. The clock sequence field
    * is used to guarantee temporal uniqueness in a time-based UUID.
    * <p>
    * The {@code clockSequence} value is only meaningful in a time-based UUID, which has version type 1. If this UUID is
@@ -250,7 +250,7 @@ public class VertxUUID implements Comparable<VertxUUID> {
   /**
    * The node value associated with this UUID.
    * <p>
-   * The 48 bit node value is constructed from the node field of this UUID. This field is intended to hold the IEEE 802
+   * The 48-bit node value is constructed from the node field of this UUID. This field is intended to hold the IEEE 802
    * address of the machine that generated this UUID to guarantee spatial uniqueness.
    * <p>
    * The node value is only meaningful in a time-based UUID, which has version type 1. If this UUID is not a time-based

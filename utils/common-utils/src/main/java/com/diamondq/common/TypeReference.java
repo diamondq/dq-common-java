@@ -1,5 +1,7 @@
 package com.diamondq.common;
 
+import org.jspecify.annotations.Nullable;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -18,12 +20,12 @@ import java.lang.reflect.Type;
  * TypeReference ref = new TypeReference&lt;List&lt;Integer&gt;&gt;() {
  * };
  * </pre>
- *
+ * <p>
  * which can be passed to methods that accept TypeReference
  *
  * @param <T> the type to capture
  */
-public abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
+public abstract class TypeReference<T extends @Nullable Object> implements Comparable<TypeReference<T>> {
   protected final Type mType;
 
   protected TypeReference(Type pType) {
@@ -56,8 +58,8 @@ public abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
     }
   }
 
-  public static <C> TypeReference<C> of(Class<C> pClass) {
-    return new SimpleTypeReference<C>(pClass);
+  public static <C extends @Nullable Object> TypeReference<C> of(Class<C> pClass) {
+    return new SimpleTypeReference<>(pClass);
   }
 
   /**

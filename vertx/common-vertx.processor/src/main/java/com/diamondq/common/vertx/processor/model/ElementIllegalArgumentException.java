@@ -2,7 +2,7 @@ package com.diamondq.common.vertx.processor.model;
 
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.i18n.MessagesEnum;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.lang.model.element.Element;
 

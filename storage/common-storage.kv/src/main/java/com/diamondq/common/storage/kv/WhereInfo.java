@@ -2,7 +2,7 @@ package com.diamondq.common.storage.kv;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class WhereInfo {
 
@@ -10,9 +10,9 @@ public class WhereInfo {
 
   public final WhereOperator operator;
 
-  @Nullable public final Object constant;
+  public final @Nullable Object constant;
 
-  @Nullable public final String paramKey;
+  public final @Nullable String paramKey;
 
   public WhereInfo(String pKey, WhereOperator pOperator, @Nullable Object pConstant, @Nullable String pParamKey) {
     super();

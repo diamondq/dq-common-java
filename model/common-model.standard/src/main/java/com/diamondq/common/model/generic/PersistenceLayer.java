@@ -19,8 +19,7 @@ import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,165 +31,169 @@ public interface PersistenceLayer {
 
   /* StructureDefinitions */
 
-  public StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName, int pRevision);
+  StructureDefinition createNewStructureDefinition(Toolkit pToolkit, Scope pScope, String pName, int pRevision);
 
-  public StructureDefinition populateStructureDefinition(Toolkit pToolkit, Scope pScope, byte[] pBytes);
+  StructureDefinition populateStructureDefinition(Toolkit pToolkit, Scope pScope, byte[] pBytes);
 
-  public StructureDefinition createNewTombstoneStructureDefinition(Toolkit pToolkit, Scope pScope, String pName);
+  StructureDefinition createNewTombstoneStructureDefinition(Toolkit pToolkit, Scope pScope, String pName);
 
-  public StructureDefinition writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
+  StructureDefinition writeStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
   /**
-   * Only called by the CombinedPeristenceLayer to enable the StructureDefinition on layers that don't persist the
+   * Only called by the Combined Persistence Layer to enable the StructureDefinition on layers that don't persist the
    * structure.
    *
-   * @param pToolkit
-   * @param pScope
-   * @param pValue
+   * @param pToolkit the toolkit
+   * @param pScope the scope
+   * @param pValue the value
    */
-  public void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
+  void enableStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
-  public void deleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
+  void deleteStructureDefinition(Toolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
-  public Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope);
+  Collection<StructureDefinitionRef> getAllStructureDefinitionRefs(Toolkit pToolkit, Scope pScope);
 
-  public @Nullable StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName);
+  @Nullable
+  StructureDefinition lookupStructureDefinitionByName(Toolkit pToolkit, Scope pScope, String pName);
 
-  public @Nullable StructureDefinition lookupStructureDefinitionByNameAndRevision(Toolkit pToolkit, Scope pScope,
-    String pName, @Nullable Integer pRevision);
+  @Nullable
+  StructureDefinition lookupStructureDefinitionByNameAndRevision(Toolkit pToolkit, Scope pScope, String pName,
+    @Nullable Integer pRevision);
 
   /* Reference */
 
-  public StructureDefinitionRef createStructureDefinitionRef(Toolkit pToolkit, Scope pScope,
-    StructureDefinition pResolvable, boolean pWildcard);
+  StructureDefinitionRef createStructureDefinitionRef(Toolkit pToolkit, Scope pScope, StructureDefinition pResolvable,
+    boolean pWildcard);
 
-  public PropertyDefinitionRef createPropertyDefinitionRef(Toolkit pToolkit, Scope pScope,
-    PropertyDefinition pResolvable, StructureDefinition pContaining);
+  PropertyDefinitionRef createPropertyDefinitionRef(Toolkit pToolkit, Scope pScope, PropertyDefinition pResolvable,
+    StructureDefinition pContaining);
 
-  public StructureRef createStructureRef(Toolkit pToolkit, Scope pScope, Structure pResolvable);
+  StructureRef createStructureRef(Toolkit pToolkit, Scope pScope, Structure pResolvable);
 
-  public String createStructureRefStr(Toolkit pToolkit, Scope pScope, Structure pResolvable);
+  String createStructureRefStr(Toolkit pToolkit, Scope pScope, Structure pResolvable);
 
-  public <@Nullable T> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope,
+  <T extends @Nullable Object> PropertyRef<T> createPropertyRef(Toolkit pToolkit, Scope pScope,
     @Nullable Property<T> pResolvable, Structure pContaining);
 
   /* PropertyDefinition */
 
-  public PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope, String pName,
-    PropertyType pType);
+  PropertyDefinition createNewPropertyDefinition(Toolkit pToolkit, Scope pScope, String pName, PropertyType pType);
 
-  public String collapsePrimaryKeys(Toolkit pToolkit, Scope pScope, List<@Nullable Object> pNames);
+  String collapsePrimaryKeys(Toolkit pToolkit, Scope pScope, List<@Nullable Object> pNames);
 
   /* Structure */
 
-  public Structure createNewStructure(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition);
+  Structure createNewStructure(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition);
 
-  public Structure createNewTombstoneStructure(Toolkit pToolkit, Scope pScope, Structure pOldStructure);
+  Structure createNewTombstoneStructure(Toolkit pToolkit, Scope pScope, Structure pOldStructure);
 
-  public void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure);
+  void writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure);
 
-  public boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure,
-    @Nullable Structure pOldStructure);
+  boolean writeStructure(Toolkit pToolkit, Scope pScope, Structure pStructure, @Nullable Structure pOldStructure);
 
-  public @Nullable Structure lookupStructureBySerializedRef(Toolkit pToolkit, Scope pScope, String pSerializedRef);
+  @Nullable
+  Structure lookupStructureBySerializedRef(Toolkit pToolkit, Scope pScope, String pSerializedRef);
 
-  public @Nullable Structure lookupStructureByPrimaryKeys(Toolkit pToolkit, Scope pScope,
-    StructureDefinition pStructureDef, @Nullable Object[] pPrimaryKeys);
+  @Nullable
+  Structure lookupStructureByPrimaryKeys(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef,
+    @Nullable Object[] pPrimaryKeys);
 
-  public boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue);
+  boolean deleteStructure(Toolkit pToolkit, Scope pScope, Structure pValue);
 
   /* Property */
 
-  public <@Nullable T> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope,
+  <T extends @Nullable Object> Property<T> createNewProperty(Toolkit pToolkit, Scope pScope,
     PropertyDefinition pPropertyDefinition, boolean pIsValueSet, T pValue);
 
   /* TranslatableString */
 
-  public TranslatableString createNewTranslatableString(Toolkit pToolkit, Scope pScope, String pKey);
+  TranslatableString createNewTranslatableString(Toolkit pToolkit, Scope pScope, String pKey);
 
   /* EditorGroupDefinition */
 
-  public EditorGroupDefinition createNewEditorGroupDefinition(Toolkit pToolkit, Scope pScope);
+  EditorGroupDefinition createNewEditorGroupDefinition(Toolkit pToolkit, Scope pScope);
 
   /* EditorPropertyDefinition */
 
-  public EditorPropertyDefinition createNewEditorPropertyDefinition(Toolkit pToolkit, Scope pScope);
+  EditorPropertyDefinition createNewEditorPropertyDefinition(Toolkit pToolkit, Scope pScope);
 
   /* EditorStructureDefinition */
 
-  public EditorStructureDefinition createNewEditorStructureDefinition(Toolkit pToolkit, Scope pScope, String pName,
+  EditorStructureDefinition createNewEditorStructureDefinition(Toolkit pToolkit, Scope pScope, String pName,
     StructureDefinitionRef pRef);
 
-  public void writeEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
+  void writeEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
     EditorStructureDefinition pEditorStructureDefinition);
 
-  public void deleteEditorStructureDefinition(Toolkit pToolkit, Scope pScope, EditorStructureDefinition pValue);
+  void deleteEditorStructureDefinition(Toolkit pToolkit, Scope pScope, EditorStructureDefinition pValue);
 
-  public List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef(Toolkit pToolkit, Scope pScope,
+  List<EditorStructureDefinition> lookupEditorStructureDefinitionByRef(Toolkit pToolkit, Scope pScope,
     StructureDefinitionRef pRef);
 
-  public StructureRef createStructureRefFromSerialized(Toolkit pToolkit, Scope pScope, String pValue);
+  StructureRef createStructureRefFromSerialized(Toolkit pToolkit, Scope pScope, String pValue);
 
-  public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pToolkit, Scope pScope, String pValue);
+  <T extends @Nullable Object> PropertyRef<T> createPropertyRefFromSerialized(Toolkit pToolkit, Scope pScope,
+    String pValue);
 
-  public Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope, StructureDefinitionRef pRef,
+  Collection<Structure> getAllStructuresByDefinition(Toolkit pToolkit, Scope pScope, StructureDefinitionRef pRef,
     @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef);
 
-  public @Nullable String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey);
+  @Nullable
+  String lookupResourceString(Toolkit pToolkit, Scope pScope, @Nullable Locale pLocale, String pKey);
 
-  public void setGlobalDefaultLocale(Toolkit pToolkit, @Nullable Scope pScope, Locale pLocale);
+  void setGlobalDefaultLocale(Toolkit pToolkit, @Nullable Scope pScope, Locale pLocale);
 
-  public void setThreadLocale(Toolkit pToolkit, @Nullable Scope pScope, @Nullable Locale pLocale);
+  void setThreadLocale(Toolkit pToolkit, @Nullable Scope pScope, @Nullable Locale pLocale);
 
-  public boolean isResourceStringWritingSupported(Toolkit pToolkit, Scope pScope);
+  boolean isResourceStringWritingSupported(Toolkit pToolkit, Scope pScope);
 
-  public void writeResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey, String pValue);
+  void writeResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey, String pValue);
 
-  public void deleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey);
+  void deleteResourceString(Toolkit pToolkit, Scope pScope, Locale pLocale, String pKey);
 
-  public String createNewTombstoneResourceString(Toolkit pToolkit, Scope pScope);
+  String createNewTombstoneResourceString(Toolkit pToolkit, Scope pScope);
 
-  public boolean isTombstoneResourceString(Toolkit pToolkit, Scope pScope, String pValue);
+  boolean isTombstoneResourceString(Toolkit pToolkit, Scope pScope, String pValue);
 
-  public Collection<Locale> getResourceStringLocales(Toolkit pToolkit, Scope pScope);
+  Collection<Locale> getResourceStringLocales(Toolkit pToolkit, Scope pScope);
 
-  public Map<String, String> getResourceStringsByLocale(Toolkit pToolkit, Scope pScope, Locale pLocale);
+  Map<String, String> getResourceStringsByLocale(Toolkit pToolkit, Scope pScope, Locale pLocale);
 
-  public EditorStructureDefinition createDynamicEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
+  EditorStructureDefinition createDynamicEditorStructureDefinition(Toolkit pToolkit, Scope pScope,
     StructureDefinition pStructureDefinition);
 
-  public List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
+  List<Structure> lookupStructuresByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues);
 
-  public QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition,
+  QueryBuilder createNewQueryBuilder(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDefinition,
     String pQueryName);
 
-  public ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder);
+  ModelQuery writeQueryBuilder(Toolkit pToolkit, Scope pScope, QueryBuilder pQueryBuilder);
 
-  public StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
+  StructureRef createStructureRefFromParts(Toolkit pToolkit, Scope pScope, @Nullable Structure pStructure,
     @Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys);
 
-  public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Toolkit pToolkit, Scope pScope,
-    String pSerialized);
+  StructureDefinitionRef createStructureDefinitionRefFromSerialized(Toolkit pToolkit, Scope pScope, String pSerialized);
 
-  public BiFunction<Structure, Structure, Structure> createStandardMigration(Toolkit pToolkit, Scope pScope,
-    StandardMigrations pMigrationType, @NotNull Object @Nullable [] pParams);
+  BiFunction<Structure, Structure, Structure> createStandardMigration(Toolkit pToolkit, Scope pScope,
+    StandardMigrations pMigrationType, Object @Nullable [] pParams);
 
-  public void addMigration(Toolkit pToolkit, Scope pScope, String pStructureDefinitionName, int pFromRevision,
-    int pToRevision, BiFunction<Structure, Structure, Structure> pMigrationFunction);
+  void addMigration(Toolkit pToolkit, Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
+    BiFunction<Structure, Structure, Structure> pMigrationFunction);
 
-  public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
-    Toolkit pToolkit, Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
+  @Nullable
+  List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(Toolkit pToolkit,
+    Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
 
-  public @Nullable Integer lookupLatestStructureDefinitionRevision(Toolkit pToolkit, Scope pScope, String pDefName);
+  @Nullable
+  Integer lookupLatestStructureDefinitionRevision(Toolkit pToolkit, Scope pScope, String pDefName);
 
-  public AsyncPersistenceLayer getAsyncPersistenceLayer();
+  AsyncPersistenceLayer getAsyncPersistenceLayer();
 
-  public boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope);
+  boolean inferStructureDefinitions(GenericToolkit pGenericToolkit, Scope pScope);
 
-  public void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef);
+  void clearStructures(Toolkit pToolkit, Scope pScope, StructureDefinition pStructureDef);
 
-  public int countByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery,
-    @Nullable Map<String, Object> pParamValues);
+  int countByQuery(Toolkit pToolkit, Scope pScope, ModelQuery pQuery, @Nullable Map<String, Object> pParamValues);
 
 }

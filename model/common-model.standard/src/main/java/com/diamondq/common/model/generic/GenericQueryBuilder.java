@@ -7,7 +7,7 @@ import com.diamondq.common.storage.kv.WhereInfo;
 import com.diamondq.common.storage.kv.WhereOperator;
 import com.google.common.collect.ImmutableList;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -57,11 +57,13 @@ public class GenericQueryBuilder implements QueryBuilder {
     return mWhereList;
   }
 
-  @Nullable String getParentParamKey() {
+  @Nullable
+  String getParentParamKey() {
     return mParentParamKey;
   }
 
-  @Nullable PropertyDefinition getParentPropertyDefinition() {
+  @Nullable
+  PropertyDefinition getParentPropertyDefinition() {
     return mParentPropertyDefinition;
   }
 
@@ -69,7 +71,8 @@ public class GenericQueryBuilder implements QueryBuilder {
     return mSortList;
   }
 
-  @Nullable String getLimitKey() {
+  @Nullable
+  String getLimitKey() {
     return mLimitKey;
   }
 

@@ -20,8 +20,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.ReadStream;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -125,28 +124,29 @@ public class VertxUtils {
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
-    Function<@NotNull T, ExtendedCompletionStage<R>> pFunction) {
+    Function<T, ExtendedCompletionStage<R>> pFunction) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable T result = ar.result();
-        if (result == null) throw new IllegalStateException();
-        try {
-          pFunction.apply(result).whenComplete((r, ex) -> {
-            if (ex != null) future.completeExceptionally(ex);
-            else future.complete(r);
-          });
-        }
-        catch (RuntimeException ex) {
-          future.completeExceptionally(ex);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
+          future.completeExceptionally(cause);
+        } else {
+          T result = ar.result();
+          if (result == null) throw new IllegalStateException();
+          try {
+            pFunction.apply(result).whenComplete((r, ex) -> {
+              if (ex != null) future.completeExceptionally(ex);
+              else future.complete(r);
+            });
+          }
+          catch (RuntimeException ex) {
+            future.completeExceptionally(ex);
+          }
         }
       }
-    });
+    );
   }
 
   /**
@@ -157,28 +157,29 @@ public class VertxUtils {
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, A1, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
-    Function2<@NotNull T, A1, ExtendedCompletionStage<R>> pFunction, A1 pArg1) {
+    Function2<T, A1, ExtendedCompletionStage<R>> pFunction, A1 pArg1) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable T result = ar.result();
-        if (result == null) throw new IllegalStateException();
-        try {
-          pFunction.apply(result, pArg1).whenComplete((r, ex) -> {
-            if (ex != null) future.completeExceptionally(ex);
-            else future.complete(r);
-          });
-        }
-        catch (RuntimeException ex) {
-          future.completeExceptionally(ex);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
+          future.completeExceptionally(cause);
+        } else {
+          T result = ar.result();
+          if (result == null) throw new IllegalStateException();
+          try {
+            pFunction.apply(result, pArg1).whenComplete((r, ex) -> {
+              if (ex != null) future.completeExceptionally(ex);
+              else future.complete(r);
+            });
+          }
+          catch (RuntimeException ex) {
+            future.completeExceptionally(ex);
+          }
         }
       }
-    });
+    );
   }
 
   /**
@@ -190,28 +191,29 @@ public class VertxUtils {
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, A1, A2, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrapAsync(
-    Function3<@NotNull T, A1, A2, ExtendedCompletionStage<R>> pFunction, A1 pArg1, A2 pArg2) {
+    Function3<T, A1, A2, ExtendedCompletionStage<R>> pFunction, A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable T result = ar.result();
-        if (result == null) throw new IllegalStateException();
-        try {
-          pFunction.apply(result, pArg1, pArg2).whenComplete((r, ex) -> {
-            if (ex != null) future.completeExceptionally(ex);
-            else future.complete(r);
-          });
-        }
-        catch (RuntimeException ex) {
-          future.completeExceptionally(ex);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
+          future.completeExceptionally(cause);
+        } else {
+          T result = ar.result();
+          if (result == null) throw new IllegalStateException();
+          try {
+            pFunction.apply(result, pArg1, pArg2).whenComplete((r, ex) -> {
+              if (ex != null) future.completeExceptionally(ex);
+              else future.complete(r);
+            });
+          }
+          catch (RuntimeException ex) {
+            future.completeExceptionally(ex);
+          }
         }
       }
-    });
+    );
   }
 
   /* **************************************** WRAP SYNC ************************************************** */
@@ -222,27 +224,27 @@ public class VertxUtils {
    * @param pFunction the function
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
-  public static <T, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
-    Function<@NotNull T, R> pFunction) {
+  public static <T, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(Function<T, R> pFunction) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable T result = ar.result();
-        if (result == null) throw new IllegalStateException();
-        try {
-          R r = pFunction.apply(result);
-          future.complete(r);
-        }
-        catch (RuntimeException ex) {
-          future.completeExceptionally(ex);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
+          future.completeExceptionally(cause);
+        } else {
+          T result = ar.result();
+          if (result == null) throw new IllegalStateException();
+          try {
+            R r = pFunction.apply(result);
+            future.complete(r);
+          }
+          catch (RuntimeException ex) {
+            future.completeExceptionally(ex);
+          }
         }
       }
-    });
+    );
   }
 
   /**
@@ -253,26 +255,27 @@ public class VertxUtils {
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, A1, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
-    Function2<@NotNull T, A1, R> pFunction, A1 pArg1) {
+    Function2<T, A1, R> pFunction, A1 pArg1) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable T result = ar.result();
-        if (result == null) throw new IllegalStateException();
-        try {
-          R r = pFunction.apply(result, pArg1);
-          future.complete(r);
-        }
-        catch (RuntimeException ex) {
-          future.completeExceptionally(ex);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
+          future.completeExceptionally(cause);
+        } else {
+          T result = ar.result();
+          if (result == null) throw new IllegalStateException();
+          try {
+            R r = pFunction.apply(result, pArg1);
+            future.complete(r);
+          }
+          catch (RuntimeException ex) {
+            future.completeExceptionally(ex);
+          }
         }
       }
-    });
+    );
   }
 
   /**
@@ -284,26 +287,27 @@ public class VertxUtils {
    * @return the pair of a future with the result of the function and the Vertx Handler
    */
   public static <T, A1, A2, R> Pair<ContextExtendedCompletionStage<R>, Handler<AsyncResult<T>>> wrap(
-    Function3<@NotNull T, A1, A2, R> pFunction, A1 pArg1, A2 pArg2) {
+    Function3<T, A1, A2, R> pFunction, A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     return Pair.with(future, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable T result = ar.result();
-        if (result == null) throw new IllegalStateException();
-        try {
-          R r = pFunction.apply(result, pArg1, pArg2);
-          future.complete(r);
-        }
-        catch (RuntimeException ex) {
-          future.completeExceptionally(ex);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          ContextFactory.getInstance().reportThrowable(pFunction.getClass(), pFunction, cause);
+          future.completeExceptionally(cause);
+        } else {
+          T result = ar.result();
+          if (result == null) throw new IllegalStateException();
+          try {
+            R r = pFunction.apply(result, pArg1, pArg2);
+            future.complete(r);
+          }
+          catch (RuntimeException ex) {
+            future.completeExceptionally(ex);
+          }
         }
       }
-    });
+    );
   }
 
   /* **************************************** VERTX CALL ************************************************** */
@@ -316,7 +320,7 @@ public class VertxUtils {
         if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
       } else {
-        @Nullable R result = ar.result();
+        R result = ar.result();
         if (result == null) future.completeExceptionally(new IllegalArgumentException());
         else future.complete(result);
       }
@@ -328,16 +332,17 @@ public class VertxUtils {
     A1 pArg1) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        if (result == null) future.completeExceptionally(new IllegalArgumentException());
-        else future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          if (result == null) future.completeExceptionally(new IllegalArgumentException());
+          else future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 
@@ -345,16 +350,17 @@ public class VertxUtils {
     A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        if (result == null) future.completeExceptionally(new IllegalArgumentException());
-        else future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          if (result == null) future.completeExceptionally(new IllegalArgumentException());
+          else future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 
@@ -362,16 +368,17 @@ public class VertxUtils {
     Consumer4<A1, A2, A3, Handler<AsyncResult<R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        if (result == null) future.completeExceptionally(new IllegalArgumentException());
-        else future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          if (result == null) future.completeExceptionally(new IllegalArgumentException());
+          else future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 
@@ -384,7 +391,7 @@ public class VertxUtils {
         if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
       } else {
-        @Nullable R result = ar.result();
+        R result = ar.result();
         if (result == null) future.completeExceptionally(new IllegalArgumentException());
         else future.complete(result);
       }
@@ -396,16 +403,17 @@ public class VertxUtils {
     Function2<A1, Handler<AsyncResult<R>>, FR> pCallee, A1 pArg1) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.apply(pArg1, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        if (result == null) future.completeExceptionally(new IllegalArgumentException());
-        else future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          if (result == null) future.completeExceptionally(new IllegalArgumentException());
+          else future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 
@@ -413,16 +421,17 @@ public class VertxUtils {
     Function3<A1, A2, Handler<AsyncResult<R>>, FR> pCallee, A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.apply(pArg1, pArg2, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        if (result == null) future.completeExceptionally(new IllegalArgumentException());
-        else future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          if (result == null) future.completeExceptionally(new IllegalArgumentException());
+          else future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 
@@ -430,16 +439,17 @@ public class VertxUtils {
     Function4<A1, A2, A3, Handler<AsyncResult<R>>, FR> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
     pCallee.apply(pArg1, pArg2, pArg3, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        if (result == null) future.completeExceptionally(new IllegalArgumentException());
-        else future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          if (result == null) future.completeExceptionally(new IllegalArgumentException());
+          else future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 
@@ -452,7 +462,7 @@ public class VertxUtils {
         if (cause == null) cause = new RuntimeException();
         future.completeExceptionally(cause);
       } else {
-        @Nullable R result = ar.result();
+        R result = ar.result();
         future.complete(result);
       }
     });
@@ -463,15 +473,16 @@ public class VertxUtils {
     Consumer2<A1, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1) {
     ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 
@@ -479,15 +490,16 @@ public class VertxUtils {
     Consumer3<A1, A2, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 
@@ -495,15 +507,16 @@ public class VertxUtils {
     Consumer4<A1, A2, A3, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
     ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
     pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        @Nullable R result = ar.result();
-        future.complete(result);
+        if (ar.succeeded() == false) {
+          Throwable cause = ar.cause();
+          if (cause == null) cause = new RuntimeException();
+          future.completeExceptionally(cause);
+        } else {
+          R result = ar.result();
+          future.complete(result);
+        }
       }
-    });
+    );
     return future;
   }
 

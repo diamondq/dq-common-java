@@ -1,7 +1,9 @@
 package com.diamondq.common.lambda.interfaces;
 
+import org.jspecify.annotations.Nullable;
+
 @FunctionalInterface
-public interface Function6<T1, T2, T3, T4, T5, T6, R> {
+public interface Function6<T1 extends @Nullable Object, T2 extends @Nullable Object, T3 extends @Nullable Object, T4 extends @Nullable Object, T5 extends @Nullable Object, T6 extends @Nullable Object, R extends @Nullable Object> {
 
   /**
    * Performs this operation on the given argument.

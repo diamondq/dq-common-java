@@ -1,21 +1,20 @@
 package com.diamondq.common.storage.kv;
 
 import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Builder for Index Definitions
  *
  * @param <IDB> the actual type for the Index Definitions builder
  */
-public abstract class KVIndexDefinitionBuilder<@NotNull IDB extends KVIndexDefinitionBuilder<IDB>> {
+public abstract class KVIndexDefinitionBuilder<IDB extends KVIndexDefinitionBuilder<IDB>> {
 
-  @Nullable protected String mTableName;
+  protected @Nullable String mTableName;
 
-  @Nullable protected String mName;
+  protected @Nullable String mName;
 
-  protected ImmutableList.Builder<@NotNull IKVIndexColumn> mColumns;
+  protected ImmutableList.Builder<IKVIndexColumn> mColumns;
 
   /**
    * Builds the Index Definition

@@ -7,7 +7,7 @@ import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
 import com.diamondq.common.jaxrs.model.ApplicationInfo;
 import com.diamondq.common.jaxrs.model.ApplicationInfo.Builder;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URI;
 import java.net.URISyntaxException;

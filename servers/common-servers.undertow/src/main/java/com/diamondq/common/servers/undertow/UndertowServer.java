@@ -4,7 +4,7 @@ import com.diamondq.common.config.Config;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.UndertowOptions;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.xnio.Option;
 
 import javax.net.ssl.KeyManager;

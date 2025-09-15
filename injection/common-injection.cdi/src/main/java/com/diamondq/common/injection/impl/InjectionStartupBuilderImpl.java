@@ -12,7 +12,6 @@ import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.inject.spi.Extension;
 import jakarta.enterprise.util.AnnotationLiteral;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +64,7 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
    * @see com.diamondq.common.injection.InjectionStartupBuilder#singletons(java.lang.Object[])
    */
   @Override
-  public InjectionStartupBuilder singletons(@NotNull Object @NotNull ... pSingletons) {
+  public InjectionStartupBuilder singletons(Object... pSingletons) {
     synchronized (this) {
       for (final Object o : pSingletons)
         mSingletons.add(o);
@@ -118,10 +117,11 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
           event.addBean()
             .types(InjectionContext.class)
             .qualifiers(new AnnotationLiteral<Default>() {
-              private static final long serialVersionUID = 1L;
-            }, new AnnotationLiteral<Any>() {
-              private static final long serialVersionUID = 1L;
-            })
+                          private static final long serialVersionUID = 1L;
+                        }, new AnnotationLiteral<Any>() {
+                          private static final long serialVersionUID = 1L;
+                        }
+            )
             .scope(ApplicationScoped.class)
             .name(InjectionContext.class.getName())
             .beanClass(InjectionContext.class)
@@ -132,10 +132,11 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
             event.addBean()
               .types(singleton.getClass())
               .qualifiers(new AnnotationLiteral<Default>() {
-                private static final long serialVersionUID = 1L;
-              }, new AnnotationLiteral<Any>() {
-                private static final long serialVersionUID = 1L;
-              })
+                            private static final long serialVersionUID = 1L;
+                          }, new AnnotationLiteral<Any>() {
+                            private static final long serialVersionUID = 1L;
+                          }
+              )
               .scope(ApplicationScoped.class)
               .name(singleton.getClass().getName())
               .beanClass(singleton.getClass())
@@ -149,10 +150,11 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
             event.addBean()
               .types(singleton.getClass())
               .qualifiers(new AnnotationLiteral<Default>() {
-                private static final long serialVersionUID = 1L;
-              }, new AnnotationLiteral<Any>() {
-                private static final long serialVersionUID = 1L;
-              })
+                            private static final long serialVersionUID = 1L;
+                          }, new AnnotationLiteral<Any>() {
+                            private static final long serialVersionUID = 1L;
+                          }
+              )
               .scope(ApplicationScoped.class)
               .name(name)
               .beanClass(singleton.getClass())

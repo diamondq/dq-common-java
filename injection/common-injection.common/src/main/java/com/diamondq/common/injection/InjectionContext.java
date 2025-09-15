@@ -1,6 +1,6 @@
 package com.diamondq.common.injection;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Closeable;
 import java.lang.reflect.Constructor;

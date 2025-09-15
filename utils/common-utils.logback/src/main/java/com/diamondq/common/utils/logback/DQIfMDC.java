@@ -1,7 +1,7 @@
 package com.diamondq.common.utils.logback;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

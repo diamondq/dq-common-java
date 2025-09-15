@@ -2,7 +2,7 @@ package com.diamondq.common.errors;
 
 import com.diamondq.common.i18n.I18NString;
 import com.diamondq.common.i18n.MessagesEnum;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class ExtendedIllegalStateException extends ExtendedRuntimeException {
 

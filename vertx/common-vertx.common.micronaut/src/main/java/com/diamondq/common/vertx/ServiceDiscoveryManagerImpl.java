@@ -13,7 +13,7 @@ import io.vertx.servicediscovery.Status;
 import io.vertx.serviceproxy.ServiceProxyBuilder;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -49,22 +49,23 @@ public class ServiceDiscoveryManagerImpl implements ServiceDiscoveryManager {
       /* Register a consumer for any new record events */
 
       pVertx.eventBus().localConsumer("vertx.discovery.announce", (message) -> {
-        JsonObject body = (JsonObject) message.body();
-        Record record = new Record(body);
+          JsonObject body = (JsonObject) message.body();
+          Record record = new Record(body);
 
-        Status status = record.getStatus();
-        String id = record.getRegistration();
-        if (id != null) {
-          if (status == Status.UP) {
-            mCachedRecords.put(id, record);
-            for (Consumer<Record> callback : mCallbacks) {
-              callback.accept(record);
+          Status status = record.getStatus();
+          String id = record.getRegistration();
+          if (id != null) {
+            if (status == Status.UP) {
+              mCachedRecords.put(id, record);
+              for (Consumer<Record> callback : mCallbacks) {
+                callback.accept(record);
+              }
+            } else {
+              mCachedRecords.remove(id);
             }
-          } else {
-            mCachedRecords.remove(id);
           }
         }
-      });
+      );
     }
   }
 

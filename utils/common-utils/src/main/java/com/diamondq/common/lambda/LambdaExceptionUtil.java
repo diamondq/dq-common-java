@@ -1,7 +1,7 @@
 package com.diamondq.common.lambda;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.function.BiConsumer;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Helper util class originated by MarcG on Stackoverflow (http://stackoverflow.com/a/27644392)
+ * Helper util class originated by MarcG on Stackoverflow (<a href="http://stackoverflow.com/a/27644392">...</a>)
  */
 public final class LambdaExceptionUtil {
 
@@ -22,7 +22,7 @@ public final class LambdaExceptionUtil {
    * @param <E> the exception
    */
   @FunctionalInterface
-  public interface Consumer_WithExceptions<T, E extends Exception> {
+  public interface Consumer_WithExceptions<T extends @Nullable Object, E extends Exception> {
     /**
      * @param t the input
      * @throws E the exception
@@ -38,7 +38,7 @@ public final class LambdaExceptionUtil {
    * @param <E> the exception
    */
   @FunctionalInterface
-  public interface Producer_WithExceptions<T, E extends Exception> {
+  public interface Producer_WithExceptions<T extends @Nullable Object, E extends Exception> {
     /**
      * producer
      *
@@ -52,11 +52,11 @@ public final class LambdaExceptionUtil {
    * BiConsumer with Exceptions
    *
    * @param <T> input 1 type
-   * @param <U> input 2 type
+   * @param <U> input 2 types
    * @param <E> exception type
    */
   @FunctionalInterface
-  public interface BiConsumer_WithExceptions<T, U, E extends Exception> {
+  public interface BiConsumer_WithExceptions<T extends @Nullable Object, U extends @Nullable Object, E extends Exception> {
     /**
      * consumer
      *
@@ -76,7 +76,7 @@ public final class LambdaExceptionUtil {
    * @param <E> exception type
    */
   @FunctionalInterface
-  public interface BiFunction_WithExceptions<T, U, R, E extends Exception> {
+  public interface BiFunction_WithExceptions<T extends @Nullable Object, U extends @Nullable Object, R extends @Nullable Object, E extends Exception> {
     /**
      * function
      *
@@ -96,7 +96,7 @@ public final class LambdaExceptionUtil {
    * @param <E> exception type
    */
   @FunctionalInterface
-  public interface Function_WithExceptions<T, R, E extends Exception> {
+  public interface Function_WithExceptions<T extends @Nullable Object, R extends @Nullable Object, E extends Exception> {
     /**
      * function
      *
@@ -114,7 +114,7 @@ public final class LambdaExceptionUtil {
    * @param <E> exception type
    */
   @FunctionalInterface
-  public interface Supplier_WithExceptions<T, E extends Exception> {
+  public interface Supplier_WithExceptions<T extends @Nullable Object, E extends Exception> {
     /**
      * supplier
      *
@@ -150,7 +150,8 @@ public final class LambdaExceptionUtil {
    * @param consumer the consumer with exceptions
    * @return the consumer
    */
-  public static <T, E extends Exception> Consumer<T> rethrowConsumer(Consumer_WithExceptions<T, E> consumer) {
+  public static <T extends @Nullable Object, E extends Exception> Consumer<T> rethrowConsumer(
+    Consumer_WithExceptions<T, E> consumer) {
     return t -> {
       try {
         consumer.accept(t);
@@ -170,11 +171,11 @@ public final class LambdaExceptionUtil {
    * @param comparator the comparator with exceptions
    * @return the comparator
    */
-  public static <P, E extends Exception> Comparator<P> rethrowComparator(
+  public static <P extends @Nullable Object, E extends Exception> Comparator<P> rethrowComparator(
     BiFunction_WithExceptions<P, P, @Nullable Integer, E> comparator) {
     return (a, b) -> {
       try {
-        Integer result = comparator.apply(a, b);
+        var result = comparator.apply(a, b);
         if (result == null) return 0;
         return result;
       }
@@ -193,7 +194,7 @@ public final class LambdaExceptionUtil {
    * @param biConsumer the BiConsumer with exceptions
    * @return the BiConsumer
    */
-  public static <T, U, E extends Exception> BiConsumer<T, U> rethrowBiConsumer(
+  public static <T extends @Nullable Object, U extends @Nullable Object, E extends Exception> BiConsumer<T, U> rethrowBiConsumer(
     BiConsumer_WithExceptions<T, U, E> biConsumer) {
     return (t, u) -> {
       try {
@@ -214,7 +215,7 @@ public final class LambdaExceptionUtil {
    * @param biFunction the BiFunction with exceptions
    * @return the BiFunction
    */
-  public static <T, U, R, E extends Exception> BiFunction<T, U, R> rethrowBiFunction(
+  public static <T extends @Nullable Object, U extends @Nullable Object, R extends @Nullable Object, E extends Exception> BiFunction<T, U, R> rethrowBiFunction(
     BiFunction_WithExceptions<T, U, R, E> biFunction) {
     return (t, u) -> {
       try {
@@ -236,7 +237,8 @@ public final class LambdaExceptionUtil {
    * @return the Function
    */
   /* .map(rethrowFunction(name -> Class.forName(name))) or .map(rethrowFunction(Class::forName)) */
-  public static <T, R, E extends Exception> Function<T, R> rethrowFunction(Function_WithExceptions<T, R, E> function) {
+  public static <T extends @Nullable Object, R extends @Nullable Object, E extends Exception> Function<T, R> rethrowFunction(
+    Function_WithExceptions<T, R, E> function) {
     return t -> {
       try {
         return function.apply(t);
@@ -249,16 +251,15 @@ public final class LambdaExceptionUtil {
       }
     };
   }
-
-  /* rethrowSupplier(() -> new StringJoiner(new String(new byte[]{77, 97, 114, 107}, "UTF-8"))), */
-
+  
   /**
    * Takes a Supplier with Exceptions and returns a Supplier or throws a Runtime Exception
    *
    * @param function the Supplier with Exceptions
    * @return the Supplier
    */
-  public static <T, E extends Exception> Supplier<T> rethrowSupplier(Supplier_WithExceptions<T, E> function) {
+  public static <T extends @Nullable Object, E extends Exception> Supplier<T> rethrowSupplier(
+    Supplier_WithExceptions<T, E> function) {
     return () -> {
       try {
         return function.get();
@@ -278,7 +279,7 @@ public final class LambdaExceptionUtil {
    * @param function the supplier
    * @return the future
    */
-  public static <T> ExtendedCompletableFuture<T> wrapSyncSupplierResult(Supplier<T> function) {
+  public static <T extends @Nullable Object> ExtendedCompletableFuture<T> wrapSyncSupplierResult(Supplier<T> function) {
     try {
       return ExtendedCompletableFuture.completedFuture(function.get());
     }
@@ -293,13 +294,13 @@ public final class LambdaExceptionUtil {
    * @param function the supplier
    * @return the future
    */
-  @SuppressWarnings({ "unchecked" })
-  public static <T> ExtendedCompletableFuture<T> wrapSyncNonNullSupplierResult(Supplier<T> function) {
+  public static <T extends @Nullable Object> ExtendedCompletableFuture<T> wrapSyncNonNullSupplierResult(
+    Supplier<T> function) {
     try {
       return ExtendedCompletableFuture.completedFuture(function.get());
     }
     catch (RuntimeException ex) {
-      return (ExtendedCompletableFuture<T>) ExtendedCompletableFuture.completedFailure(ex);
+      return ExtendedCompletableFuture.completedFailure(ex);
     }
   }
 
@@ -330,7 +331,7 @@ public final class LambdaExceptionUtil {
    * @param supplier the Supplier with Exceptions
    * @return the result
    */
-  public static <R, E extends Exception> R uncheck(Supplier_WithExceptions<R, E> supplier) {
+  public static <R extends @Nullable Object, E extends Exception> R uncheck(Supplier_WithExceptions<R, E> supplier) {
     try {
       return supplier.get();
     }
@@ -351,7 +352,8 @@ public final class LambdaExceptionUtil {
    * @param t input parameter
    * @return the result
    */
-  public static <T, R, E extends Exception> R uncheck(Function_WithExceptions<T, R, E> function, T t) {
+  public static <T extends @Nullable Object, R extends @Nullable Object, E extends Exception> R uncheck(
+    Function_WithExceptions<T, R, E> function, T t) {
     try {
       return function.apply(t);
     }

@@ -10,8 +10,7 @@ import com.diamondq.common.storage.kv.WhereInfo;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import javax.transaction.Status;
@@ -177,7 +176,7 @@ public class JDBCKVTransaction implements IKVTransaction {
    * @see com.diamondq.common.storage.kv.IKVTransaction#keyIterator(java.lang.String)
    */
   @Override
-  public Iterator<@NotNull String> keyIterator(String pTable) {
+  public Iterator<String> keyIterator(String pTable) {
     try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable)) {
       try {
         validateConnection();
@@ -192,8 +191,7 @@ public class JDBCKVTransaction implements IKVTransaction {
             JDBCResultSetIterator result = new JDBCResultSetIterator(ps, rs);
             rs = null;
             ps = null;
-            @SuppressWarnings("null") Iterator<@NotNull String> filtered = (Iterator<@NotNull String>) Iterators.filter(
-              result,
+            @SuppressWarnings("null") Iterator<String> filtered = (Iterator<String>) Iterators.filter(result,
               Predicates.notNull()
             );
             return filtered;
@@ -216,7 +214,7 @@ public class JDBCKVTransaction implements IKVTransaction {
    * @see com.diamondq.common.storage.kv.IKVTransaction#keyIterator2(java.lang.String, java.lang.String)
    */
   @Override
-  public Iterator<@NotNull String> keyIterator2(String pTable, String pKey1) {
+  public Iterator<String> keyIterator2(String pTable, String pKey1) {
     try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this, pTable, pKey1)) {
       try {
         validateConnection();
@@ -232,8 +230,7 @@ public class JDBCKVTransaction implements IKVTransaction {
             JDBCResultSetIterator result = new JDBCResultSetIterator(ps, rs);
             rs = null;
             ps = null;
-            @SuppressWarnings("null") Iterator<@NotNull String> filtered = (Iterator<@NotNull String>) Iterators.filter(
-              result,
+            @SuppressWarnings("null") Iterator<String> filtered = (Iterator<String>) Iterators.filter(result,
               Predicates.notNull()
             );
             return filtered;
@@ -303,13 +300,13 @@ public class JDBCKVTransaction implements IKVTransaction {
    * @see com.diamondq.common.storage.kv.IKVTransaction#getTableList()
    */
   @Override
-  public Iterator<@NotNull String> getTableList() {
+  public Iterator<String> getTableList() {
     try (Context context = mContextFactory.newContext(JDBCKVTransaction.class, this)) {
       try {
         validateConnection();
         Connection c = mConnection;
         if (c == null) throw new IllegalStateException();
-        ImmutableList.Builder<@NotNull String> results = ImmutableList.builder();
+        ImmutableList.Builder<String> results = ImmutableList.builder();
         try (ResultSet rs = c.getMetaData().getTables(null, mStore.getTableSchema(), null, null)) {
           while (rs.next() == true) {
             String str = rs.getString(3);
@@ -480,8 +477,8 @@ public class JDBCKVTransaction implements IKVTransaction {
             ps.setInt(paramCount, limitVal);
           }
           if ((traceBuilder != null) && (traceArgs != null)) {
-            @SuppressWarnings("null") @Nullable Object @NotNull [] startArray = new Object[traceArgs.size()];
-            @Nullable Object @NotNull [] args = traceArgs.<@Nullable Object>toArray(startArray);
+            @SuppressWarnings("null") @Nullable Object[] startArray = new Object[traceArgs.size()];
+            @Nullable Object[] args = traceArgs.<@Nullable Object>toArray(startArray);
             context.trace(traceBuilder.toString(), args);
           }
           try (ResultSet rs = ps.executeQuery()) {
@@ -545,8 +542,8 @@ public class JDBCKVTransaction implements IKVTransaction {
             }
           }
           if ((traceBuilder != null) && (traceArgs != null)) {
-            @SuppressWarnings("null") @Nullable Object @NotNull [] startArray = new Object[traceArgs.size()];
-            @Nullable Object @NotNull [] args = traceArgs.<@Nullable Object>toArray(startArray);
+            @SuppressWarnings("null") @Nullable Object[] startArray = new Object[traceArgs.size()];
+            @Nullable Object[] args = traceArgs.<@Nullable Object>toArray(startArray);
             context.trace(traceBuilder.toString(), args);
           }
           try (ResultSet rs = ps.executeQuery()) {

@@ -21,8 +21,7 @@ import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +51,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
 
   private void setupTables() {
     synchronized (this) {
-      if (mSetupTables == false) {
+      if (!mSetupTables) {
         IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = Verify.notNull(mStore.getTableDefinitionSupport());
 
         KVTableDefinitionBuilder<?> tableBuilder = tableDefinitionSupport.createTableDefinitionBuilder();
@@ -96,7 +95,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
       return sd;
     }
     finally {
-      if (commit == true) transaction.commit();
+      if (commit) transaction.commit();
       else transaction.rollback();
     }
   }
@@ -117,21 +116,19 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
         String name = i.next();
         for (Iterator<String> i2 = transaction.keyIterator2("structures", name); i2.hasNext(); ) {
           String revStr = i2.next();
-          int rev = Integer.valueOf(revStr);
+          int rev = Integer.parseInt(revStr);
           if (pStructureDefinitionCache != null) {
-            String cacheKey = new StringBuilder(name).append('-').append(rev).toString();
+            String cacheKey = name + '-' + rev;
             if (pStructureDefinitionCache.getIfPresent(cacheKey) != null) continue;
           }
-          resultBuilder.add(pToolkit.createStructureDefinitionRefFromSerialized(pScope,
-            new StringBuilder(name).append(':').append(rev).toString()
-          ));
+          resultBuilder.add(pToolkit.createStructureDefinitionRefFromSerialized(pScope, name + ':' + rev));
         }
       }
       commit = true;
       return resultBuilder.build();
     }
     finally {
-      if (commit == true) transaction.commit();
+      if (commit) transaction.commit();
       else transaction.rollback();
     }
   }
@@ -157,7 +154,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
       return pValue;
     }
     finally {
-      if (commit == true) transaction.commit();
+      if (commit) transaction.commit();
       else transaction.rollback();
     }
 
@@ -177,7 +174,7 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
       commit = true;
     }
     finally {
-      if (commit == true) transaction.commit();
+      if (commit) transaction.commit();
       else transaction.rollback();
     }
   }
@@ -218,8 +215,8 @@ public class StorageStructureKVPersistenceLayer extends AbstractDocumentPersiste
    *   com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
    */
   @Override
-  protected <@NotNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
-    boolean pIsMeta, String pKey, PropertyType pType, @NotNull R pValue) {
+  protected <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
+    boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
     throw new UnsupportedOperationException();
   }
 

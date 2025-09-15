@@ -7,10 +7,9 @@ import io.micronaut.http.client.bind.ClientRequestUriContext;
 import io.micronaut.http.client.bind.TypedClientArgumentRequestBinder;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.NotNull;
 
 /**
- * Connects to Micronauts Argument Binder so that when an AuthInfo is detected in the parameters, the current
+ * Connects to Micronaut's Argument Binder so that when an AuthInfo is detected in the parameters, the current
  * authentication is injected into the outgoing HttpRequest.
  */
 @Singleton
@@ -21,7 +20,6 @@ public class AuthInfoBinder implements TypedClientArgumentRequestBinder<AuthInfo
   }
 
   @Override
-  @NotNull
   public Argument<AuthInfo> argumentType() {
     return Argument.of(AuthInfo.class);
   }

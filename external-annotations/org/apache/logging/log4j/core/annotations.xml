@@ -1,0 +1,5 @@
+<root>
+  <item name='org.apache.logging.log4j.core.LogEvent org.apache.logging.log4j.util.ReadOnlyStringMap getContextData()'>
+    <annotation name='org.jspecify.annotations.Nullable' />
+  </item>
+</root>

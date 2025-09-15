@@ -1,7 +1,6 @@
 package com.diamondq.common.storage.kv;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 
@@ -10,7 +9,7 @@ import java.math.BigDecimal;
  *
  * @param <CDB> the actual type for the Column Definition Builder
  */
-public abstract class KVColumnDefinitionBuilder<@NotNull CDB extends KVColumnDefinitionBuilder<@NotNull CDB>> {
+public abstract class KVColumnDefinitionBuilder<CDB extends KVColumnDefinitionBuilder<CDB>> {
 
   protected @Nullable String mName;
 

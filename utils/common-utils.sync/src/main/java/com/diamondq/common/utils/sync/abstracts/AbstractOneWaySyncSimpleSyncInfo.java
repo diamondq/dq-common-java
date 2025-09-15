@@ -2,7 +2,7 @@ package com.diamondq.common.utils.sync.abstracts;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.stream.Stream;
 

@@ -2,19 +2,18 @@ package com.diamondq.common.utils.sync;
 
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * Defines everything about syncing these two kinds of objects. NOTE: We extend the full object A/B with the idea of a
- * fragment A_FRAG/B_FRAG. This allows us to manipulate an object before detailing with the full content. i.e. The
- * content of a file may be represented as a hash in a database. By representing the hash as the fragment, we can still
- * compare to see if changes are needed without having to look at the full content. Only when it's obvious that it is
- * needed, can we 'convert' the fragment to the full object.
+ * Defines everything about syncing these two kinds of objects. <br/> NOTE: Extend the full object A/B with the idea of
+ * a fragment A_FRAG/B_FRAG. <br/>This allows the code to manipulate an object before detailing with the full content.
+ * The content of a file may be represented as a hash in a database. <br/>By representing the hash as the fragment, the
+ * code can still compare <br/> to see if changes are needed without having to look at the full content. <br/>Only when
+ * it's clear that it is necessary, can the code 'convert' the fragment to the full object.
  *
  * @param <A> the class of the real A
  * @param <B> the class of the real B
@@ -64,8 +63,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
   }
 
   /**
-   * Returns true if an B can be modified with changes from A. If false, then the B will be deleted and a new B
-   * created.
+   * Returns true if a B can be modified with changes from A. If false, then the B will be deleted and a new B created.
    *
    * @return true or false
    */
@@ -75,7 +73,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 
   /**
    * Returns true if Delete operations must be performed for Create operations. False if the order doesn't matter. This
-   * is mainly used if we are not supporting modification, and the ids are the same.
+   * is mainly used if the code is not supporting modification, and the ids are the same.
    *
    * @return true or false
    */
@@ -85,7 +83,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 
   /**
    * Returns true if Delete operations must be performed for Create operations. False if the order doesn't matter. This
-   * is mainly used if we are not supporting modification, and the ids are the same.
+   * is mainly used if the code is not supporting modification, and the ids are the same.
    *
    * @return true or false
    */
@@ -95,7 +93,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
 
   /**
    * Returns an optional hash representing the A source data. If it's present, and the B hash is present, they can be
-   * compared to decide if we're all in sync. This then skips all the synchronization.
+   * compared to decide if all is in sync. This then skips all the synchronization.
    *
    * @return the optional A Hash
    */
@@ -108,11 +106,11 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    *
    * @return the future Map of key/frag for the A source
    */
-  ExtendedCompletionStage<@NotNull Map<@NotNull A_KEY, @NotNull A_FRAG>> getASource();
+  ExtendedCompletionStage<Map<A_KEY, A_FRAG>> getASource();
 
   /**
    * Returns an optional hash representing the B source data. If it's present, and the A hash is present, they can be
-   * compared to decide if we're all in sync. This then skips all the synchronization.
+   * compared to decide if all is in sync. This then skips all the synchronization.
    *
    * @return the optional B Hash
    */
@@ -125,10 +123,10 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    *
    * @return the future Map of key/frag for the B source
    */
-  ExtendedCompletionStage<@NotNull Map<@NotNull B_KEY, @NotNull B_FRAG>> getBSource();
+  ExtendedCompletionStage<Map<B_KEY, B_FRAG>> getBSource();
 
   /**
-   * Return's the deleted status for a key
+   * Return the deleted status for a key
    *
    * @param pKey the key
    * @return true if the item is marked as deleted or false if it doesn't exist
@@ -136,7 +134,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
   boolean getAStatus(A_KEY pKey);
 
   /**
-   * Return's the deleted status for a key
+   * Return the deleted status for a key
    *
    * @param pKey the key
    * @return true if the item is marked as deleted or false if it doesn't exist
@@ -152,7 +150,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
   B_KEY convertAKeyToBKey(A_KEY pKey);
 
   /**
-   * Converts an B key to the matching A key
+   * Converts a B key to the matching A key
    *
    * @param pKey the B key
    * @return the A Key
@@ -188,7 +186,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * Converts an A_KEY/A_FRAG to an A
    *
    * @param pAKey the A key
-   * @param pAFrag the A fragment
+   * @param pAFrag a fragment
    * @return the A
    */
   A convertAFragToA(A_KEY pAKey, A_FRAG pAFrag);
@@ -206,7 +204,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * Merges the contents of the A into the B and returns the updated B
    *
    * @param pAKey the A key
-   * @param pAFrag the A fragment
+   * @param pAFrag a fragment
    * @param pA the original A
    * @param pBKey the B key
    * @param pBFrag the B fragment
@@ -219,7 +217,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * Merges the contents of the B into the A and returns the updated A
    *
    * @param pAKey the A key
-   * @param pAFrag the A fragment
+   * @param pAFrag the fragment for A
    * @param pA the original A
    * @param pBKey the B key
    * @param pBFrag the B fragment

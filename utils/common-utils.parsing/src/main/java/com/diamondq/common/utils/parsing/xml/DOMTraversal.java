@@ -1,6 +1,6 @@
 package com.diamondq.common.utils.parsing.xml;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,7 +22,7 @@ public class DOMTraversal {
    * @return the resulting set
    */
   public static <X extends Node> List<X> traverse(Node pStartingNode, Class<X> pClass,
-    @Nullable String... pTraverseArgs) {
+    @org.jspecify.annotations.Nullable String... pTraverseArgs) {
     List<X> results = new ArrayList<>();
 
     Element elem;

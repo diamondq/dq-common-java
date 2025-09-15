@@ -1,7 +1,7 @@
 package com.diamondq.common.bpm.camunda;
 
 import io.micronaut.retry.annotation.RetryPredicate;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 

@@ -6,7 +6,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.storage.kv.WhereInfo;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;

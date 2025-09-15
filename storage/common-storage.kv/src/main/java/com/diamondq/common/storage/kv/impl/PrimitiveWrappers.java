@@ -2,7 +2,7 @@ package com.diamondq.common.storage.kv.impl;
 
 import com.diamondq.common.storage.kv.IObjectWithId;
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -12,9 +12,9 @@ import java.lang.reflect.InvocationTargetException;
 public class PrimitiveWrappers {
 
   /**
-   * If the provided class is a primitive, then returns a wrapper around that primitive to make it persistable
+   * If the provided class is a primitive type, then returns a wrapper around that primitive to make it persistable
    *
-   * @param pClass
+   * @param pClass the class
    * @param pMustHaveRevision true if the wrapper (or main object) must support both id and revision
    * @return the wrapper class that should be used or null if this is not a primitive
    */
@@ -25,13 +25,13 @@ public class PrimitiveWrappers {
 
     if (pClass.isAssignableFrom(IObjectWithIdAndRev.class)) return null;
 
-    /* If we don't need the revision, but it is an object with an id, then it's definitely not a primitive */
+    /* If the revision isn't needed, but it is an object with an id, then it's definitely not a primitive */
 
-    if ((pMustHaveRevision == false) && (pClass.isAssignableFrom(IObjectWithId.class))) return null;
+    if ((!pMustHaveRevision) && (pClass.isAssignableFrom(IObjectWithId.class))) return null;
 
-    /* We need to create a wrapper. Determine the best possible wrapper, based on the class */
+    /* Create a wrapper. Determine the best possible wrapper, based on the class */
 
-    if (pMustHaveRevision == true) {
+    if (pMustHaveRevision) {
       if (pClass.isAssignableFrom(IObjectWithId.class)) return RevisionOnlyWrapper.class;
       else return IdAndRevisionWrapper.class;
     } else {
@@ -50,7 +50,7 @@ public class PrimitiveWrappers {
   public static <O> @Nullable O unwrap(@Nullable Object pObj, Class<O> pClass) {
     if (pObj == null) {
 
-      /* If it's a pure primitive, then we need to return the 'default' value */
+      /* If it's a pure primitive, then return the 'default' value */
 
       if (pClass == Boolean.TYPE) return (O) Boolean.FALSE;
       else if (pClass == Integer.TYPE) return (O) Integer.valueOf(0);

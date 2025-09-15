@@ -17,8 +17,7 @@ import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -160,7 +159,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    *   com.diamondq.common.model.interfaces.Property, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
-  public <@Nullable T> PropertyRef<@Nullable T> createPropertyRef(Scope pScope,
+  public <T extends @Nullable Object> PropertyRef<@Nullable T> createPropertyRef(Scope pScope,
     @Nullable Property<@Nullable T> pResolvable, Structure pContaining) {
     return getPersistenceLayer(pScope).createPropertyRef(this, pScope, pResolvable, pContaining);
   }
@@ -219,7 +218,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    */
   @Override
   public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(Scope pScope,
-    StructureDefinition pStructureDef, @Nullable Object @NotNull ... pPrimaryKeys) {
+    StructureDefinition pStructureDef, @Nullable Object... pPrimaryKeys) {
     return getPersistenceLayer(pScope).lookupStructureByPrimaryKeys(this, pScope, pStructureDef, pPrimaryKeys);
   }
 
@@ -265,7 +264,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    *   com.diamondq.common.model.interfaces.PropertyDefinition, boolean, java.lang.Object)
    */
   @Override
-  public <@Nullable TYPE> Property<@Nullable TYPE> createNewProperty(Scope pScope,
+  public <TYPE extends @Nullable Object> Property<@Nullable TYPE> createNewProperty(Scope pScope,
     PropertyDefinition pPropertyDefinition, boolean pIsValueSet, @Nullable TYPE pValue) {
     return getPersistenceLayer(pScope).createNewProperty(this, pScope, pPropertyDefinition, pIsValueSet, pValue);
   }
@@ -301,7 +300,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    *   java.lang.String)
    */
   @Override
-  public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
+  public <T extends @Nullable Object> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
     return getPersistenceLayer(pScope).createPropertyRefFromSerialized(this, pScope, pValue);
   }
 
@@ -350,7 +349,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    */
   @Override
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
-    StandardMigrations pMigrationType, @NotNull Object @Nullable ... pParams) {
+    StandardMigrations pMigrationType, Object @Nullable ... pParams) {
     return getPersistenceLayer(pScope).createStandardMigration(this, pScope, pMigrationType, pParams);
   }
 

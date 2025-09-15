@@ -1,14 +1,13 @@
 package com.diamondq.common.injection.osgi;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 public class ConstructorInfo {
 
-  public static enum SpecialTypes {
+  public enum SpecialTypes {
     NA,
     BUNDLECONTEXT,
     COMPONENTCONTEXT,
@@ -57,17 +56,17 @@ public class ConstructorInfo {
 
   public final @Nullable Method deleteMethod;
 
-  public final @NotNull String[] filters;
+  public final String[] filters;
 
-  public final @NotNull Class<?>[] filterClasses;
+  public final Class<?>[] filterClasses;
 
-  public final @NotNull String[] registrationClasses;
+  public final String[] registrationClasses;
 
-  public final @NotNull ConstructionArg[] constructionArgs;
+  public final ConstructionArg[] constructionArgs;
 
   public ConstructorInfo(Class<?> pConstructionClass, @Nullable Constructor<?> pConstructor, @Nullable Method pMethod,
-    @Nullable Method pDeleteMethod, @NotNull ConstructionArg[] pConstructionArgs, @NotNull String[] pFilters,
-    @NotNull Class<?>[] pFilterClasses, @NotNull String[] pRegistrationClasses) {
+    @Nullable Method pDeleteMethod, ConstructionArg[] pConstructionArgs, String[] pFilters, Class<?>[] pFilterClasses,
+    String[] pRegistrationClasses) {
     super();
     constructionClass = pConstructionClass;
     constructor = pConstructor;

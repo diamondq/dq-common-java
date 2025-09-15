@@ -1,7 +1,6 @@
 package com.diamondq.common.storage.kv;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public interface IKVTableDefinition {
    *
    * @return the name
    */
-  public String getTableName();
+  String getTableName();
 
   /**
    * A single primary key is usually stored as the underlying KV stores primary key, and thus the name of the key is
@@ -24,14 +23,15 @@ public interface IKVTableDefinition {
    *
    * @return the name (if available and there is only one primary key)
    */
-  public @Nullable String getSinglePrimaryKeyName();
+  @Nullable
+  String getSinglePrimaryKeyName();
 
   /**
    * Returns the list of columns
    *
    * @return the list of columns
    */
-  public List<@NotNull IKVColumnDefinition> getColumnDefinitions();
+  List<IKVColumnDefinition> getColumnDefinitions();
 
   /**
    * Search for a given definition by name
@@ -39,6 +39,7 @@ public interface IKVTableDefinition {
    * @param pName the name
    * @return the column definition or null
    */
-  public @Nullable IKVColumnDefinition getColumnDefinitionsByName(String pName);
+  @Nullable
+  IKVColumnDefinition getColumnDefinitionsByName(String pName);
 
 }

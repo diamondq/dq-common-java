@@ -1,8 +1,8 @@
 package com.diamondq.common.model.interfaces;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public class StructureAndProperty<@Nullable T> {
+public class StructureAndProperty<T extends @Nullable Object> {
 
   public final Structure structure;
 

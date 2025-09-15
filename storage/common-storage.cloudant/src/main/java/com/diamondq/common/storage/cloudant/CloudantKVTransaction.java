@@ -9,8 +9,7 @@ import com.diamondq.common.storage.kv.Query;
 import com.diamondq.common.storage.kv.impl.PrimitiveWrappers;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,13 +118,13 @@ public class CloudantKVTransaction implements IKVTransaction {
    * @see com.diamondq.common.storage.kv.IKVTransaction#keyIterator(java.lang.String)
    */
   @Override
-  public Iterator<@NotNull String> keyIterator(String pTable) {
+  public Iterator<String> keyIterator(String pTable) {
     // TODO Auto-generated method stub
     return Collections.emptyIterator();
   }
 
   @Override
-  public Iterator<@NotNull String> keyIterator2(String pTable, String pKey1) {
+  public Iterator<String> keyIterator2(String pTable, String pKey1) {
     // TODO Auto-generated method stub
     return Collections.emptyIterator();
   }
@@ -143,7 +142,7 @@ public class CloudantKVTransaction implements IKVTransaction {
   }
 
   @Override
-  public Iterator<@NotNull String> getTableList() {
+  public Iterator<String> getTableList() {
     // TODO Auto-generated method stub
     return Collections.emptyIterator();
   }

@@ -10,7 +10,7 @@ import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.logging.SLF4JLogDelegateFactory;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;

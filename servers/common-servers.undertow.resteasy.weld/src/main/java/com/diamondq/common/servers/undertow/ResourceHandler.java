@@ -1,7 +1,7 @@
 package com.diamondq.common.servers.undertow;
 
 import io.undertow.util.MimeMappings;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

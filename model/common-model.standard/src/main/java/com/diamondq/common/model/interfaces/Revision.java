@@ -1,7 +1,5 @@
 package com.diamondq.common.model.interfaces;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Indicates that this Structure holds a revision key. This unique object can be used for optimistic transactions
  * against the underlying persistent layer.
@@ -15,14 +13,14 @@ public interface Revision<RO> {
    *
    * @return true if it supports revisions or false otherwise
    */
-  public boolean supportsRevisions();
+  boolean supportsRevisions();
 
   /**
    * Returns a unique revision object
    *
    * @return the revision object
    */
-  public @NotNull RO getRevision();
+  RO getRevision();
 
   /**
    * Compares the revision of the current object against the supplied revision
@@ -30,5 +28,5 @@ public interface Revision<RO> {
    * @param pOtherRevision the other revision
    * @return true if they match or false if they don't
    */
-  public boolean compareToRevision(@NotNull RO pOtherRevision);
+  boolean compareToRevision(RO pOtherRevision);
 }

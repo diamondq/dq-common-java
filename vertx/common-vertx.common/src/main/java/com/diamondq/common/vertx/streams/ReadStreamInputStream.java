@@ -4,7 +4,7 @@ import com.diamondq.common.context.Context;
 import com.diamondq.common.context.ContextFactory;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.ReadStream;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,18 +29,19 @@ public class ReadStreamInputStream extends InputStream {
     mInternalBuffer = Buffer.buffer();
     try (Context ctx1 = ContextFactory.getInstance().newContext(ReadStreamInputStream.class, this, pStream)) {
       StreamUtils.processStream(pStream, (buffer, ctx, backPressure) -> {
-        synchronized (ReadStreamInputStream.this) {
-          mInternalBuffer.appendBuffer(buffer);
-          if (mInternalBuffer.length() > mMaxInternalBufferSize) {
-            mPaused = backPressure;
-            backPressure.pause();
-          }
-          if (mWaiting == true) {
-            mWaiting = false;
-            ReadStreamInputStream.this.notifyAll();
+          synchronized (ReadStreamInputStream.this) {
+            mInternalBuffer.appendBuffer(buffer);
+            if (mInternalBuffer.length() > mMaxInternalBufferSize) {
+              mPaused = backPressure;
+              backPressure.pause();
+            }
+            if (mWaiting == true) {
+              mWaiting = false;
+              ReadStreamInputStream.this.notifyAll();
+            }
           }
         }
-      }).handle((v, ex, ctx) -> {
+      ).handle((v, ex, ctx) -> {
         if (ex != null) ctx.reportThrowable(ex);
         synchronized (ReadStreamInputStream.this) {
           mFinished = true;

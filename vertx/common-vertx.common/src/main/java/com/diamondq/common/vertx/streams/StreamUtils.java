@@ -12,8 +12,7 @@ import com.diamondq.common.lambda.interfaces.Function1;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.vertx.streams.impl.ReadStreamBackPressure;
 import io.vertx.core.streams.ReadStream;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class StreamUtils {
 
@@ -89,8 +88,8 @@ public class StreamUtils {
    * @param pOnEnd called when the ReadStream is complete, and converts the intermediate object into it's final form
    * @return the result
    */
-  public static <T, @NotNull SI, U> ContextExtendedCompletionStage<U> processStream(ReadStream<T> pStream,
-    Function1<Context, SI> pOnStart, Consumer4<T, @NotNull SI, Context, BackPressure> pConsumer,
+  public static <T, SI, U> ContextExtendedCompletionStage<U> processStream(ReadStream<T> pStream,
+    Function1<Context, SI> pOnStart, Consumer4<T, SI, Context, BackPressure> pConsumer,
     Function2<SI, Context, U> pOnEnd) {
 
     ContextExtendedCompletableFuture<U> result = FutureUtils.newCompletableFuture();

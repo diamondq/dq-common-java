@@ -1,7 +1,7 @@
 package com.diamondq.common.bpm.camunda;
 
 import org.camunda.model.VariableValueDto;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Date;
 import java.util.HashMap;

@@ -14,7 +14,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.shredzone.acme4j.Authorization;
 import org.shredzone.acme4j.Certificate;
 import org.shredzone.acme4j.Registration;
@@ -612,19 +612,20 @@ public class AcmeAuthorizationController {
     NoSuchAlgorithmException {
 
     return process(pState -> {
-      try {
-        sLogger.debug("Marking terms of agreement as read {}", pAgreementURI);
-        Registration registration = pState.registration;
-        if (registration == null) throw new IllegalArgumentException();
-        registration.modify().setAgreement(new URI(pAgreementURI)).commit();
-      }
-      catch (URISyntaxException ex) {
-        throw new RuntimeException(ex);
-      }
-      catch (AcmeException ex) {
-        throw new RuntimeException(ex);
-      }
-    }, WorkflowEventState.AFTER_REGISTRATION);
+        try {
+          sLogger.debug("Marking terms of agreement as read {}", pAgreementURI);
+          Registration registration = pState.registration;
+          if (registration == null) throw new IllegalArgumentException();
+          registration.modify().setAgreement(new URI(pAgreementURI)).commit();
+        }
+        catch (URISyntaxException ex) {
+          throw new RuntimeException(ex);
+        }
+        catch (AcmeException ex) {
+          throw new RuntimeException(ex);
+        }
+      }, WorkflowEventState.AFTER_REGISTRATION
+    );
 
   }
 

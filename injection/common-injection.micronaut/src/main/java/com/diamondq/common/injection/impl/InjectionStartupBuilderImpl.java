@@ -5,7 +5,6 @@ import com.diamondq.common.injection.InjectionStartupBuilder;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.ApplicationContextBuilder;
 import io.micronaut.inject.qualifiers.Qualifiers;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
 
   public InjectionStartupBuilderImpl() {
     mEnvironmentTags = new HashSet<>();
-    mPropertiesList = new ArrayList<Map<String, Object>>();
+    mPropertiesList = new ArrayList<>();
     mSingletons = new HashSet<>();
     mNamedSingletons = new HashMap<>();
     mClassLoader = InjectionStartupBuilder.class.getClassLoader();
@@ -61,7 +60,7 @@ public class InjectionStartupBuilderImpl implements InjectionStartupBuilder {
    * @see com.diamondq.common.injection.InjectionStartupBuilder#singletons(java.lang.Object[])
    */
   @Override
-  public InjectionStartupBuilder singletons(@NotNull Object @NotNull ... pSingletons) {
+  public InjectionStartupBuilder singletons(Object... pSingletons) {
     synchronized (this) {
       for (final Object o : pSingletons)
         mSingletons.add(o);

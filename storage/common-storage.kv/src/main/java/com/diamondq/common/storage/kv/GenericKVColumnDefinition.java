@@ -1,6 +1,6 @@
 package com.diamondq.common.storage.kv;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 
@@ -34,8 +34,8 @@ public class GenericKVColumnDefinition implements IKVColumnDefinition {
    * @param pMaxLength the max length (can be null)
    * @param pMinValue the min value (can be null)
    * @param pMaxValue the max value (can be null)
-   * @param pAutoIncrementBy
-   * @param pAutoIncrementStart
+   * @param pAutoIncrementBy the amount to increment
+   * @param pAutoIncrementStart the amount to start with
    */
   public GenericKVColumnDefinition(String pName, KVColumnType pType, boolean pIsPrimaryKey,
     @Nullable Integer pMaxLength, @Nullable BigDecimal pMinValue, @Nullable BigDecimal pMaxValue,

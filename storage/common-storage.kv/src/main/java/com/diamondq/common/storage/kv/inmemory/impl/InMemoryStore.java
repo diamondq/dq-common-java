@@ -10,8 +10,7 @@ import com.diamondq.common.storage.kv.KVIndexColumnBuilder;
 import com.diamondq.common.storage.kv.KVIndexDefinitionBuilder;
 import com.diamondq.common.storage.kv.KVTableDefinitionBuilder;
 import com.diamondq.common.storage.kv.SyncWrapperAsyncKVTransaction;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -49,7 +48,7 @@ public class InMemoryStore implements IKVStore {
    * @see com.diamondq.common.storage.kv.IKVStore#getIndexSupport()
    */
   @Override
-  public <ICB extends @NotNull KVIndexColumnBuilder<@NotNull ICB>, IDB extends @NotNull KVIndexDefinitionBuilder<@NotNull IDB>> @Nullable IKVIndexSupport<@NotNull ICB, @NotNull IDB> getIndexSupport() {
+  public <ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> @Nullable IKVIndexSupport<ICB, IDB> getIndexSupport() {
     return null;
   }
 
@@ -57,7 +56,7 @@ public class InMemoryStore implements IKVStore {
    * @see com.diamondq.common.storage.kv.IKVStore
    */
   @Override
-  public <TDB extends @NotNull KVTableDefinitionBuilder<@NotNull TDB>, CDB extends @NotNull KVColumnDefinitionBuilder<@NotNull CDB>> @Nullable IKVTableDefinitionSupport<@NotNull TDB, @NotNull CDB> getTableDefinitionSupport() {
+  public <TDB extends KVTableDefinitionBuilder<TDB>, CDB extends KVColumnDefinitionBuilder<CDB>> @Nullable IKVTableDefinitionSupport<TDB, CDB> getTableDefinitionSupport() {
     return null;
   }
 }

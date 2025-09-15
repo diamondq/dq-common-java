@@ -1,7 +1,9 @@
 package com.diamondq.common.lambda.interfaces;
 
+import org.jspecify.annotations.Nullable;
+
 @FunctionalInterface
-public interface Consumer2<T1, T2> {
+public interface Consumer2<T1 extends @Nullable Object, T2 extends @Nullable Object> {
 
   /**
    * Performs this operation on the given argument.

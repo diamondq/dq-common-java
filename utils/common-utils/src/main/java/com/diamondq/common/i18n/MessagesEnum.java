@@ -1,6 +1,6 @@
 package com.diamondq.common.i18n;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -16,11 +16,11 @@ public interface MessagesEnum {
    *
    * @return the key
    */
-  public String getCode();
+  String getCode();
 
-  public ResourceBundle getBundle(Locale pLocale);
+  ResourceBundle getBundle(Locale pLocale);
 
-  public default I18NString with(@Nullable Object @Nullable ... pParams) {
+  default I18NString with(@Nullable Object @Nullable ... pParams) {
     return new I18NString(this, pParams);
   }
 }

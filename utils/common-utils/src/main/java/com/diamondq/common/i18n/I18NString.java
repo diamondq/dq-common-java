@@ -1,7 +1,7 @@
 package com.diamondq.common.i18n;
 
 import com.diamondq.common.errors.I18NStringAndException;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;

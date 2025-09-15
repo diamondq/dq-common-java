@@ -1,7 +1,6 @@
 package com.diamondq.common.storage.kv;
 
 import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ public class GenericKVIndexDefinition implements IKVIndexDefinition {
 
   private final String mName;
 
-  private final List<@NotNull IKVIndexColumn> mColumns;
+  private final List<IKVIndexColumn> mColumns;
 
   /**
    * Default constructor
@@ -23,7 +22,7 @@ public class GenericKVIndexDefinition implements IKVIndexDefinition {
    * @param pName the name
    * @param pColumns the list of columns
    */
-  public GenericKVIndexDefinition(String pTableName, String pName, List<@NotNull IKVIndexColumn> pColumns) {
+  public GenericKVIndexDefinition(String pTableName, String pName, List<IKVIndexColumn> pColumns) {
     super();
     mTableName = pTableName;
     mName = pName;
@@ -50,7 +49,7 @@ public class GenericKVIndexDefinition implements IKVIndexDefinition {
    * @see com.diamondq.common.storage.kv.IKVIndexDefinition#getColumns()
    */
   @Override
-  public List<@NotNull IKVIndexColumn> getColumns() {
+  public List<IKVIndexColumn> getColumns() {
     return mColumns;
   }
 

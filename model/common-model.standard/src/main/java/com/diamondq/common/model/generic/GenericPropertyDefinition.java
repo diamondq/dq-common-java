@@ -18,8 +18,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -452,7 +451,7 @@ public class GenericPropertyDefinition implements PropertyDefinition {
 
   @Override
   public PropertyDefinition removeReferenceType(StructureDefinitionRef pValue) {
-    @SuppressWarnings("null") @NotNull Predicate<StructureDefinitionRef> equalTo = Predicates.equalTo(pValue);
+    Predicate<StructureDefinitionRef> equalTo = Predicates.equalTo(pValue);
     return new GenericPropertyDefinition(mScope,
       mName,
       mLabel,

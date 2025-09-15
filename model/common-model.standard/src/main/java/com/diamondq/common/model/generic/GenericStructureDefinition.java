@@ -22,8 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -263,7 +262,7 @@ public class GenericStructureDefinition implements StructureDefinition {
    */
   @Override
   public StructureDefinition removePropertyDefinition(PropertyDefinition pValue) {
-    @SuppressWarnings("null") @NotNull Predicate<PropertyDefinition> equalTo = Predicates.equalTo(pValue);
+    Predicate<PropertyDefinition> equalTo = Predicates.equalTo(pValue);
     return new GenericStructureDefinition(mScope,
       mName,
       mRevision,
@@ -304,7 +303,7 @@ public class GenericStructureDefinition implements StructureDefinition {
    */
   @Override
   public StructureDefinition removeParentDefinition(StructureDefinitionRef pValue) {
-    @SuppressWarnings("null") @NotNull Predicate<StructureDefinitionRef> equalTo = Predicates.equalTo(pValue);
+    Predicate<StructureDefinitionRef> equalTo = Predicates.equalTo(pValue);
     return new GenericStructureDefinition(mScope,
       mName,
       mRevision,

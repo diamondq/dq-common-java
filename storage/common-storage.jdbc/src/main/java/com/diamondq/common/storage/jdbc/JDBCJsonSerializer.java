@@ -3,7 +3,7 @@ package com.diamondq.common.storage.jdbc;
 import com.diamondq.common.storage.kv.IKVColumnDefinition;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -21,7 +21,7 @@ public class JDBCJsonSerializer implements IPreparedStatementSerializer {
    *   java.sql.PreparedStatement, int)
    */
   @Override
-  public <@Nullable O> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
+  public <O extends @Nullable Object> int serializeToPreparedStatement(O pObj, PreparedStatement pPs, int pStartAtIndex)
     throws SQLException {
     try {
       String str = mMapper.writeValueAsString(pObj);

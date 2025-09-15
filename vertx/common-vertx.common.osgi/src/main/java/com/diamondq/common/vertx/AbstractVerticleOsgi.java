@@ -12,7 +12,7 @@ import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
 

@@ -7,8 +7,7 @@ import io.opentracing.propagation.Format;
 import io.opentracing.propagation.TextMapExtractAdapter;
 import io.opentracing.propagation.TextMapInjectAdapter;
 import io.opentracing.util.GlobalTracer;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.xmpp.core.session.XmppClient;
@@ -17,9 +16,9 @@ import rocks.xmpp.core.stanza.IQHandler;
 import rocks.xmpp.core.stanza.model.IQ;
 import rocks.xmpp.core.stanza.model.IQ.Type;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -51,19 +50,19 @@ public class OpenTracingExtender {
 
       if ((type == Type.GET) || (type == Type.SET)) {
         try {
-          Map<@NotNull String, @NotNull String> map = new HashMap<>();
+          Map<String, String> map = new HashMap<>();
           GlobalTracer.get()
             .inject(activeSpan.context(), Format.Builtin.TEXT_MAP_INJECT, new TextMapInjectAdapter(map));
           StringBuilder sb = new StringBuilder();
           sb.append(iq.getId());
           sb.append(sKEYWORD);
           boolean isFirst = true;
-          for (Map.Entry<@NotNull String, @NotNull String> pair : map.entrySet()) {
-            if (isFirst == true) isFirst = false;
+          for (Map.Entry<String, String> pair : map.entrySet()) {
+            if (isFirst) isFirst = false;
             else sb.append('&');
-            sb.append(URLEncoder.encode(pair.getKey(), "UTF-8"));
+            sb.append(URLEncoder.encode(pair.getKey(), StandardCharsets.UTF_8));
             sb.append('=');
-            sb.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+            sb.append(URLEncoder.encode(pair.getValue(), StandardCharsets.UTF_8));
           }
           String newId = sb.toString();
 
@@ -72,7 +71,7 @@ public class OpenTracingExtender {
           sPendingIDRemaps.put(newId, Objects.requireNonNull(iq.getId()));
           iq.setId(newId);
         }
-        catch (IllegalArgumentException | UnsupportedEncodingException ex) {
+        catch (IllegalArgumentException ex) {
           throw new RuntimeException(ex);
         }
       }
@@ -110,28 +109,23 @@ public class OpenTracingExtender {
   }
 
   public static @Nullable SpanBuilder processID(String id) {
-    try {
-      int offset = id.indexOf(sKEYWORD);
-      if (offset != -1) {
-        String data = id.substring(offset + sKEYWORD.length());
-        Map<String, String> map = new HashMap<>();
-        String[] parts = data.split("\\&");
-        for (String part : parts) {
-          int breakOffset = part.indexOf('=');
-          if (breakOffset != -1) {
-            String key = URLDecoder.decode(part.substring(0, breakOffset), "UTF-8");
-            String value = URLDecoder.decode(part.substring(breakOffset + 1), "UTF-8");
-            map.put(key, value);
-          }
+    int offset = id.indexOf(sKEYWORD);
+    if (offset != -1) {
+      String data = id.substring(offset + sKEYWORD.length());
+      Map<String, String> map = new HashMap<>();
+      String[] parts = data.split("&");
+      for (String part : parts) {
+        int breakOffset = part.indexOf('=');
+        if (breakOffset != -1) {
+          String key = URLDecoder.decode(part.substring(0, breakOffset), StandardCharsets.UTF_8);
+          String value = URLDecoder.decode(part.substring(breakOffset + 1), StandardCharsets.UTF_8);
+          map.put(key, value);
         }
-
-        SpanContext spanContext = GlobalTracer.get()
-          .extract(Format.Builtin.TEXT_MAP_EXTRACT, new TextMapExtractAdapter(map));
-        return GlobalTracer.get().buildSpan("").asChildOf(spanContext);
       }
-    }
-    catch (UnsupportedEncodingException ex) {
-      sLogger.error("Error, but continuing", ex);
+
+      SpanContext spanContext = GlobalTracer.get()
+        .extract(Format.Builtin.TEXT_MAP_EXTRACT, new TextMapExtractAdapter(map));
+      return GlobalTracer.get().buildSpan("").asChildOf(spanContext);
     }
     return null;
   }

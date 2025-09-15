@@ -2,16 +2,15 @@ package com.diamondq.common.model.generic;
 
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.Structure;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
 public class StandardCopyColumnMigration implements BiFunction<Structure, Structure, Structure> {
 
-  private final @NotNull String[] mColumns;
+  private final String[] mColumns;
 
-  public StandardCopyColumnMigration(@NotNull String[] pColumns) {
+  public StandardCopyColumnMigration(String[] pColumns) {
     mColumns = pColumns;
   }
 

@@ -1,6 +1,7 @@
 package com.diamondq.common.lambda;
 
 import com.diamondq.common.lambda.interfaces.Function3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,24 +17,21 @@ public class Memoizer {
   public Memoizer() {
   }
 
-  public <T> T memoize(Supplier<T> pSupplier, String pPrefix) {
+  public <T extends @Nullable Object> T memoize(Supplier<T> pSupplier, String pPrefix) {
 
     /* Check the memoizer */
 
-    String cacheKey = pPrefix;
-    Optional<Object> result = mData.get(cacheKey);
+    Optional<Object> result = mData.get(pPrefix);
     if (result == null) {
 
       Optional<Object> newResult = Optional.ofNullable(pSupplier.get());
 
-      if ((result = mData.putIfAbsent(cacheKey, newResult)) == null)
-        result = newResult;
+      if ((result = mData.putIfAbsent(pPrefix, newResult)) == null) result = newResult;
     }
 
     /* Cast and return */
 
-    @SuppressWarnings("unchecked")
-    T castedResult = (T) (result.isPresent() ? result.get() : null);
+    @SuppressWarnings("unchecked") T castedResult = (T) (result.isPresent() ? result.get() : null);
     return castedResult;
   }
 
@@ -43,22 +41,19 @@ public class Memoizer {
 
     StringBuilder sb = new StringBuilder(pPrefix);
     sb.append('/');
-    if (pInput1 != null)
-      sb.append(pInput1.toString());
+    if (pInput1 != null) sb.append(pInput1);
     String cacheKey = sb.toString();
     Optional<Object> result = mData.get(cacheKey);
     if (result == null) {
 
       Optional<Object> newResult = Optional.ofNullable(pSupplier.apply(pInput1));
 
-      if ((result = mData.putIfAbsent(cacheKey, newResult)) == null)
-        result = newResult;
+      if ((result = mData.putIfAbsent(cacheKey, newResult)) == null) result = newResult;
     }
 
     /* Cast and return */
 
-    @SuppressWarnings("unchecked")
-    T castedResult = (T) (result.isPresent() ? result.get() : null);
+    @SuppressWarnings("unchecked") T castedResult = (T) (result.isPresent() ? result.get() : null);
     return castedResult;
   }
 
@@ -68,25 +63,21 @@ public class Memoizer {
 
     StringBuilder sb = new StringBuilder(pPrefix);
     sb.append('/');
-    if (pInput1 != null)
-      sb.append(pInput1.toString());
+    if (pInput1 != null) sb.append(pInput1.toString());
     sb.append('/');
-    if (pInput2 != null)
-      sb.append(pInput2.toString());
+    if (pInput2 != null) sb.append(pInput2.toString());
     String cacheKey = sb.toString();
     Optional<Object> result = mData.get(cacheKey);
     if (result == null) {
 
       Optional<Object> newResult = Optional.ofNullable(pSupplier.apply(pInput1, pInput2));
 
-      if ((result = mData.putIfAbsent(cacheKey, newResult)) == null)
-        result = newResult;
+      if ((result = mData.putIfAbsent(cacheKey, newResult)) == null) result = newResult;
     }
 
     /* Cast and return */
 
-    @SuppressWarnings("unchecked")
-    T castedResult = (T) (result.isPresent() ? result.get() : null);
+    @SuppressWarnings("unchecked") T castedResult = (T) (result.isPresent() ? result.get() : null);
     return castedResult;
   }
 
@@ -97,28 +88,23 @@ public class Memoizer {
 
     StringBuilder sb = new StringBuilder(pPrefix);
     sb.append('/');
-    if (pInput1 != null)
-      sb.append(pInput1.toString());
+    if (pInput1 != null) sb.append(pInput1.toString());
     sb.append('/');
-    if (pInput2 != null)
-      sb.append(pInput2.toString());
+    if (pInput2 != null) sb.append(pInput2.toString());
     sb.append('/');
-    if (pInput3 != null)
-      sb.append(pInput3.toString());
+    if (pInput3 != null) sb.append(pInput3.toString());
     String cacheKey = sb.toString();
     Optional<Object> result = mData.get(cacheKey);
     if (result == null) {
 
       Optional<Object> newResult = Optional.ofNullable(pSupplier.apply(pInput1, pInput2, pInput3));
 
-      if ((result = mData.putIfAbsent(cacheKey, newResult)) == null)
-        result = newResult;
+      if ((result = mData.putIfAbsent(cacheKey, newResult)) == null) result = newResult;
     }
 
     /* Cast and return */
 
-    @SuppressWarnings("unchecked")
-    T castedResult = (T) (result.isPresent() ? result.get() : null);
+    @SuppressWarnings("unchecked") T castedResult = (T) (result.isPresent() ? result.get() : null);
     return castedResult;
   }
 }

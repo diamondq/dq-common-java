@@ -1,7 +1,7 @@
 package com.diamondq.common.security.acme.model;
 
 import com.diamondq.common.model.interfaces.Structure;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class PersistedState {
 

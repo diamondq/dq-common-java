@@ -2,7 +2,7 @@ package com.diamondq.common.injection.osgi;
 
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
@@ -30,11 +30,11 @@ public class FilterTracker implements ServiceTrackerCustomizer<Object, Object> {
     return idResult < 0 ? -1 : (idResult == 0 ? 0 : 1);
   };
 
-  private BundleContext mBundleContext;
+  private final BundleContext mBundleContext;
 
-  private Map<ServiceReference<Object>, Pair<Integer, Long>> mReferences;
+  private final Map<ServiceReference<Object>, Pair<Integer, Long>> mReferences;
 
-  private List<Triplet<Integer, Long, ServiceReference<Object>>> mRankedReferences;
+  private final List<Triplet<Integer, Long, ServiceReference<Object>>> mRankedReferences;
 
   private @Nullable ServiceTracker<Object, Object> mTracker;
 
@@ -92,7 +92,7 @@ public class FilterTracker implements ServiceTrackerCustomizer<Object, Object> {
       Pair<Integer, Long> pair = getRankingIdPair(pReference);
       mReferences.put(pReference, pair);
       mRankedReferences.add(Triplet.with(pair.getValue0(), pair.getValue1(), pReference));
-      Collections.sort(mRankedReferences, sRANKED_COMPARATOR);
+      mRankedReferences.sort(sRANKED_COMPARATOR);
       if (mNotify != null) mNotify.accept(this);
     }
     return mBundleContext.getService(pReference);
@@ -119,7 +119,7 @@ public class FilterTracker implements ServiceTrackerCustomizer<Object, Object> {
       Pair<Integer, Long> pair = mReferences.remove(pReference);
       if (pair != null) {
         mRankedReferences.remove(Triplet.with(pair.getValue0(), pair.getValue1(), pReference));
-        Collections.sort(mRankedReferences, sRANKED_COMPARATOR);
+        mRankedReferences.sort(sRANKED_COMPARATOR);
       }
       if (mNotify != null) mNotify.accept(this);
     }

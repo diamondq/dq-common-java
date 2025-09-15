@@ -3,7 +3,7 @@ package com.diamondq.common.model.generic;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureRef;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class GenericStructureRef extends AbstractRef<Structure> implements StructureRef {
 

@@ -1,6 +1,6 @@
 package com.diamondq.common.storage.jdbc;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

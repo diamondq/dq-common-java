@@ -1,6 +1,6 @@
 package com.diamondq.common.context.spi;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 

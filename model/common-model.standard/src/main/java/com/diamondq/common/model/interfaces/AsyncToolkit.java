@@ -2,8 +2,7 @@ package com.diamondq.common.model.interfaces;
 
 import com.diamondq.common.context.ContextExtendedCompletionStage;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,27 +18,27 @@ public interface AsyncToolkit {
    * @return the set
    */
 
-  public ContextExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(Scope pScope);
+  ContextExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(Scope pScope);
 
   /**
-   * Creates a new StructureDefinition that is not yet persisted.
+   * Creates a new StructureDefinition that has not yet persisted.
    *
    * @param pScope the scope
    * @param pName the name for the StructureDefinition
    * @param pRevision the revision
    * @return the blank StructureDefinition
    */
-  public StructureDefinition createNewStructureDefinition(Scope pScope, String pName, int pRevision);
+  StructureDefinition createNewStructureDefinition(Scope pScope, String pName, int pRevision);
 
   /**
-   * Writes a StructureDefinition back to persistent storage. Future queries will return the persisted value, but
-   * existing StructureDefinition's will not be automatically updated.
+   * Writes a StructureDefinition back to persistent storage.<br/> Future queries will return the persisting value, but
+   * existing StructureDefinition will not be automatically updated.
    *
    * @param pScope the scope
    * @param pValue the StructureDefinition to write
    * @return the stored StructureDefinition
    */
-  public ContextExtendedCompletionStage<StructureDefinition> writeStructureDefinition(Scope pScope,
+  ContextExtendedCompletionStage<StructureDefinition> writeStructureDefinition(Scope pScope,
     StructureDefinition pValue);
 
   /**
@@ -49,8 +48,7 @@ public interface AsyncToolkit {
    * @param pValue the StructureDefinition to delete.
    * @return completion future
    */
-  public ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(Scope pScope,
-    StructureDefinition pValue);
+  ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(Scope pScope, StructureDefinition pValue);
 
   /**
    * Creates a reference for a StructureDefinition
@@ -60,8 +58,7 @@ public interface AsyncToolkit {
    * @param pWildcard true of the reference should be a wildcard reference or false if not
    * @return the reference
    */
-  public StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable,
-    boolean pWildcard);
+  StructureDefinitionRef createStructureDefinitionRef(Scope pScope, StructureDefinition pResolvable, boolean pWildcard);
 
   /**
    * Creates a reference for StructureDefinition
@@ -71,7 +68,7 @@ public interface AsyncToolkit {
    * @return the reference
    */
 
-  public StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized);
+  StructureDefinitionRef createStructureDefinitionRefFromSerialized(Scope pScope, String pSerialized);
 
   /**
    * Creates a reference for a Structure
@@ -81,7 +78,7 @@ public interface AsyncToolkit {
    * @return the reference
    */
 
-  public StructureRef createStructureRef(Scope pScope, Structure pResolvable);
+  StructureRef createStructureRef(Scope pScope, Structure pResolvable);
 
   /**
    * Creates a reference string for a Structure
@@ -91,18 +88,18 @@ public interface AsyncToolkit {
    * @return the reference string
    */
 
-  public String createStructureRefStr(Scope pScope, Structure pResolvable);
+  String createStructureRefStr(Scope pScope, Structure pResolvable);
 
   /**
    * Creates a reference for a PropertyDefinition
    *
    * @param pScope the scope
-   * @param pResolvable the PropertyDefinition
+   * @param pResolvable propertyDefinition
    * @param pContaining the containing StructureDefinition
    * @return the reference
    */
 
-  public PropertyDefinitionRef createPropertyDefinitionRef(Scope pScope, PropertyDefinition pResolvable,
+  PropertyDefinitionRef createPropertyDefinitionRef(Scope pScope, PropertyDefinition pResolvable,
     StructureDefinition pContaining);
 
   /**
@@ -114,7 +111,7 @@ public interface AsyncToolkit {
    * @return the reference
    */
 
-  public <@Nullable T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
+  <T extends @Nullable Object> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
     Structure pContaining);
 
   /**
@@ -124,7 +121,7 @@ public interface AsyncToolkit {
    * @param pName the name
    * @return the StructureDefinition or null
    */
-  public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(Scope pScope,
+  ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByName(Scope pScope,
     String pName);
 
   /**
@@ -132,11 +129,11 @@ public interface AsyncToolkit {
    *
    * @param pScope the scope
    * @param pName the name
-   * @param pRevision the revision (if null then find the latest)
+   * @param pRevision the revision (if null, then find the latest)
    * @return the StructureDefinition or null
    */
-  public ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(
-    Scope pScope, String pName, @Nullable Integer pRevision);
+  ContextExtendedCompletionStage<@Nullable StructureDefinition> lookupStructureDefinitionByNameAndRevision(Scope pScope,
+    String pName, @Nullable Integer pRevision);
 
   /**
    * Creates a new blank PropertyDefinition.
@@ -146,18 +143,19 @@ public interface AsyncToolkit {
    * @param pType the property type
    * @return the PropertyDefinition, never null.
    */
-  public PropertyDefinition createNewPropertyDefinition(Scope pScope, String pName, PropertyType pType);
+  PropertyDefinition createNewPropertyDefinition(Scope pScope, String pName, PropertyType pType);
 
   /**
    * Given a list of primary keys, collapse it into a single name. This usually just returns a String separated by a
    * separator such as '$'. NOTE: It also usually munges the primary keys to guarantee the ability to separate the
-   * pieces again. There is no standard for the format. You must use the same 'toolkit' to pull apart a primary key.
+   * pieces again. There is no standard for the format. The caller must use the same 'toolkit' to pull apart a primary
+   * key.
    *
    * @param pScope the scope
    * @param pNames the names
    * @return the collapsed primary key
    */
-  public String collapsePrimaryKeys(Scope pScope, List<@Nullable Object> pNames);
+  String collapsePrimaryKeys(Scope pScope, List<@Nullable Object> pNames);
 
   /**
    * Looks up a Structure by the full serialized reference string. This is actually called by the
@@ -166,9 +164,9 @@ public interface AsyncToolkit {
    * @param pScope the scope
    * @param pSerializedRef the serialized reference string (generally created from
    *   {@link StructureRef#getSerializedString()}
-   * @return the Structure or null
+   * @return structure or null
    */
-  public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(Scope pScope,
+  ContextExtendedCompletionStage<@Nullable Structure> lookupStructureBySerializedRef(Scope pScope,
     String pSerializedRef);
 
   /**
@@ -179,7 +177,7 @@ public interface AsyncToolkit {
    * @param pPrimaryKeys the primary keys
    * @return the structure or null if there is no match
    */
-  public ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(Scope pScope,
+  ContextExtendedCompletionStage<@Nullable Structure> lookupStructureByPrimaryKeys(Scope pScope,
     StructureDefinition pStructureDef, @Nullable Object... pPrimaryKeys);
 
   /**
@@ -190,7 +188,7 @@ public interface AsyncToolkit {
    * @param pStructureDefinition the StructureDefinition to use
    * @return the new, empty, Structure
    */
-  public Structure createNewStructure(Scope pScope, StructureDefinition pStructureDefinition);
+  Structure createNewStructure(Scope pScope, StructureDefinition pStructureDefinition);
 
   /**
    * Writes a Structure to the persistence layer.
@@ -199,7 +197,7 @@ public interface AsyncToolkit {
    * @param pStructure the Structure
    * @return the completion future
    */
-  public ContextExtendedCompletionStage<@Nullable Void> writeStructure(Scope pScope, Structure pStructure);
+  ContextExtendedCompletionStage<@Nullable Void> writeStructure(Scope pScope, Structure pStructure);
 
   /**
    * Writes a Structure to the persistence layer if the old structure is what was previously in the persistence layer
@@ -208,9 +206,10 @@ public interface AsyncToolkit {
    * @param pScope the scope
    * @param pStructure the structure
    * @param pOldStructure the old structure or null if there shouldn't be a matching structure
-   * @return true if the structure was written or false if it wasn't written because it didn't match the old structure
+   * @return a future true if the structure was written or false if it wasn't written because it didn't match the old
+   *   structure
    */
-  public ContextExtendedCompletionStage<Boolean> writeStructure(Scope pScope, Structure pStructure,
+  ContextExtendedCompletionStage<Boolean> writeStructure(Scope pScope, Structure pStructure,
     @Nullable Structure pOldStructure);
 
   /**
@@ -218,10 +217,10 @@ public interface AsyncToolkit {
    *
    * @param pScope the scope
    * @param pOldStructure the Structure to delete.
-   * @return true if the structure was deleted or false if it wasn't deleted because there wasn't a structure that
-   *   matches the old structure.
+   * @return a future true if the structure was deleted or false if it wasn't deleted because there wasn't a structure
+   *   that matches the old structure.
    */
-  public ContextExtendedCompletionStage<Boolean> deleteStructure(Scope pScope, Structure pOldStructure);
+  ContextExtendedCompletionStage<Boolean> deleteStructure(Scope pScope, Structure pOldStructure);
 
   /**
    * Creates a new Property given a PropertyDefinition. NOTE: The PropertyDefinition must be in the same scope as that
@@ -233,17 +232,17 @@ public interface AsyncToolkit {
    * @param pValue the value (if the value is not set, then this is ignored)
    * @return the new, empty, Property
    */
-  public <@Nullable TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
+  <TYPE extends @Nullable Object> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
     boolean isValueSet, TYPE pValue);
 
   /**
    * Creates a new StructureRef from a serialized string
    *
-   * @param pScope
+   * @param pScope the scope
    * @param pValue the serialized string
    * @return the StructureRef
    */
-  public StructureRef createStructureRefFromSerialized(Scope pScope, String pValue);
+  StructureRef createStructureRefFromSerialized(Scope pScope, String pValue);
 
   /**
    * Creates a new StructureRef from the parts of a serialized string. There are multiple different ways that this can
@@ -262,8 +261,8 @@ public interface AsyncToolkit {
    * @param pPrimaryKeys the set of primary keys in the appropriate order
    * @return the StructureRef
    */
-  public StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure,
-    @Nullable String pPropName, @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys);
+  StructureRef createStructureRefFromParts(Scope pScope, @Nullable Structure pStructure, @Nullable String pPropName,
+    @Nullable StructureDefinition pDef, @Nullable List<@Nullable Object> pPrimaryKeys);
 
   /**
    * Creates a new PropertyRef from a serialized string
@@ -272,9 +271,9 @@ public interface AsyncToolkit {
    * @param pValue the serialized string
    * @return the PropertyRef
    */
-  public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue);
+  <T extends @Nullable Object> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue);
 
-  public ContextExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(Scope pScope,
+  ContextExtendedCompletionStage<Collection<Structure>> getAllStructuresByDefinition(Scope pScope,
     StructureDefinitionRef pRef, @Nullable String pParentKey, @Nullable PropertyDefinition pParentPropertyDef);
 
   /**
@@ -285,7 +284,7 @@ public interface AsyncToolkit {
    * @param pQueryName the query name
    * @return the QueryBuilder
    */
-  public QueryBuilder createNewQueryBuilder(Scope pScope, StructureDefinition pStructureDefinition, String pQueryName);
+  QueryBuilder createNewQueryBuilder(Scope pScope, StructureDefinition pStructureDefinition, String pQueryName);
 
   /**
    * Writes the query builder.
@@ -294,7 +293,7 @@ public interface AsyncToolkit {
    * @param pQueryBuilder the query builder
    * @return the query
    */
-  public ContextExtendedCompletionStage<ModelQuery> writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder);
+  ContextExtendedCompletionStage<ModelQuery> writeQueryBuilder(Scope pScope, QueryBuilder pQueryBuilder);
 
   /**
    * Executes a previously written query
@@ -304,7 +303,7 @@ public interface AsyncToolkit {
    * @param pParamValues the map of parameters
    * @return the result
    */
-  public ContextExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(Scope pScope, ModelQuery pQuery,
+  ContextExtendedCompletionStage<List<Structure>> lookupStructuresByQuery(Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues);
 
   /**
@@ -315,7 +314,7 @@ public interface AsyncToolkit {
    * @param pParamValues the map of parameters
    * @return the number of matching records
    */
-  public ContextExtendedCompletionStage<Integer> countByQuery(Scope pScope, ModelQuery pQuery,
+  ContextExtendedCompletionStage<Integer> countByQuery(Scope pScope, ModelQuery pQuery,
     @Nullable Map<String, Object> pParamValues);
 
   /**
@@ -326,8 +325,8 @@ public interface AsyncToolkit {
    * @param pParams parameters needed for that migration type
    * @return the migration function
    */
-  public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
-    StandardMigrations pMigrationType, @NotNull Object @Nullable ... pParams);
+  BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope, StandardMigrations pMigrationType,
+    Object @Nullable ... pParams);
 
   /**
    * Adds a migration between two revisions of a Structure's Definition
@@ -337,9 +336,9 @@ public interface AsyncToolkit {
    * @param pFromRevision the older revision of the StructureDefinition
    * @param pToRevision the newer revision of the StructureDefinition
    * @param pMigrationFunction the function that takes the older Structure and migrates it to the new Structure. The
-   *   starting point of the new Structure is passed in as the second parameter, and must be returned as the result.
+   *   starting point of the new Structure is passed in as the second parameter and must be returned as the result.
    */
-  public void addMigration(Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
+  void addMigration(Scope pScope, String pStructureDefinitionName, int pFromRevision, int pToRevision,
     BiFunction<Structure, Structure, Structure> pMigrationFunction);
 
   /**
@@ -351,8 +350,9 @@ public interface AsyncToolkit {
    * @param pToRevision the ending revision
    * @return the path or null if there is no possible path
    */
-  public @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
-    Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
+  @Nullable
+  List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(Scope pScope,
+    String pStructureDefName, int pFromRevision, int pToRevision);
 
   /**
    * Returns the latest revision of a given structure definition name
@@ -361,7 +361,7 @@ public interface AsyncToolkit {
    * @param pDefName the definition name
    * @return the revision (or null if the definition doesn't exist)
    */
-  public ContextExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(Scope pScope,
+  ContextExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(Scope pScope,
     String pDefName);
 
   /**
@@ -369,7 +369,7 @@ public interface AsyncToolkit {
    *
    * @return the toolkit
    */
-  public Toolkit getSyncToolkit();
+  Toolkit getSyncToolkit();
 
   /**
    * Deletes all structures for the given structure definition
@@ -378,6 +378,5 @@ public interface AsyncToolkit {
    * @param pStructureDef the structure definition
    * @return the future
    */
-  public ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope,
-    StructureDefinition pStructureDef);
+  ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope, StructureDefinition pStructureDef);
 }

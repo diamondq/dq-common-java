@@ -2,7 +2,7 @@ package com.diamondq.common.storage.jdbc;
 
 import com.diamondq.common.storage.kv.GenericKVTableDefinition;
 import com.diamondq.common.storage.kv.IKVColumnDefinition;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

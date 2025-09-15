@@ -4,7 +4,7 @@ import com.diamondq.common.injection.InjectionContext;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.literal.NamedLiteral;
 import jakarta.enterprise.inject.se.SeContainer;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;

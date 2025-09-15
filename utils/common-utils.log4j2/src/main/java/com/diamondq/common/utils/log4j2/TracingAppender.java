@@ -12,26 +12,23 @@ import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @Plugin(name = "OpenTracing", category = "Core", elementType = "appender", printObject = true)
 public class TracingAppender extends AbstractAppender {
 
-  private static final Charset sUTF8 = Charset.forName("UTF-8");
-
   public TracingAppender(String pName, @Nullable Filter pFilter, Layout<? extends Serializable> pLayout,
-    boolean pIgnoreExceptions, final @NotNull Property[] pProperties) {
+    boolean pIgnoreExceptions, final Property[] pProperties) {
     super(pName, pFilter, pLayout, pIgnoreExceptions, pProperties);
   }
 
   @PluginFactory
   public static @Nullable TracingAppender createAppender(@PluginAttribute("name") @Nullable String name,
     @PluginAttribute("ignoreExceptions") boolean ignoreExceptions,
-    @PluginElement("Layout") @Nullable Layout<@NotNull ? extends @NotNull Serializable> layout,
+    @PluginElement("Layout") @Nullable Layout<? extends Serializable> layout,
     @PluginElement("Filters") @Nullable Filter filter) {
 
     if (name == null) {
@@ -40,8 +37,7 @@ public class TracingAppender extends AbstractAppender {
     }
 
     if (layout == null) {
-      @SuppressWarnings(
-        "null") Layout<@NotNull ? extends @NotNull Serializable> defaultLayout = PatternLayout.createDefaultLayout();
+      @SuppressWarnings("null") Layout<? extends Serializable> defaultLayout = PatternLayout.createDefaultLayout();
       layout = defaultLayout;
     }
     return new TracingAppender(name, filter, layout, ignoreExceptions, Property.EMPTY_ARRAY);
@@ -56,7 +52,7 @@ public class TracingAppender extends AbstractAppender {
     if (layout == null) data = pEvent.toString();
     else {
       byte[] byteArray = layout.toByteArray(pEvent);
-      data = new String(byteArray, sUTF8);
+      data = new String(byteArray, StandardCharsets.UTF_8);
     }
     activeSpan.log(pEvent.getTimeMillis() * 1000, data);
   }

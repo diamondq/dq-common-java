@@ -2,21 +2,21 @@ package com.diamondq.common.vertx.processor.tests;
 
 import com.diamondq.common.context.ContextExtendedCompletionStage;
 import com.diamondq.common.vertx.annotations.ProxyGen;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @ProxyGen
 public interface SimpleProxy {
 
-  public ContextExtendedCompletionStage<String> getName();
+  ContextExtendedCompletionStage<String> getName();
 
-  public ContextExtendedCompletionStage<@Nullable Void> setName(String pValue);
+  ContextExtendedCompletionStage<@Nullable Void> setName(String pValue);
 
-  public ContextExtendedCompletionStage<@Nullable Void> setTitle(@Nullable String pValue);
+  ContextExtendedCompletionStage<@Nullable Void> setTitle(@Nullable String pValue);
 
-  public ContextExtendedCompletionStage<@Nullable Void> setWidth(int pWidth);
+  ContextExtendedCompletionStage<@Nullable Void> setWidth(int pWidth);
 
-  public ContextExtendedCompletionStage<@Nullable Void> setHeight(short pWidth);
+  ContextExtendedCompletionStage<@Nullable Void> setHeight(short pWidth);
 
-  public ContextExtendedCompletionStage<@Nullable Void> save();
+  ContextExtendedCompletionStage<@Nullable Void> save();
 
 }

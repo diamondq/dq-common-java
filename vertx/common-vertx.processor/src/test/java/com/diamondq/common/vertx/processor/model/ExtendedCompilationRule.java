@@ -3,7 +3,7 @@ package com.diamondq.common.vertx.processor.model;
 import com.google.common.collect.ImmutableSet;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;

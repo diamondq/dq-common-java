@@ -1,15 +1,15 @@
 package com.diamondq.common.lambda;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class MemoizedSupplier<TYPE> {
+public class MemoizedSupplier<TYPE extends @Nullable Object> {
 
   private final Supplier<TYPE> mSupplier;
 
-  private transient boolean mIsSupplied;
+  private final transient boolean mIsSupplied;
 
   private transient @Nullable TYPE mSuppliedValue;
 
@@ -20,11 +20,16 @@ public class MemoizedSupplier<TYPE> {
     mSuppliedValue = null;
   }
 
+  @SuppressWarnings("DataFlowIssue")
   public TYPE getValue() {
     synchronized (this) {
-      if (mIsSupplied == false) mSuppliedValue = mSupplier.get();
-      @SuppressWarnings("null") TYPE result = mSuppliedValue;
-      return result;
+      TYPE localSuppliedValue;
+      if (mIsSupplied) localSuppliedValue = mSuppliedValue;
+      else {
+        localSuppliedValue = mSupplier.get();
+        mSuppliedValue = localSuppliedValue;
+      }
+      return localSuppliedValue;
     }
   }
 

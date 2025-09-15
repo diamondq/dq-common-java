@@ -1,6 +1,6 @@
 package com.diamondq.common.lambda.future;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,7 +42,7 @@ public class FutureUtils {
     Set<Class<?>> pValidReplacements) {
 
     synchronized (FutureUtils.class) {
-      if (pValidReplacements.contains(completedClass) == false) return false;
+      if (!pValidReplacements.contains(completedClass)) return false;
       ofFutureMethod = pOfFutureMethod;
       newCompletableFutureMethod = pNewCompletabledFutureMethod;
       completedFutureMethod = pCompletedFutureMethod;
@@ -61,7 +61,7 @@ public class FutureUtils {
    * @param pValue the value
    * @return the future
    */
-  public static <T, U extends ExtendedCompletableFuture<T>> U completedFuture(T pValue) {
+  public static <T extends @Nullable Object, U extends ExtendedCompletableFuture<T>> U completedFuture(T pValue) {
     try {
       Object resultObj = completedFutureMethod.invoke(null, pValue);
       @SuppressWarnings("unchecked") U result = (U) resultObj;
@@ -80,7 +80,8 @@ public class FutureUtils {
    * @param pValue the value
    * @return the future
    */
-  public static <T, U extends ExtendedCompletableFuture<T>> U completedFailure(Throwable pValue) {
+  public static <T extends @Nullable Object, U extends ExtendedCompletableFuture<T>> U completedFailure(
+    Throwable pValue) {
     try {
       Object resultObj = failedFutureMethod.invoke(null, pValue);
       @SuppressWarnings("unchecked") U result = (U) resultObj;
@@ -99,7 +100,7 @@ public class FutureUtils {
    * @param pFuture the existing future
    * @return the extended future
    */
-  public static <T, U extends ExtendedCompletableFuture<T>> U of(CompletionStage<T> pFuture) {
+  public static <T extends @Nullable Object, U extends ExtendedCompletableFuture<T>> U of(CompletionStage<T> pFuture) {
     CompletableFuture<T> future;
     if (pFuture instanceof CompletableFuture) future = (CompletableFuture<T>) pFuture;
     else future = pFuture.toCompletableFuture();
@@ -113,7 +114,7 @@ public class FutureUtils {
     }
   }
 
-  public static <T, U extends ExtendedCompletableFuture<T>> U newCompletableFuture() {
+  public static <T extends @Nullable Object, U extends ExtendedCompletableFuture<T>> U newCompletableFuture() {
     try {
       Object resultObj = newCompletableFutureMethod.invoke(null);
       @SuppressWarnings("unchecked") U result = (U) resultObj;
@@ -124,8 +125,8 @@ public class FutureUtils {
     }
   }
 
-  public static <T, @NotNull U extends @NotNull ExtendedCompletionStage<@NotNull List<T>>> U listOf(
-    List<@NotNull ? extends @NotNull ExtendedCompletionStage<T>> pList) {
+  public static <T extends @Nullable Object, U extends ExtendedCompletionStage<List<T>>> U listOf(
+    List<? extends ExtendedCompletionStage<T>> pList) {
     try {
       Object resultObj = listOfFutureMethod.invoke(null, pList);
       @SuppressWarnings("unchecked") U result = (U) resultObj;

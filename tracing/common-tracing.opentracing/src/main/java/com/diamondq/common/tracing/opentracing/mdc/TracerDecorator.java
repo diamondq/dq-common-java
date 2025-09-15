@@ -8,7 +8,7 @@ import jakarta.decorator.Decorator;
 import jakarta.decorator.Delegate;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Decorator
 @Priority(1)
@@ -21,7 +21,7 @@ public abstract class TracerDecorator implements Tracer {
   @Inject
   public TracerDecorator(@Delegate Tracer pTracer, Instance<TraceIdExtractor> pExtractor) {
     mTracer = pTracer;
-    mExtractor = (pExtractor.isUnsatisfied() == false) && (pExtractor.isAmbiguous() == false) ? pExtractor.get() : null;
+    mExtractor = (!pExtractor.isUnsatisfied()) && (!pExtractor.isAmbiguous()) ? pExtractor.get() : null;
   }
 
   /**

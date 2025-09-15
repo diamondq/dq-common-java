@@ -13,12 +13,13 @@ import io.micrometer.core.instrument.Statistic;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.distribution.HistogramSnapshot;
 import io.micrometer.core.instrument.distribution.HistogramSupport;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,13 +28,11 @@ import java.util.concurrent.TimeUnit;
 
 public class SLF4JReporter {
 
-  private ContextFactory mContextFactory;
+  private @Nullable ContextFactory mContextFactory;
 
-  private ScheduledExecutorService mScheduledExecutorService;
+  private @Nullable ScheduledExecutorService mScheduledExecutorService;
 
-  private MeterRegistry mMeterRegistry;
-
-  private long mReportEveryMills;
+  private @Nullable MeterRegistry mMeterRegistry;
 
   private @Nullable ScheduledFuture<?> mScheduler;
 
@@ -72,13 +71,13 @@ public class SLF4JReporter {
       TimeUnit reportUnit = TimeUnit.valueOf(PropertiesParsing.getNonNullString(pProps, ".report-time-unit", "SECONDS")
         .toUpperCase(Locale.ENGLISH));
 
-      mReportEveryMills = TimeUnit.MILLISECONDS.convert(reportTime, reportUnit);
+      long reportEveryMills = TimeUnit.MILLISECONDS.convert(reportTime, reportUnit);
 
       /* Schedule the first reporting */
 
       mScheduler = mScheduledExecutorService.scheduleAtFixedRate(this::onReport,
-        mReportEveryMills,
-        mReportEveryMills,
+        reportEveryMills,
+        reportEveryMills,
         TimeUnit.MILLISECONDS
       );
     }
@@ -88,9 +87,9 @@ public class SLF4JReporter {
   }
 
   public void onDeactivate() {
-    try (Context context = mContextFactory.newContext(SLF4JReporter.class, this)) {
+    try (Context context = Objects.requireNonNull(mContextFactory).newContext(SLF4JReporter.class, this)) {
 
-      /* If we have a scheduled report, then cancel it */
+      /* If there is a scheduled report, then cancel it */
 
       ScheduledFuture<?> scheduler = mScheduler;
       if (scheduler != null) {
@@ -102,14 +101,14 @@ public class SLF4JReporter {
       }
     }
     catch (RuntimeException ex) {
-      throw mContextFactory.reportThrowable(SLF4JReporter.class, this, ex);
+      throw Objects.requireNonNull(mContextFactory).reportThrowable(SLF4JReporter.class, this, ex);
     }
   }
 
   private void onReport() {
-    try (Context context = mContextFactory.newContext(SLF4JReporter.class, this)) {
+    try (Context context = Objects.requireNonNull(mContextFactory).newContext(SLF4JReporter.class, this)) {
       SortedMap<String, Meter> sortedMeters = new TreeMap<>();
-      for (Meter meter : mMeterRegistry.getMeters()) {
+      for (Meter meter : Objects.requireNonNull(mMeterRegistry).getMeters()) {
         sortedMeters.put(meter.getId().getName(), meter);
       }
       for (Meter meter : sortedMeters.values()) {
@@ -120,15 +119,14 @@ public class SLF4JReporter {
         for (Measurement measurement : meter.measure()) {
           Statistic statistic = measurement.getStatistic();
           double value = measurement.getValue();
-          if (tags.isEmpty() == false) {
+          if (!tags.isEmpty()) {
             List<String> tagStrings = new ArrayList<>();
             for (Tag tag : tags)
               tagStrings.add(tag.toString());
             context.info("{}({}) / {} = {} : {}", name, String.join(", ", tagStrings), type, statistic, value);
           } else context.info("{} / {} = {} : {}", name, type, statistic, value);
         }
-        if (meter instanceof HistogramSupport) {
-          HistogramSupport hs = (HistogramSupport) meter;
+        if (meter instanceof final HistogramSupport hs) {
           HistogramSnapshot snapshot = hs.takeSnapshot();
           context.info("  Histogram: {}", snapshot.toString());
         }

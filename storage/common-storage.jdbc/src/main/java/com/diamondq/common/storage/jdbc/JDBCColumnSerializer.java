@@ -2,7 +2,7 @@ package com.diamondq.common.storage.jdbc;
 
 import com.diamondq.common.storage.kv.IKVColumnDefinition;
 import com.diamondq.common.storage.kv.IKVTableDefinition;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;

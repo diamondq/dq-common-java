@@ -1,6 +1,6 @@
 package com.diamondq.common.i18n;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.spi.ResourceBundleControlProvider;
  */
 public class I18N {
 
-  private static ConcurrentMap<String, Map<Locale, String>> sCachedStrings = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<String, Map<Locale, String>> sCachedStrings = new ConcurrentHashMap<>();
 
   private static final @Nullable List<ResourceBundleControlProvider> providers;
 
@@ -43,7 +43,7 @@ public class I18N {
   }
 
   /**
-   * Formats a given string (provided by resource key) with arguments into a locale specific value.
+   * Formats a given string (provided by a resource key) with arguments into a locale-specific value.
    *
    * @param pLocale the locale
    * @param pFormatKey the key
@@ -75,11 +75,12 @@ public class I18N {
       for (Locale locale : Locale.getAvailableLocales()) {
         try {
           ResourceBundle bundle = pFormatKey.getBundle(locale);
-          if ((locale.equals(defaultLocale) == false) && (bundle.equals(defaultBundle) == true)) continue;
+          if ((!locale.equals(defaultLocale)) && (bundle.equals(defaultBundle))) continue;
           String format = bundle.getString(pFormatKey.getCode());
           newMap.put(locale, format);
         }
         catch (MissingResourceException ex) {
+          // Quietly ignore the exception
         }
       }
       if ((map = sCachedStrings.putIfAbsent(pFormatKey.getCode(), newMap)) == null) map = newMap;

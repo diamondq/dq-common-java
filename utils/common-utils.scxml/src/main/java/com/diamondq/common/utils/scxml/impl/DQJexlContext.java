@@ -2,13 +2,14 @@ package com.diamondq.common.utils.scxml.impl;
 
 import org.apache.commons.scxml2.Context;
 import org.apache.commons.scxml2.env.jexl.JexlContext;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
+import java.io.Serial;
 import java.util.Map;
 
 public class DQJexlContext extends JexlContext {
 
-  private static final long serialVersionUID = -6746429116329135206L;
+  @Serial private static final long serialVersionUID = -6746429116329135206L;
 
   /**
    * Constructor.

@@ -1,6 +1,6 @@
 package com.diamondq.common.context;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
@@ -26,21 +26,18 @@ public class ContextPrinters {
 
   static {
     sHashType = (i) -> {
-      if (i instanceof byte[]) {
-        byte[] d = (byte[]) i;
+      if (i instanceof final byte[] d) {
         return "%HASH[" + Base64.getEncoder().encodeToString(d) + "]";
       } else return i;
     };
     sBytesType = (i) -> {
-      if (i instanceof byte[]) {
-        byte[] d = (byte[]) i;
+      if (i instanceof final byte[] d) {
         if (d.length < 5) return d;
         return "%BYTES[" + d.length + "]";
       } else return i;
     };
     sX509CertificateType = (i) -> {
-      if (i instanceof X509Certificate) {
-        X509Certificate cert = (X509Certificate) i;
+      if (i instanceof final X509Certificate cert) {
         return "X509Certificate[" + "Version=" + cert.getVersion() + ", Subject=" + cert.getSubjectX500Principal()
           .toString() + ", Signature Algorithm=" + cert.getSigAlgName() + ", Issuer=" + cert.getIssuerX500Principal()
           .toString() + ", Serial Number=" + cert.getSerialNumber().toString() + ", Validity=[From="
@@ -48,8 +45,7 @@ public class ContextPrinters {
       } else return i;
     };
     sKeyPairType = (i) -> {
-      if (i instanceof KeyPair) {
-        KeyPair keyPair = (KeyPair) i;
+      if (i instanceof final KeyPair keyPair) {
         return "%KEYPAIR[public=" + keyPair.getPublic() + "]";
       } else return i;
     };

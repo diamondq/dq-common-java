@@ -2,7 +2,7 @@ package com.diamondq.common.xmpp;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Information about a specific XMPP Server. Generally provided via DNS SRV lookups or a configuration lookup

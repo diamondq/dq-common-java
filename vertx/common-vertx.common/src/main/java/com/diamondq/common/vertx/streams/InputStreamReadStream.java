@@ -5,7 +5,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.ReadStream;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,39 +72,49 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
 
   private void handleRead() {
     mVertx.executeBlocking((future) -> {
-      try {
-        /* Read some data from the stream */
-
         try {
-          int bytesRead = mStream.read(mBuffer);
-          if (bytesRead == -1) {
+          /* Read some data from the stream */
 
-            /* We've reached the end of the stream, so inform the ReadStream endHandler */
+          try {
+            int bytesRead = mStream.read(mBuffer);
+            if (bytesRead == -1) {
 
-            Context context = mEndContext;
-            Handler<@Nullable Void> endHandler = mEndHandler;
-            mIsFinished = true;
-            if ((context != null) && (endHandler != null)) {
-              context.runOnContext((v) -> {
-                endHandler.handle(null);
-              });
+              /* We've reached the end of the stream, so inform the ReadStream endHandler */
+
+              Context context = mEndContext;
+              Handler<@Nullable Void> endHandler = mEndHandler;
+              mIsFinished = true;
+              if ((context != null) && (endHandler != null)) {
+                context.runOnContext((v) -> {
+                  endHandler.handle(null);
+                });
+              }
+            } else {
+              Buffer buffer = Buffer.buffer(bytesRead);
+              buffer.appendBytes(mBuffer, 0, bytesRead);
+              Context context = mHandlerContext;
+              Handler<Buffer> handler = mHandler;
+              mIsFinished = true;
+              if ((context != null) && (handler != null)) {
+                context.runOnContext((v) -> {
+                  handler.handle(buffer);
+                  if (mPausedState == 1) mPausedState = 2;
+                  else if (mPausedState == 0) handleRead();
+                });
+              }
             }
-          } else {
-            Buffer buffer = Buffer.buffer(bytesRead);
-            buffer.appendBytes(mBuffer, 0, bytesRead);
-            Context context = mHandlerContext;
-            Handler<Buffer> handler = mHandler;
-            mIsFinished = true;
-            if ((context != null) && (handler != null)) {
+          }
+          catch (IOException ex) {
+            Context context = mExceptionContext;
+            Handler<Throwable> exceptionHandler = mExceptionHandler;
+            if ((context != null) && (exceptionHandler != null)) {
               context.runOnContext((v) -> {
-                handler.handle(buffer);
-                if (mPausedState == 1) mPausedState = 2;
-                else if (mPausedState == 0) handleRead();
+                exceptionHandler.handle(ex);
               });
             }
           }
         }
-        catch (IOException ex) {
+        catch (RuntimeException ex) {
           Context context = mExceptionContext;
           Handler<Throwable> exceptionHandler = mExceptionHandler;
           if ((context != null) && (exceptionHandler != null)) {
@@ -113,18 +123,9 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
             });
           }
         }
+      }, (ar) -> {
       }
-      catch (RuntimeException ex) {
-        Context context = mExceptionContext;
-        Handler<Throwable> exceptionHandler = mExceptionHandler;
-        if ((context != null) && (exceptionHandler != null)) {
-          context.runOnContext((v) -> {
-            exceptionHandler.handle(ex);
-          });
-        }
-      }
-    }, (ar) -> {
-    });
+    );
     mVertx.runOnContext((v) -> {
     });
 

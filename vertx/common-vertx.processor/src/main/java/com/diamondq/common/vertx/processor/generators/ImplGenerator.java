@@ -54,7 +54,7 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.types.EventBusService;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +166,8 @@ public class ImplGenerator implements Generator {
       ).build());
 
     builder = builder.addField(FieldSpec.builder(ParameterizedTypeName.get(MessageConsumer.class, JsonObject.class)
-      .annotated(AnnotationSpec.builder(Nullable.class).build()), "mConsumer", Modifier.PRIVATE).build());
+      .annotated(AnnotationSpec.builder(Nullable.class).build()), "mConsumer", Modifier.PRIVATE
+    ).build());
 
     builder = builder.addField(FieldSpec.builder(pImplClass.getBaseQualifiedTypeName(),
       "mSelfProxy",
@@ -225,8 +226,9 @@ public class ImplGenerator implements Generator {
     methodBuilder = methodBuilder.addModifiers(Modifier.PRIVATE) //
       .returns(TypeName.VOID) //
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Message.class),
-        ClassName.get(JsonObject.class)
-      ), "pMessage").build()) //
+          ClassName.get(JsonObject.class)
+        ), "pMessage"
+      ).build()) //
     ;
 
     // try (Context ctx =
@@ -1045,9 +1047,11 @@ public class ImplGenerator implements Generator {
           .addModifiers(Modifier.PUBLIC) //
           .returns(TypeName.VOID.box().annotated(AnnotationSpec.builder(Nullable.class).build())) //
           .addParameter(ParameterSpec.builder(TypeName.VOID.box()
-            .annotated(AnnotationSpec.builder(Nullable.class).build()), "r2").build()) //
+            .annotated(AnnotationSpec.builder(Nullable.class).build()), "r2"
+          ).build()) //
           .addParameter(ParameterSpec.builder(ClassName.get(Throwable.class)
-            .annotated(AnnotationSpec.builder(Nullable.class).build()), "ex2").build()) //
+            .annotated(AnnotationSpec.builder(Nullable.class).build()), "ex2"
+          ).build()) //
           .addParameter(ParameterSpec.builder(Context.class, "ctx3").build()) //
           // try {
           .beginControlFlow("try")
@@ -1315,8 +1319,9 @@ public class ImplGenerator implements Generator {
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-      ), "ar").build())
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+        ), "ar"
+      ).build())
       .beginControlFlow("try ($T ctx2 = ctx.activateOnThread($S))", Context.class, "")
       // if (ar.failed() == true) {
       .beginControlFlow("if (ar.failed() == true)")
@@ -1351,8 +1356,9 @@ public class ImplGenerator implements Generator {
       .addAnnotation(Override.class) //
       .returns(TypeName.VOID) //
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Promise.class),
-        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-      ), "pStopFuture").build()) //
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+        ), "pStopFuture"
+      ).build()) //
       .addException(ClassName.get(Exception.class));
 
     // /**
@@ -1392,8 +1398,9 @@ public class ImplGenerator implements Generator {
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-      ), "ar").build())
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+        ), "ar"
+      ).build())
       .beginControlFlow("try ($T ctx2 = ctx.activateOnThread($S))", Context.class, "")
       // /* The registration of the consumer is complete */
       //
@@ -1435,8 +1442,9 @@ public class ImplGenerator implements Generator {
       .addAnnotation(Override.class) //
       .returns(TypeName.VOID) //
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Promise.class),
-        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-      ), "pStartFuture").build()) //
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+        ), "pStartFuture"
+      ).build()) //
       .addException(ClassName.get(Exception.class));
 
     // /**
@@ -1557,9 +1565,10 @@ public class ImplGenerator implements Generator {
       .addParameter(ParameterSpec.builder(ServiceDiscovery.class, "pServiceDiscovery").build()) //
       .addParameter(ParameterSpec.builder(Vertx.class, "pVertx").build()) //
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Pair.class),
-        ClassName.get(String.class),
-        ClassName.get(String.class)
-      ), "pReg").build()) //
+          ClassName.get(String.class),
+          ClassName.get(String.class)
+        ), "pReg"
+      ).build()) //
     ;
 
     methodBuilder = methodBuilder.addJavadoc("Stops the verticles to support the $T interface\n\n",
@@ -1618,8 +1627,9 @@ public class ImplGenerator implements Generator {
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-      ), "far").build())
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+        ), "far"
+      ).build())
       // (far) -> {
       // try (Context ctx3 = ctx2.activateOnThread("")) {
       .beginControlFlow("try ($T ctx3 = ctx2.activateOnThread($S))", Context.class, "")
@@ -1664,8 +1674,9 @@ public class ImplGenerator implements Generator {
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-      ), "far").build())
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+        ), "far"
+      ).build())
 
       // (far) -> {
       // try (Context ctx4 = ctx3.activateOnThread("")) {
@@ -1711,8 +1722,9 @@ public class ImplGenerator implements Generator {
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-        ClassName.get(Record.class)
-      ), "par").build())
+          ClassName.get(Record.class)
+        ), "par"
+      ).build())
       // (par) -> {
       //
       // /* Reactivate the context */
@@ -1890,15 +1902,18 @@ public class ImplGenerator implements Generator {
       .addParameter(ParameterSpec.builder(Vertx.class, "pVertx").build()) //
       .addParameter(ParameterSpec.builder(Integer.TYPE, "pInstanceCount").build()) //
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Supplier.class),
-        ClassName.get(Verticle.class)
-      ), "pSupplier").build()) //
+          ClassName.get(Verticle.class)
+        ), "pSupplier"
+      ).build()) //
       .addParameter(ParameterSpec.builder(String.class, "pName").build()) //
       .addParameter(ParameterSpec.builder(ClassName.get(String.class)
-        .annotated(AnnotationSpec.builder(Nullable.class).build()), "pAddress").build()) //
+        .annotated(AnnotationSpec.builder(Nullable.class).build()), "pAddress"
+      ).build()) //
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Map.class),
-        ClassName.get(String.class),
-        ClassName.get(String.class)
-      ).annotated(AnnotationSpec.builder(Nullable.class).build()), "pMetaData").build()) //
+          ClassName.get(String.class),
+          ClassName.get(String.class)
+        ).annotated(AnnotationSpec.builder(Nullable.class).build()), "pMetaData"
+      ).build()) //
     ;
 
     methodBuilder = methodBuilder.addJavadoc("Sets verticles to support the $T interface\n\n",

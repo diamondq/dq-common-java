@@ -8,8 +8,7 @@ import jakarta.inject.Singleton;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
 import org.javatuples.Sextet;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,8 +20,8 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * This engine is capable of synchronizing two sets of data. Either sets may have changes that need to be synchronized
- * to the other.
+ * This engine is capable of synchronizing two sets of data.<br/> Either set may have changes that need to be
+ * synchronized to the other.
  */
 @Singleton
 public class SyncEngine {
@@ -43,8 +42,8 @@ public class SyncEngine {
    * Return a Function that creates an A from the B
    *
    * @param pSyncInfo the SyncInfo
-   * @param pIsKeyTypesEqual are the key types equal (passed for performance)
-   * @param bFragTypeComplete is the B_FRAG type complete (passed for performance)
+   * @param pIsKeyTypesEqual indicates if the key types equal (passed for performance)
+   * @param bFragTypeComplete indicates if the B_FRAG type complete (passed for performance)
    * @param typesEqual are the A/B types equal
    * @return the conversion function
    */
@@ -65,8 +64,8 @@ public class SyncEngine {
    * Return a Function that creates a B from the A
    *
    * @param pSyncInfo the SyncInfo
-   * @param pIsKeyTypesEqual are the key types equal (passed for performance)
-   * @param aFragTypeComplete is the A_FRAG type complete (passed for performance)
+   * @param pIsKeyTypesEqual indicates if the key types equal (passed for performance)
+   * @param aFragTypeComplete indicates if the A_FRAG type is complete (passed for performance)
    * @param typesEqual are the A/B types equal
    * @return the conversion function
    */
@@ -87,8 +86,8 @@ public class SyncEngine {
    * Returns a Function that does the work of modifying A
    *
    * @param pSyncInfo the SyncInfo
-   * @param aFragTypeComplete is the A_FRAG type complete (passed for performance)
-   * @param bFragTypeComplete is the B_FRAG type complete (passed for performance)
+   * @param aFragTypeComplete indicates if the A_FRAG type is complete (passed for performance)
+   * @param bFragTypeComplete indicates if the B_FRAG type is complete (passed for performance)
    * @return the function
    */
   public static <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> Function<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>, Pair<A_KEY, A>> modifyA(
@@ -109,8 +108,8 @@ public class SyncEngine {
    * Returns a Function that does the work of modifying A
    *
    * @param pSyncInfo the SyncInfo
-   * @param aFragTypeComplete is the A_FRAG type complete (passed for performance)
-   * @param bFragTypeComplete is the B_FRAG type complete (passed for performance)
+   * @param aFragTypeComplete indicates if the A_FRAG type is complete (passed for performance)
+   * @param bFragTypeComplete indicates if the B_FRAG type is complete (passed for performance)
    * @return the function
    */
   public static <A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> Function<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>, Pair<B_KEY, B>> modifyB(
@@ -129,7 +128,7 @@ public class SyncEngine {
 
   /**
    * Perform a sync between A/B by passing in the SyncInfo. This synchronization will occur asynchronously (as much as
-   * possible) and the function will return a future that can be checked for completion (or failure)
+   * possible), and the function will return a future that can be checked for completion (or failure)
    *
    * @param pInfo the SyncInfo
    * @return the future
@@ -162,7 +161,7 @@ public class SyncEngine {
 
           if (bHashOpt.isPresent()) {
 
-            /* If the hashes match, then we're done */
+            /* If the hashes match, then it is done */
 
             if (aHashOpt.get().equals(bHashOpt.get())) {
               result.totalElapsedTime = System.currentTimeMillis() - startTimer;
@@ -184,28 +183,26 @@ public class SyncEngine {
         pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_A_SOURCE);
         long aSourceStartTimer = System.currentTimeMillis();
         ctx.prepareForAlternateThreads();
-        ExtendedCompletionStage<@NotNull Map<@NotNull A_KEY, @NotNull A_FRAG>> aSourceFuture = pInfo.getASource()
-          .thenApply((source) -> {
-            try (var ctx2 = ctx.activateOnThread("")) {
-              result.aSourceLoadElapsedTime = System.currentTimeMillis() - aSourceStartTimer;
-              ctx2.trace("Received A Source after {} ms", result.aSourceLoadElapsedTime);
-              pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_A_SOURCE);
-              return ctx2.exit(source);
-            }
-          });
+        ExtendedCompletionStage<Map<A_KEY, A_FRAG>> aSourceFuture = pInfo.getASource().thenApply((source) -> {
+          try (var ctx2 = ctx.activateOnThread("")) {
+            result.aSourceLoadElapsedTime = System.currentTimeMillis() - aSourceStartTimer;
+            ctx2.trace("Received A Source after {} ms", result.aSourceLoadElapsedTime);
+            pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_A_SOURCE);
+            return ctx2.exit(source);
+          }
+        });
 
         pInfo.reportSyncStatus(true, SyncInfo.ActionType.GET_B_SOURCE);
         long bSourceStartTimer = System.currentTimeMillis();
         ctx.prepareForAlternateThreads();
-        ExtendedCompletionStage<@NotNull Map<@NotNull B_KEY, @NotNull B_FRAG>> bSourceFuture = pInfo.getBSource()
-          .thenApply((source) -> {
-            try (var ctx2 = ctx.activateOnThread("")) {
-              result.bSourceLoadElapsedTime = System.currentTimeMillis() - bSourceStartTimer;
-              ctx2.trace("Received B Source after {} ms", result.bSourceLoadElapsedTime);
-              pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_B_SOURCE);
-              return ctx2.exit(source);
-            }
-          });
+        ExtendedCompletionStage<Map<B_KEY, B_FRAG>> bSourceFuture = pInfo.getBSource().thenApply((source) -> {
+          try (var ctx2 = ctx.activateOnThread("")) {
+            result.bSourceLoadElapsedTime = System.currentTimeMillis() - bSourceStartTimer;
+            ctx2.trace("Received B Source after {} ms", result.bSourceLoadElapsedTime);
+            pInfo.reportSyncStatus(false, SyncInfo.ActionType.GET_B_SOURCE);
+            return ctx2.exit(source);
+          }
+        });
 
         boolean keyTypesEqual = pInfo.isKeyTypesEqual();
         boolean aFragTypeComplete = pInfo.isAFragTypeComplete();
@@ -214,134 +211,135 @@ public class SyncEngine {
 
         ctx.prepareForAlternateThreads();
         return aSourceFuture.thenCombine(bSourceFuture, (origAMap, origBMap) -> {
-          try (var ctx2 = ctx.activateOnThread("")) {
-            pInfo.reportSyncStatus(true, SyncInfo.ActionType.CATEGORIZE_A);
+            try (var ctx2 = ctx.activateOnThread("")) {
+              pInfo.reportSyncStatus(true, SyncInfo.ActionType.CATEGORIZE_A);
 
-            long categorizationStartTimer = System.currentTimeMillis();
+              long categorizationStartTimer = System.currentTimeMillis();
 
-            result.aSourceCount = origAMap.size();
-            result.bSourceCount = origBMap.size();
+              result.aSourceCount = origAMap.size();
+              result.bSourceCount = origBMap.size();
 
-            Map<A_KEY, A_FRAG> aMap = new HashMap<>(origAMap);
-            Map<B_KEY, B_FRAG> bMap = new HashMap<>(origBMap);
-            Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = new HashSet<>();
-            Set<Pair<B_KEY, B_FRAG>> aToBeCreated = new HashSet<>();
-            Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = new HashSet<>();
+              Map<A_KEY, A_FRAG> aMap = new HashMap<>(origAMap);
+              Map<B_KEY, B_FRAG> bMap = new HashMap<>(origBMap);
+              Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = new HashSet<>();
+              Set<Pair<B_KEY, B_FRAG>> aToBeCreated = new HashSet<>();
+              Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> aToBeModified = new HashSet<>();
 
-            Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = new HashSet<>();
-            Set<Pair<A_KEY, A_FRAG>> bToBeCreated = new HashSet<>();
-            Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = new HashSet<>();
+              Set<Pair<B_KEY, B_FRAG>> bToBeDeleted = new HashSet<>();
+              Set<Pair<A_KEY, A_FRAG>> bToBeCreated = new HashSet<>();
+              Set<Quartet<A_KEY, A_FRAG, B_KEY, B_FRAG>> bToBeModified = new HashSet<>();
 
-            boolean aModSupported = pInfo.isAModificationSupported();
-            boolean bModSupported = pInfo.isBModificationSupported();
+              boolean aModSupported = pInfo.isAModificationSupported();
+              boolean bModSupported = pInfo.isBModificationSupported();
 
-            pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_A, result.aSourceCount);
-            ctx2.trace("Categorizing A into create/delete/modify buckets");
-            for (Map.Entry<A_KEY, A_FRAG> aPair : aMap.entrySet()) {
+              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_A, result.aSourceCount);
+              ctx2.trace("Categorizing A into create/delete/modify buckets");
+              for (Map.Entry<A_KEY, A_FRAG> aPair : aMap.entrySet()) {
 
-              pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_A);
+                pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_A);
 
-              A_KEY aKey = aPair.getKey();
-              @SuppressWarnings(
-                "unchecked") B_KEY bKey = (keyTypesEqual ? (B_KEY) aKey : pInfo.convertAKeyToBKey(aKey));
+                A_KEY aKey = aPair.getKey();
+                @SuppressWarnings(
+                  "unchecked") B_KEY bKey = (keyTypesEqual ? (B_KEY) aKey : pInfo.convertAKeyToBKey(aKey));
 
-              /* See if the item exists in the other side */
+                /* See if the item exists on the other side */
 
-              @Nullable B_FRAG bItem = bMap.remove(bKey);
+                B_FRAG bItem = bMap.remove(bKey);
 
-              if (bItem == null) {
+                if (bItem == null) {
 
-                /* b is missing. Was b deleted or does b not yet exist */
+                  /* b is missing. Was b deleted or does b not yet exist? */
 
-                boolean wasDeleted = pInfo.getBStatus(bKey);
-                if (wasDeleted) {
+                  boolean wasDeleted = pInfo.getBStatus(bKey);
+                  if (wasDeleted) {
 
-                  /* B was deleted, so A should be deleted as well */
+                    /* B was deleted, so A should be deleted as well */
 
-                  aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
-                } else {
+                    aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
+                  } else {
 
-                  /* B doesn't yet exist, so A should be added to B */
+                    /* B doesn't yet exist, so A should be added to B */
 
-                  bToBeCreated.add(Pair.with(aKey, aPair.getValue()));
-                }
-              } else {
-
-                /* Compare to see if the two are the same */
-
-                int compare = pInfo.compare(aPair.getValue(), bItem);
-                //noinspection StatementWithEmptyBody
-                if (compare == 0) {
-                  /* They are the same */
-                } else if (compare < 0) {
-
-                  /* A is newer */
-
-                  if (bModSupported) bToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
-                  else {
-                    bToBeDeleted.add(Pair.with(bKey, bItem));
                     bToBeCreated.add(Pair.with(aKey, aPair.getValue()));
                   }
-
                 } else {
 
-                  /* B is newer */
+                  /* Compare to see if the two are the same */
 
-                  if (aModSupported) aToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
-                  else {
-                    aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
-                    aToBeCreated.add(Pair.with(bKey, bItem));
+                  int compare = pInfo.compare(aPair.getValue(), bItem);
+                  //noinspection StatementWithEmptyBody
+                  if (compare == 0) {
+                    /* They are the same */
+                  } else if (compare < 0) {
+
+                    /* A is newer */
+
+                    if (bModSupported) bToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
+                    else {
+                      bToBeDeleted.add(Pair.with(bKey, bItem));
+                      bToBeCreated.add(Pair.with(aKey, aPair.getValue()));
+                    }
+
+                  } else {
+
+                    /* B is newer */
+
+                    if (aModSupported) aToBeModified.add(Quartet.with(aKey, aPair.getValue(), bKey, bItem));
+                    else {
+                      aToBeDeleted.add(Pair.with(aKey, aPair.getValue()));
+                      aToBeCreated.add(Pair.with(bKey, bItem));
+                    }
+
                   }
 
                 }
-
-              }
-            }
-
-            pInfo.reportSyncStatus(false, SyncInfo.ActionType.CATEGORIZE_A);
-            pInfo.reportSyncStatus(true, SyncInfo.ActionType.CATEGORIZE_B);
-            ctx2.trace("Categorizing B into create/delete/modify buckets");
-
-            /* Anything left in B has to be processed */
-
-            pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_B, bMap.size());
-            for (Map.Entry<B_KEY, B_FRAG> bPair : bMap.entrySet()) {
-
-              pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_B);
-
-              B_KEY bKey = bPair.getKey();
-              @SuppressWarnings(
-                "unchecked") A_KEY aKey = (keyTypesEqual ? (A_KEY) bKey : pInfo.convertBKeyToAKey(bKey));
-              boolean wasDeleted = pInfo.getAStatus(aKey);
-              if (wasDeleted) {
-
-                /* A was deleted, so B should be deleted as well */
-
-                bToBeDeleted.add(Pair.with(bKey, bPair.getValue()));
-
-              } else {
-
-                /* A doesn't yet exist, so B should be added to A */
-
-                aToBeCreated.add(Pair.with(bKey, bPair.getValue()));
               }
 
+              pInfo.reportSyncStatus(false, SyncInfo.ActionType.CATEGORIZE_A);
+              pInfo.reportSyncStatus(true, SyncInfo.ActionType.CATEGORIZE_B);
+              ctx2.trace("Categorizing B into create/delete/modify buckets");
+
+              /* Anything left in B has to be processed */
+
+              pInfo.reportSyncStatusTotal(SyncInfo.ActionType.CATEGORIZE_B, bMap.size());
+              for (Map.Entry<B_KEY, B_FRAG> bPair : bMap.entrySet()) {
+
+                pInfo.reportIncrementStatus(SyncInfo.ActionType.CATEGORIZE_B);
+
+                B_KEY bKey = bPair.getKey();
+                @SuppressWarnings(
+                  "unchecked") A_KEY aKey = (keyTypesEqual ? (A_KEY) bKey : pInfo.convertBKeyToAKey(bKey));
+                boolean wasDeleted = pInfo.getAStatus(aKey);
+                if (wasDeleted) {
+
+                  /* A was deleted, so B should be deleted as well */
+
+                  bToBeDeleted.add(Pair.with(bKey, bPair.getValue()));
+
+                } else {
+
+                  /* A doesn't yet exist, so B should be added to A */
+
+                  aToBeCreated.add(Pair.with(bKey, bPair.getValue()));
+                }
+
+              }
+
+              result.categorizationElapsedTime = System.currentTimeMillis() - categorizationStartTimer;
+              ctx2.trace("Categorization complete after {} ms", result.categorizationElapsedTime);
+              pInfo.reportSyncStatus(false, SyncInfo.ActionType.CATEGORIZE_B);
+
+              ctx.prepareForAlternateThreads();
+              return ctx2.exit(Sextet.with(aToBeCreated,
+                aToBeDeleted,
+                aToBeModified,
+                bToBeCreated,
+                bToBeDeleted,
+                bToBeModified
+              ));
             }
-
-            result.categorizationElapsedTime = System.currentTimeMillis() - categorizationStartTimer;
-            ctx2.trace("Categorization complete after {} ms", result.categorizationElapsedTime);
-            pInfo.reportSyncStatus(false, SyncInfo.ActionType.CATEGORIZE_B);
-
-            ctx.prepareForAlternateThreads();
-            return ctx2.exit(Sextet.with(aToBeCreated,
-              aToBeDeleted,
-              aToBeModified,
-              bToBeCreated,
-              bToBeDeleted,
-              bToBeModified
-            ));
           }
-        }).thenCompose((sextet) -> {
+        ).thenCompose((sextet) -> {
           try (var ctx2 = ctx.activateOnThread("")) {
             Set<Pair<B_KEY, B_FRAG>> aToBeCreated = sextet.getValue0();
             Set<Pair<A_KEY, A_FRAG>> aToBeDeleted = sextet.getValue1();

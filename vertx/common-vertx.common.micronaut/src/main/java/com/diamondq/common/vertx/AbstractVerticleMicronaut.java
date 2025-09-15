@@ -17,8 +17,7 @@ import io.vertx.servicediscovery.types.EventBusService;
 import io.vertx.serviceproxy.ServiceBinder;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -41,7 +40,7 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
 
   private final @Nullable String mAddress;
 
-  private final Class<@NotNull INTERFACE> mInterfaceClass;
+  private final Class<INTERFACE> mInterfaceClass;
 
   private @Nullable Record mPublishedRecord;
 
@@ -98,7 +97,7 @@ public abstract class AbstractVerticleMicronaut<INTERFACE> extends AbstractVerti
       Verify.notNullArg(mVertx, UtilMessages.VERIFY_DEPENDENCY_MISSING, "vertx", pid);
       try {
 
-        @SuppressWarnings("null") @NotNull String address = (mAddress == null ? mName : mAddress);
+        String address = (mAddress == null ? mName : mAddress);
 
         /* Start by deploying the instance to Vertx */
 

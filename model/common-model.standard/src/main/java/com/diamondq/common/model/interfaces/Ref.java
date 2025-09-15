@@ -1,6 +1,6 @@
 package com.diamondq.common.model.interfaces;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface Ref<X> {
 
@@ -9,12 +9,13 @@ public interface Ref<X> {
    *
    * @return the object
    */
-  public @Nullable X resolve();
+  @Nullable
+  X resolve();
 
   /**
    * Returns a string that can be used to reconstruct this Reference at a later time.
    *
    * @return the serialization of the reference as a string
    */
-  public String getSerializedString();
+  String getSerializedString();
 }

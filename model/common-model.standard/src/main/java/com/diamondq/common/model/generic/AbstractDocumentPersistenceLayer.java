@@ -21,8 +21,7 @@ import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -80,8 +79,8 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
   protected abstract @Nullable STRUCTUREOPTIMISTICOBJ constructOptimisticObj(Toolkit pToolkit, Scope pScope,
     String pDefName, String pKey, @Nullable Structure pStructure);
 
-  protected abstract <@NotNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope,
-    STRUCTURECONFIGOBJ pConfig, boolean pIsMeta, String pKey, PropertyType pType, R pValue);
+  protected abstract <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
+    boolean pIsMeta, String pKey, PropertyType pType, R pValue);
 
   protected abstract <R> R getStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, STRUCTURECONFIGOBJ pConfig,
     boolean pIsMeta, String pKey, PropertyType pType);
@@ -876,7 +875,7 @@ public abstract class AbstractDocumentPersistenceLayer<STRUCTURECONFIGOBJ, STRUC
           );
           if (newStructureDef == null) throw new IllegalArgumentException();
           Structure newStructure = pToolkit.createNewStructure(pScope, newStructureDef);
-          for (BiFunction<@NotNull Structure, @NotNull Structure, @NotNull Structure> migrator : pair.getValue1()) {
+          for (BiFunction<Structure, Structure, Structure> migrator : pair.getValue1()) {
             @SuppressWarnings("null") Structure replaceStructure = migrator.apply(oldStructure, newStructure);
             newStructure = replaceStructure;
           }

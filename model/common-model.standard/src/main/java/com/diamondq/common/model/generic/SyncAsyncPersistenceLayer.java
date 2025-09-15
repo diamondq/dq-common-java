@@ -18,8 +18,7 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.StructureRef;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -170,7 +169,7 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
-  public <@Nullable T> PropertyRef<T> createPropertyRef(AsyncToolkit pToolkit, Scope pScope,
+  public <T extends @Nullable Object> PropertyRef<T> createPropertyRef(AsyncToolkit pToolkit, Scope pScope,
     @Nullable Property<T> pResolvable, Structure pContaining) {
     return mPersistenceLayer.createPropertyRef(pToolkit.getSyncToolkit(), pScope, pResolvable, pContaining);
   }
@@ -285,7 +284,7 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *   java.lang.Object)
    */
   @Override
-  public <@Nullable T> Property<T> createNewProperty(AsyncToolkit pToolkit, Scope pScope,
+  public <T extends @Nullable Object> Property<T> createNewProperty(AsyncToolkit pToolkit, Scope pScope,
     PropertyDefinition pPropertyDefinition, boolean pIsValueSet, T pValue) {
     return mPersistenceLayer.createNewProperty(pToolkit.getSyncToolkit(),
       pScope,
@@ -309,8 +308,8 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *   com.diamondq.common.model.interfaces.Scope, java.lang.String)
    */
   @Override
-  public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(AsyncToolkit pToolkit, Scope pScope,
-    String pValue) {
+  public <T extends @Nullable Object> PropertyRef<T> createPropertyRefFromSerialized(AsyncToolkit pToolkit,
+    Scope pScope, String pValue) {
     return mPersistenceLayer.createPropertyRefFromSerialized(pToolkit.getSyncToolkit(), pScope, pValue);
   }
 
@@ -403,7 +402,7 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    */
   @Override
   public BiFunction<Structure, Structure, Structure> createStandardMigration(AsyncToolkit pToolkit, Scope pScope,
-    StandardMigrations pMigrationType, @NotNull Object @Nullable [] pParams) {
+    StandardMigrations pMigrationType, Object @Nullable [] pParams) {
     return mPersistenceLayer.createStandardMigration(pToolkit.getSyncToolkit(), pScope, pMigrationType, pParams);
   }
 

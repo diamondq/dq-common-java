@@ -1,9 +1,10 @@
 package com.diamondq.common.lambda.interfaces;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @FunctionalInterface
-public interface NullableSupplier<T> {
+public interface NullableSupplier<T extends @Nullable Object> {
 
-  @Nullable T get();
+  @Nullable
+  T get();
 }

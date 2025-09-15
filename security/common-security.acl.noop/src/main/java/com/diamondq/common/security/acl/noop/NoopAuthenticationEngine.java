@@ -1,7 +1,7 @@
 package com.diamondq.common.security.acl.noop;
 
 import com.diamondq.common.security.acl.api.AuthenticationEngine;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package com.diamondq.common.vertx;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import io.vertx.core.Promise;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
 

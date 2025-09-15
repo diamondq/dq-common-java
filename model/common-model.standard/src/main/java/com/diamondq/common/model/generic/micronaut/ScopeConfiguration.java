@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.convert.format.MapFormat;
 import io.micronaut.core.convert.format.MapFormat.MapTransformation;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;

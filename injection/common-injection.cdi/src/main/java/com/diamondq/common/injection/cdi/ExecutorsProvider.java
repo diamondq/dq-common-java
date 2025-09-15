@@ -6,7 +6,7 @@ import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Named;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,8 +27,8 @@ public class ExecutorsProvider {
   @ApplicationScoped
   @Named("long-lived")
   public ScheduledExecutorService createScheduledExecutorServiceViaInjection(Instance<Config> pConfig) {
-    @Nullable Config config = null;
-    if ((pConfig.isAmbiguous() == false) && (pConfig.isUnsatisfied() == false)) config = pConfig.get();
+    Config config = null;
+    if ((!pConfig.isAmbiguous()) && (!pConfig.isUnsatisfied())) config = pConfig.get();
     return createScheduledExecutorService(config);
   }
 

@@ -2,7 +2,7 @@ package com.diamondq.common.errors;
 
 import com.diamondq.common.UtilMessages;
 import com.diamondq.common.i18n.I18NString;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @param <T> the type of the result
  */
-public class ResultOrError<T> {
+public class ResultOrError<T extends @Nullable Object> {
 
   private final @Nullable T mValue;
 
@@ -40,7 +40,7 @@ public class ResultOrError<T> {
    * @return the ResultOrError instance
    */
   public static <A> ResultOrError<A> of(A pValue) {
-    return new ResultOrError<A>(pValue, null, null, false);
+    return new ResultOrError<>(pValue, null, null, false);
   }
 
   /**
@@ -51,11 +51,11 @@ public class ResultOrError<T> {
    * @return the ResultOrError instance
    */
   public static <A> ResultOrError<A> error(I18NString pValue) {
-    return new ResultOrError<A>(null, pValue, null, true);
+    return new ResultOrError<>(null, pValue, null, true);
   }
 
   public static <A> ResultOrError<A> error(I18NStringAndException pValue) {
-    return new ResultOrError<A>(null, pValue.getMessage(), pValue.getThrowable(), true);
+    return new ResultOrError<>(null, pValue.getMessage(), pValue.getThrowable(), true);
   }
 
   /**
@@ -66,7 +66,7 @@ public class ResultOrError<T> {
    * @return the ResultOrError instance
    */
   public static <A> ResultOrError<A> error(ExtendedRuntimeException ex) {
-    return new ResultOrError<A>(null, ex.getCode().with(ex.getParams()), ex, true);
+    return new ResultOrError<>(null, ex.getCode().with(ex.getParams()), ex, true);
   }
 
   /**
@@ -76,7 +76,7 @@ public class ResultOrError<T> {
    * @return the transferred error Result
    */
   public <A> ResultOrError<A> transferError() {
-    return new ResultOrError<A>(null, mError, mException, mIsError);
+    return new ResultOrError<>(null, mError, mException, mIsError);
   }
 
   /**
@@ -85,7 +85,7 @@ public class ResultOrError<T> {
    * @return true if a result or false otherwise
    */
   public boolean isResult() {
-    return mIsError == false;
+    return !mIsError;
   }
 
   /**
@@ -94,7 +94,7 @@ public class ResultOrError<T> {
    * @return true if an error or false otherwise
    */
   public boolean isError() {
-    return mIsError == true;
+    return mIsError;
   }
 
   /**
@@ -103,7 +103,7 @@ public class ResultOrError<T> {
    * @return the result
    */
   public T getOrThrow() {
-    if (mIsError == true) {
+    if (mIsError) {
       Throwable exception = mException;
       if (exception != null) {
         if (exception instanceof ExtendedRuntimeException) throw (ExtendedRuntimeException) exception;
@@ -112,8 +112,8 @@ public class ResultOrError<T> {
       }
       throw new ExtendedRuntimeException(Objects.requireNonNull(mError));
     }
-    @SuppressWarnings("null") T result = mValue;
-    return result;
+    //noinspection DataFlowIssue
+    return mValue;
   }
 
   /**
@@ -133,7 +133,7 @@ public class ResultOrError<T> {
    * @return the exception
    */
   public @Nullable Throwable getException() {
-    if (mIsError == false) throw new ExtendedRuntimeException(UtilMessages.RESULTORERROR_IS_NOT_AN_ERROR);
+    if (!mIsError) throw new ExtendedRuntimeException(UtilMessages.RESULTORERROR_IS_NOT_AN_ERROR);
     return mException;
   }
 
@@ -143,23 +143,24 @@ public class ResultOrError<T> {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    if (mIsError == false) {
-      @Nullable T value = mValue;
+    if (!mIsError) {
+      T value = mValue;
       if (value == null) sb.append("null");
-      else sb.append(value.toString());
+      else sb.append(value);
     } else {
       I18NString error = mError;
       if (error == null) sb.append("null");
-      else sb.append(error.toString());
+      else sb.append(error);
       if (mException != null) {
         try (StringWriter sw = new StringWriter()) {
           try (PrintWriter pw = new PrintWriter(sw)) {
             mException.printStackTrace(pw);
           }
           sw.flush();
-          sb.append("\n").append(sw.toString());
+          sb.append("\n").append(sw);
         }
         catch (IOException ex) {
+          // Ignored
         }
 
       }

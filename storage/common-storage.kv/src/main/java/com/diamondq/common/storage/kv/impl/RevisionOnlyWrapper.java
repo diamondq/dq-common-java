@@ -2,7 +2,7 @@ package com.diamondq.common.storage.kv.impl;
 
 import com.diamondq.common.storage.kv.IObjectWithId;
 import com.diamondq.common.storage.kv.IObjectWithIdAndRev;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A wrapper that adds revision information
@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RevisionOnlyWrapper<P> implements IObjectWithIdAndRev<RevisionOnlyWrapper<P>> {
 
-  @Nullable private String _rev;
+  private @Nullable String _rev;
 
-  @Nullable private P data;
+  private @Nullable P data;
 
   /**
    * Default constructor

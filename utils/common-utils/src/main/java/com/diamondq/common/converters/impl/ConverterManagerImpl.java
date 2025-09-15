@@ -9,8 +9,7 @@ import com.googlecode.gentyref.GenericTypeReflector;
 import com.googlecode.gentyref.TypeFactory;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -110,7 +109,7 @@ public class ConverterManagerImpl implements ConverterManager {
       Type rawType = pt.getRawType();
       if (rawType instanceof Class) {
 
-        @NotNull Type[] typeArgs = pt.getActualTypeArguments();
+        Type[] typeArgs = pt.getActualTypeArguments();
         int typeArgsLen = typeArgs.length;
         boolean changed = false;
         if (typeArgsLen > 0) for (int i = 0; i < typeArgsLen; i++) {
@@ -156,7 +155,7 @@ public class ConverterManagerImpl implements ConverterManager {
     pSet.add(pType);
     if (pType instanceof Class) {
       Class<?> clazz = (Class<?>) pType;
-      @NotNull Class<?>[] interfaces = clazz.getInterfaces();
+      Class<?>[] interfaces = clazz.getInterfaces();
       for (Class<?> intf : interfaces) {
         Type exactIntf = GenericTypeReflector.getExactSuperType(pType, intf);
         if (exactIntf != null) recurseType(exactIntf, pSet, pRawTypes);
@@ -171,7 +170,7 @@ public class ConverterManagerImpl implements ConverterManager {
       if (rawType instanceof Class) {
         Class<?> rawClass = (Class<?>) rawType;
         pRawTypes.add(rawClass);
-        @NotNull Class<?>[] interfaces = rawClass.getInterfaces();
+        Class<?>[] interfaces = rawClass.getInterfaces();
         for (Class<?> intf : interfaces) {
           Type exactSuperType = GenericTypeReflector.getExactSuperType(pType, intf);
           if (exactSuperType != null) recurseType(exactSuperType, pSet, pRawTypes);
@@ -187,124 +186,130 @@ public class ConverterManagerImpl implements ConverterManager {
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Class<O> pOutputClass) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput, Class<O> pOutputClass) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInput.getClass(), pOutputClass, null, true);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Class<O> pOutputClass, @Nullable String pGroupName) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput, Class<O> pOutputClass,
+    @Nullable String pGroupName) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInput.getClass(), pOutputClass, pGroupName, true);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, Class<O> pOutputClass) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convert(I pInput, Class<O> pOutputClass) {
     assert pInput != null;
     return internalConvert(pInput, pInput.getClass(), pOutputClass, null, false);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, Class<O> pOutputClass, @Nullable String pGroupName) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convert(I pInput, Class<O> pOutputClass,
+    @Nullable String pGroupName) {
     assert pInput != null;
     return internalConvert(pInput, pInput.getClass(), pOutputClass, pGroupName, false);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<I> pInputType,
-    TypeReference<O> pOutputType) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput,
+    TypeReference<I> pInputType, TypeReference<O> pOutputType) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInputType.getType(), pOutputType.getType(), null, true);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<I> pInputType,
-    TypeReference<O> pOutputType, @Nullable String pGroupName) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput,
+    TypeReference<I> pInputType, TypeReference<O> pOutputType, @Nullable String pGroupName) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInputType.getType(), pOutputType.getType(), pGroupName, true);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, TypeReference<O> pOutputType) {
+  public <I, O> O convert(I pInput, TypeReference<O> pOutputType) {
     return internalConvert(pInput, pInput.getClass(), pOutputType.getType(), null, false);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, TypeReference<I> pInputType,
-    TypeReference<@NotNull O> pOutputType, @Nullable String pGroupName) {
+  public <I, O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType,
+    @Nullable String pGroupName) {
     return internalConvert(pInput, pInput.getClass(), pOutputType.getType(), pGroupName, false);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<O> pOutputType) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput,
+    TypeReference<O> pOutputType) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInput.getClass(), pOutputType.getType(), null, true);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, TypeReference<O> pOutputType,
-    @Nullable String pGroupName) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput,
+    TypeReference<O> pOutputType, @Nullable String pGroupName) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInput.getClass(), pOutputType.getType(), pGroupName, true);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, TypeReference<O> pOutputType, @Nullable String pGroupName) {
+  public <I, O> O convert(I pInput, TypeReference<O> pOutputType, @Nullable String pGroupName) {
     return internalConvert(pInput, pInput.getClass(), pOutputType.getType(), pGroupName, false);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType) {
+  public <I, O> O convert(I pInput, TypeReference<I> pInputType, TypeReference<O> pOutputType) {
     return internalConvert(pInput, pInputType.getType(), pOutputType.getType(), null, false);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, Type pOutputType) {
+  public <I, O> O convert(I pInput, Type pOutputType) {
     return internalConvert(pInput, pInput.getClass(), pOutputType, null, false);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> @NotNull O convert(I pInput, Type pOutputType, @Nullable String pGroupName) {
+  public <I, O> O convert(I pInput, Type pOutputType, @Nullable String pGroupName) {
     return internalConvert(pInput, pInput.getClass(), pOutputType, pGroupName, false);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, Type pInputType, Type pOutputType) {
+  public <I, O> O convert(I pInput, Type pInputType, Type pOutputType) {
     return internalConvert(pInput, pInputType, pOutputType, null, false);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pInputType, Type pOutputType) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput, Type pInputType,
+    Type pOutputType) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInputType, pOutputType, null, true);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pInputType, Type pOutputType,
-    @Nullable String pGroupName) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput, Type pInputType,
+    Type pOutputType, @Nullable String pGroupName) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInputType, pOutputType, pGroupName, true);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pOutputType) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput, Type pOutputType) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInput.getClass(), pOutputType, null, true);
   }
 
   @Override
-  public <@Nullable I, @Nullable O> O convertNullable(I pInput, Type pOutputType, @Nullable String pGroupName) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convertNullable(I pInput, Type pOutputType,
+    @Nullable String pGroupName) {
     if (pInput == null) return null;
     return internalConvert(pInput, pInput.getClass(), pOutputType, pGroupName, true);
   }
 
   @Override
-  public <@NotNull I, @NotNull O> O convert(I pInput, Type pInputType, Type pOutputType, @Nullable String pGroupName) {
+  public <I extends @Nullable Object, O extends @Nullable Object> O convert(I pInput, Type pInputType, Type pOutputType,
+    @Nullable String pGroupName) {
     return internalConvert(pInput, pInputType, pOutputType, pGroupName, false);
   }
 
-  private <@NotNull I, @Nullable O> O internalConvert(I pInput, Type pInputType, Type pOutputType,
-    @Nullable String pGroupName, boolean pAllowNullOutput) {
+  private <I, O> O internalConvert(I pInput, Type pInputType, Type pOutputType, @Nullable String pGroupName,
+    boolean pAllowNullOutput) {
     Objects.requireNonNull(pInput);
 
     /* Quick check for matching classes */
@@ -320,7 +325,7 @@ public class ConverterManagerImpl implements ConverterManager {
 
     /* Attempt to look for a shortcut */
 
-    @NotNull TypePair inputTypePair = new TypePair(pGroupName, pInputType, pOutputType);
+    TypePair inputTypePair = new TypePair(pGroupName, pInputType, pOutputType);
     Converter<?, ?> matchConverter = mShortcuts.get(inputTypePair);
     if (matchConverter == null) {
 
@@ -423,7 +428,7 @@ public class ConverterManagerImpl implements ConverterManager {
       }
     }
     @SuppressWarnings("unchecked") Converter<I, O> converter = (Converter<I, O>) matchConverter;
-    @Nullable O result = converter.convert(pInput);
+    O result = converter.convert(pInput);
 
     /* Verify the result matches */
 

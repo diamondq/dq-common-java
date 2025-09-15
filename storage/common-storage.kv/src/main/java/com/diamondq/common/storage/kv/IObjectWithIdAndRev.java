@@ -1,6 +1,6 @@
 package com.diamondq.common.storage.kv;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This can be attached to a model object to allow the underlying KV store implementation to get access to the id and
@@ -15,7 +15,8 @@ public interface IObjectWithIdAndRev<O> extends IObjectWithId<O> {
    *
    * @return the revision
    */
-  public @Nullable String getObjectRevision();
+  @Nullable
+  String getObjectRevision();
 
   /**
    * Sets a new object revision
@@ -23,5 +24,5 @@ public interface IObjectWithIdAndRev<O> extends IObjectWithId<O> {
    * @param pValue the revision
    * @return the updated object (may or may not be the same as the passed in object)
    */
-  public O setObjectRevision(String pValue);
+  O setObjectRevision(String pValue);
 }

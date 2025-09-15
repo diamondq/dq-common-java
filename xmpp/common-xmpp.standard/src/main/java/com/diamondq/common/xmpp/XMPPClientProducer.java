@@ -12,7 +12,7 @@ import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.Annotated;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import jakarta.inject.Inject;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.xmpp.core.XmppException;
@@ -45,9 +45,7 @@ public class XMPPClientProducer {
 
   @Produces
   @Dependent
-  public @Nullable
-  @Default
-  @XMPPClientRef("") XmppClient getClient(InjectionPoint pInjectionPoint, Config pConfig,
+  public @Nullable @Default @XMPPClientRef("") XmppClient getClient(InjectionPoint pInjectionPoint, Config pConfig,
     XMPPServerLookup pServerInfoLookup) {
 
     String scope = pInjectionPoint.getBean().getScope().getName();

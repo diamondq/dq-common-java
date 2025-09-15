@@ -8,7 +8,7 @@ import io.undertow.servlet.api.DeploymentInfo;
 import org.jboss.resteasy.core.ResteasyDeploymentImpl;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.ws.rs.core.Application;
 

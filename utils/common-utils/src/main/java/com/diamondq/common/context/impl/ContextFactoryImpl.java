@@ -8,7 +8,7 @@ import com.diamondq.common.context.spi.ContextHandler;
 import com.diamondq.common.context.spi.SPIContextFactory;
 import io.micronaut.context.annotation.Secondary;
 import jakarta.annotation.PostConstruct;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -95,7 +95,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   public Context newContextWithMeta(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
 
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass parentContext;
+    ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
 
@@ -133,7 +133,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   public Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
 
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass parentContext;
+    ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
 
@@ -170,14 +170,14 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void closeContext(ContextClass pContext) {
     boolean exitSet = false;
-    @Nullable Object exitValue = pContext.getHandlerData(ContextHandler.sEXIT_VALUE, false, Object.class);
+    Object exitValue = pContext.getHandlerData(ContextHandler.sEXIT_VALUE, false, Object.class);
     if (exitValue == sNULL_EXIT_VALUE) {
       exitValue = null;
       exitSet = true;
     } else //noinspection VariableNotUsedInsideIf
       if (exitValue != null) exitSet = true;
-    @Nullable Function<@Nullable Object, @Nullable Object> exitFunc;
-    @Nullable Object exitFuncObj = pContext.getHandlerData(ContextHandler.sEXIT_FUNC, false, Object.class);
+    Function<@Nullable Object, @Nullable Object> exitFunc;
+    Object exitFuncObj = pContext.getHandlerData(ContextHandler.sEXIT_FUNC, false, Object.class);
     if (exitFuncObj == sNULL_EXIT_VALUE) exitFunc = null;
     else if (exitFuncObj != null) {
       @SuppressWarnings(
@@ -204,7 +204,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
       pContext.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, null);
 
       Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-      @Nullable ContextClass oldContext;
+      ContextClass oldContext;
       if (contextStack.isEmpty()) oldContext = null;
       else oldContext = contextStack.peek();
       if (pContext.equals(oldContext)) {
@@ -227,7 +227,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
     for (ContextHandler handler : mHandlers)
       handler.executeOnDetachContextToThread(pContext);
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass oldContext;
+    ContextClass oldContext;
     if (contextStack.isEmpty()) oldContext = null;
     else oldContext = contextStack.peek();
     if (pContext.equals(oldContext)) {
@@ -274,7 +274,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public RuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass parentContext;
+    ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
@@ -289,7 +289,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass parentContext;
+    ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
@@ -309,7 +309,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass parentContext;
+    ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
@@ -329,7 +329,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   public void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass parentContext;
+    ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
@@ -345,7 +345,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   public void reportInfo(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass parentContext;
+    ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
@@ -361,7 +361,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   public void reportWarn(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    @Nullable ContextClass parentContext;
+    ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
     try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
@@ -381,7 +381,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
    *   java.lang.Object)
    */
   @Override
-  public <T> T internalExitValue(ContextClass pContext, T pResult) {
+  public <T extends @Nullable Object> T internalExitValue(ContextClass pContext, T pResult) {
     pContext.setHandlerData(ContextHandler.sEXIT_VALUE, (pResult == null ? sNULL_EXIT_VALUE : pResult));
     pContext.setHandlerData(ContextHandler.sEXIT_FUNC, sNULL_EXIT_VALUE);
     return pResult;
@@ -392,7 +392,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
    *   java.lang.Object, java.util.function.Function)
    */
   @Override
-  public <T> T internalExitValueWithMeta(ContextClass pContext, T pResult,
+  public <T extends @Nullable Object> T internalExitValueWithMeta(ContextClass pContext, T pResult,
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
     pContext.setHandlerData(ContextHandler.sEXIT_VALUE, (pResult == null ? sNULL_EXIT_VALUE : pResult));
     pContext.setHandlerData(ContextHandler.sEXIT_FUNC, (pFunc == null ? sNULL_EXIT_VALUE : pFunc));

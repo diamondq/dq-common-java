@@ -1,11 +1,11 @@
 package com.diamondq.common.xmpp;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.SortedSet;
 
 public interface XMPPServerLookup {
 
-  public SortedSet<XMPPServerInfo> getXMPPServerList(@Nullable String pDNSDomain);
+  SortedSet<XMPPServerInfo> getXMPPServerList(@Nullable String pDNSDomain);
 
 }

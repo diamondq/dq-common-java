@@ -2,8 +2,7 @@ package com.diamondq.common.storage.kv;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -22,22 +21,20 @@ public abstract class TransactionUtil {
    * @param pSupplier the supplier
    * @return the future
    */
-  public static <@Nullable T, @Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<T, CONTEXT>> runInTransaction(
-    IKVStore pStore,
-    Function<@NotNull IKVAsyncTransaction, @Nullable ExtendedCompletableFuture<@NotNull Pair<T, CONTEXT>>> pSupplier) {
+  public static <T extends @Nullable Object, CONTEXT extends @Nullable Object> ExtendedCompletableFuture<Pair<T, CONTEXT>> runInTransaction(
+    IKVStore pStore, Function<IKVAsyncTransaction, @Nullable ExtendedCompletableFuture<Pair<T, CONTEXT>>> pSupplier) {
     IKVAsyncTransaction transaction = pStore.startAsyncTransaction();
     try {
-      @Nullable ExtendedCompletableFuture<@NotNull Pair<@Nullable T, @Nullable CONTEXT>> supplierResult = pSupplier.apply(
-        transaction);
+      ExtendedCompletableFuture<Pair<@Nullable T, @Nullable CONTEXT>> supplierResult = pSupplier.apply(transaction);
       if (supplierResult == null) throw new IllegalArgumentException();
       @SuppressWarnings(
-        "null") ExtendedCompletableFuture<@NotNull Pair<@Nullable T, @Nullable CONTEXT>> composeResult = (ExtendedCompletableFuture<@NotNull Pair<@Nullable T, @Nullable CONTEXT>>) supplierResult.thenCompose(
-        p -> transaction.commit(p));
+        "null") ExtendedCompletableFuture<Pair<@Nullable T, @Nullable CONTEXT>> composeResult = supplierResult.thenCompose(
+        transaction::commit);
       return composeResult;
     }
     catch (RuntimeException ex) {
       @SuppressWarnings(
-        "null") ExtendedCompletableFuture<@NotNull Pair<@Nullable T, @Nullable CONTEXT>> composeResult = (ExtendedCompletableFuture<@NotNull Pair<@Nullable T, @Nullable CONTEXT>>) transaction.rollback(
+        "null") ExtendedCompletableFuture<Pair<@Nullable T, @Nullable CONTEXT>> composeResult = transaction.rollback(
           null)
         .thenCompose(a -> ExtendedCompletableFuture.<@Nullable Pair<@Nullable T, @Nullable CONTEXT>>completedFailure(ex));
       return composeResult;

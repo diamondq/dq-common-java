@@ -25,8 +25,7 @@ import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -140,7 +139,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
    *   com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
    */
   @Override
-  protected <@NotNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
+  protected <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
     boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
     pConfig.put(pKey, pValue);
   }
@@ -175,23 +174,22 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected boolean removeStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
     boolean pIsMeta, String pKey, PropertyType pType) {
-    if (pConfig.remove(pKey) != null) return true;
-    return false;
+    return pConfig.remove(pKey) != null;
   }
 
-  private @Nullable ConcurrentMap<String, Object> resolveToParent(ConcurrentMap<String, Object> pTop,
-    @NotNull String[] pParts, boolean pCreateIfMissing) {
+  private @Nullable ConcurrentMap<String, Object> resolveToParent(ConcurrentMap<String, Object> pTop, String[] pParts,
+    boolean pCreateIfMissing) {
     ConcurrentMap<String, Object> map = pTop;
     if (pParts.length > 1) for (int i = 0; i < (pParts.length - 1); i++) {
       Object result = map.get(pParts[i]);
       if (result == null) {
-        if (pCreateIfMissing == false) {
+        if (!pCreateIfMissing) {
           map = null;
           break;
         }
         ConcurrentMap<String, Object> newMap = Maps.newConcurrentMap();
         if ((result = map.putIfAbsent(pParts[i], newMap)) == null) result = newMap;
-      } else if ((result instanceof ConcurrentMap) == false)
+      } else if (!(result instanceof ConcurrentMap))
         throw new IllegalArgumentException("Parent key writing to real object");
       @SuppressWarnings("unchecked") ConcurrentMap<String, Object> castedMap = (ConcurrentMap<String, Object>) result;
       map = castedMap;
@@ -207,7 +205,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected @Nullable Map<String, Object> loadStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName,
     String pKey, boolean pCreateIfMissing) {
-    @NotNull String[] parts = pKey.split("/");
+    String[] parts = pKey.split("/");
     ConcurrentMap<String, Object> map = resolveToParent(mDataCache, parts, false);
     Map<String, Object> data;
     if (map == null) data = null;
@@ -217,7 +215,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
       else data = wrapper.data;
     }
 
-    if ((data == null) && (pCreateIfMissing == true)) data = Maps.newHashMap();
+    if ((data == null) && (pCreateIfMissing)) data = Maps.newHashMap();
     return data;
   }
 
@@ -229,13 +227,13 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected boolean saveStructureConfigObject(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Map<String, Object> pConfig, boolean pMustMatchOptimisticObj, @Nullable String pOptimisticObj) {
-    @NotNull String[] parts = pKey.split("/");
+    String[] parts = pKey.split("/");
     ConcurrentMap<String, Object> map = resolveToParent(mDataCache, parts, true);
     if (map == null) throw new IllegalStateException("The map shouldn't be null");
     map.put(parts[parts.length - 1] + ".map", new DataWrapper(pConfig));
 
     // TODO: Support the optimistic code
-    if (pMustMatchOptimisticObj == true) throw new UnsupportedOperationException();
+    if (pMustMatchOptimisticObj) throw new UnsupportedOperationException();
     return true;
   }
 
@@ -247,7 +245,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected boolean internalDeleteStructure(Toolkit pToolkit, Scope pScope, String pDefName, String pKey,
     Structure pStructure) {
-    @NotNull String[] parts = pKey.split("/");
+    String[] parts = pKey.split("/");
     ConcurrentMap<String, Object> map = resolveToParent(mDataCache, parts, false);
     if (map != null) map.remove(parts[parts.length - 1] + ".map");
     // TODO: Support optimistic checks
@@ -269,13 +267,13 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
     @Nullable String pKey, @Nullable PropertyDefinition pPropDef, Builder<StructureRef> pStructureRefListBuilder) {
     List<String> partList = pKey == null ? Lists.newArrayList() : Lists.newArrayList(pKey.split("/"));
     if (pPropDef != null) partList.add(pPropDef.getName());
-    @SuppressWarnings("null") @NotNull String[] parts = partList.toArray(new String[0]);
+    String[] parts = partList.toArray(new String[0]);
     ConcurrentMap<String, Object> parent = resolveToParent(mDataCache, parts, false);
     if (parent == null) return;
     @SuppressWarnings("unchecked") ConcurrentMap<String, Object> child = (
       parts.length == 0 ? parent : (ConcurrentMap<String, Object>) parent.get(parts[parts.length - 1]));
     if (child == null) return;
-    String[] listTypeDirs = Maps.filterValues(child, (v) -> ((v instanceof DataWrapper) == false))
+    String[] listTypeDirs = Maps.filterValues(child, (v) -> (!(v instanceof DataWrapper)))
       .keySet()
       .toArray(new String[0]);
 
@@ -291,7 +289,7 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
       if (pPropDef != null) {
         Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
-        if (referenceTypes.isEmpty() == false) {
+        if (!referenceTypes.isEmpty()) {
           boolean match = false;
           for (StructureDefinitionRef sdr : referenceTypes) {
             StructureDefinition sd = sdr.resolve();
@@ -302,14 +300,14 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
               break;
             }
           }
-          if (match == false) continue;
+          if (!match) continue;
         }
       } else if (pKey == null) {
         /*
          * Special case where there is no parent key. In this case, the StructureDefinition is the restriction
          */
 
-        if (typeName.equals(pStructureDefName) == false) continue;
+        if (!typeName.equals(pStructureDefName)) continue;
       }
 
       refBuilder.setLength(preTypeOffset);
@@ -326,7 +324,6 @@ public class NewMemoryPersistenceLayer extends AbstractDocumentPersistenceLayer<
           .createStructureRefFromSerialized(pScope, refBuilder.toString()));
       }
     }
-    return;
   }
 
   public ConcurrentMap<String, Object> getDataCache() {

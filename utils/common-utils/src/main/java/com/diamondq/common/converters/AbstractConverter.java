@@ -1,11 +1,12 @@
 package com.diamondq.common.converters;
 
 import com.diamondq.common.TypeReference;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
-public abstract class AbstractConverter<I, O> implements Converter<I, O> {
+public abstract class AbstractConverter<I extends @Nullable Object, O extends @Nullable Object>
+  implements Converter<I, O> {
 
   protected final @Nullable String mGroupName;
 

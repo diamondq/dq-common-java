@@ -25,8 +25,7 @@ import com.diamondq.common.model.interfaces.ToolkitFactory;
 import com.diamondq.common.model.interfaces.TranslatableString;
 import org.javatuples.Octet;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -274,7 +273,7 @@ public class WrappedToolkit implements Toolkit {
    *   com.diamondq.common.model.interfaces.Property, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
-  public <@Nullable T> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
+  public <T extends @Nullable Object> PropertyRef<T> createPropertyRef(Scope pScope, @Nullable Property<T> pResolvable,
     Structure pContaining) {
     return mToolkit.createPropertyRef(dewrapScope(pScope), pResolvable, pContaining);
   }
@@ -331,7 +330,7 @@ public class WrappedToolkit implements Toolkit {
    */
   @Override
   public @Nullable Structure lookupStructureByPrimaryKeys(Scope pScope, StructureDefinition pStructureDef,
-    @Nullable Object @NotNull ... pPrimaryKeys) {
+    @Nullable Object... pPrimaryKeys) {
     return mToolkit.lookupStructureByPrimaryKeys(dewrapScope(pScope), pStructureDef, pPrimaryKeys);
   }
 
@@ -379,8 +378,8 @@ public class WrappedToolkit implements Toolkit {
    *   com.diamondq.common.model.interfaces.PropertyDefinition, boolean, java.lang.Object)
    */
   @Override
-  public <@Nullable TYPE> Property<TYPE> createNewProperty(Scope pScope, PropertyDefinition pPropertyDefinition,
-    boolean pIsValueSet, TYPE pValue) {
+  public <TYPE extends @Nullable Object> Property<TYPE> createNewProperty(Scope pScope,
+    PropertyDefinition pPropertyDefinition, boolean pIsValueSet, TYPE pValue) {
     return mToolkit.createNewProperty(dewrapScope(pScope), pPropertyDefinition, pIsValueSet, pValue);
   }
 
@@ -474,7 +473,7 @@ public class WrappedToolkit implements Toolkit {
    *   java.lang.String)
    */
   @Override
-  public <@Nullable T> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
+  public <T extends @Nullable Object> PropertyRef<T> createPropertyRefFromSerialized(Scope pScope, String pValue) {
     return mToolkit.createPropertyRefFromSerialized(dewrapScope(pScope), pValue);
   }
 
@@ -595,7 +594,7 @@ public class WrappedToolkit implements Toolkit {
    */
   @Override
   public BiFunction<Structure, Structure, Structure> createStandardMigration(Scope pScope,
-    StandardMigrations pMigrationType, @NotNull Object @Nullable ... pParams) {
+    StandardMigrations pMigrationType, Object @Nullable ... pParams) {
     return mToolkit.createStandardMigration(dewrapScope(pScope), pMigrationType, pParams);
   }
 

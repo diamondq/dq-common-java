@@ -1,7 +1,5 @@
 package com.diamondq.common.storage.kv;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 
 /**
@@ -10,7 +8,7 @@ import java.util.Collection;
  * @param <ICB> the type representing a KVIndexColumnBuilder
  * @param <IDB> the type representing a KVIndexDefinitionBuilder
  */
-public interface IKVIndexSupport<@NotNull ICB extends KVIndexColumnBuilder<@NotNull ICB>, @NotNull IDB extends KVIndexDefinitionBuilder<@NotNull IDB>> {
+public interface IKVIndexSupport<ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> {
 
   /**
    * This tells the store the set of indexes that are required. If these indexes are already created, then nothing
@@ -18,19 +16,19 @@ public interface IKVIndexSupport<@NotNull ICB extends KVIndexColumnBuilder<@NotN
    *
    * @param pIndexes the collection of index definitions
    */
-  public void addRequiredIndexes(Collection<@NotNull IKVIndexDefinition> pIndexes);
+  void addRequiredIndexes(Collection<IKVIndexDefinition> pIndexes);
 
   /**
    * Returns a new Index Column Builder
    *
    * @return the builder
    */
-  public ICB createIndexColumnBuilder();
+  ICB createIndexColumnBuilder();
 
   /**
    * Returns a new Index Definition Builder
    *
    * @return the builder
    */
-  public IDB createIndexDefinitionBuilder();
+  IDB createIndexDefinitionBuilder();
 }

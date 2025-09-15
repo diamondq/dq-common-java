@@ -3,7 +3,7 @@ package com.diamondq.common.jaxrs.utils;
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.container.AsyncResponse;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class AsyncResponseHelper {
    * @param pFuture the future
    */
   public void toDeferredResult(Locale pLocale, AsyncResponse pResponse,
-    ExtendedCompletableFuture<@Nullable ?> pFuture) {
+    ExtendedCompletableFuture<? extends @Nullable Object> pFuture) {
 
     pFuture.whenComplete((response, error) -> {
       try {

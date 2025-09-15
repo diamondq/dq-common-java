@@ -3,7 +3,6 @@ package com.diamondq.common.vertx.processor.model;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +89,7 @@ public class ProcessorClass<R extends ProcessorType<R>, P extends ProcessorParam
             if (element.getModifiers().contains(Modifier.DEFAULT) == true) continue;
 
             try {
-              @NotNull M method = pMethodConstructor.newInstance(element,
+              M method = pMethodConstructor.newInstance(element,
                 pParamConstructor,
                 pTypeConstructor,
                 pProcessingEnv,

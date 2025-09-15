@@ -26,8 +26,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +160,7 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
    */
   @SuppressWarnings("unchecked")
   @Override
-  public <ICB extends @NotNull KVIndexColumnBuilder<@NotNull ICB>, IDB extends @NotNull KVIndexDefinitionBuilder<@NotNull IDB>> @Nullable IKVIndexSupport<@NotNull ICB, @NotNull IDB> getIndexSupport() {
+  public <ICB extends KVIndexColumnBuilder<ICB>, IDB extends KVIndexDefinitionBuilder<IDB>> @Nullable IKVIndexSupport<ICB, IDB> getIndexSupport() {
     return (IKVIndexSupport<ICB, IDB>) this;
   }
 
@@ -169,9 +168,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
    * @see com.diamondq.common.storage.kv.IKVIndexSupport#addRequiredIndexes(java.util.Collection)
    */
   @Override
-  public void addRequiredIndexes(Collection<@NotNull IKVIndexDefinition> pIndexes) {
+  public void addRequiredIndexes(Collection<IKVIndexDefinition> pIndexes) {
     try (Context context = mContextFactory.newContext(JDBCKVStore.class, this, pIndexes)) {
-      Map<@NotNull String, @NotNull IKVIndexDefinition> indexByName = Maps.newHashMap();
+      Map<String, IKVIndexDefinition> indexByName = Maps.newHashMap();
       for (IKVIndexDefinition index : pIndexes) {
         indexByName.put(index.getName(), index);
         String indexName = index.getName().toLowerCase();
@@ -316,8 +315,8 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
    */
   @SuppressWarnings("unchecked")
   @Override
-  public <TDB extends @NotNull KVTableDefinitionBuilder<@NotNull TDB>, CDB extends @NotNull KVColumnDefinitionBuilder<@NotNull CDB>> @Nullable IKVTableDefinitionSupport<@NotNull TDB, @NotNull CDB> getTableDefinitionSupport() {
-    return (@Nullable IKVTableDefinitionSupport<@NotNull TDB, @NotNull CDB>) this;
+  public <TDB extends KVTableDefinitionBuilder<TDB>, CDB extends KVColumnDefinitionBuilder<CDB>> @Nullable IKVTableDefinitionSupport<TDB, CDB> getTableDefinitionSupport() {
+    return (@Nullable IKVTableDefinitionSupport<TDB, CDB>) this;
   }
 
   /**
@@ -693,8 +692,9 @@ public class JDBCKVStore implements IKVStore, IKVIndexSupport<JDBCIndexColumnBui
 
       sb.append(String.join(",",
         Iterables.concat(Iterables.transform(pInfo.definition.getColumnDefinitions(),
-          (cd) -> cd == null ? null : escapeColumnName(cd.getName())
-        ), Lists.newArrayList(sPRIMARY_KEY_1, sPRIMARY_KEY_2))
+            (cd) -> cd == null ? null : escapeColumnName(cd.getName())
+          ), Lists.newArrayList(sPRIMARY_KEY_1, sPRIMARY_KEY_2)
+        )
       ));
       sb.append(" FROM ");
       if (pInfo.tableSchema != null) sb.append(pInfo.tableSchema).append('.');

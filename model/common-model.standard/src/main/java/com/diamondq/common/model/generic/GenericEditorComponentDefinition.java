@@ -7,8 +7,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
@@ -133,7 +132,7 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
   @Override
   public T addVisibleIfValueEquals(String pValue) {
     Set<String> visibleIfValueEquals = mVisibleIfValueEquals;
-    @SuppressWarnings("null") @NotNull Predicate<String> equalTo = Predicates.equalTo(pValue);
+    Predicate<String> equalTo = Predicates.equalTo(pValue);
     return constructNew(mLabel,
       mColumn,
       mColumnSpan,
@@ -154,7 +153,7 @@ public abstract class GenericEditorComponentDefinition<T extends EditorComponent
   @Override
   public T removeVisibleIfValueEquals(String pValue) {
     Set<String> visibleIfValueEquals = mVisibleIfValueEquals;
-    @SuppressWarnings("null") @NotNull Predicate<String> equalTo = Predicates.equalTo(pValue);
+    Predicate<String> equalTo = Predicates.equalTo(pValue);
     return constructNew(mLabel,
       mColumn,
       mColumnSpan,

@@ -8,8 +8,7 @@ import com.diamondq.common.model.interfaces.PropertyRef;
 import com.diamondq.common.model.interfaces.Script;
 import com.diamondq.common.model.interfaces.Structure;
 import com.diamondq.common.model.interfaces.StructureRef;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -18,7 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
+public class GenericProperty<TYPE extends @Nullable Object> implements Property<TYPE> {
 
   private final PropertyDefinition mPropertyDefinition;
 
@@ -42,18 +41,18 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
    */
   @Override
   public TYPE getValue(Structure pContainer) {
-    if (mValueSet == true) {
+    if (mValueSet) {
       if (mSupplier != null) return mSupplier.getValue();
       else return mValue;
     }
 
-    if (mPropertyDefinition.getKeywords().containsKey(CommonKeywordKeys.INHERIT_PARENT) == false) {
+    if (!mPropertyDefinition.getKeywords().containsKey(CommonKeywordKeys.INHERIT_PARENT)) {
       StructureRef parentRef = pContainer.getParentRef();
       if (parentRef != null) {
         Structure parent = parentRef.resolve();
         if (parent != null) {
           Property<TYPE> parentProperty = parent.lookupPropertyByName(mPropertyDefinition.getName());
-          if (parentProperty != null) if (parentProperty.getDefinition().isFinal() == false)
+          if (parentProperty != null) if (!parentProperty.getDefinition().isFinal())
             if (parentProperty.getDefinition().getType() == mPropertyDefinition.getType())
               return parentProperty.getValue(parent);
         }
@@ -268,7 +267,7 @@ public class GenericProperty<@Nullable TYPE> implements Property<TYPE> {
    * @see com.diamondq.common.model.interfaces.Property#clearValueSet()
    */
   @Override
-  public @NotNull Property<@Nullable TYPE> clearValueSet() {
+  public Property<@Nullable TYPE> clearValueSet() {
     return new GenericProperty<>(mPropertyDefinition, false, null, null);
   }
 

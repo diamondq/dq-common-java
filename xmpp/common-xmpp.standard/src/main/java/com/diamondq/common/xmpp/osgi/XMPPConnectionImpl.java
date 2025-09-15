@@ -2,7 +2,7 @@ package com.diamondq.common.xmpp.osgi;
 
 import com.diamondq.common.injection.osgi.AbstractOSGiConstructor;
 import com.diamondq.common.injection.osgi.ConstructorInfoBuilder;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
@@ -201,33 +201,34 @@ public class XMPPConnectionImpl extends AbstractOSGiConstructor {
       }
       if (count < requiredModules.length) {
         mScheduledExecutorService.schedule(() -> {
-          XmppClient client = create(pDomain,
-            pHostname,
-            pPort,
-            pConnectTimeout,
-            pKeepAliveInterval,
-            pSecure,
-            pProxyHost,
-            pProxyPort,
-            pProxyType,
-            pDebuggerName,
-            pDefaultResponseTimeout,
-            pLocaleStr,
-            pReconnectType,
-            pSlotTime,
-            pCeilingTime,
-            pAfterTime,
-            pMinTime,
-            pMaxTime,
-            pUserName,
-            pPassword,
-            pResource,
-            pInboundPresenceListeners
-          );
-          if (client != null) {
-            registerService(client);
-          }
-        }, 5, TimeUnit.SECONDS);
+            XmppClient client = create(pDomain,
+              pHostname,
+              pPort,
+              pConnectTimeout,
+              pKeepAliveInterval,
+              pSecure,
+              pProxyHost,
+              pProxyPort,
+              pProxyType,
+              pDebuggerName,
+              pDefaultResponseTimeout,
+              pLocaleStr,
+              pReconnectType,
+              pSlotTime,
+              pCeilingTime,
+              pAfterTime,
+              pMinTime,
+              pMaxTime,
+              pUserName,
+              pPassword,
+              pResource,
+              pInboundPresenceListeners
+            );
+            if (client != null) {
+              registerService(client);
+            }
+          }, 5, TimeUnit.SECONDS
+        );
         return null;
       }
     }

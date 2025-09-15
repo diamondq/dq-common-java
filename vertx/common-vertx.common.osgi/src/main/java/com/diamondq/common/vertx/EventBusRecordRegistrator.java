@@ -12,7 +12,7 @@ import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.Status;
 import io.vertx.servicediscovery.spi.ServiceExporter;
 import io.vertx.servicediscovery.spi.ServicePublisher;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 

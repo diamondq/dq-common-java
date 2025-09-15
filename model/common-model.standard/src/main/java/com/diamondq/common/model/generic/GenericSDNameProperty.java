@@ -3,8 +3,7 @@ package com.diamondq.common.model.generic;
 import com.diamondq.common.model.interfaces.Property;
 import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.Structure;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -45,7 +44,7 @@ public class GenericSDNameProperty implements Property<@Nullable String> {
    * @see com.diamondq.common.model.interfaces.Property#clearValueSet()
    */
   @Override
-  public @NotNull Property<@Nullable String> clearValueSet() {
+  public Property<@Nullable String> clearValueSet() {
     throw new IllegalArgumentException();
   }
 

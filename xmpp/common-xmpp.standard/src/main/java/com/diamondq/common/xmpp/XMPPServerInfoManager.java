@@ -1,6 +1,6 @@
 package com.diamondq.common.xmpp;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import rocks.xmpp.core.session.Manager;
 import rocks.xmpp.core.session.XmppSession;
 

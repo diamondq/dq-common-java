@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSortedSet;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xbill.DNS.Lookup;

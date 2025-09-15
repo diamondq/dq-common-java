@@ -1,9 +1,11 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
-    <inspection_tool class="AssignmentToNull" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CdiInjectionPointsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="CdiManagedBeanInconsistencyInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="ConstantValue" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="DONT_REPORT_TRUE_ASSERT_STATEMENTS" value="true" />
+    </inspection_tool>
     <inspection_tool class="InstanceVariableUninitializedUse" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_ignorePrimitives" value="false" />
       <option name="annotationNamesString" value="" />
@@ -15,7 +17,7 @@
       <option name="m_reportObjectMethods" value="true" />
       <option name="m_reportArrayMethods" value="true" />
       <option name="m_reportCollectionMethods" value="true" />
-      <option name="m_ignorePrivateMethods" value="false" />
+      <option name="m_ignorePrivateMethods" value="true" />
     </inspection_tool>
     <inspection_tool class="StaticVariableUninitializedUse" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_ignorePrimitives" value="false" />

@@ -2,7 +2,6 @@ package com.diamondq.common.vertx.processor.model;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
@@ -50,7 +49,7 @@ public abstract class ProcessorMethod<R extends ProcessorType<R>, P extends Proc
       List<P> params = new ArrayList<>();
       boolean needsConverter = mReturnType.isConverterAvailable();
       for (VariableElement ve : pElement.getParameters()) {
-        @NotNull P param = pParamConstructor.newInstance(ve, pTypeConstructor, pProcessingEnv, pTypeMap);
+        P param = pParamConstructor.newInstance(ve, pTypeConstructor, pProcessingEnv, pTypeMap);
         if (param.isNeedsConverter() == true) needsConverter = true;
         params.add(param);
       }

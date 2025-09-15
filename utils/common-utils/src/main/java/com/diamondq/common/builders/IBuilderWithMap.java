@@ -1,6 +1,6 @@
 package com.diamondq.common.builders;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -13,5 +13,5 @@ public interface IBuilderWithMap<SELF extends IBuilderWithMap<SELF, RESULT>, RES
    * @param pPrefix an optional prefix that should be stripped off the config
    * @return the updated builder
    */
-  public SELF withMap(Map<String, Object> pConfig, @Nullable String pPrefix);
+  SELF withMap(Map<String, Object> pConfig, @Nullable String pPrefix);
 }

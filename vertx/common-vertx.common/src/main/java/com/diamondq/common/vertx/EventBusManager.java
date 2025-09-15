@@ -2,11 +2,11 @@ package com.diamondq.common.vertx;
 
 import com.diamondq.common.context.ContextExtendedCompletionStage;
 import io.vertx.core.eventbus.DeliveryOptions;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface EventBusManager {
 
-  public static DeliveryOptions oneMonthTimeout() {
+  static DeliveryOptions oneMonthTimeout() {
     return new DeliveryOptions().setSendTimeout(31L * 24L * 60L * 60L * 1000L);
   }
 
@@ -19,7 +19,7 @@ public interface EventBusManager {
    * @param pDeliveryOptions
    * @return a future indicating that the send was queued. The result is a future for the actual result.
    */
-  public <I, R> ContextExtendedCompletionStage<ContextExtendedCompletionStage<R>> send(String pAddress, I pToSend,
+  <I, R> ContextExtendedCompletionStage<ContextExtendedCompletionStage<R>> send(String pAddress, I pToSend,
     @Nullable DeliveryOptions pDeliveryOptions);
 
 }

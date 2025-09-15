@@ -4,7 +4,7 @@ import com.diamondq.common.model.interfaces.PropertyType;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.Toolkit;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 

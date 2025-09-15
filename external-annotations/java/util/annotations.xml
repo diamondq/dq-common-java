@@ -1,0 +1,5 @@
+<root>
+  <item name='java.util.Dictionary V get(java.lang.Object)'>
+    <annotation name='org.jspecify.annotations.Nullable' />
+  </item>
+</root>

@@ -4,7 +4,7 @@ import com.diamondq.common.model.interfaces.PropertyDefinition;
 import com.diamondq.common.model.interfaces.PropertyDefinitionRef;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StructureDefinition;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class GenericPropertyDefinitionRef extends AbstractRef<PropertyDefinition> implements PropertyDefinitionRef {
 

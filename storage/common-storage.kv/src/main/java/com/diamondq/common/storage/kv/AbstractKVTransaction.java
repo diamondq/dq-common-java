@@ -1,6 +1,6 @@
 package com.diamondq.common.storage.kv;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract class for most KVTransaction implementations
@@ -20,7 +20,7 @@ public abstract class AbstractKVTransaction {
   }
 
   @SuppressWarnings("unchecked")
-  protected <O> O getObjFromString(String pTable, Class<O> pClass, @Nullable String pResult) {
+  protected <O extends @Nullable Object> O getObjFromString(String pTable, Class<O> pClass, @Nullable String pResult) {
     return (O) pResult;
   }
 

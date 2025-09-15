@@ -4,8 +4,8 @@ import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.injection.osgi.ConstructorInfo.ConstructionArg;
 import com.diamondq.common.injection.osgi.ConstructorInfo.SpecialTypes;
 import com.diamondq.common.injection.osgi.i18n.Messages;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -19,11 +19,11 @@ public class ConstructorInfoBuilder {
     return new ConstructorInfoBuilder();
   }
 
-  private List<ConstructionArg> mConstructionArgs;
+  private final List<ConstructionArg> mConstructionArgs;
 
   private @Nullable Class<?> mConstructionClass;
 
-  private List<String> mRegistrationClasses;
+  private final List<String> mRegistrationClasses;
 
   private @Nullable String mConstructionMethod;
 
@@ -110,16 +110,16 @@ public class ConstructorInfoBuilder {
 
       /* Make sure there is a way to find the argument */
 
-      if ((mFilter == null) && (mProperty == null) && (mValueSet == false) && (mSpecialType == SpecialTypes.NA))
+      if ((mFilter == null) && (mProperty == null) && (!mValueSet) && (mSpecialType == SpecialTypes.NA))
         throw new ExtendedIllegalArgumentException(Messages.ARG_VALUE_REQUIRED);
 
       Boolean requiredObj = mRequired;
-      boolean required = (requiredObj == null ? true : requiredObj);
+      boolean required = (requiredObj == null || requiredObj);
 
       Boolean collectionObj = mCollection;
-      boolean collection = (collectionObj == null ? false : collectionObj);
+      boolean collection = (collectionObj != null && collectionObj);
 
-      if ((mValueSet == true) && (mValue == null) && (required == true))
+      if ((mValueSet) && (mValue == null) && (required))
         throw new ExtendedIllegalArgumentException(Messages.REQUIRED_VALUE_NULL);
 
       ConstructionArg arg = new ConstructionArg(localClass,
@@ -183,30 +183,30 @@ public class ConstructorInfoBuilder {
     }
 
     String localConstructionMethod = mConstructionMethod;
-    @Nullable Constructor<?> constructor = null;
-    @Nullable Method method = null;
-    @Nullable Method deleteMethod = null;
+    Constructor<?> constructor = null;
+    Method method = null;
+    Method deleteMethod = null;
 
     if (localConstructionMethod == null) {
       /* Figure out the constructor */
 
       Constructor<?>[] possibleConstructors = localConstructionClass.getConstructors();
       for (Constructor<?> possibleConstructor : possibleConstructors) {
-        @NotNull Parameter[] parameters = possibleConstructor.getParameters();
+        @NonNull Parameter[] parameters = possibleConstructor.getParameters();
         if (parameters.length != mConstructionArgs.size()) continue;
         boolean match = true;
         for (int i = 0; i < parameters.length; i++) {
           Class<?> paramClass = parameters[i].getType();
           ConstructionArg arg = mConstructionArgs.get(i);
-          if (arg.collection == true) {
-            if (paramClass.isAssignableFrom(List.class) == false) {
+          if (arg.collection) {
+            if (!paramClass.isAssignableFrom(List.class)) {
               match = false;
               break;
             }
 
             /* TODO: Check the generic parameter is possible */
           } else {
-            if (paramClass.isAssignableFrom(arg.argumentClass) == false) {
+            if (!paramClass.isAssignableFrom(arg.argumentClass)) {
 
               // if ((paramClass.isPrimitive()) && (paramClass.)
               /* Handle some basic conversions */
@@ -217,7 +217,7 @@ public class ConstructorInfoBuilder {
             }
           }
         }
-        if (match == false) continue;
+        if (!match) continue;
         constructor = possibleConstructor;
       }
       if (constructor == null) {
@@ -225,7 +225,7 @@ public class ConstructorInfoBuilder {
         sb.append('(');
         boolean first = true;
         for (ConstructionArg arg : mConstructionArgs) {
-          if (first == true) first = false;
+          if (first) first = false;
           else sb.append(", ");
           sb.append(arg.argumentClass.getName());
         }
@@ -240,33 +240,33 @@ public class ConstructorInfoBuilder {
 
       Method[] possibleMethods = localConstructionClass.getDeclaredMethods();
       for (Method possibleMethod : possibleMethods) {
-        if (possibleMethod.getName().equals(localConstructionMethod) == false) continue;
-        @NotNull Parameter[] parameters = possibleMethod.getParameters();
+        if (!possibleMethod.getName().equals(localConstructionMethod)) continue;
+        @NonNull Parameter[] parameters = possibleMethod.getParameters();
         if (parameters.length != mConstructionArgs.size()) continue;
         boolean match = true;
         for (int i = 0; i < parameters.length; i++) {
           Class<?> paramClass = parameters[i].getType();
           ConstructionArg arg = mConstructionArgs.get(i);
-          if (arg.collection == true) {
-            if (paramClass.isAssignableFrom(List.class) == false) {
+          if (arg.collection) {
+            if (!paramClass.isAssignableFrom(List.class)) {
               match = false;
               break;
             }
           } else {
-            if (paramClass.isAssignableFrom(arg.argumentClass) == false) {
+            if (!paramClass.isAssignableFrom(arg.argumentClass)) {
               match = false;
               break;
             }
           }
         }
-        if (match == false) continue;
+        if (!match) continue;
         method = possibleMethod;
       }
       String localDeleteMethod = mDeleteMethod;
       if (localDeleteMethod != null) {
         for (Method possibleMethod : possibleMethods) {
-          if (possibleMethod.getName().equals(localDeleteMethod) == false) continue;
-          @NotNull Parameter[] parameters = possibleMethod.getParameters();
+          if (!possibleMethod.getName().equals(localDeleteMethod)) continue;
+          @NonNull Parameter[] parameters = possibleMethod.getParameters();
           if (parameters.length != 1) continue;
           boolean match = false;
           for (String matchClassName : mRegistrationClasses) {
@@ -277,12 +277,12 @@ public class ConstructorInfoBuilder {
             catch (ClassNotFoundException ex) {
               break;
             }
-            if (parameters[0].getType().isAssignableFrom(matchClass) == true) {
+            if (parameters[0].getType().isAssignableFrom(matchClass)) {
               match = true;
               break;
             }
           }
-          if (match == false) continue;
+          if (!match) continue;
           deleteMethod = possibleMethod;
         }
       }
@@ -294,10 +294,10 @@ public class ConstructorInfoBuilder {
       constructor,
       method,
       deleteMethod,
-      mConstructionArgs.toArray(new @NotNull ConstructionArg[0]),
-      filterList.toArray(new @NotNull String[0]),
-      filterClassList.toArray(new @NotNull Class[0]),
-      mRegistrationClasses.toArray(new @NotNull String[0])
+      mConstructionArgs.toArray(new ConstructionArg[0]),
+      filterList.toArray(new String[0]),
+      filterClassList.toArray(new Class[0]),
+      mRegistrationClasses.toArray(new String[0])
     );
   }
 

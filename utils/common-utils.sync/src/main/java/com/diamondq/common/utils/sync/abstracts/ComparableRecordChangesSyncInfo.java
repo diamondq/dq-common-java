@@ -1,7 +1,6 @@
 package com.diamondq.common.utils.sync.abstracts;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,17 +10,17 @@ import java.util.function.Function;
 public class ComparableRecordChangesSyncInfo<T extends Comparable<T>, T_KEY>
   extends AbstractRecordChangesSimpleSyncInfo<T, T_KEY> {
 
-  private final Map<@NotNull T_KEY, @NotNull T> mAMap;
+  private final Map<T_KEY, T> mAMap;
 
-  private final Map<@NotNull T_KEY, @NotNull T> mBMap;
+  private final Map<T_KEY, T> mBMap;
 
-  public ComparableRecordChangesSyncInfo(Map<@NotNull T_KEY, @NotNull T> pAMap, Map<@NotNull T_KEY, @NotNull T> pBMap) {
+  public ComparableRecordChangesSyncInfo(Map<T_KEY, T> pAMap, Map<T_KEY, T> pBMap) {
     mAMap = pAMap;
     mBMap = pBMap;
   }
 
-  public ComparableRecordChangesSyncInfo(Collection<@NotNull T> pACollection, Collection<@NotNull T> pBCollection,
-    Function<@NotNull T, @NotNull T_KEY> pToKey) {
+  public ComparableRecordChangesSyncInfo(Collection<T> pACollection, Collection<T> pBCollection,
+    Function<T, T_KEY> pToKey) {
     mAMap = new HashMap<>();
     mBMap = new HashMap<>();
     for (T t : pACollection)
@@ -30,8 +29,7 @@ public class ComparableRecordChangesSyncInfo<T extends Comparable<T>, T_KEY>
       mBMap.put(pToKey.apply(t), t);
   }
 
-  public ComparableRecordChangesSyncInfo(T[] pACollection, T[] pBCollection,
-    Function<@NotNull T, @NotNull T_KEY> pToKey) {
+  public ComparableRecordChangesSyncInfo(T[] pACollection, T[] pBCollection, Function<T, T_KEY> pToKey) {
     mAMap = new HashMap<>();
     mBMap = new HashMap<>();
     for (T t : pACollection)
@@ -41,12 +39,12 @@ public class ComparableRecordChangesSyncInfo<T extends Comparable<T>, T_KEY>
   }
 
   @Override
-  public ExtendedCompletableFuture<Map<@NotNull T_KEY, @NotNull T>> getASource() {
+  public ExtendedCompletableFuture<Map<T_KEY, T>> getASource() {
     return ExtendedCompletableFuture.completedFuture(mAMap);
   }
 
   @Override
-  public ExtendedCompletableFuture<Map<@NotNull T_KEY, @NotNull T>> getBSource() {
+  public ExtendedCompletableFuture<Map<T_KEY, T>> getBSource() {
     return ExtendedCompletableFuture.completedFuture(mBMap);
   }
 

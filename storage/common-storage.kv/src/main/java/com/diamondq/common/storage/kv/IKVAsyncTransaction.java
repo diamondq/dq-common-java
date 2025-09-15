@@ -2,8 +2,7 @@ package com.diamondq.common.storage.kv;
 
 import com.diamondq.common.lambda.future.ExtendedCompletableFuture;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 
@@ -22,8 +21,8 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable O, @Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<O, CONTEXT>> getByKey(String pTable,
-    String pKey1, @Nullable String pKey2, Class<O> pClass, CONTEXT pContext);
+  <O extends @Nullable Object, CONTEXT extends @Nullable Object> ExtendedCompletableFuture<Pair<O, CONTEXT>> getByKey(
+    String pTable, String pKey1, @Nullable String pKey2, Class<O> pClass, CONTEXT pContext);
 
   /**
    * Stores a new value by key in the future
@@ -35,8 +34,8 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable O, @Nullable CONTEXT> ExtendedCompletableFuture<CONTEXT> putByKey(String pTable, String pKey1,
-    @Nullable String pKey2, O pObj, CONTEXT pContext);
+  <O extends @Nullable Object, CONTEXT extends @Nullable Object> ExtendedCompletableFuture<CONTEXT> putByKey(
+    String pTable, String pKey1, @Nullable String pKey2, O pObj, CONTEXT pContext);
 
   /**
    * Removes a value by key in the future
@@ -47,8 +46,8 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<@NotNull Boolean, CONTEXT>> removeByKey(
-    String pTable, String pKey1, @Nullable String pKey2, CONTEXT pContext);
+  <CONTEXT extends @Nullable Object> ExtendedCompletableFuture<Pair<Boolean, CONTEXT>> removeByKey(String pTable,
+    String pKey1, @Nullable String pKey2, CONTEXT pContext);
 
   /**
    * Returns an iterator that goes over all the distinct first keys within the table in the future
@@ -57,7 +56,7 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<Iterator<String>, CONTEXT>> keyIterator(
+  <CONTEXT extends @Nullable Object> ExtendedCompletableFuture<Pair<Iterator<String>, CONTEXT>> keyIterator(
     String pTable, CONTEXT pContext);
 
   /**
@@ -68,7 +67,7 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<@NotNull Iterator<@NotNull String>, CONTEXT>> keyIterator2(
+  <CONTEXT extends @Nullable Object> ExtendedCompletableFuture<Pair<Iterator<String>, CONTEXT>> keyIterator2(
     String pTable, String pKey1, CONTEXT pContext);
 
   /**
@@ -78,7 +77,7 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<CONTEXT> clear(String pTable, CONTEXT pContext);
+  <CONTEXT extends @Nullable Object> ExtendedCompletableFuture<CONTEXT> clear(String pTable, CONTEXT pContext);
 
   /**
    * Returns the number of entries within the table in the future
@@ -87,7 +86,7 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<@NotNull Long, CONTEXT>> getCount(String pTable,
+  <CONTEXT extends @Nullable Object> ExtendedCompletableFuture<Pair<Long, CONTEXT>> getCount(String pTable,
     CONTEXT pContext);
 
   /**
@@ -96,7 +95,7 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<@NotNull Pair<@NotNull Iterator<@NotNull String>, CONTEXT>> getTableList(
+  <CONTEXT extends @Nullable Object> ExtendedCompletableFuture<Pair<Iterator<String>, CONTEXT>> getTableList(
     CONTEXT pContext);
 
   /**
@@ -105,7 +104,7 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<CONTEXT> commit(CONTEXT pContext);
+  <CONTEXT extends @Nullable Object> ExtendedCompletableFuture<CONTEXT> commit(CONTEXT pContext);
 
   /**
    * Rolls back the changes to this transaction in the future
@@ -113,6 +112,6 @@ public interface IKVAsyncTransaction {
    * @param pContext the context to pass to the future (can be null)
    * @return the future
    */
-  public <@Nullable CONTEXT> ExtendedCompletableFuture<CONTEXT> rollback(CONTEXT pContext);
+  <CONTEXT extends @Nullable Object> ExtendedCompletableFuture<CONTEXT> rollback(CONTEXT pContext);
 
 }

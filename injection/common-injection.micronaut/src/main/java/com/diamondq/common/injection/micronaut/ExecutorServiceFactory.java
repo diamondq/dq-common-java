@@ -3,7 +3,7 @@ package com.diamondq.common.injection.micronaut;
 import io.micronaut.context.annotation.Factory;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,13 +27,11 @@ public class ExecutorServiceFactory {
     }
   };
 
-  public @Named("DiamondQ")
-  @Singleton ExecutorService getExecutorService() {
+  public @Named("DiamondQ") @Singleton ExecutorService getExecutorService() {
     return Executors.newCachedThreadPool(daemonThreadFactory);
   }
 
-  public @Named("DiamondQ")
-  @Singleton ScheduledExecutorService getScheduledExecutorService() {
+  public @Named("DiamondQ") @Singleton ScheduledExecutorService getScheduledExecutorService() {
     return Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2, daemonThreadFactory);
   }
 }

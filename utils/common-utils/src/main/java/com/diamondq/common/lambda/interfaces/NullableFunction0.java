@@ -1,14 +1,15 @@
 package com.diamondq.common.lambda.interfaces;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @FunctionalInterface
-public interface NullableFunction0<R> {
+public interface NullableFunction0<R extends @Nullable Object> {
 
   /**
    * Performs this operation
    *
    * @return the result
    */
-  @Nullable R apply();
+  @Nullable
+  R apply();
 }

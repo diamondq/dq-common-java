@@ -8,7 +8,7 @@ import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
 import com.diamondq.common.model.interfaces.Toolkit;
 import com.diamondq.common.model.interfaces.TranslatableString;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 

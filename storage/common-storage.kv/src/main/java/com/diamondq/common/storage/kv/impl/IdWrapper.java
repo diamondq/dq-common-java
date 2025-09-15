@@ -1,18 +1,18 @@
 package com.diamondq.common.storage.kv.impl;
 
 import com.diamondq.common.storage.kv.IObjectWithId;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Generic implementation for Object with Id
+ * Generic implementation for Object with ID
  *
  * @param <P>
  */
 public class IdWrapper<P> implements IObjectWithId<IdWrapper<P>> {
 
-  @Nullable private String _id;
+  private @Nullable String _id;
 
-  @Nullable private P data;
+  private @Nullable P data;
 
   /**
    * Default constructor

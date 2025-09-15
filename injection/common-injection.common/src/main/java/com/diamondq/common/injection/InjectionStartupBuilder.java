@@ -1,6 +1,6 @@
 package com.diamondq.common.injection;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -28,7 +28,7 @@ public interface InjectionStartupBuilder {
    * @param pSingletons
    * @return the builder for fluent use
    */
-  public InjectionStartupBuilder singletons(@NotNull Object... pSingletons);
+  public InjectionStartupBuilder singletons(@NonNull Object... pSingletons);
 
   /**
    * Adds a singleton to the injection engine with the given name

@@ -2,7 +2,6 @@ package com.diamondq.common.converters.impl;
 
 import com.diamondq.common.TypeReference;
 import com.diamondq.common.types.Types;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +23,7 @@ public class TestTypeRecursion {
   }
 
   @SuppressWarnings("null")
-  private @NotNull String[] setToArray(Set<Type> pSet) {
+  private String[] setToArray(Set<Type> pSet) {
     return pSet.stream().map((type) -> type.getTypeName()).toArray(String[]::new);
   }
 
@@ -52,7 +51,8 @@ public class TestTypeRecursion {
   public void testFixedInterface() {
     LinkedHashSet<Type> set = new LinkedHashSet<>();
     converterManager.calculateTypes(new TypeReference<StringMap>() {
-    }.getType(), set);
+      }.getType(), set
+    );
     assertArrayEquals(new String[] { "com.diamondq.common.converters.impl.StringMap", "java.util.Map<java.lang.String, java.lang.String>", "java.util.Map<?, ?>" },
       setToArray(set)
     );
@@ -62,7 +62,8 @@ public class TestTypeRecursion {
   public <O> void testUnboundedInterface() {
     LinkedHashSet<Type> set = new LinkedHashSet<>();
     converterManager.calculateTypes(new TypeReference<WildcardMap<String, O>>() {
-    }.getType(), set);
+      }.getType(), set
+    );
     printSet(set);
     assertArrayEquals(new String[] { "com.diamondq.common.converters.impl.WildcardMap<java.lang.String, ?>", "java.util.Map<java.lang.String, ?>", "com.diamondq.common.converters.impl.WildcardMap<?, ?>", "java.util.Map<?, ?>" },
       setToArray(set)

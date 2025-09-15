@@ -1,6 +1,6 @@
 package com.diamondq.common.injection.osgi;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.osgi.framework.ServiceReference;
 
 import java.util.HashMap;
@@ -10,7 +10,7 @@ public class ServiceReferenceUtils {
 
   public static <S> Map<String, Object> getProperties(ServiceReference<S> pRef) {
     Map<String, Object> result = new HashMap<>();
-    @NotNull String[] keys = pRef.getPropertyKeys();
+    @NonNull String[] keys = pRef.getPropertyKeys();
     if (keys != null) {
       for (String key : keys) {
         Object obj = pRef.getProperty(key);

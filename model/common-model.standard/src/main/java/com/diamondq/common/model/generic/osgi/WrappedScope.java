@@ -17,8 +17,7 @@ import com.google.common.collect.Lists;
 import org.javatuples.Octet;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -54,7 +53,7 @@ public class WrappedScope implements Scope {
 
   protected boolean[] mDefaultLayers;
 
-  private static final @NotNull String[] sFILTER_KEYS = new @NotNull String[] { ".structure_filter", ".structure_definition_filter", ".editor_structure_definition_filter", ".resource_filter" };
+  private static final String[] sFILTER_KEYS = new String[] { ".structure_filter", ".structure_definition_filter", ".editor_structure_definition_filter", ".resource_filter" };
 
   @SuppressWarnings("null")
   public WrappedScope() {
@@ -161,8 +160,6 @@ public class WrappedScope implements Scope {
   /**
    * Adds the PersistenceLayer if the filter matches the properties
    *
-   * @param pLayer
-   * @param pProps
    */
   private void processLayers(boolean pIsFirstProcess) {
     try (Context context = mContextFactory.newContext(WrappedScope.class, this, pIsFirstProcess)) {
@@ -272,16 +269,16 @@ public class WrappedScope implements Scope {
         for (int i = 0; i < sFILTER_KEYS.length; i++) {
           final int o = i;
           Collections.sort(layers[o], (a, b) -> {
-            return b.getValue0() - a.getValue0();
-          });
+              return b.getValue0() - a.getValue0();
+            }
+          );
           sortedLayers[o] = ImmutableList.builder();
           layers[o].forEach((p) -> {
             sortedLayers[o].add(p.getValue1());
           });
         }
 
-        @SuppressWarnings(
-          "unchecked") @NotNull List<PersistenceLayer>[] finalLayers = new @NotNull List[sFILTER_KEYS.length];
+        List<PersistenceLayer>[] finalLayers = new List[sFILTER_KEYS.length];
         for (int i = 0; i < sFILTER_KEYS.length; i++)
           finalLayers[i] = sortedLayers[i].build();
 

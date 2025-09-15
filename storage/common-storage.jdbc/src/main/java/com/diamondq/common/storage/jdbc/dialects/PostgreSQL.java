@@ -2,8 +2,7 @@ package com.diamondq.common.storage.jdbc.dialects;
 
 import com.diamondq.common.storage.kv.KVColumnType;
 import com.google.common.collect.ImmutableSet;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -19,14 +18,15 @@ import java.util.UUID;
 
 public class PostgreSQL extends AbstractDialect {
 
-  private static ThreadLocal<@NotNull Calendar> sCALENDAR = ThreadLocal.withInitial(() -> Calendar.getInstance(TimeZone.getTimeZone(
-    "UTC"), Locale.ENGLISH));
+  private static ThreadLocal<Calendar> sCALENDAR = ThreadLocal.withInitial(() -> Calendar.getInstance(TimeZone.getTimeZone(
+    "UTC"), Locale.ENGLISH
+  ));
 
-  protected static Set<@NotNull String> sRESERVED_WORDS;
+  protected static Set<String> sRESERVED_WORDS;
 
   static {
     String wordsStr = "abort,acl,add,aggregate,append,archive,arch_store,backward,binary,boolean,change,cluster,copy,database,delimiter,delimiters,do,extend,explain,forward,heavy,index,inherits,isnull,light,listen,load,merge,nothing,notify,notnull,offset,oids,purge,rename,replace,retrieve,returns,rule,recipe,setof,stdin,stdout,store,vacuum,verbose,version";
-    @NotNull String[] words = wordsStr.split(",");
+    String[] words = wordsStr.split(",");
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
     for (String w : words)
       builder.add(w);
@@ -299,7 +299,7 @@ public class PostgreSQL extends AbstractDialect {
    * @see com.diamondq.common.storage.jdbc.IJDBCDialect#getReservedWords()
    */
   @Override
-  public Set<@NotNull String> getReservedWords() {
+  public Set<String> getReservedWords() {
     return sRESERVED_WORDS;
   }
 

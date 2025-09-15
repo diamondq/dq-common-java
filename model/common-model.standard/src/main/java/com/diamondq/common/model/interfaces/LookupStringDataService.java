@@ -1,6 +1,6 @@
 package com.diamondq.common.model.interfaces;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -13,6 +13,7 @@ public interface LookupStringDataService {
    * @param pKey the key to lookup
    * @return the result or null if there is no possible match
    */
-  public @Nullable String lookupString(Locale pPreferredLocale, String pKey);
+  @Nullable
+  String lookupString(Locale pPreferredLocale, String pKey);
 
 }

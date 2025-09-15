@@ -9,8 +9,7 @@ import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +59,7 @@ public abstract class ProcessorType<R extends ProcessorType<R>> {
   public ProcessorType(TypeMirror pType, Constructor<R> pTypeConstructor, ProcessingEnvironment pProcessingEnv,
     Map<String, TypeMirror> pTypeMap) {
     try {
-      List<@NotNull ? extends AnnotationMirror> annotationMirrors = pType.getAnnotationMirrors();
+      List<? extends AnnotationMirror> annotationMirrors = pType.getAnnotationMirrors();
 
       if (pType.getKind() == TypeKind.TYPEVAR) {
         TypeVariable tv = (TypeVariable) pType;
@@ -143,7 +142,7 @@ public abstract class ProcessorType<R extends ProcessorType<R>> {
           ClassName className = ClassName.get((TypeElement) dt.asElement());
           if (typeList.isEmpty() == true) typeName = className;
           else {
-            @SuppressWarnings("null") @NotNull TypeName[] typeNameArray = typeNameList.toArray(new TypeName[0]);
+            TypeName[] typeNameArray = typeNameList.toArray(new TypeName[0]);
             typeName = ParameterizedTypeName.get(className, typeNameArray);
           }
           break;

@@ -9,8 +9,7 @@ import org.apache.logging.log4j.core.pattern.MdcPatternConverter;
 import org.apache.logging.log4j.core.pattern.PatternConverter;
 import org.apache.logging.log4j.util.ReadOnlyStringMap;
 import org.apache.logging.log4j.util.SortedArrayStringMap;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,18 +34,18 @@ public class DQIfMDC extends LogEventPatternConverter {
   /**
    * Private constructor.
    *
-   * @param options options, may be null.
+   * @param options options may be null.
    */
   private DQIfMDC(final String @Nullable [] options) {
     super("DQIfMDC", null);
     final Set<String> omits = new HashSet<>();
-    if ((options != null) && (options.length > 0) && (options[0] != null)) {
-      @NotNull String[] keys;
+    if ((options != null) && (options.length > 0)) {
+      String[] keys;
       if (options[0].indexOf(',') > 0) keys = options[0].split(",");
       else {
         final String opt = options[0];
         if (opt == null) throw new IllegalStateException();
-        keys = new @NotNull String[] { opt };
+        keys = new String[] { opt };
       }
       final Set<String> keep = new HashSet<>();
       for (int i = 0; i < (keys.length - 1); i++) {
@@ -62,9 +61,9 @@ public class DQIfMDC extends LogEventPatternConverter {
   }
 
   /**
-   * Obtains an instance of pattern converter.
+   * Gets an instance of pattern converter.
    *
-   * @param pOptions options, may be null.
+   * @param pOptions options may be null.
    * @return instance of pattern converter.
    */
   public static DQIfMDC newInstance(final String @Nullable [] pOptions) {
@@ -81,16 +80,16 @@ public class DQIfMDC extends LogEventPatternConverter {
   public void format(LogEvent pEvent, StringBuilder pToAppendTo) {
     final StringBuilder sb = new StringBuilder();
     final ReadOnlyStringMap contextData = pEvent.getContextData();
-    if (contextData.isEmpty() == true) mMDCPatternConverter.format(pEvent, sb);
+    if (contextData.isEmpty()) mMDCPatternConverter.format(pEvent, sb);
     else {
       final SortedArrayStringMap map = new SortedArrayStringMap(contextData);
-      mOmit.forEach((k) -> map.remove(k));
+      mOmit.forEach(map::remove);
       final MutableLogEvent updatedEvent = new MutableLogEvent();
       updatedEvent.initFrom(pEvent);
       updatedEvent.setContextData(map);
       mMDCPatternConverter.format(updatedEvent, sb);
     }
     final String result = sb.toString();
-    if (result.isEmpty() == false) pToAppendTo.append(mValue);
+    if (!result.isEmpty()) pToAppendTo.append(mValue);
   }
 }

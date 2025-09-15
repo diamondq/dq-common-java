@@ -37,13 +37,12 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -156,17 +155,6 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
     mConfiguredTableDefinitions = Maps.newConcurrentMap();
     mTableDefinitionSupport = mStructureStore.getTableDefinitionSupport();
 
-    // IKVIndexSupport<? extends KVIndexColumnBuilder<?>, ? extends KVIndexDefinitionBuilder<?>> support =
-    // mStructureStore.getIndexSupport();
-    // if (support != null) {
-    //
-    // /* Define an index for the lookups */
-    //
-    // KVIndexDefinitionBuilder<?> indexDefinitionBuilder = support.createIndexDefinitionBuilder().name("lookups");
-    // indexDefinitionBuilder = indexDefinitionBuilder
-    // .addColumn(support.createIndexColumnBuilder().name("data.structureDef").type(KVColumnType.String).build());
-    // support.addRequiredIndexes(Collections.singletonList(indexDefinitionBuilder.build()));
-    // }
   }
 
   public static StorageKVPersistenceLayerBuilder builder() {
@@ -196,7 +184,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
     IKVTableDefinitionSupport<?, ?> tableDefinitionSupport = mTableDefinitionSupport;
     if (tableDefinitionSupport != null) {
       synchronized (this) {
-        if (mConfiguredTableDefinitions.containsKey(pTableName) == false) {
+        if (!mConfiguredTableDefinitions.containsKey(pTableName)) {
           try (Context context = mContextFactory.newContext(StorageKVPersistenceLayer.class, this, pTableName)) {
             String singlePrimaryKey = "";
             try {
@@ -207,7 +195,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
                 throw new IllegalArgumentException("Unable to find the structure definition " + pTableName);
               Map<String, PropertyDefinition> allProperties = sd.getAllProperties();
 
-              /* Determine if there is multiple primary keys */
+              /* Determine if there are multiple primary keys */
 
               int primaryKeyCount = Iterables.size(Iterables.filter(allProperties.values(),
                 (pd) -> (pd != null) && pd.isPrimaryKey()
@@ -216,17 +204,17 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
               for (PropertyDefinition pd : allProperties.values()) {
 
                 /*
-                 * Primary keys are already included in the KV's primary key, so skip those. However, if there is
-                 * multiple primary keys, then include them, so that they can be accessed independently of the primary
-                 * key
+                 * Primary keys are already included in the KV's primary key, so skip those.
+                 * However, if there are multiple primary keys, then include them so that they
+                 * can be accessed independently of the primary key
                  */
 
-                if ((pd.isPrimaryKey() == true) && (primaryKeyCount == 1)) {
+                if ((pd.isPrimaryKey()) && (primaryKeyCount == 1)) {
                   singlePrimaryKey = pd.getName();
                   continue;
                 }
 
-                /* If it's a Container reference to the parent, then we don't include it */
+                /* If it's a Container reference to the parent, then don't include it */
 
                 Collection<String> containerValue = pd.getKeywords().get(CommonKeywordKeys.CONTAINER);
                 if (containerValue.contains(CommonKeywordValues.CONTAINER_PARENT)) {
@@ -237,12 +225,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
                   Collection<StructureDefinitionRef> types = pd.getReferenceTypes();
                   for (StructureDefinitionRef type : types) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(pTableName).append('_');
-                    sb.append(pd.getName());
-                    sb.append('_');
-                    sb.append(type.getSerializedString());
-                    validateKVStoreManyToManySetup(pToolkit, pScope, sb.toString());
+                    final String sb = pTableName + '_' + pd.getName() + '_' + type.getSerializedString();
+                    validateKVStoreManyToManySetup(pToolkit, pScope, sb);
                   }
 
                   continue;
@@ -328,7 +312,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
                 builder = builder.addColumn(colBuilder.build());
               }
-              if (singlePrimaryKey.isEmpty() == false) builder = builder.singlePrimaryKeyName(singlePrimaryKey);
+              if (!singlePrimaryKey.isEmpty()) builder = builder.singlePrimaryKeyName(singlePrimaryKey);
               tableDefinitionSupport.addTableDefinition(builder.build());
             }
             catch (RuntimeException ex) {
@@ -352,7 +336,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
 
       /*
        * Handle the table validation. NOTE: This makes the assumption that this persistence layer is part of a
-       * CombinedLayer, and the 'real' layer is earlier for StructureDefinitions (ie. it's already been persisted and
+       * CombinedLayer, and the 'real' layer is earlier for StructureDefinitions (i.e., it's already been persisted and
        * can now be looked up)
        */
 
@@ -389,20 +373,20 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           containerAndPrimaryKey.primary,
           Map.class
         );
-        if ((configMap == null) && (pCreateIfMissing == true)) configMap = Maps.newHashMap();
+        if ((configMap == null) && (pCreateIfMissing)) configMap = Maps.newHashMap();
         if (configMap != null) {
           Integer revision = pToolkit.lookupLatestStructureDefinitionRevision(pScope, pDefName);
           if (revision == null) throw new IllegalArgumentException();
-          configMap.put("structureDef", new StringBuilder(pDefName).append(':').append(revision).toString());
+          configMap.put("structureDef", pDefName + ':' + revision);
           String primaryKey = mConfiguredTableDefinitions.get(pDefName);
-          if ((primaryKey != null) && (primaryKey.isEmpty() == false))
+          if ((primaryKey != null) && (!primaryKey.isEmpty()))
             configMap.put(primaryKey, unescapeValue(containerAndPrimaryKey.primary));
         }
         success = true;
         return context.exit(configMap);
       }
       finally {
-        if (success == true) transaction.commit();
+        if (success) transaction.commit();
         else transaction.rollback();
       }
     }
@@ -448,15 +432,14 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         return result;
       }
       case StructureRefList: {
-        @NotNull String[] strings = (value == null ? "" : (String) value).split(",");
+        String[] strings = (value == null ? "" : (String) value).split(",");
         for (int i = 0; i < strings.length; i++)
           strings[i] = unescape(strings[i]);
         @SuppressWarnings("unchecked") R result = (R) strings;
         return result;
       }
       case Binary: {
-        @SuppressWarnings("unchecked") R result = (R) (value == null ? null : (byte[]) value);
-        return result;
+        return (R) (value == null ? null : (byte[]) value);
       }
       case EmbeddedStructureList: {
         throw new UnsupportedOperationException();
@@ -504,10 +487,9 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   @Override
   protected boolean hasStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
     boolean pIsMeta, String pKey) {
-    if (pConfig.containsKey(pKey) == false) return false;
+    if (!pConfig.containsKey(pKey)) return false;
     Object value = pConfig.get(pKey);
-    if (value == null) return false;
-    return true;
+    return value != null;
   }
 
   /**
@@ -526,7 +508,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
    *   com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
    */
   @Override
-  protected <@NotNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
+  protected <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Map<String, Object> pConfig,
     boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
     switch (pType) {
       case String: {
@@ -558,8 +540,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         break;
       }
       case StructureRefList: {
-        @NotNull String[] strings = (@NotNull String[]) pValue;
-        @NotNull String @NotNull [] escaped = new @NotNull String[strings.length];
+        String[] strings = (String[]) pValue;
+        String[] escaped = new String[strings.length];
         for (int i = 0; i < strings.length; i++)
           escaped[i] = escape(strings[i]);
         String escapedStr = String.join(",", escaped);
@@ -632,29 +614,27 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         String[] parts = pKey.split("/");
         if (parts.length > 2) {
           for (int i = 0; i < (parts.length - 2); i += 3) {
-            StringBuilder typeBuilder = new StringBuilder();
-            typeBuilder.append(parts[i]).append('_').append(parts[i + 2]).append('_').append(parts[i + 3]);
+            final String typeBuilder = parts[i] + '_' + parts[i + 2] + '_' + parts[i + 3];
 
             StringBuilder leftKeyBuilder = new StringBuilder();
             boolean isFirst = true;
             for (int o = 0; o <= (i + 1); o++) {
-              if (isFirst == true) isFirst = false;
+              if (isFirst) isFirst = false;
               else leftKeyBuilder.append('/');
               leftKeyBuilder.append(parts[o]);
             }
 
-            String tableName = typeBuilder.toString();
             String leftKey = leftKeyBuilder.toString();
             String rightKey = parts[i + 4];
 
-            validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
+            validateKVStoreManyToManySetup(pToolkit, pScope, typeBuilder);
 
-            @SuppressWarnings("unchecked") Map<String, Object> lookupDate = transaction.getByKey(tableName,
+            @SuppressWarnings("unchecked") Map<String, Object> lookupDate = transaction.getByKey(typeBuilder,
               leftKey,
               rightKey,
               Map.class
             );
-            if (lookupDate == null) transaction.putByKey(tableName,
+            if (lookupDate == null) transaction.putByKey(typeBuilder,
               leftKey,
               rightKey,
               Collections.singletonMap("dateCreated", new Date().getTime())
@@ -665,7 +645,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         success = true;
       }
       finally {
-        if (success == true) transaction.commit();
+        if (success) transaction.commit();
         else transaction.rollback();
       }
       return context.exit(true);
@@ -673,21 +653,11 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
   }
 
   private String unescape(String pValue) {
-    try {
-      return URLDecoder.decode(pValue, "UTF-8");
-    }
-    catch (UnsupportedEncodingException ex) {
-      throw new RuntimeException(ex);
-    }
+    return URLDecoder.decode(pValue, StandardCharsets.UTF_8);
   }
 
   private String escape(String pValue) {
-    try {
-      return URLEncoder.encode(pValue, "UTF-8");
-    }
-    catch (UnsupportedEncodingException ex) {
-      throw new RuntimeException(ex);
-    }
+    return URLEncoder.encode(pValue, StandardCharsets.UTF_8);
   }
 
   /**
@@ -716,31 +686,29 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         String[] parts = pKey.split("/");
         if (parts.length > 2) {
           for (int i = 0; i < (parts.length - 2); i += 3) {
-            StringBuilder typeBuilder = new StringBuilder();
-            typeBuilder.append(parts[i]).append('_').append(parts[i + 2]).append('_').append(parts[i + 3]);
+            final String typeBuilder = parts[i] + '_' + parts[i + 2] + '_' + parts[i + 3];
 
             StringBuilder leftKeyBuilder = new StringBuilder();
             boolean isFirst = true;
             for (int o = 0; o <= (i + 1); o++) {
-              if (isFirst == true) isFirst = false;
+              if (isFirst) isFirst = false;
               else leftKeyBuilder.append('/');
               leftKeyBuilder.append(parts[o]);
             }
 
-            String tableName = typeBuilder.toString();
             String leftKey = leftKeyBuilder.toString();
             String rightKey = parts[i + 4];
 
-            validateKVStoreManyToManySetup(pToolkit, pScope, tableName);
+            validateKVStoreManyToManySetup(pToolkit, pScope, typeBuilder);
 
-            transaction.removeByKey(tableName, leftKey, rightKey);
+            transaction.removeByKey(typeBuilder, leftKey, rightKey);
           }
         }
 
         success = true;
       }
       finally {
-        if (success == true) transaction.commit();
+        if (success) transaction.commit();
         else transaction.rollback();
       }
       return context.exit(true);
@@ -779,7 +747,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           List<String> containerKeys = Lists.newArrayList(transaction.keyIterator(pStructureDefName));
           for (String containerKey : containerKeys) {
             StringBuilder refBuilder = new StringBuilder();
-            if ("__ROOT__".equals(containerKey) == false) refBuilder.append(containerKey).append('/');
+            if (!"__ROOT__".equals(containerKey)) refBuilder.append(containerKey).append('/');
             refBuilder.append(pStructureDefName).append('/');
             int refOffset = refBuilder.length();
             for (Iterator<String> i = transaction.keyIterator2(pStructureDefName, containerKey); i.hasNext(); ) {
@@ -796,8 +764,8 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
           int lastSlash = pKey.lastIndexOf('/');
           if (lastSlash == -1) throw new IllegalArgumentException("The key isn't in the right format: " + pKey);
           int nextLastSlash = pKey.lastIndexOf('/', lastSlash - 1);
-          if (nextLastSlash == -1) tableNameBuilder.append(pKey.substring(0, lastSlash));
-          else tableNameBuilder.append(pKey.substring(nextLastSlash + 1, lastSlash));
+          if (nextLastSlash == -1) tableNameBuilder.append(pKey, 0, lastSlash);
+          else tableNameBuilder.append(pKey, nextLastSlash + 1, lastSlash);
           tableNameBuilder.append('_');
           tableNameBuilder.append(pPropDef.getName()).append('_');
           Collection<StructureDefinitionRef> referenceTypes = pPropDef.getReferenceTypes();
@@ -831,7 +799,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         success = true;
       }
       finally {
-        if (success == true) transaction.commit();
+        if (success) transaction.commit();
         else transaction.rollback();
       }
     }
@@ -856,8 +824,9 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
       StructureDefinition sd = result.getStructureDefinition();
 
       /*
-       * Primary keys are already included in the KV's primary key, so skip those. However, if there is multiple primary
-       * keys, then include them, so that they can be accessed independently of the primary key
+       * Primary keys are already included in the KV's primary key, so skip those.
+       * However, if there are multiple primary keys, then include them so that
+       * they can be accessed independently of the primary key
        */
       int primaryKeyCount = Iterables.size(Iterables.filter(sd.getAllProperties().values(),
         (pd) -> (pd != null) && pd.isPrimaryKey()
@@ -872,7 +841,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         PropertyDefinition pd = sd.lookupPropertyDefinitionByName(gwi.key);
         if (pd == null) throw new IllegalArgumentException();
         String colName = gwi.key;
-        if (pd.isPrimaryKey() == true) {
+        if (pd.isPrimaryKey()) {
           if (primaryKeyCount == 1) continue;
         }
         onlyPrimary = false;
@@ -934,7 +903,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         idb = idb.addColumn(ic);
         colCount++;
       }
-      if ((colCount > 0) && (onlyPrimary == false)) {
+      if ((colCount > 0) && (!onlyPrimary)) {
         IKVIndexDefinition id = idb.build();
         String tableName = id.getTableName();
         validateKVStoreTableSetup(pToolkit, pScope, tableName);
@@ -973,23 +942,19 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         ImmutableList.Builder<Structure> builder = ImmutableList.builder();
         for (Map<String, Object> queryResult : queryResults) {
 
-          // ContainerAndPrimaryKey containerAndPrimaryKey = ContainerAndPrimaryKey.parse(pKey);
-          // String primaryKey = mConfiguredTableDefinitions.get(defName);
-          // if ((primaryKey != null) && (primaryKey.isEmpty() == false))
-          // configMap.put(primaryKey, unescapeValue(containerAndPrimaryKey.primary));
-
           StringBuilder primaryKeyBuilder = new StringBuilder();
           primaryKeyBuilder.append(defName);
           primaryKeyBuilder.append('/');
 
           List<@Nullable Object> names = Lists.transform(propNames, (n) -> {
-            if (n == null) throw new IllegalArgumentException("The name must not be null");
-            return queryResult.get(n);
-          });
+              if (n == null) throw new IllegalArgumentException("The name must not be null");
+              return queryResult.get(n);
+            }
+          );
           primaryKeyBuilder.append(pToolkit.collapsePrimaryKeys(pScope, names));
           String key = primaryKeyBuilder.toString();
 
-          queryResult.put("structureDef", new StringBuilder(defName).append(':').append(revision).toString());
+          queryResult.put("structureDef", defName + ':' + revision);
 
           builder.add(convertToStructure(pToolkit, pScope, key, queryResult));
         }
@@ -998,7 +963,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         return context.exit(builder.build());
       }
       finally {
-        if (success == true) transaction.commit();
+        if (success) transaction.commit();
         else transaction.rollback();
       }
     }
@@ -1027,7 +992,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         return context.exit(queryResults);
       }
       finally {
-        if (success == true) transaction.commit();
+        if (success) transaction.commit();
         else transaction.rollback();
       }
     }
@@ -1061,7 +1026,7 @@ public class StorageKVPersistenceLayer extends AbstractDocumentPersistenceLayer<
         success = true;
       }
       finally {
-        if (success == true) transaction.commit();
+        if (success) transaction.commit();
         else transaction.rollback();
       }
     }

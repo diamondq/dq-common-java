@@ -1,8 +1,11 @@
 package com.diamondq.common.lambda.interfaces;
 
-public interface CancelableSupplier<R> extends Supplier<R>, java.util.function.Supplier<R>, Cancelable {
+import org.jspecify.annotations.Nullable;
 
-  public static final class NoopCancelableSupplier<R> implements CancelableSupplier<R> {
+public interface CancelableSupplier<R extends @Nullable Object>
+  extends Supplier<R>, java.util.function.Supplier<R>, Cancelable {
+
+  public static final class NoopCancelableSupplier<R extends @Nullable Object> implements CancelableSupplier<R> {
 
     private final Supplier<R> mDelegate;
 

@@ -11,7 +11,7 @@ import com.diamondq.common.security.acme.model.ChallengeState;
 import com.diamondq.common.security.acme.model.PersistedState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 

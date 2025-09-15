@@ -7,7 +7,7 @@ import com.diamondq.common.storage.kv.GenericQuery;
 import com.diamondq.common.storage.kv.WhereInfo;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

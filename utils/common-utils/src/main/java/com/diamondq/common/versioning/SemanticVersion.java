@@ -1,6 +1,6 @@
 package com.diamondq.common.versioning;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -55,9 +55,10 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
    * @param pMinor minor version number (must not be negative)
    * @param pPatch patch level (must not be negative).
    * @param pPreRelease pre-release identifiers. Must not be null, all parts must match "[0-9A-Za-z-]+".
-   * @param pBuildMeta build meta identifiers. Must not be null, all parts must match "[0-9A-Za-z-]+".
+   * @param pBuildMeta build meta-identifiers. Must not be null, all parts must match "[0-9A-Za-z-]+".
    */
-  public SemanticVersion(int pMajor, int pMinor, int pPatch, String[] pPreRelease, String[] pBuildMeta) {
+  public SemanticVersion(int pMajor, int pMinor, int pPatch, @Nullable String[] pPreRelease,
+    @Nullable String[] pBuildMeta) {
     if ((pMajor < 0) || (pMinor < 0) || (pPatch < 0)) {
       throw new IllegalArgumentException("Version numbers must be positive!");
     }
@@ -69,16 +70,18 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
     preRelease = new String[pPreRelease.length];
     Pattern p = Pattern.compile("[0-9A-Za-z-]+");
     for (int i = 0; i < pPreRelease.length; i++) {
-      if ((pPreRelease[i] == null) || !p.matcher(pPreRelease[i]).matches()) {
+      var localPreRelease = pPreRelease[i];
+      if ((localPreRelease == null) || !p.matcher(localPreRelease).matches()) {
         throw new IllegalArgumentException("Pre Release tag: " + i);
       }
-      preRelease[i] = pPreRelease[i];
+      preRelease[i] = localPreRelease;
     }
     for (int i = 0; i < pBuildMeta.length; i++) {
-      if ((pBuildMeta[i] == null) || !p.matcher(pBuildMeta[i]).matches()) {
+      var localBuildMeta = pBuildMeta[i];
+      if ((localBuildMeta == null) || !p.matcher(localBuildMeta).matches()) {
         throw new IllegalArgumentException("Build Meta tag: " + i);
       }
-      buildMeta[i] = pBuildMeta[i];
+      buildMeta[i] = localBuildMeta;
     }
 
     major = pMajor;
@@ -129,7 +132,7 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
   }
 
   /**
-   * Check if this version has a given build Meta tags.
+   * Check if this version has the given build Meta tags.
    *
    * @param tag the tag to check for.
    * @return true if the tag is found in {@link SemanticVersion#buildMeta}.
@@ -226,10 +229,9 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
     if (this == other) {
       return true;
     }
-    if (!(other instanceof SemanticVersion)) {
+    if (!(other instanceof final SemanticVersion ov)) {
       return false;
     }
-    SemanticVersion ov = (SemanticVersion) other;
     if ((ov.major != major) || (ov.minor != minor) || (ov.patch != patch)) {
       return false;
     }
@@ -287,17 +289,19 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
 
   @SuppressWarnings("null")
   private int comparePreReleaseTag(int pos, SemanticVersion ov) {
-    @Nullable Integer here = null;
-    @Nullable Integer there = null;
+    Integer here = null;
+    Integer there = null;
     try {
       here = Integer.parseInt(preRelease[pos], 10);
     }
     catch (NumberFormatException e) {
+      // Ignored
     }
     try {
       there = Integer.parseInt(ov.preRelease[pos], 10);
     }
     catch (NumberFormatException e) {
+      // Ignored
     }
     if ((here != null) && (there == null)) {
       return -1; // Strings take precedence over numbers
@@ -305,7 +309,7 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
     if ((here == null) && (there != null)) {
       return 1; // Strings take precedence over numbers
     }
-    if ((here == null) && (there == null)) {
+    if (here == null) {
       return (preRelease[pos].compareTo(ov.preRelease[pos])); // ASCII compare
     }
     return here.compareTo(there); // Number compare
@@ -377,7 +381,7 @@ public final class SemanticVersion implements Comparable<SemanticVersion> {
       return true;
     }
 
-    if (input[pos] == '+') { // We have build meta tags -> descend
+    if (input[pos] == '+') { // We have build meta-tags -> descend
       return stateMeta(pos + 1);
     }
 

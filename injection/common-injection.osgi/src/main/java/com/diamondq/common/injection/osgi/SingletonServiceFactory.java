@@ -2,22 +2,23 @@ package com.diamondq.common.injection.osgi;
 
 import com.diamondq.common.context.Context;
 import com.diamondq.common.context.ContextFactory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
+import java.util.Objects;
+
 public abstract class SingletonServiceFactory<S> implements ServiceFactory<S> {
 
-  protected ContextFactory mContextFactory;
+  protected @Nullable ContextFactory mContextFactory;
 
   protected @Nullable S mCachedService;
 
   protected int mCount = 0;
 
-  protected abstract @NotNull S createSingleton(ServiceReference<S> pServiceReference);
+  protected abstract S createSingleton(ServiceReference<S> pServiceReference);
 
   protected abstract void destroySingleton(S pService);
 
@@ -34,9 +35,10 @@ public abstract class SingletonServiceFactory<S> implements ServiceFactory<S> {
   @SuppressWarnings("null")
   @Override
   public S getService(Bundle pBundle, ServiceRegistration<S> pRegistration) {
-    try (Context context = mContextFactory.newContext(SingletonServiceFactory.class, this, pBundle, pRegistration)) {
+    try (Context context = Objects.requireNonNull(mContextFactory)
+      .newContext(SingletonServiceFactory.class, this, pBundle, pRegistration)) {
       synchronized (this) {
-        @Nullable S service = mCachedService;
+        S service = mCachedService;
         if (service == null) {
           service = createSingleton(pRegistration.getReference());
           mCachedService = service;
@@ -46,29 +48,25 @@ public abstract class SingletonServiceFactory<S> implements ServiceFactory<S> {
       }
     }
     catch (RuntimeException ex) {
-      throw mContextFactory.reportThrowable(SingletonServiceFactory.class, this, ex);
+      throw Objects.requireNonNull(mContextFactory).reportThrowable(SingletonServiceFactory.class, this, ex);
     }
   }
 
   @Override
-  public void ungetService(Bundle pBundle, ServiceRegistration<@NotNull S> pRegistration, @NotNull S pService) {
-    try (Context context = mContextFactory.newContext(SingletonServiceFactory.class,
-      this,
-      pBundle,
-      pRegistration,
-      pService
-    )) {
+  public void ungetService(Bundle pBundle, ServiceRegistration<S> pRegistration, S pService) {
+    try (Context context = Objects.requireNonNull(mContextFactory)
+      .newContext(SingletonServiceFactory.class, this, pBundle, pRegistration, pService)) {
       synchronized (this) {
         mCount--;
         if (mCount == 0) {
-          @Nullable S service = mCachedService;
+          S service = mCachedService;
           mCachedService = null;
           if (service != null) destroySingleton(service);
         }
       }
     }
     catch (RuntimeException ex) {
-      throw mContextFactory.reportThrowable(SingletonServiceFactory.class, this, ex);
+      throw Objects.requireNonNull(mContextFactory).reportThrowable(SingletonServiceFactory.class, this, ex);
     }
   }
 

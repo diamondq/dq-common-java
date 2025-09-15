@@ -4,8 +4,7 @@ import com.diamondq.common.tracing.opentracing.TraceIdExtractor;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.tag.Tag;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.MDC;
 
 import java.util.Map;
@@ -44,12 +43,12 @@ public class MDCSpan implements Span {
   }
 
   @Override
-  public Span log(@Nullable Map<String, @NotNull ?> pFields) {
+  public Span log(@Nullable Map<String, ?> pFields) {
     return mDelegate.log(pFields);
   }
 
   @Override
-  public Span log(long pTimestampMicroseconds, @Nullable Map<String, @NotNull ?> pFields) {
+  public Span log(long pTimestampMicroseconds, @Nullable Map<String, ?> pFields) {
     return mDelegate.log(pTimestampMicroseconds, pFields);
   }
 

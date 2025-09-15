@@ -5,7 +5,7 @@ import com.diamondq.common.i18n.I18NString;
 import com.diamondq.common.types.Types;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,8 +48,7 @@ public class I18NStringToMapConverter extends AbstractConverter<I18NString, Map<
   @Override
   public Map<String, @Nullable Object> convert(I18NString pInput) {
     Map<String, @Nullable Object> result = new HashMap<>();
-    if (pInput.message instanceof Enum<?>) {
-      Enum<?> messageEnum = (Enum<?>) pInput.message;
+    if (pInput.message instanceof final Enum<?> messageEnum) {
       String enumName = messageEnum.name();
       final Class<?> enumClass = messageEnum.getDeclaringClass();
       result.put("n", enumName);

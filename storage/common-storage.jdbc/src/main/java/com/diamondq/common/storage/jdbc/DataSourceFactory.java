@@ -4,7 +4,6 @@ import com.diamondq.common.config.ConfigKey;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.NotNull;
 
 import javax.sql.DataSource;
 import java.lang.reflect.InvocationTargetException;
@@ -27,7 +26,7 @@ public class DataSourceFactory {
         DataSource source = sourceClass.getDeclaredConstructor().newInstance();
 
         param:
-        for (Map.Entry<@NotNull Object, Object> pair : mParams.entrySet()) {
+        for (Map.Entry<Object, Object> pair : mParams.entrySet()) {
           String key = pair.getKey().toString();
           List<String> possibleNames = determinePossible(key);
           Set<Class<?>> possibleArgs = determinePossibleArgs(pair.getValue());
@@ -88,7 +87,7 @@ public class DataSourceFactory {
     }
 
     private Set<Class<?>> determinePossibleArgs(Object pValue) {
-      ImmutableSet.Builder<@NotNull Class<?>> builder = ImmutableSet.builder();
+      ImmutableSet.Builder<Class<?>> builder = ImmutableSet.builder();
       builder.add(String.class);
       if (pValue instanceof Boolean) builder.add(Boolean.class).add(Boolean.TYPE);
       else if (pValue instanceof Short) builder.add(Short.class).add(Short.TYPE);
@@ -136,7 +135,7 @@ public class DataSourceFactory {
       return builder.build();
     }
 
-    private List<@NotNull String> determinePossible(String pKey) {
+    private List<String> determinePossible(String pKey) {
 
       /* The key may be either a-b or aB or just a, in which case, the possible values should be AB or A */
 

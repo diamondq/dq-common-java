@@ -3,7 +3,7 @@ package com.diamondq.common.model.persistence;
 import com.diamondq.common.config.Config;
 import com.diamondq.common.context.ContextFactory;
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.Map;

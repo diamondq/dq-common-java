@@ -9,8 +9,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,8 +33,9 @@ public class GenericEditorGroupDefinition extends GenericEditorComponentDefiniti
     mNumColumns = pNumColumns;
     pComponents = pComponents == null ? Collections.emptyList() : pComponents;
     Collections.sort(pComponents, (a, b) -> {
-      return a.getOrder() - b.getOrder();
-    });
+        return a.getOrder() - b.getOrder();
+      }
+    );
     mComponents = ImmutableList.copyOf(pComponents);
   }
 
@@ -119,7 +119,7 @@ public class GenericEditorGroupDefinition extends GenericEditorComponentDefiniti
    */
   @Override
   public <T extends EditorComponentDefinition<T>> EditorGroupDefinition removeComponent(T pValue) {
-    @SuppressWarnings("null") @NotNull Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
+    Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
     return new GenericEditorGroupDefinition(mLabel,
       mColumn,
       mColumnSpan,

@@ -7,7 +7,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.util.HierarchicalNameMapper;
 import io.micrometer.graphite.GraphiteConfig;
 import io.micrometer.graphite.GraphiteMeterRegistry;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 

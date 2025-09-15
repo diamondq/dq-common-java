@@ -5,7 +5,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.util.OptionHelper;
 import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.context.spi.ContextClass;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ public class DQContext extends ClassicConverter {
 
   protected void processOptionList(@Nullable List<String> pOptionList) {
     if (pOptionList != null) {
-      if (pOptionList.size() >= 1) {
-        String[] optionInfo = OptionHelper.extractDefaultReplacement(pOptionList.get(0));
+      if (!pOptionList.isEmpty()) {
+        @Nullable String[] optionInfo = OptionHelper.extractDefaultReplacement(pOptionList.get(0));
         String key = optionInfo[0];
         if (key != null) {
           mContextLength = Integer.parseInt(key);
@@ -36,7 +36,7 @@ public class DQContext extends ClassicConverter {
         }
       }
       if (pOptionList.size() >= 2) {
-        String[] optionInfo = OptionHelper.extractDefaultReplacement(pOptionList.get(1));
+        @Nullable String[] optionInfo = OptionHelper.extractDefaultReplacement(pOptionList.get(1));
         String key = optionInfo[0];
         if (key != null) {
           mPrintRefCount = Boolean.parseBoolean(key);
@@ -56,7 +56,7 @@ public class DQContext extends ClassicConverter {
     List<String> stack = context.getContextStackNames(mPrintRefCount);
     StringBuilder sb = new StringBuilder();
     int size = stack.size();
-    if (mPrintContext == true) {
+    if (mPrintContext) {
       StringBuilder mid = new StringBuilder();
       for (int i = 0; i < size; i++) {
         if (i == 0) sb.append(stack.get(i));
@@ -80,9 +80,8 @@ public class DQContext extends ClassicConverter {
       }
     } else {
       Boolean duringNormal = context.getHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, false, Boolean.class);
-      if ((duringNormal != null) && (duringNormal == true)) size--;
-      if (size > 0) for (int i = 0; i < size; i++)
-        sb.append("  ");
+      if ((duringNormal != null) && (duringNormal)) size--;
+      if (size > 0) sb.append("  ".repeat(size));
     }
 
     return sb.toString();

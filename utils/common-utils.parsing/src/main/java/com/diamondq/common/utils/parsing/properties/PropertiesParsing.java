@@ -1,7 +1,7 @@
 package com.diamondq.common.utils.parsing.properties;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Dictionary;
 import java.util.Map;
@@ -26,17 +26,15 @@ public class PropertiesParsing {
 
   public static @Nullable Boolean getNullableBoolean(Map<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
-    @Nullable Boolean bool;
-    if (propObj == null) bool = null;
-    else bool = Boolean.parseBoolean(propObj.toString());
+    Boolean bool = null;
+    if (propObj != null) bool = Boolean.parseBoolean(propObj.toString());
     return bool;
   }
 
   public static @Nullable Boolean getNullableBoolean(Dictionary<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
-    @Nullable Boolean bool;
-    if (propObj == null) bool = null;
-    else bool = Boolean.parseBoolean(propObj.toString());
+    Boolean bool = null;
+    if (propObj != null) bool = Boolean.parseBoolean(propObj.toString());
     return bool;
   }
 
@@ -58,17 +56,15 @@ public class PropertiesParsing {
 
   public static @Nullable String getNullableString(Map<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
-    @Nullable String val;
-    if (propObj == null) val = null;
-    else val = propObj.toString();
+    String val = null;
+    if (propObj != null) val = propObj.toString();
     return val;
   }
 
   public static @Nullable String getNullableString(Dictionary<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
-    @Nullable String val;
-    if (propObj == null) val = null;
-    else val = propObj.toString();
+    String val = null;
+    if (propObj != null) val = propObj.toString();
     return val;
   }
 
@@ -90,17 +86,15 @@ public class PropertiesParsing {
 
   public static @Nullable Integer getNullableInt(Map<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
-    @Nullable Integer val;
-    if (propObj == null) val = null;
-    else val = Integer.parseInt(propObj.toString());
+    Integer val = null;
+    if (propObj != null) val = Integer.parseInt(propObj.toString());
     return val;
   }
 
   public static @Nullable Integer getNullableInt(Dictionary<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
-    @Nullable Integer val;
-    if (propObj == null) val = null;
-    else val = Integer.parseInt(propObj.toString());
+    Integer val = null;
+    if (propObj != null) val = Integer.parseInt(propObj.toString());
     return val;
   }
 
@@ -122,33 +116,31 @@ public class PropertiesParsing {
 
   public static @Nullable Long getNullableLong(Map<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
-    @Nullable Long val;
-    if (propObj == null) val = null;
-    else val = Long.parseLong(propObj.toString());
+    Long val = null;
+    if (propObj != null) val = Long.parseLong(propObj.toString());
     return val;
   }
 
   public static @Nullable Long getNullableLong(Dictionary<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
-    @Nullable Long val;
-    if (propObj == null) val = null;
-    else val = Long.parseLong(propObj.toString());
+    Long val = null;
+    if (propObj != null) val = Long.parseLong(propObj.toString());
     return val;
   }
 
-  public static @NotNull String[] getStringArray(Map<String, Object> pProps, String pKey) {
+  public static String[] getStringArray(Map<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
     if (propObj == null) return new String[0];
     String val = propObj.toString();
-    @NotNull String[] results = val.split(",");
+    @NonNull String[] results = val.split(",");
     return results;
   }
 
-  public static @NotNull String[] getStringArray(Dictionary<String, Object> pProps, String pKey) {
+  public static String[] getStringArray(Dictionary<String, Object> pProps, String pKey) {
     Object propObj = pProps.get(pKey);
     if (propObj == null) return new String[0];
     String val = propObj.toString();
-    @NotNull String[] results = val.split(",");
+    @NonNull String[] results = val.split(",");
     return results;
   }
 

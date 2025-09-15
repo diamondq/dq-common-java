@@ -1,0 +1,5 @@
+<root>
+  <item name='org.osgi.framework.BundleContext S getService(org.osgi.framework.ServiceReference&lt;S&gt;)'>
+    <annotation name='org.jspecify.annotations.Nullable' />
+  </item>
+</root>

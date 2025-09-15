@@ -10,8 +10,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -65,7 +64,7 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
    */
   @Override
   public <T extends EditorComponentDefinition<T>> EditorStructureDefinition addComponent(T pValue) {
-    @SuppressWarnings("null") @NotNull Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
+    Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
     return new GenericEditorStructureDefinition(mName,
       mStructureDefinitionRef,
       ImmutableList.<EditorComponentDefinition<?>>builder()
@@ -78,7 +77,7 @@ public class GenericEditorStructureDefinition implements EditorStructureDefiniti
 
   @Override
   public <T extends EditorComponentDefinition<T>> EditorStructureDefinition removeComponent(T pValue) {
-    @SuppressWarnings("null") @NotNull Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
+    Predicate<EditorComponentDefinition<?>> equalTo = Predicates.equalTo(pValue);
     return new GenericEditorStructureDefinition(mName,
       mStructureDefinitionRef,
       ImmutableList.<EditorComponentDefinition<?>>builder()

@@ -3,7 +3,7 @@ package com.diamondq.common.model.generic;
 import com.diamondq.common.model.interfaces.Scope;
 import com.diamondq.common.model.interfaces.StructureDefinition;
 import com.diamondq.common.model.interfaces.StructureDefinitionRef;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

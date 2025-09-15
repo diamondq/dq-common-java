@@ -3,7 +3,7 @@ package com.diamondq.common.tracing.opentracing.wrappers;
 import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractTracerWrapper implements AbortableContinuation {
 

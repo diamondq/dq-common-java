@@ -1,21 +1,23 @@
 package com.diamondq.common.model.interfaces;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public interface PropertyRef<@Nullable T> extends Ref<Property<T>> {
+public interface PropertyRef<T extends @Nullable Object> extends Ref<Property<T>> {
 
   /**
    * Resolves this reference into the containing Structure
    *
    * @return the object
    */
-  public @Nullable Structure resolveToStructure();
+  @Nullable
+  Structure resolveToStructure();
 
   /**
    * Resolves this reference into a Structure and a Property
    *
-   * @return the StructureAndProperty
+   * @return structureAndProperty
    */
-  public @Nullable StructureAndProperty<T> resolveToBoth();
+  @Nullable
+  StructureAndProperty<T> resolveToBoth();
 
 }

@@ -10,7 +10,7 @@ import org.apache.commons.scxml2.SCXMLSemantics;
 import org.apache.commons.scxml2.TriggerEvent;
 import org.apache.commons.scxml2.model.ModelException;
 import org.apache.commons.scxml2.model.SCXML;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -119,7 +119,7 @@ public class DQSCXMLExecutor extends SCXMLExecutor {
 
         while (getExecutionContext().isRunning()) {
           synchronized (this) {
-            if (hasPendingEvents() == false) {
+            if (!hasPendingEvents()) {
               try {
                 this.wait(5000L);
                 continue;

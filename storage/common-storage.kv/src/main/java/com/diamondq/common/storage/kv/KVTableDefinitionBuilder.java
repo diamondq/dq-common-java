@@ -1,15 +1,14 @@
 package com.diamondq.common.storage.kv;
 
 import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An abstract TableDefinitionBuilder
  *
  * @param <TDB> the actual type of the TableDefinitionBuilder
  */
-public abstract class KVTableDefinitionBuilder<@NotNull TDB extends KVTableDefinitionBuilder<@NotNull TDB>> {
+public abstract class KVTableDefinitionBuilder<TDB extends KVTableDefinitionBuilder<TDB>> {
 
   protected @Nullable String mTableName;
 

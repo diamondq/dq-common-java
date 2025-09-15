@@ -19,8 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,30 +47,19 @@ public class GenericStructure implements Structure, Revision<String> {
     if (pProperties == null) {
       for (PropertyDefinition pd : pDefinition.getAllProperties().values()) {
         String name = pd.getName();
-        Property<?> p = mScope.getToolkit().createNewProperty(mScope, pd, false, null);
+        Property<? extends @Nullable Object> p = mScope.getToolkit()
+          .<@Nullable Void>createNewProperty(mScope, pd, false, null);
         b.put(name, p);
       }
     } else {
       for (Map.Entry<String, Property<?>> pair : pProperties.entrySet()) {
         b.put(pair.getKey(), pair.getValue());
-        // mmansell: Making a copy shouldn't be necessary, since Property's are immutable. And making a copy can screw
-        // up the MemoizedSupplier
-        // Property<?> existingProperty = pair.getValue();
-        // boolean isSet = existingProperty.isValueSet();
-        // PropertyDefinition pd =
-        // pDefinition.lookupPropertyDefinitionByName(existingProperty.getDefinition().getName());
-        // if (pd == null)
-        // throw new IllegalArgumentException(
-        // "Unable to find the property definition " + existingProperty.getDefinition().getName());
-        // Property<?> newProp = mScope.getToolkit().createNewProperty(mScope, pd, isSet,
-        // isSet == true ? existingProperty.getValue(this) : null);
-        // b.put(pair.getKey(), newProp);
       }
     }
     mProperties = b.build();
   }
 
-  private <@Nullable T> @Nullable PropertyRef<T> internalGetContainerRef() {
+  private <T extends @Nullable Object> @Nullable PropertyRef<T> internalGetContainerRef() {
     Collection<String> names = mDefinition.lookupPropertyDefinitionNamesByKeyword(CommonKeywordKeys.CONTAINER,
       CommonKeywordValues.CONTAINER_PARENT,
       PropertyType.PropertyRef
@@ -91,7 +79,7 @@ public class GenericStructure implements Structure, Revision<String> {
       null,
       null
     );
-    return revisionProperties.isEmpty() == false;
+    return !revisionProperties.isEmpty();
   }
 
   /**
@@ -101,11 +89,14 @@ public class GenericStructure implements Structure, Revision<String> {
   public String getRevision() {
     StringBuilder sb = new StringBuilder();
     boolean isFirst = true;
-    for (Property<?> prop : lookupPropertiesByKeyword(CommonKeywordKeys.REVISION, null, null)) {
-      if (isFirst == true) isFirst = false;
+    for (Property<? extends @Nullable Object> prop : lookupPropertiesByKeyword(CommonKeywordKeys.REVISION,
+      null,
+      null
+    )) {
+      if (isFirst) isFirst = false;
       else sb.append('/');
       Object value = prop.getValue(this);
-      if (value != null) sb.append(value.toString());
+      if (value != null) sb.append(value);
     }
     return sb.toString();
   }
@@ -122,7 +113,7 @@ public class GenericStructure implements Structure, Revision<String> {
    * @see com.diamondq.common.model.interfaces.Structure#getContainerRef()
    */
   @Override
-  public <@Nullable T> @Nullable PropertyRef<T> getContainerRef() {
+  public <T extends @Nullable Object> @Nullable PropertyRef<T> getContainerRef() {
     Supplier<@Nullable PropertyRef<T>> supplier = this::internalGetContainerRef;
     return mMemoizer.memoize(supplier, "gcr");
   }
@@ -150,11 +141,12 @@ public class GenericStructure implements Structure, Revision<String> {
   private String internalGetLocalName() {
     List<String> propNames = mDefinition.lookupPrimaryKeyNames();
     List<@Nullable Object> names = Lists.transform(propNames, (n) -> {
-      if (n == null) throw new IllegalArgumentException("The name must not be null");
-      Property<@Nullable ?> property = lookupPropertyByName(n);
-      if (property == null) throw new IllegalArgumentException("Unable to find the primary key property " + n);
-      return property.getValue(GenericStructure.this);
-    });
+        if (n == null) throw new IllegalArgumentException("The name must not be null");
+        Property<? extends @Nullable Object> property = lookupPropertyByName(n);
+        if (property == null) throw new IllegalArgumentException("Unable to find the primary key property " + n);
+        return property.getValue(GenericStructure.this);
+      }
+    );
     return mScope.getToolkit().collapsePrimaryKeys(mScope, names);
   }
 
@@ -198,7 +190,7 @@ public class GenericStructure implements Structure, Revision<String> {
    */
   @Override
   public Structure updateProperty(Property<?> pValue) {
-    @SuppressWarnings("null") @NotNull Predicate<String> equalTo = Predicates.equalTo(pValue.getDefinition().getName());
+    @SuppressWarnings("null") Predicate<String> equalTo = Predicates.equalTo(pValue.getDefinition().getName());
     return new GenericStructure(mScope,
       mDefinition,
       ImmutableMap.<String, Property<?>>builder()
@@ -212,9 +204,9 @@ public class GenericStructure implements Structure, Revision<String> {
    * @see com.diamondq.common.model.interfaces.Structure#lookupPropertyByName(java.lang.String)
    */
   @Override
-  public <@Nullable T> @Nullable Property<T> lookupPropertyByName(String pName) {
+  public <T extends @Nullable Object> @Nullable Property<T> lookupPropertyByName(String pName) {
     Property<?> prop = mProperties.get(pName);
-    @SuppressWarnings({ "rawtypes", "unchecked" }) @Nullable Property<T> result = (@Nullable Property) prop;
+    @SuppressWarnings({ "rawtypes", "unchecked" }) Property<T> result = (@Nullable Property) prop;
     return result;
   }
 
@@ -223,7 +215,7 @@ public class GenericStructure implements Structure, Revision<String> {
    */
   @SuppressWarnings({ "null", "unused" })
   @Override
-  public <@Nullable T> Property<T> lookupMandatoryPropertyByName(String pName) {
+  public <T extends @Nullable Object> Property<T> lookupMandatoryPropertyByName(String pName) {
     Property<?> prop = mProperties.get(pName);
     if (prop == null) throw new IllegalArgumentException(
       "The mandatory property " + pName + " was not found in the Structure " + mDefinition.getName());
@@ -236,14 +228,15 @@ public class GenericStructure implements Structure, Revision<String> {
    *   com.diamondq.common.model.interfaces.PropertyType)
    */
   @Override
-  public <@Nullable T> Collection<Property<T>> lookupPropertiesByKeyword(String pKey, @Nullable String pValue,
-    @Nullable PropertyType pType) {
+  public <T extends @Nullable Object> Collection<Property<T>> lookupPropertiesByKeyword(String pKey,
+    @Nullable String pValue, @Nullable PropertyType pType) {
     Collection<String> names = mDefinition.lookupPropertyDefinitionNamesByKeyword(pKey, pValue, pType);
-    Collection<@Nullable Property<T>> list = Collections2.filter(Collections2.<@NotNull String, @Nullable Property<T>>transform(
-      names,
-      (n) -> n == null ? null : lookupPropertyByName(n)
-    ), Predicates.notNull());
-    @SuppressWarnings("null") Collection<Property<T>> result = (Collection<Property<T>>) list;
+    @SuppressWarnings(
+      "null") Collection<Property<T>> result = Collections2.filter(Collections2.<String, @Nullable Property<T>>transform(
+        names,
+        (n) -> n == null ? null : lookupPropertyByName(n)
+      ), Predicates.notNull()
+    );
     return result;
   }
 

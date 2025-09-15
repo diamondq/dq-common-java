@@ -12,8 +12,7 @@ import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +23,13 @@ public class NoopTracer implements Tracer {
 
   private static final Logger sLogger = LoggerFactory.getLogger(NoopTracer.class);
 
-  private Tracer mDelegate;
+  private final Tracer mDelegate;
 
   @SuppressWarnings("deprecation")
   @Inject
   public NoopTracer() {
     mDelegate = NoopTracerFactory.create();
-    if (GlobalTracer.isRegistered() == false) GlobalTracer.register(this);
+    if (!GlobalTracer.isRegistered()) GlobalTracer.register(this);
     else sLogger.warn("Skipping attempt to register a second GlobalTracer. The existing tracer was {}",
       GlobalTracer.get().getClass().getName()
     );
@@ -64,7 +63,7 @@ public class NoopTracer implements Tracer {
    * @see io.opentracing.Tracer#inject(io.opentracing.SpanContext, io.opentracing.propagation.Format, java.lang.Object)
    */
   @Override
-  public <C> void inject(SpanContext pSpanContext, Format<C> pFormat, @NotNull C pCarrier) {
+  public <C> void inject(SpanContext pSpanContext, Format<C> pFormat, C pCarrier) {
     mDelegate.inject(pSpanContext, pFormat, pCarrier);
   }
 
@@ -72,7 +71,7 @@ public class NoopTracer implements Tracer {
    * @see io.opentracing.Tracer#extract(io.opentracing.propagation.Format, java.lang.Object)
    */
   @Override
-  public <C> SpanContext extract(Format<C> pFormat, @NotNull C pCarrier) {
+  public <C> SpanContext extract(Format<C> pFormat, C pCarrier) {
     return mDelegate.extract(pFormat, pCarrier);
   }
 

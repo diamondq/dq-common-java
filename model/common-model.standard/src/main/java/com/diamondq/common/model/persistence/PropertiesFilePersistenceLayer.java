@@ -23,8 +23,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -309,7 +308,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
       pKey,
       pCreateIfMissing
     )) {
-      @NotNull String[] parts = pKey.split("/");
+      String[] parts = pKey.split("/");
       parts[parts.length - 1] = parts[parts.length - 1] + ".properties";
       File structureFile = pParentFileSupplier.get();
       if (structureFile == null) throw new IllegalStateException("Constructor was called with a null structureFile");
@@ -324,7 +323,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
   }
 
   protected @Nullable File getStructureDir(@Nullable String pKey, boolean pCreateIfMissing) {
-    @NotNull String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
+    String[] parts = (pKey == null ? new String[0] : pKey.split("/"));
     File structureFile = getStructureBaseDir();
     if (structureFile == null) throw new IllegalStateException("Constructor was called with a null structureFile");
     for (String p : parts)
@@ -408,7 +407,7 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
         return result;
       }
       case StructureRefList: {
-        @NotNull String[] strings = (value == null ? "" : value).split(",");
+        String[] strings = (value == null ? "" : value).split(",");
         for (int i = 0; i < strings.length; i++)
           strings[i] = unescape(strings[i]);
         @SuppressWarnings("unchecked") R result = (R) strings;
@@ -483,8 +482,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
    *   com.diamondq.common.model.interfaces.PropertyType, java.lang.Object)
    */
   @Override
-  protected <@NotNull R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig,
-    boolean pIsMeta, String pKey, PropertyType pType, R pValue) {
+  protected <R> void setStructureConfigObjectProp(Toolkit pToolkit, Scope pScope, Properties pConfig, boolean pIsMeta,
+    String pKey, PropertyType pType, R pValue) {
     switch (pType) {
       case String: {
         pConfig.setProperty(pKey, (String) pValue);
@@ -515,8 +514,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
         break;
       }
       case StructureRefList: {
-        @SuppressWarnings("null") @NotNull String[] strings = (String[]) pValue;
-        @NotNull String[] escaped = new @NotNull String[strings.length];
+        String[] strings = (String[]) pValue;
+        String[] escaped = new String[strings.length];
         for (int i = 0; i < strings.length; i++)
           escaped[i] = escape(strings[i]);
         String escapedStr = String.join(",", escaped);
@@ -579,8 +578,8 @@ public class PropertiesFilePersistenceLayer extends AbstractDocumentPersistenceL
       File structureFile = getStructureFile(pKey, this::getStructureBaseDir, true);
 
       if (pMustMatchOptimisticObj == true) {
-        @Nullable Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
-        @Nullable String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
+        Structure oldObj = internalLookupStructureByName(pToolkit, pScope, pDefName, pKey);
+        String oldOptimistic = constructOptimisticObj(pToolkit, pScope, pDefName, pKey, oldObj);
         if (Objects.equals(pOptimisticObj, oldOptimistic) == false) return context.exit(false);
       }
 

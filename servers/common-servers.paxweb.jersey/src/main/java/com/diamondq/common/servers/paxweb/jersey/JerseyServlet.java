@@ -6,8 +6,7 @@ import org.glassfish.jersey.servlet.ServletProperties;
 import org.glassfish.jersey.servlet.internal.ServletContainerProviderFactory;
 import org.glassfish.jersey.servlet.internal.Utils;
 import org.glassfish.jersey.servlet.internal.spi.ServletContainerProvider;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +175,7 @@ public class JerseyServlet implements Servlet {
     ServletRegistration registration = context.getServletRegistration(Application.class.getName());
 
     if (registration != null) {
-      final Set<Class<@NotNull ?>> appClasses = getRootResourceAndProviderClasses(classes);
+      final Set<Class<?>> appClasses = getRootResourceAndProviderClasses(classes);
       final ResourceConfig resourceConfig = ResourceConfig.forApplicationClass(ResourceConfig.class, appClasses)
         .addProperties(getInitParams(registration))
         .addProperties(Utils.getContextParams(context));
@@ -205,7 +204,7 @@ public class JerseyServlet implements Servlet {
    * {@code servlet-mapping}.
    */
   private static void addServletWithApplication(final ServletContext context, final Class<? extends Application> clazz,
-    final Set<Class<@NotNull ?>> defaultClasses) throws ServletException {
+    final Set<Class<?>> defaultClasses) throws ServletException {
     final ApplicationPath ap = clazz.getAnnotation(ApplicationPath.class);
     if (ap != null) {
       // App is annotated with ApplicationPath
@@ -231,7 +230,7 @@ public class JerseyServlet implements Servlet {
    * Enhance existing servlet configuration.
    */
   private static void addServletWithExistingRegistration(final ServletContext context, ServletRegistration registration,
-    final Class<? extends Application> clazz, final Set<Class<@NotNull ?>> classes) throws ServletException {
+    final Class<? extends Application> clazz, final Set<Class<?>> classes) throws ServletException {
     // create a new servlet container for a given app.
     final ResourceConfig resourceConfig = ResourceConfig.forApplicationClass(clazz, classes)
       .addProperties(getInitParams(registration))
@@ -319,9 +318,9 @@ public class JerseyServlet implements Servlet {
     return s;
   }
 
-  private static Set<Class<@NotNull ?>> getRootResourceAndProviderClasses(final Set<Class<?>> classes) {
+  private static Set<Class<?>> getRootResourceAndProviderClasses(final Set<Class<?>> classes) {
     // TODO filter out any classes from the Jersey jars
-    final Set<Class<@NotNull ?>> s = new LinkedHashSet<>();
+    final Set<Class<?>> s = new LinkedHashSet<>();
     for (final Class<?> c : classes) {
       if (c.isAnnotationPresent(Path.class) || c.isAnnotationPresent(Provider.class)) {
         s.add(c);

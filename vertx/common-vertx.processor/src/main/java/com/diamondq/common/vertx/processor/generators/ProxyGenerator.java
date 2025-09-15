@@ -52,7 +52,7 @@ import org.javatuples.Septet;
 import org.javatuples.Sextet;
 import org.javatuples.Triplet;
 import org.javatuples.Unit;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
@@ -153,8 +153,9 @@ public class ProxyGenerator implements Generator {
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Message.class),
-        ClassName.get(JsonObject.class)
-      ), "m").build())
+          ClassName.get(JsonObject.class)
+        ), "m"
+      ).build())
       // Record record = Verify.notNull(m.body());
       .addStatement("$T record = new $T($T.notNull(m.body()))", Record.class, Record.class, Verify.class)
       // String interfaceStr = record.getMetadata().getString("service.interface");
@@ -238,8 +239,9 @@ public class ProxyGenerator implements Generator {
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
       .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-        ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-      ), "ar").build())
+          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+        ), "ar"
+      ).build())
       // try (Context ctx2 = ctx.activateOnThread("")) {
       .beginControlFlow("try ($T ctx2 = ctx.activateOnThread($S))", Context.class, "")
       // if (ar.failed() == true) {
@@ -307,14 +309,16 @@ public class ProxyGenerator implements Generator {
       //
       // private @Nullable MessageConsumer<Record> mListener;
       .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(MessageConsumer.class),
-        ClassName.get(JsonObject.class)
-      ).annotated(AnnotationSpec.builder(Nullable.class).build()), "mListener", Modifier.PRIVATE).build())
+          ClassName.get(JsonObject.class)
+        ).annotated(AnnotationSpec.builder(Nullable.class).build()), "mListener", Modifier.PRIVATE
+      ).build())
       //
       // private final ConcurrentMap<String, ServiceRegistration<Engine>> mRegistrations;
       .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(ConcurrentMap.class),
-        ClassName.get(String.class),
-        ParameterizedTypeName.get(ClassName.get(ServiceRegistration.class), pProxyClass.getBaseQualifiedTypeName())
-      ), "mRegistrations", Modifier.PRIVATE, Modifier.FINAL).build())
+          ClassName.get(String.class),
+          ParameterizedTypeName.get(ClassName.get(ServiceRegistration.class), pProxyClass.getBaseQualifiedTypeName())
+        ), "mRegistrations", Modifier.PRIVATE, Modifier.FINAL
+      ).build())
       //
       // @SuppressWarnings("null")
       // public OsgiManager() {
@@ -1020,8 +1024,9 @@ public class ProxyGenerator implements Generator {
         .addAnnotation(Override.class) //
         .returns(Void.TYPE) //
         .addParameter(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-          ParameterizedTypeName.get(ClassName.get(Message.class), replyReturnType)
-        ), "ar") //
+            ParameterizedTypeName.get(ClassName.get(Message.class), replyReturnType)
+          ), "ar"
+        ) //
         // try (Context ctx2 = ctx.activateOnThread("")) {
         .beginControlFlow("try (Context ctx2 = ctx.activateOnThread($S))", "")
         // try {

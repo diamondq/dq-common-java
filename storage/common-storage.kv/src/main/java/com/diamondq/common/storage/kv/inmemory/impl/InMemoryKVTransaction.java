@@ -5,8 +5,7 @@ import com.diamondq.common.storage.kv.IKVTransaction;
 import com.diamondq.common.storage.kv.Query;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +44,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
    *   java.lang.Class)
    */
   @Override
-  public <@Nullable O> O getByKey(String pTable, String pKey1, @Nullable String pKey2, Class<O> pClass) {
+  public <O extends @Nullable Object> O getByKey(String pTable, String pKey1, @Nullable String pKey2, Class<O> pClass) {
     ConcurrentMap<String, @Nullable String> table = getFromTable(pTable);
     String key = getFlattenedKey(pKey1, pKey2);
     String result = table.get(key);
@@ -57,7 +56,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
    *   java.lang.Object)
    */
   @Override
-  public <@Nullable O> void putByKey(String pTable, String pKey1, @Nullable String pKey2, O pObj) {
+  public <O extends @Nullable Object> void putByKey(String pTable, String pKey1, @Nullable String pKey2, O pObj) {
     ConcurrentMap<String, @Nullable String> table = getFromTable(pTable);
     String key = getFlattenedKey(pKey1, pKey2);
     table.put(key, getStringFromObj(pTable, pObj));
@@ -78,7 +77,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
    * @see com.diamondq.common.storage.kv.IKVTransaction#keyIterator(java.lang.String)
    */
   @Override
-  public Iterator<@NotNull String> keyIterator(String pTable) {
+  public Iterator<String> keyIterator(String pTable) {
     throw new UnsupportedOperationException();
   }
 
@@ -86,7 +85,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
    * @see com.diamondq.common.storage.kv.IKVTransaction#keyIterator2(java.lang.String, java.lang.String)
    */
   @Override
-  public Iterator<@NotNull String> keyIterator2(String pTable, String pKey1) {
+  public Iterator<String> keyIterator2(String pTable, String pKey1) {
     throw new UnsupportedOperationException();
   }
 
@@ -111,7 +110,7 @@ public class InMemoryKVTransaction extends AbstractKVTransaction implements IKVT
    * @see com.diamondq.common.storage.kv.IKVTransaction#getTableList()
    */
   @Override
-  public Iterator<@NotNull String> getTableList() {
+  public Iterator<String> getTableList() {
     return Sets.newHashSet(mData.keySet()).iterator();
   }
 

@@ -3,7 +3,7 @@ package com.diamondq.common.tracing.opentracing.xmpp;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;

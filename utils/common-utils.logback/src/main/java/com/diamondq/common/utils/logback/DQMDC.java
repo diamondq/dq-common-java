@@ -3,7 +3,7 @@ package com.diamondq.common.utils.logback;
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.util.OptionHelper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import java.util.TreeSet;
 /**
  * This LogBack converter will output the MDC properties. The configuration is a comma-separated list of keys. If the
  * keys start with a !, then they will be omitted. If the key is listed, then the value will be used. The key can
- * contain a default value by using the ":-" delimiter (i.e., DQMDC{myKey:-defaultValue} )
+ * contain a default value by using the ":-" delimiter (i.e., DQMDC{myKey:-defaultValue})
  */
 @SuppressWarnings("SpellCheckingInspection")
 public class DQMDC extends ClassicConverter {
@@ -71,7 +71,7 @@ public class DQMDC extends ClassicConverter {
       else sb.append(", ");
 
       // format: key0=value0, key1=value1
-      @Nullable String r = mdcPropertyMap.get(key);
+      String r = mdcPropertyMap.get(key);
       if ((r != null) && ("DQIndent".equals(key))) {
         String mdcThreadName = mdcPropertyMap.get("DQT");
         String threadName = Thread.currentThread().getName();

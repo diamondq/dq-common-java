@@ -5,7 +5,7 @@ import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.Tracer.SpanBuilder;
 import io.opentracing.util.GlobalTracer;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.xmpp.core.session.XmppSession;
