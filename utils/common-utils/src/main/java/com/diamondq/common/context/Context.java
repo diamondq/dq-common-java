@@ -23,7 +23,7 @@ public interface Context extends AutoCloseable {
    * @param pResult the exit value
    * @return the exit value
    */
-  <T> T exit(T pResult);
+  <T extends @Nullable Object> T exit(T pResult);
 
   /**
    * Reports an explicit exit value with a conversion function for the context
@@ -32,7 +32,7 @@ public interface Context extends AutoCloseable {
    * @param pFunc the conversion function
    * @return the exit value
    */
-  <T> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
+  <T extends @Nullable Object> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
 
   I18NStringAndException trace(I18NStringAndException pEx);
 
@@ -114,7 +114,7 @@ public interface Context extends AutoCloseable {
    * @param pKey the key
    * @param pValue the value
    */
-  <T> void setData(String pKey, T pValue);
+  <T extends @Nullable Object> void setData(String pKey, T pValue);
 
   /**
    * Retrieve data associated with the current context (or parent contexts)
@@ -125,7 +125,7 @@ public interface Context extends AutoCloseable {
    * @param pDataClass the return data class
    * @return the return data or null if there is no match
    */
-  <T> @Nullable T getData(String pKey, boolean pSearchParents, Class<T> pDataClass);
+  <T extends @Nullable Object> @Nullable T getData(String pKey, boolean pSearchParents, Class<T> pDataClass);
 
   /**
    * Allows a context to be used in an alternate thread. This call increases the 'open' count, so that an additional

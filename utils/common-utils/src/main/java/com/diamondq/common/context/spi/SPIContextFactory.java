@@ -18,9 +18,9 @@ public interface SPIContextFactory extends ContextFactory {
 
   void detachContextFromThread(ContextClass pContext);
 
-  <T extends @Nullable Object> T internalExitValue(ContextClass pContext, T pResult);
+  <T extends @Nullable Object> @Nullable T internalExitValue(ContextClass pContext, @Nullable T pResult);
 
-  <T extends @Nullable Object> T internalExitValueWithMeta(ContextClass pContext, T pResult,
+  <T extends @Nullable Object> @Nullable T internalExitValueWithMeta(ContextClass pContext, @Nullable T pResult,
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
 
   void internalReportTrace(ContextClass pContext, @Nullable Object @Nullable [] pArgs);

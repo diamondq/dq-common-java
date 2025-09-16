@@ -51,7 +51,7 @@ public class ContextClass implements Context {
   public final @Nullable Object startThis;
 
   /**
-   * The set of arguments passed during creation of the context
+   * The set of arguments passed during the creation of the context
    */
   public final @Nullable Object @Nullable [] startArguments;
 
@@ -115,9 +115,9 @@ public class ContextClass implements Context {
 
     /* NOTE: The context is NOT verified to be open, since this may be called during the closing of the context */
 
-    @Nullable ConcurrentMap<String, Object> dataMap = mDataMap;
+    ConcurrentMap<String, Object> dataMap = mDataMap;
 
-    /* Due to the fact that the mDataMap is defined as volatile, it's ok to do the check/sync/check pattern */
+    /* Since mDataMap is defined as volatile, it's ok to do the check/sync/check pattern */
 
     if (dataMap == null) {
       synchronized (this) {
@@ -162,10 +162,10 @@ public class ContextClass implements Context {
 
     /* NOTE: The context is NOT verified to be open, since this may be called during the closing of the context */
 
-    /* If we're not searching the parent, then a simple handle */
+    /* If not searching for the parent, then a simple handle */
 
     if (!pSearchParents) {
-      @Nullable ConcurrentMap<String, Object> dataMap = mDataMap;
+      ConcurrentMap<String, Object> dataMap = mDataMap;
       if (dataMap == null) return null;
       Object result = dataMap.get(pKey);
       if ((result != null) && (!pDataClass.isInstance(result))) throw new IllegalArgumentException();
@@ -173,9 +173,9 @@ public class ContextClass implements Context {
       return objResult;
     }
 
-    @Nullable ContextClass context = this;
+    ContextClass context = this;
     while (context != null) {
-      @Nullable ConcurrentMap<String, Object> dataMap = context.mDataMap;
+      ConcurrentMap<String, Object> dataMap = context.mDataMap;
       if (dataMap != null) {
         Object result = dataMap.get(pKey);
         if (result != null) {
@@ -192,24 +192,24 @@ public class ContextClass implements Context {
   /**
    * Returns the stack method that 'created' the Context. This is a cached value, but it must be called at least once
    * during the creation handling, otherwise, the method name won't be correct. <br/> <br/> NOTE: The method name is
-   * determined by walking the stack until we pass out of the ContextFactoryImpl.
+   * determined by walking the stack until passing out of the ContextFactoryImpl.
    *
    * @return the stack method
    */
   public String getLatestStackMethod() {
-    @Nullable String localLatestStackMethod = mLatestStackMethod;
+    String localLatestStackMethod = mLatestStackMethod;
     if (localLatestStackMethod != null) return localLatestStackMethod;
     synchronized (this) {
       if (mLatestStackMethod == null) {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         boolean inFactory = false;
-        for (int i = 0; i < stackTrace.length; i++) {
-          String className = stackTrace[i].getClassName();
+        for (final StackTraceElement pStackTraceElement : stackTrace) {
+          String className = pStackTraceElement.getClassName();
           if (!inFactory) {
             if (className.startsWith("com.diamondq.common.context.impl.ContextFactoryImpl")) inFactory = true;
           } else {
 
-            /* There are a slew of 'internal' entries that we'll skip. This is mostly around CDI injection */
+            /* There is a slew of 'internal' entries that'll be skipped. This is mostly around CDI injection */
 
             if (className.startsWith("com.diamondq.common.context.")) continue;
             if (className.startsWith("sun.reflect.")) continue;
@@ -224,7 +224,7 @@ public class ContextClass implements Context {
               }
             }
             if (ignore) continue;
-            mLatestStackMethod = stackTrace[i].getMethodName();
+            mLatestStackMethod = pStackTraceElement.getMethodName();
             break;
           }
         }
@@ -240,9 +240,10 @@ public class ContextClass implements Context {
    * @see com.diamondq.common.context.Context#exit(java.lang.Object)
    */
   @Override
-  public <T> T exit(T pResult) {
+  public <T extends @Nullable Object> T exit(T pResult) {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.exit() called on an already closed Context", null);
+    //noinspection DataFlowIssue
     return mFactory.internalExitValue(this, pResult);
   }
 
@@ -250,9 +251,10 @@ public class ContextClass implements Context {
    * @see com.diamondq.common.context.Context#exit(java.lang.Object, java.util.function.Function)
    */
   @Override
-  public <T> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
+  public <T extends @Nullable Object> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.exit() called on an already closed Context", null);
+    //noinspection DataFlowIssue
     return mFactory.internalExitValueWithMeta(this, pResult, pFunc);
   }
 
@@ -425,7 +427,7 @@ public class ContextClass implements Context {
   @Override
   public void close() {
 
-    /* Only actually close if we've reached 0. */
+    /* Only actually close if reached 0. */
 
     int count = mOpenCount.decrementAndGet();
     if (count == 0) mFactory.closeContext(this);
@@ -473,10 +475,10 @@ public class ContextClass implements Context {
   }
 
   public List<String> getContextStackNames(boolean pPrintRefCount) {
-    @Nullable final List<String> localContextStackNames = mContextStackNames;
+    final List<String> localContextStackNames = mContextStackNames;
     if ((!pPrintRefCount) && (localContextStackNames != null)) return localContextStackNames;
     List<String> contextStackNames = new ArrayList<>();
-    @Nullable ContextClass context = this;
+    ContextClass context = this;
     while (context != null) {
       if (pPrintRefCount) {
         final String sb = context.contextName + '(' + context.mOpenCount.get() + ')';
@@ -500,7 +502,7 @@ public class ContextClass implements Context {
   public Context getRootContext() {
     ContextClass current = this;
     while (true) {
-      @Nullable ContextClass parent = current.getParentContextClass();
+      ContextClass parent = current.getParentContextClass();
       if (parent == current) throw new IllegalStateException();
       if (parent == null) return current;
       current = parent;

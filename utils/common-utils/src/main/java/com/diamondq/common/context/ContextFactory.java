@@ -26,23 +26,24 @@ public interface ContextFactory {
     return getInstance().getNullableCurrentContext();
   }
 
-  static <T> ContextExtendedCompletableFuture<T> completedFuture(T pValue) {
+  static <T extends @Nullable Object> ContextExtendedCompletableFuture<T> completedFuture(T pValue) {
     return FutureUtils.completedFuture(pValue);
   }
 
-  static <T> ContextExtendedCompletableFuture<T> completedFailure(Throwable pValue) {
+  static <T extends @Nullable Object> ContextExtendedCompletableFuture<T> completedFailure(Throwable pValue) {
     return FutureUtils.completedFailure(pValue);
   }
 
-  static <T> ContextExtendedCompletableFuture<T> of(CompletionStage<T> pFuture) {
+  static <T extends @Nullable Object> ContextExtendedCompletableFuture<T> of(CompletionStage<T> pFuture) {
     return FutureUtils.of(pFuture);
   }
 
-  static <T> ContextExtendedCompletableFuture<T> newCompletableFuture() {
+  static <T extends @Nullable Object> ContextExtendedCompletableFuture<T> newCompletableFuture() {
     return FutureUtils.newCompletableFuture();
   }
 
-  static <T> ContextExtendedCompletableFuture<List<T>> listOf(List<? extends ExtendedCompletionStage<T>> pList) {
+  static <T extends @Nullable Object> ContextExtendedCompletableFuture<List<T>> listOf(
+    List<? extends ExtendedCompletionStage<T>> pList) {
     return FutureUtils.listOf(pList);
   }
 

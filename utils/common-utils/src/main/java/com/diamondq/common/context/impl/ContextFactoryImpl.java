@@ -381,7 +381,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
    *   java.lang.Object)
    */
   @Override
-  public <T extends @Nullable Object> T internalExitValue(ContextClass pContext, T pResult) {
+  public <T extends @Nullable Object> @Nullable T internalExitValue(ContextClass pContext, @Nullable T pResult) {
     pContext.setHandlerData(ContextHandler.sEXIT_VALUE, (pResult == null ? sNULL_EXIT_VALUE : pResult));
     pContext.setHandlerData(ContextHandler.sEXIT_FUNC, sNULL_EXIT_VALUE);
     return pResult;
@@ -392,7 +392,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
    *   java.lang.Object, java.util.function.Function)
    */
   @Override
-  public <T extends @Nullable Object> T internalExitValueWithMeta(ContextClass pContext, T pResult,
+  public <T extends @Nullable Object> @Nullable T internalExitValueWithMeta(ContextClass pContext, @Nullable T pResult,
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
     pContext.setHandlerData(ContextHandler.sEXIT_VALUE, (pResult == null ? sNULL_EXIT_VALUE : pResult));
     pContext.setHandlerData(ContextHandler.sEXIT_FUNC, (pFunc == null ? sNULL_EXIT_VALUE : pFunc));
