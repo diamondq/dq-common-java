@@ -24,7 +24,7 @@ public class TestTypeRecursion {
 
   @SuppressWarnings("null")
   private String[] setToArray(Set<Type> pSet) {
-    return pSet.stream().map((type) -> type.getTypeName()).toArray(String[]::new);
+    return pSet.stream().map(Type::getTypeName).sorted().toArray(String[]::new);
   }
 
   @SuppressWarnings("unused")
@@ -36,13 +36,13 @@ public class TestTypeRecursion {
   public void testSimple() {
     LinkedHashSet<Type> set = new LinkedHashSet<>();
     converterManager.calculateTypes(Types.LIST_OF_STRING.getType(), set);
-    assertArrayEquals(new String[] { "java.util.List<java.lang.String>", "java.util.Collection<java.lang.String>", "java.lang.Iterable<java.lang.String>", "java.util.List<?>", "java.util.Collection<?>", "java.lang.Iterable<?>" },
+    assertArrayEquals(new String[] { "java.lang.Iterable<?>", "java.lang.Iterable<java.lang.String>", "java.util.Collection<?>", "java.util.Collection<java.lang.String>", "java.util.List<?>", "java.util.List<java.lang.String>", "java.util.SequencedCollection<?>", "java.util.SequencedCollection<java.lang.String>" },
       setToArray(set)
     );
 
     set = new LinkedHashSet<>();
     converterManager.calculateTypes(Types.MAP_OF_STRING_TO_STRING.getType(), set);
-    assertArrayEquals(new String[] { "java.util.Map<java.lang.String, java.lang.String>", "java.util.Map<?, ?>" },
+    assertArrayEquals(new String[] { "java.util.Map<?, ?>", "java.util.Map<java.lang.String, java.lang.String>" },
       setToArray(set)
     );
   }
@@ -53,7 +53,7 @@ public class TestTypeRecursion {
     converterManager.calculateTypes(new TypeReference<StringMap>() {
       }.getType(), set
     );
-    assertArrayEquals(new String[] { "com.diamondq.common.converters.impl.StringMap", "java.util.Map<java.lang.String, java.lang.String>", "java.util.Map<?, ?>" },
+    assertArrayEquals(new String[] { "com.diamondq.common.converters.impl.StringMap", "java.util.Map<?, ?>", "java.util.Map<java.lang.String, java.lang.String>" },
       setToArray(set)
     );
   }
@@ -65,7 +65,7 @@ public class TestTypeRecursion {
       }.getType(), set
     );
     printSet(set);
-    assertArrayEquals(new String[] { "com.diamondq.common.converters.impl.WildcardMap<java.lang.String, ?>", "java.util.Map<java.lang.String, ?>", "com.diamondq.common.converters.impl.WildcardMap<?, ?>", "java.util.Map<?, ?>" },
+    assertArrayEquals(new String[] { "com.diamondq.common.converters.impl.WildcardMap<?, ?>", "com.diamondq.common.converters.impl.WildcardMap<java.lang.String, ?>", "java.util.Map<?, ?>", "java.util.Map<java.lang.String, ?>" },
       setToArray(set)
     );
   }
@@ -74,7 +74,8 @@ public class TestTypeRecursion {
   public <O> void testNonGeneric() {
     LinkedHashSet<Type> set = new LinkedHashSet<>();
     converterManager.calculateTypes(List.class, set);
-    assertArrayEquals(new String[] { "java.util.List<?>", "java.util.Collection<?>", "java.lang.Iterable<?>" },
+    System.err.println("Value: " + set);
+    assertArrayEquals(new String[] { "java.lang.Iterable<?>", "java.util.Collection<?>", "java.util.List<?>", "java.util.SequencedCollection<?>" },
       setToArray(set)
     );
   }

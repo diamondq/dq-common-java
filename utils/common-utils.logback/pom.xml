@@ -23,10 +23,6 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.janino</groupId>
-      <artifactId>janino</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.diamondq.common</groupId>
       <artifactId>common-tracing.opentracing</artifactId>
       <optional>true</optional>
