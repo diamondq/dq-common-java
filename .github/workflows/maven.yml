@@ -11,15 +11,14 @@ jobs:
     steps:
       # Checkout the source code
       - uses: actions/checkout@v4
-      # Make sure that we have a Java 17 environment
-      - name: Set up JDK 17
+      # Make sure that we have a Java 25 environment
+      - name: Set up JDK 25
         id: setupJava
         uses: actions/setup-java@v4
         with:
           java-version: |
             8
-            11
-            17
+            25
           distribution: 'corretto'
           cache: 'maven'
       # Get the short revision number
