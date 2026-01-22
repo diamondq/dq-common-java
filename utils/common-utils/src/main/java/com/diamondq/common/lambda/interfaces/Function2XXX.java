@@ -1,0 +1,14 @@
+package com.diamondq.common.lambda.interfaces;
+
+@FunctionalInterface
+public interface Function2XXX<T1, T2, R> extends Function2<T1, T2, R> {
+
+  /**
+   * Performs this operation on the given argument.
+   *
+   * @param t1 the input argument
+   * @param t2 the input argument
+   * @return the result
+   */
+  R apply(T1 t1, T2 t2);
+}
