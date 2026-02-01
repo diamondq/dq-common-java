@@ -11,7 +11,7 @@
   <packaging>jar</packaging>
   <name>DiamondQ Common: Utils</name>
   <properties>
-    <osgi.extra.import.packages>com.diamondq.common.tracing.opentracing.wrappers;resolution:=optional
+    <osgi.extra.import.packages>com.diamondq.common.tracing.opentracing.wrappers@@resolution:=optional
     </osgi.extra.import.packages>
     <osgi.embed.dependency>*;groupId=com.googlecode.gentyref</osgi.embed.dependency>
     <osgi.manifest.directory>${project.build.outputDirectory}/META-INF</osgi.manifest.directory>
