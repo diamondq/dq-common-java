@@ -1,2 +1,0 @@
-acme-ssl:
-  connect-url: acme://letsencrypt.org/staging
