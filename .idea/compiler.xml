@@ -22,14 +22,12 @@
         <module name="common-security.acl.noop" />
         <module name="common-utils.parsing" />
         <module name="common-security.jcasbin" />
-        <module name="common-security.jwt" />
         <module name="common-injection.cdi.weld" />
         <module name="common-utils.logback" />
         <module name="common-storage.jdbc" />
         <module name="common-deployment.basic" />
         <module name="common-xmpp.eclipse.system.fragment" />
         <module name="common-injection.osgi" />
-        <module name="common-servers.paxweb.jersey" />
         <module name="common-utils.logback.fragment" />
         <module name="common-jaxrs.resteasy" />
         <module name="common-storage.cloudant" />
@@ -45,23 +43,28 @@
         <outputRelativeToContentRoot value="true" />
         <processor name="io.vertx.codegen.CodeGenProcessor" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/5.0.8/vertx-codegen-5.0.8-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-processor/5.0.8/vertx-codegen-processor-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-json/5.0.8/vertx-codegen-json-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/5.0.8/vertx-service-proxy-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-api/5.0.8/vertx-codegen-api-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/5.0.8/vertx-core-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core-logging/5.0.8/vertx-core-logging-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.2.10.Final/netty-common-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.2.10.Final/netty-buffer-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.2.10.Final/netty-transport-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.2.10.Final/netty-handler-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.2.10.Final/netty-transport-native-unix-common-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-base/4.2.10.Final/netty-codec-base-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.2.10.Final/netty-handler-proxy-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.2.10.Final/netty-codec-socks-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.2.10.Final/netty-codec-http-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-compression/4.2.10.Final/netty-codec-compression-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.2.10.Final/netty-codec-http2-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.2.10.Final/netty-resolver-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.2.10.Final/netty-resolver-dns-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.2.10.Final/netty-codec-dns-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.18.2/jackson-core-2.18.2.jar" />
         </processorPath>
         <module name="common-vertx.common.osgi" />
       </profile>
@@ -768,18 +771,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.12.0/value-2.12.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.12.1/value-2.12.1.jar" />
         </processorPath>
         <module name="common-jaxrs.common" />
-      </profile>
-      <profile name="Annotation profile for common-security.acme" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.12.0/value-2.12.0.jar" />
-        </processorPath>
-        <module name="common-security.acme" />
       </profile>
       <profile name="Annotation profile for common-vertx.common" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -787,23 +781,28 @@
         <outputRelativeToContentRoot value="true" />
         <processor name="io.vertx.codegen.CodeGenProcessor" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/5.0.8/vertx-codegen-5.0.8-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-processor/5.0.8/vertx-codegen-processor-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-json/5.0.8/vertx-codegen-json-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/5.0.8/vertx-service-proxy-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-api/5.0.8/vertx-codegen-api-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/5.0.8/vertx-core-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core-logging/5.0.8/vertx-core-logging-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.2.10.Final/netty-common-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.2.10.Final/netty-buffer-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.2.10.Final/netty-transport-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.2.10.Final/netty-handler-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.2.10.Final/netty-transport-native-unix-common-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-base/4.2.10.Final/netty-codec-base-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.2.10.Final/netty-handler-proxy-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.2.10.Final/netty-codec-socks-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.2.10.Final/netty-codec-http-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-compression/4.2.10.Final/netty-codec-compression-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.2.10.Final/netty-codec-http2-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.2.10.Final/netty-resolver-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.2.10.Final/netty-resolver-dns-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.2.10.Final/netty-codec-dns-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.18.2/jackson-core-2.18.2.jar" />
         </processorPath>
         <module name="common-vertx.common" />
       </profile>
@@ -828,23 +827,28 @@
           <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.7/javaparser-core-3.25.7.jar" />
           <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-reactive/4.2.3/micronaut-core-reactive-4.2.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/4.5.9/vertx-codegen-4.5.9-processor.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.16.1/jackson-core-2.16.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/4.5.9/vertx-service-proxy-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/4.5.9/vertx-core-4.5.9.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.111.Final/netty-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.111.Final/netty-buffer-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.111.Final/netty-transport-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.111.Final/netty-handler-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.1.111.Final/netty-transport-native-unix-common-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.111.Final/netty-codec-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.1.111.Final/netty-handler-proxy-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.1.111.Final/netty-codec-socks-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.1.111.Final/netty-codec-http-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.1.111.Final/netty-codec-http2-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.111.Final/netty-resolver-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.1.111.Final/netty-resolver-dns-4.1.111.Final.jar" />
-          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.111.Final/netty-codec-dns-4.1.111.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen/5.0.8/vertx-codegen-5.0.8-processor.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-processor/5.0.8/vertx-codegen-processor-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-json/5.0.8/vertx-codegen-json-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-service-proxy/5.0.8/vertx-service-proxy-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-codegen-api/5.0.8/vertx-codegen-api-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core/5.0.8/vertx-core-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/vertx/vertx-core-logging/5.0.8/vertx-core-logging-5.0.8.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-common/4.2.10.Final/netty-common-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.2.10.Final/netty-buffer-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport/4.2.10.Final/netty-transport-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler/4.2.10.Final/netty-handler-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-transport-native-unix-common/4.2.10.Final/netty-transport-native-unix-common-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-base/4.2.10.Final/netty-codec-base-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-handler-proxy/4.2.10.Final/netty-handler-proxy-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-socks/4.2.10.Final/netty-codec-socks-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http/4.2.10.Final/netty-codec-http-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-compression/4.2.10.Final/netty-codec-compression-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-http2/4.2.10.Final/netty-codec-http2-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.2.10.Final/netty-resolver-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-resolver-dns/4.2.10.Final/netty-resolver-dns-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.2.10.Final/netty-codec-dns-4.2.10.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.18.2/jackson-core-2.18.2.jar" />
         </processorPath>
         <module name="common-vertx.common.micronaut" />
       </profile>
@@ -863,6 +867,15 @@
           <entry name="$MAVEN_REPOSITORY$/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar" />
         </processorPath>
         <module name="common-vertx.processor" />
+      </profile>
+      <profile name="Annotation profile for common-security.jwt" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.12.1/value-2.12.1.jar" />
+        </processorPath>
+        <module name="common-security.jwt" />
       </profile>
       <profile name="Annotation profile for DiamondQ Common: Root" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -896,8 +909,10 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="common-security.acme" target="25" />
       <module name="common-security.jcasbin.main" target="17" />
       <module name="common-security.jcasbin.test" target="17" />
+      <module name="common-servers.paxweb.jersey" target="25" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

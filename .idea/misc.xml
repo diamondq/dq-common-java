@@ -11,6 +11,12 @@
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/security/common-security.acme/pom.xml" />
+        <option value="$PROJECT_DIR$/servers/common-servers.paxweb.jersey/pom.xml" />
+      </set>
+    </option>
   </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="org.jspecify.annotations.Nullable" />
