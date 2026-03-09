@@ -14,7 +14,7 @@
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-all</artifactId>
-      <version>2.2.1</version>
+      <version>2.7.0</version>
       <exclusions>
         <exclusion>
           <groupId>javax.inject</groupId>
@@ -25,7 +25,7 @@
     <dependency>
       <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-sshj</artifactId>
-      <version>2.2.1</version>
+      <version>2.7.0</version>
       <exclusions>
         <exclusion>
           <groupId>javax.inject</groupId>
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-log4j</artifactId>
-      <version>2.2.1</version>
+      <version>2.7.0</version>
       <exclusions>
         <exclusion>
           <groupId>javax.inject</groupId>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-scriptbuilder</artifactId>
-      <version>2.2.1</version>
+      <version>2.7.0</version>
       <exclusions>
         <exclusion>
           <groupId>javax.inject</groupId>
