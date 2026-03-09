@@ -58,20 +58,18 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
 
     /* If we've already finished by this point, then call the handler now, since it didn't happen in the read loop */
 
-    if (mIsFinished == true) {
+    if (mIsFinished) {
       Context context = mEndContext;
       Handler<@Nullable Void> endHandler = mEndHandler;
       if ((context != null) && (endHandler != null)) {
-        context.runOnContext((v) -> {
-          endHandler.handle(null);
-        });
+        context.runOnContext((v) -> endHandler.handle(null));
       }
     }
     return this;
   }
 
   private void handleRead() {
-    mVertx.executeBlocking((future) -> {
+    mVertx.executeBlocking(() -> {
         try {
           /* Read some data from the stream */
 
@@ -85,9 +83,7 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
               Handler<@Nullable Void> endHandler = mEndHandler;
               mIsFinished = true;
               if ((context != null) && (endHandler != null)) {
-                context.runOnContext((v) -> {
-                  endHandler.handle(null);
-                });
+                context.runOnContext((v) -> endHandler.handle(null));
               }
             } else {
               Buffer buffer = Buffer.buffer(bytesRead);
@@ -108,9 +104,7 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
             Context context = mExceptionContext;
             Handler<Throwable> exceptionHandler = mExceptionHandler;
             if ((context != null) && (exceptionHandler != null)) {
-              context.runOnContext((v) -> {
-                exceptionHandler.handle(ex);
-              });
+              context.runOnContext((v) -> exceptionHandler.handle(ex));
             }
           }
         }
@@ -118,13 +112,11 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
           Context context = mExceptionContext;
           Handler<Throwable> exceptionHandler = mExceptionHandler;
           if ((context != null) && (exceptionHandler != null)) {
-            context.runOnContext((v) -> {
-              exceptionHandler.handle(ex);
-            });
+            context.runOnContext((v) -> exceptionHandler.handle(ex));
           }
         }
-      }, (ar) -> {
-      }
+        return null;
+      }, true
     );
     mVertx.runOnContext((v) -> {
     });

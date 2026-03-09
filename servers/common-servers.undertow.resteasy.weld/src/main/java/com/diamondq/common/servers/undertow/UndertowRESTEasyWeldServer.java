@@ -5,12 +5,11 @@ import io.undertow.Undertow;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
+import jakarta.ws.rs.core.Application;
 import org.jboss.resteasy.core.ResteasyDeploymentImpl;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jspecify.annotations.Nullable;
-
-import javax.ws.rs.core.Application;
 
 public class UndertowRESTEasyWeldServer extends UndertowServer {
 

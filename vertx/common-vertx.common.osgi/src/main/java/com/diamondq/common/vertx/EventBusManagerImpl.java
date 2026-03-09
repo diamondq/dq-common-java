@@ -217,21 +217,21 @@ public class EventBusManagerImpl implements EventBusManager {
       );
 
       ctx.prepareForAlternateThreads();
-      mVertx.eventBus().<Boolean>request(sendQueue.address, pToSend, options, (ar) -> {
-          try (Context ctx2 = ctx.activateOnThread("after Vertx.send: {}", ar)) {
-            synchronized (sendQueue) {
-              sendQueue.inflight--;
-            }
-            if (ar.succeeded() == false) {
-              Throwable cause = ar.cause();
-              if (cause == null) cause = new RuntimeException();
+      mVertx.eventBus().<Boolean>request(sendQueue.address, pToSend, options).onComplete((ar) -> {
+        try (Context ctx2 = ctx.activateOnThread("after Vertx.send: {}", ar)) {
+          synchronized (sendQueue) {
+            sendQueue.inflight--;
+          }
+          if (ar.succeeded() == false) {
+            Throwable cause = ar.cause();
+            if (cause == null) cause = new RuntimeException();
 //            sendQueue.pendingResults.decrementAndGet();
 //            toProcess.processingComplete.unregister();
 //            toProcess.resultFuture.completeExceptionally(cause);
 //            ctx2.error("Received error for ({}) address {}: {}", messageId, sendQueue.address, cause);
-            }
+          }
 
-            /* At this point, if there are still jobs to process, we can trigger them */
+          /* At this point, if there are still jobs to process, we can trigger them */
 
 //          while ((sendQueue.inflight.get() < sendQueue.maxInflight) && (sendQueue.queueSize.get() > 0)) {
 //            sendOneMessage(sendQueue);
@@ -239,9 +239,8 @@ public class EventBusManagerImpl implements EventBusManager {
 
 //          ctx2.trace("end sendOneMessage -> {} in flight / {} queue size", sendQueue.inflight.get(),
 //            sendQueue.queueSize.get());
-          }
         }
-      );
+      });
       return null;
     }
 

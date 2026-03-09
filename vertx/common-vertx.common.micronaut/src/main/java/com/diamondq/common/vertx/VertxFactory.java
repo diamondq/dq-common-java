@@ -10,8 +10,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.EventBusOptions;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.core.logging.SLF4JLogDelegateFactory;
 import jakarta.inject.Singleton;
 
 import java.lang.reflect.Method;
@@ -29,7 +27,6 @@ public class VertxFactory {
   public @Singleton Vertx getVertx(@Value("${vertx.blockedthreadcheckinternal:}") String pBlockedThreadCheckInterval,
     @Value("${vertx.blockedthreadcheckinternalunit:}") String pBlockedThreadCheckIntervalUnit,
     List<MessageCodecWrapper<Object, Object>> pCodecs) {
-    System.setProperty(LoggerFactory.LOGGER_DELEGATE_FACTORY_CLASS_NAME, SLF4JLogDelegateFactory.class.getName());
 
     /* Assign the Vertx future as the primary future */
 

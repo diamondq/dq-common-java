@@ -7,13 +7,13 @@ import com.diamondq.common.context.ContextExtendedCompletionStage;
 import com.diamondq.common.context.ContextFactory;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
-import com.diamondq.common.lambda.interfaces.Consumer2;
-import com.diamondq.common.lambda.interfaces.Consumer3;
-import com.diamondq.common.lambda.interfaces.Consumer4;
 import com.diamondq.common.lambda.interfaces.Function2;
 import com.diamondq.common.lambda.interfaces.Function3;
 import com.diamondq.common.lambda.interfaces.Function4;
+import com.diamondq.common.lambda.interfaces.Supplier;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Deployable;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
@@ -87,7 +87,7 @@ public class VertxUtils {
 
           /* Deploy the verticle */
 
-          VertxUtils.<Verticle, String>call(pVertx::deployVerticle, pVerticle)
+          VertxUtils.<Deployable, String>call(pVertx::deployVerticle, pVerticle)
 
             /* And record the deployment id for future undeployment */
 
@@ -312,73 +312,29 @@ public class VertxUtils {
 
   /* **************************************** VERTX CALL ************************************************** */
 
-  public static <R> ContextExtendedCompletionStage<R> call(Consumer<Handler<AsyncResult<R>>> pCallee) {
+  public static <R> ContextExtendedCompletionStage<R> call(Supplier<Future<R>> pCallee) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
-    pCallee.accept((ar) -> {
-      if (ar.succeeded() == false) {
-        Throwable cause = ar.cause();
-        if (cause == null) cause = new RuntimeException();
-        future.completeExceptionally(cause);
-      } else {
-        R result = ar.result();
-        if (result == null) future.completeExceptionally(new IllegalArgumentException());
-        else future.complete(result);
-      }
-    });
+    pCallee.get().onComplete(future::complete, future::completeExceptionally);
     return future;
   }
 
-  public static <A1, R> ContextExtendedCompletionStage<R> call(Consumer2<A1, Handler<AsyncResult<R>>> pCallee,
-    A1 pArg1) {
+  public static <A1, R> ContextExtendedCompletionStage<R> call(Function<A1, Future<R>> pCallee, A1 pArg1) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
-    pCallee.accept(pArg1, (ar) -> {
-        if (ar.succeeded() == false) {
-          Throwable cause = ar.cause();
-          if (cause == null) cause = new RuntimeException();
-          future.completeExceptionally(cause);
-        } else {
-          R result = ar.result();
-          if (result == null) future.completeExceptionally(new IllegalArgumentException());
-          else future.complete(result);
-        }
-      }
-    );
+    pCallee.apply(pArg1).onComplete(future::complete, future::completeExceptionally);
     return future;
   }
 
-  public static <A1, A2, R> ContextExtendedCompletionStage<R> call(Consumer3<A1, A2, Handler<AsyncResult<R>>> pCallee,
-    A1 pArg1, A2 pArg2) {
+  public static <A1, A2, R> ContextExtendedCompletionStage<R> call(Function2<A1, A2, Future<R>> pCallee, A1 pArg1,
+    A2 pArg2) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
-    pCallee.accept(pArg1, pArg2, (ar) -> {
-        if (ar.succeeded() == false) {
-          Throwable cause = ar.cause();
-          if (cause == null) cause = new RuntimeException();
-          future.completeExceptionally(cause);
-        } else {
-          R result = ar.result();
-          if (result == null) future.completeExceptionally(new IllegalArgumentException());
-          else future.complete(result);
-        }
-      }
-    );
+    pCallee.apply(pArg1, pArg2).onComplete(future::complete, future::completeExceptionally);
     return future;
   }
 
-  public static <A1, A2, A3, R> ContextExtendedCompletionStage<R> call(
-    Consumer4<A1, A2, A3, Handler<AsyncResult<R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
+  public static <A1, A2, A3, R> ContextExtendedCompletionStage<R> call(Function3<A1, A2, A3, Future<R>> pCallee,
+    A1 pArg1, A2 pArg2, A3 pArg3) {
     ContextExtendedCompletableFuture<R> future = FutureUtils.newCompletableFuture();
-    pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
-        if (ar.succeeded() == false) {
-          Throwable cause = ar.cause();
-          if (cause == null) cause = new RuntimeException();
-          future.completeExceptionally(cause);
-        } else {
-          R result = ar.result();
-          if (result == null) future.completeExceptionally(new IllegalArgumentException());
-          else future.complete(result);
-        }
-      }
-    );
+    pCallee.apply(pArg1, pArg2, pArg3).onComplete(future::complete, future::completeExceptionally);
     return future;
   }
 
@@ -470,53 +426,23 @@ public class VertxUtils {
   }
 
   public static <A1, R> ContextExtendedCompletionStage<@Nullable R> callReturnsNullable(
-    Consumer2<A1, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1) {
+    Function<A1, Future<@Nullable R>> pCallee, A1 pArg1) {
     ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
-    pCallee.accept(pArg1, (ar) -> {
-        if (ar.succeeded() == false) {
-          Throwable cause = ar.cause();
-          if (cause == null) cause = new RuntimeException();
-          future.completeExceptionally(cause);
-        } else {
-          R result = ar.result();
-          future.complete(result);
-        }
-      }
-    );
+    pCallee.apply(pArg1).onComplete(future::complete, future::completeExceptionally);
     return future;
   }
 
   public static <A1, A2, R> ContextExtendedCompletionStage<@Nullable R> callReturnsNullable(
-    Consumer3<A1, A2, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2) {
+    Function2<A1, A2, Future<@Nullable R>> pCallee, A1 pArg1, A2 pArg2) {
     ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
-    pCallee.accept(pArg1, pArg2, (ar) -> {
-        if (ar.succeeded() == false) {
-          Throwable cause = ar.cause();
-          if (cause == null) cause = new RuntimeException();
-          future.completeExceptionally(cause);
-        } else {
-          R result = ar.result();
-          future.complete(result);
-        }
-      }
-    );
+    pCallee.apply(pArg1, pArg2).onComplete(future::complete, future::completeExceptionally);
     return future;
   }
 
   public static <A1, A2, A3, R> ContextExtendedCompletionStage<@Nullable R> callReturnsNullable(
-    Consumer4<A1, A2, A3, Handler<AsyncResult<@Nullable R>>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
+    Function3<A1, A2, A3, Future<@Nullable R>> pCallee, A1 pArg1, A2 pArg2, A3 pArg3) {
     ContextExtendedCompletableFuture<@Nullable R> future = FutureUtils.newCompletableFuture();
-    pCallee.accept(pArg1, pArg2, pArg3, (ar) -> {
-        if (ar.succeeded() == false) {
-          Throwable cause = ar.cause();
-          if (cause == null) cause = new RuntimeException();
-          future.completeExceptionally(cause);
-        } else {
-          R result = ar.result();
-          future.complete(result);
-        }
-      }
-    );
+    pCallee.apply(pArg1, pArg2, pArg3).onComplete(future::complete, future::completeExceptionally);
     return future;
   }
 

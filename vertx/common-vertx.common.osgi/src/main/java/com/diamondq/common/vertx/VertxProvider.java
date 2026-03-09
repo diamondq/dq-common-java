@@ -8,8 +8,6 @@ import com.diamondq.common.lambda.future.FutureUtils;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBusOptions;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.core.logging.SLF4JLogDelegateFactory;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
@@ -44,7 +42,6 @@ public class VertxProvider extends AbstractOSGiConstructor {
   }
 
   public Vertx create(@Nullable String pBlockedThreadCheckInterval, @Nullable String pBlockedThreadCheckIntervalUnit) {
-    System.setProperty(LoggerFactory.LOGGER_DELEGATE_FACTORY_CLASS_NAME, SLF4JLogDelegateFactory.class.getName());
 
     /* Assign the Vertx future as the primary future */
 

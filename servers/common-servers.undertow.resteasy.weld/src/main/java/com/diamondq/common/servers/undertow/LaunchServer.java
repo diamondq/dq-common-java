@@ -3,9 +3,8 @@ package com.diamondq.common.servers.undertow;
 import com.diamondq.common.config.Config;
 import com.diamondq.common.config.core.std.StandardBootstrap;
 import jakarta.enterprise.inject.spi.CDI;
+import jakarta.ws.rs.core.Application;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import javax.ws.rs.core.Application;
 
 public class LaunchServer {
 
