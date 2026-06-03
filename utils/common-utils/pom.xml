@@ -18,6 +18,7 @@
     <osgi.osgi.directory>${project.build.outputDirectory}</osgi.osgi.directory>
     <osgi.export.scr>true</osgi.export.scr>
     <osgi.base.package>com.diamondq.common</osgi.base.package>
+    <osgi.dont.export.i18n />
   </properties>
   <dependencies>
     <dependency>
