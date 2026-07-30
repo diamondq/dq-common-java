@@ -96,14 +96,14 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
     return new ContextExtendedCompletableFuture<>(pFuture);
   }
 
-  public static ContextExtendedCompletableFuture<@Nullable Void> allOf(ExtendedCompletionStage<?>... cfs) {
-    final CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
+  public static ContextExtendedCompletableFuture<Void> allOf(ExtendedCompletionStage<?>... cfs) {
+    final CompletableFuture<? extends @Nullable Object>[] args = new CompletableFuture<?>[cfs.length];
     for (int i = 0; i < cfs.length; i++)
       args[i] = decomposeToCompletableFuture(cfs[i]);
     return new ContextExtendedCompletableFuture<>(CompletableFuture.allOf(args));
   }
 
-  public static ContextExtendedCompletableFuture<@Nullable Void> allOfCollection(
+  public static ContextExtendedCompletableFuture<Void> allOfCollection(
     Collection<? extends ExtendedCompletionStage<?>> cfs) {
     final int size = cfs.size();
     final CompletableFuture<?>[] args = new CompletableFuture<?>[size];
@@ -116,14 +116,13 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
   }
 
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(
-    Collection<? extends ExtendedCompletionStage<?>> pCfs) {
-    return (ContextExtendedCompletionStage<@Nullable Void>) super.relatedAllOf(pCfs);
+  public ContextExtendedCompletionStage<Void> relatedAllOf(Collection<? extends ExtendedCompletionStage<?>> pCfs) {
+    return (ContextExtendedCompletionStage<Void>) super.relatedAllOf(pCfs);
   }
 
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(ExtendedCompletionStage<?>... pCfs) {
-    return (ContextExtendedCompletionStage<@Nullable Void>) super.relatedAllOf(pCfs);
+  public ContextExtendedCompletionStage<Void> relatedAllOf(ExtendedCompletionStage<?>... pCfs) {
+    return (ContextExtendedCompletionStage<Void>) super.relatedAllOf(pCfs);
   }
 
   @Override
@@ -247,11 +246,11 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer1<T> pAction) {
+  public ContextExtendedCompletableFuture<Void> thenAccept(Consumer1<T> pAction) {
     final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     final Holder<Boolean> isComplete = new Holder<>(false);
-    return ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAccept((t) -> {
+    return ((ContextExtendedCompletableFuture<Void>) super.thenAccept((t) -> {
       isComplete.object = true;
       try (Context ctx = currentContext.activateOnThread("")) {
         pAction.accept(t);
@@ -263,11 +262,11 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    * @see com.diamondq.common.context.ContextExtendedCompletionStage#thenAccept(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<T, Context> pAction) {
+  public ContextExtendedCompletionStage<Void> thenAccept(Consumer2<T, Context> pAction) {
     final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     final Holder<Boolean> isComplete = new Holder<>(false);
-    return ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAccept((t) -> {
+    return ((ContextExtendedCompletableFuture<Void>) super.thenAccept((t) -> {
       isComplete.object = true;
       try (Context ctx = currentContext.activateOnThread("")) {
         pAction.accept(t, ctx);
@@ -279,11 +278,11 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction) {
+  public ContextExtendedCompletableFuture<Void> thenAcceptAsync(Consumer1<T> pAction) {
     final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     final Holder<Boolean> isComplete = new Holder<>(false);
-    return ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAcceptAsync((t) -> {
+    return ((ContextExtendedCompletableFuture<Void>) super.thenAcceptAsync((t) -> {
       isComplete.object = true;
       try (Context ctx = currentContext.activateOnThread("")) {
         pAction.accept(t);
@@ -295,11 +294,11 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    * @see com.diamondq.common.context.ContextExtendedCompletionStage#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction) {
+  public ContextExtendedCompletionStage<Void> thenAcceptAsync(Consumer2<T, Context> pAction) {
     final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     final Holder<Boolean> isComplete = new Holder<>(false);
-    return ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAcceptAsync((t) -> {
+    return ((ContextExtendedCompletableFuture<Void>) super.thenAcceptAsync((t) -> {
       isComplete.object = true;
       try (Context ctx = currentContext.activateOnThread("")) {
         pAction.accept(t, ctx);
@@ -312,11 +311,11 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    *   java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor) {
+  public ContextExtendedCompletableFuture<Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor) {
     final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     final Holder<Boolean> isComplete = new Holder<>(false);
-    return ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAcceptAsync((t) -> {
+    return ((ContextExtendedCompletableFuture<Void>) super.thenAcceptAsync((t) -> {
         isComplete.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
           pAction.accept(t);
@@ -330,12 +329,11 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    *   java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction,
-    Executor pExecutor) {
+  public ContextExtendedCompletionStage<Void> thenAcceptAsync(Consumer2<T, Context> pAction, Executor pExecutor) {
     final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     final Holder<Boolean> completeHolder = new Holder<>(false);
-    return ((ContextExtendedCompletableFuture<@Nullable Void>) super.thenAcceptAsync((t) -> {
+    return ((ContextExtendedCompletableFuture<Void>) super.thenAcceptAsync((t) -> {
         completeHolder.object = true;
         try (Context ctx = currentContext.activateOnThread("")) {
           pAction.accept(t, ctx);
@@ -1125,10 +1123,10 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#relatedRunAsync(java.lang.Runnable)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Runnable pRunnable) {
+  public ContextExtendedCompletableFuture<Void> relatedRunAsync(Runnable pRunnable) {
     @SuppressWarnings("resource") final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    return (ContextExtendedCompletableFuture<@Nullable Void>) super.relatedRunAsync(() -> {
+    return (ContextExtendedCompletableFuture<Void>) super.relatedRunAsync(() -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         pRunnable.run();
       }
@@ -1139,10 +1137,10 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    * @see com.diamondq.common.context.ContextExtendedCompletionStage#relatedRunAsync(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Consumer1<Context> pRunnable) {
+  public ContextExtendedCompletableFuture<Void> relatedRunAsync(Consumer1<Context> pRunnable) {
     @SuppressWarnings("resource") final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    return (ContextExtendedCompletableFuture<@Nullable Void>) super.relatedRunAsync(() -> {
+    return (ContextExtendedCompletableFuture<Void>) super.relatedRunAsync(() -> {
       try (Context ctx = currentContext.activateOnThread("")) {
         pRunnable.accept(ctx);
       }
@@ -1154,10 +1152,10 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    *   java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor) {
+  public ContextExtendedCompletableFuture<Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor) {
     @SuppressWarnings("resource") final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    return (ContextExtendedCompletableFuture<@Nullable Void>) super.relatedRunAsync(() -> {
+    return (ContextExtendedCompletableFuture<Void>) super.relatedRunAsync(() -> {
         try (Context ctx = currentContext.activateOnThread("")) {
           pRunnable.run();
         }
@@ -1170,11 +1168,10 @@ public class ContextExtendedCompletableFuture<T extends @Nullable Object> extend
    *   java.util.concurrent.Executor)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Consumer1<Context> pRunnable,
-    Executor pExecutor) {
+  public ContextExtendedCompletableFuture<Void> relatedRunAsync(Consumer1<Context> pRunnable, Executor pExecutor) {
     @SuppressWarnings("resource") final Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
-    return (ContextExtendedCompletableFuture<@Nullable Void>) super.relatedRunAsync(() -> {
+    return (ContextExtendedCompletableFuture<Void>) super.relatedRunAsync(() -> {
         try (Context ctx = currentContext.activateOnThread("")) {
           pRunnable.accept(ctx);
         }

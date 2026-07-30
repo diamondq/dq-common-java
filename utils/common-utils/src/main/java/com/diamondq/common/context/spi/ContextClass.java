@@ -1,6 +1,7 @@
 package com.diamondq.common.context.spi;
 
 import com.diamondq.common.context.Context;
+import com.diamondq.common.errors.DQRuntimeException;
 import com.diamondq.common.errors.I18NStringAndException;
 import com.diamondq.common.i18n.I18NString;
 import org.jspecify.annotations.Nullable;
@@ -191,7 +192,7 @@ public class ContextClass implements Context {
 
   /**
    * Returns the stack method that 'created' the Context. This is a cached value, but it must be called at least once
-   * during the creation handling, otherwise, the method name won't be correct. <br/> <br/> NOTE: The method name is
+   * during the creation handling; otherwise, the method name won't be correct. <br/> <br/> NOTE: The method name is
    * determined by walking the stack until passing out of the ContextFactoryImpl.
    *
    * @return the stack method
@@ -240,7 +241,7 @@ public class ContextClass implements Context {
    * @see com.diamondq.common.context.Context#exit(java.lang.Object)
    */
   @Override
-  public <T extends @Nullable Object> T exit(T pResult) {
+  public <T extends @Nullable Object> T exit(@Nullable T pResult) {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.exit() called on an already closed Context", null);
     //noinspection DataFlowIssue
@@ -251,7 +252,8 @@ public class ContextClass implements Context {
    * @see com.diamondq.common.context.Context#exit(java.lang.Object, java.util.function.Function)
    */
   @Override
-  public <T extends @Nullable Object> T exit(T pResult, @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
+  public <T extends @Nullable Object> T exit(@Nullable T pResult,
+    @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.exit() called on an already closed Context", null);
     //noinspection DataFlowIssue
@@ -415,7 +417,7 @@ public class ContextClass implements Context {
    * @see com.diamondq.common.context.Context#reportThrowable(java.lang.Throwable)
    */
   @Override
-  public RuntimeException reportThrowable(Throwable pThrowable) {
+  public DQRuntimeException reportThrowable(Throwable pThrowable) {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.reportThrowable() called on an already closed Context", null);
     return mFactory.internalReportThrowable(this, pThrowable);

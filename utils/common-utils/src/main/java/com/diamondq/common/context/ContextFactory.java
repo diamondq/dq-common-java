@@ -2,6 +2,7 @@ package com.diamondq.common.context;
 
 import com.diamondq.common.context.impl.ContextFactoryImpl;
 import com.diamondq.common.context.spi.ContextClass;
+import com.diamondq.common.errors.DQRuntimeException;
 import com.diamondq.common.lambda.future.ExtendedCompletionStage;
 import com.diamondq.common.lambda.future.FutureUtils;
 import org.jspecify.annotations.Nullable;
@@ -56,15 +57,15 @@ public interface ContextFactory {
     getInstance().reportTrace(pClass, pThis, pMessage, pArgs);
   }
 
-  static RuntimeException staticReportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
+  static DQRuntimeException staticReportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
     return getInstance().reportThrowable(pClass, pThis, pThrowable);
   }
 
   /**
    * This represents the ENTRY of a context. It MUST be matched with a corresponding EXIT (even under Exceptions). This
-   * differs from entry in that each argument must be followed with a @Nullable Function<@Nullable Object, @Nullable
+   * differs from the entry in that each argument must be followed with a @Nullable Function<@Nullable Object, @Nullable
    * Object> that is called to convert the argument into what is displayed. Usually the Function constants provided by
-   * ContextPrinters are used. For example newContextWithMeta(myClass, this, byteArray, ContextPrinters.sBytesType,
+   * ContextPrinters are used. For example, newContextWithMeta(myClass, this, byteArray, ContextPrinters.sBytesType,
    * hashData, ContextPrinters.sHashType). Provide a null function if conversion isn't necessary. NOTE: The last value
    * in pArgs can be an Exception in which case it doesn't have a corresponding conversion.
    *
@@ -97,22 +98,21 @@ public interface ContextFactory {
    *
    * @return the context
    */
-  @Nullable
-  Context getNullableCurrentContext();
+  @Nullable Context getNullableCurrentContext();
 
   /**
-   * Report an exception outside a context. It will automatically create a context, report the exception and then end
+   * Report an exception outside a context. It will automatically create a context, report the exception, and then end
    * the context.
    *
    * @param pClass the class
    * @param pThis the caller object
    * @param pThrowable the exception
-   * @return a RuntimeException that can be immediately thrown
+   * @return a Runtime Exception that can be immediately thrown
    */
-  RuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable);
+  DQRuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable);
 
   /**
-   * Report an exception outside a context. It will automatically create a context, report the exception and then end
+   * Report an exception outside a context. It will automatically create a context, report the exception, and then end
    * the context.
    *
    * @param pClass the class
@@ -122,7 +122,7 @@ public interface ContextFactory {
   void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs);
 
   /**
-   * Report an exception outside a context. It will automatically create a context, report the exception and then end
+   * Report an exception outside a context. It will automatically create a context, report the exception, and then end
    * the context.
    *
    * @param pClass the class
@@ -133,7 +133,7 @@ public interface ContextFactory {
   void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
-   * Report a debug outside a context. It will automatically create a context, report the debug and then end the
+   * Report a debug outside a context. It will automatically create a context, report the debug, and then end the
    * context.
    *
    * @param pClass the class
@@ -144,7 +144,7 @@ public interface ContextFactory {
   void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
-   * Report an info outside a context. It will automatically create a context, report the info and then end the
+   * Report an info message outside a context. It will automatically create a context, report the info, and then end the
    * context.
    *
    * @param pClass the class
@@ -167,7 +167,7 @@ public interface ContextFactory {
 
   /**
    * Register a new context propagator used to retrieve the Context stack for a given thread. NOTE: This registration is
-   * stored globally, and is used for all Context Factories.
+   * stored globally and is used for all Context Factories.
    *
    * @param pPropagator the supplier that returns the current thread's Context Class Stack.
    */

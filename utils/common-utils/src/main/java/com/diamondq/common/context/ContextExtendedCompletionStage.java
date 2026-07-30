@@ -40,19 +40,19 @@ public interface ContextExtendedCompletionStage<T extends @Nullable Object> exte
   /* ********** ACCEPT ********** */
 
   @Override
-  ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer1<T> pAction);
+  ContextExtendedCompletionStage<Void> thenAccept(Consumer1<T> pAction);
 
-  ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<T, Context> pAction);
-
-  @Override
-  ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction);
-
-  ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction);
+  ContextExtendedCompletionStage<Void> thenAccept(Consumer2<T, Context> pAction);
 
   @Override
-  ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor);
+  ContextExtendedCompletionStage<Void> thenAcceptAsync(Consumer1<T> pAction);
 
-  ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction, Executor pExecutor);
+  ContextExtendedCompletionStage<Void> thenAcceptAsync(Consumer2<T, Context> pAction);
+
+  @Override
+  ContextExtendedCompletionStage<Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor);
+
+  ContextExtendedCompletionStage<Void> thenAcceptAsync(Consumer2<T, Context> pAction, Executor pExecutor);
 
   /* ********** COMBINE ********** */
 
@@ -178,14 +178,14 @@ public interface ContextExtendedCompletionStage<T extends @Nullable Object> exte
   /* ********** RUNASYNC ********** */
 
   @Override
-  ContextExtendedCompletionStage<@Nullable Void> relatedRunAsync(Runnable pRunnable);
+  ContextExtendedCompletionStage<Void> relatedRunAsync(Runnable pRunnable);
 
-  ContextExtendedCompletionStage<@Nullable Void> relatedRunAsync(Consumer1<Context> pRunnable);
+  ContextExtendedCompletionStage<Void> relatedRunAsync(Consumer1<Context> pRunnable);
 
   @Override
-  ContextExtendedCompletionStage<@Nullable Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor);
+  ContextExtendedCompletionStage<Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor);
 
-  ContextExtendedCompletionStage<@Nullable Void> relatedRunAsync(Consumer1<Context> pRunnable, Executor pExecutor);
+  ContextExtendedCompletionStage<Void> relatedRunAsync(Consumer1<Context> pRunnable, Executor pExecutor);
 
   /* ********** SPLIT ********** */
 
@@ -213,10 +213,10 @@ public interface ContextExtendedCompletionStage<T extends @Nullable Object> exte
   <U extends @Nullable Object> ContextExtendedCompletionStage<U> relatedOf(CompletionStage<U> pFuture);
 
   @Override
-  ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(Collection<? extends ExtendedCompletionStage<?>> pCfs);
+  ContextExtendedCompletionStage<Void> relatedAllOf(Collection<? extends ExtendedCompletionStage<?>> pCfs);
 
   @Override
-  ContextExtendedCompletionStage<@Nullable Void> relatedAllOf(ExtendedCompletionStage<?>... pCfs);
+  ContextExtendedCompletionStage<Void> relatedAllOf(ExtendedCompletionStage<?>... pCfs);
 
   @Override
   ContextExtendedCompletionStage<@Nullable Object> relatedAnyOf(ExtendedCompletionStage<?>... pCfs);

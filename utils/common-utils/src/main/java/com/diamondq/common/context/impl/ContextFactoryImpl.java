@@ -6,6 +6,7 @@ import com.diamondq.common.context.impl.logging.LoggingContextHandler;
 import com.diamondq.common.context.spi.ContextClass;
 import com.diamondq.common.context.spi.ContextHandler;
 import com.diamondq.common.context.spi.SPIContextFactory;
+import com.diamondq.common.errors.DQRuntimeException;
 import io.micronaut.context.annotation.Secondary;
 import jakarta.annotation.PostConstruct;
 import org.jspecify.annotations.Nullable;
@@ -272,7 +273,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
    *   java.lang.Throwable)
    */
   @Override
-  public RuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
+  public DQRuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
@@ -497,12 +498,11 @@ public class ContextFactoryImpl implements SPIContextFactory {
   }
 
   @Override
-  public RuntimeException internalReportThrowable(ContextClass pContext, Throwable pThrowable) {
+  public DQRuntimeException internalReportThrowable(ContextClass pContext, Throwable pThrowable) {
     for (ContextHandler handler : mHandlers) {
       handler.executeOnContextExplicitThrowable(pContext, pThrowable);
     }
-    if (pThrowable instanceof RuntimeException) return (RuntimeException) pThrowable;
-    return new RuntimeException(pThrowable);
+    return new DQRuntimeException(pThrowable);
   }
 
 }

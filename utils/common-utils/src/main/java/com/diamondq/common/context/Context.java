@@ -1,5 +1,6 @@
 package com.diamondq.common.context;
 
+import com.diamondq.common.errors.DQRuntimeException;
 import com.diamondq.common.errors.I18NStringAndException;
 import org.jspecify.annotations.Nullable;
 
@@ -101,7 +102,7 @@ public interface Context extends AutoCloseable {
    * @param pThrowable the throwable
    * @return the throwable as a RuntimeException
    */
-  RuntimeException reportThrowable(Throwable pThrowable);
+  DQRuntimeException reportThrowable(Throwable pThrowable);
 
   /**
    * @see java.lang.AutoCloseable#close()
@@ -129,7 +130,7 @@ public interface Context extends AutoCloseable {
   <T extends @Nullable Object> @Nullable T getData(String pKey, boolean pSearchParents, Class<T> pDataClass);
 
   /**
-   * Allows a context to be used in an alternate thread. This call increases the 'open' count, so that an additional
+   * Allows a context to be used in an alternate thread. This call increases the 'open' count so that an additional
    * close is necessary to actually close the context.
    */
   void prepareForAlternateThreads();
