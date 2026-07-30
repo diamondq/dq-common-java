@@ -60,8 +60,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(Scope pScope,
-    StructureDefinition pValue) {
+  public ContextExtendedCompletionStage<Void> deleteStructureDefinition(Scope pScope, StructureDefinition pValue) {
     return mAsyncToolkit.deleteStructureDefinition(dewrapScope(pScope), pValue);
   }
 
@@ -138,7 +137,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
   }
 
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> writeStructure(Scope pScope, Structure pStructure) {
+  public ContextExtendedCompletionStage<Void> writeStructure(Scope pScope, Structure pStructure) {
     return mAsyncToolkit.writeStructure(dewrapScope(pScope), pStructure);
   }
 
@@ -243,8 +242,7 @@ public class WrappedAsyncToolkit implements AsyncToolkit {
    *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope,
-    StructureDefinition pStructureDef) {
+  public ContextExtendedCompletionStage<Void> clearStructures(Scope pScope, StructureDefinition pStructureDef) {
     return mAsyncToolkit.clearStructures(dewrapScope(pScope), pStructureDef);
   }
 

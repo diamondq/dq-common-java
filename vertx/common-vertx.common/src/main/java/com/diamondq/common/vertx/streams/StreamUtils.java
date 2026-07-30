@@ -23,10 +23,10 @@ public class StreamUtils {
    * @param pConsumer the consumer
    * @return the result
    */
-  public static <T> ContextExtendedCompletionStage<@Nullable Void> processStream(ReadStream<T> pStream,
+  public static <T> ContextExtendedCompletionStage<Void> processStream(ReadStream<T> pStream,
     Consumer3<T, Context, BackPressure> pConsumer) {
 
-    ContextExtendedCompletableFuture<@Nullable Void> result = FutureUtils.newCompletableFuture();
+    ContextExtendedCompletableFuture<Void> result = FutureUtils.newCompletableFuture();
 
     /* Get the context for usage within the consumer */
 

@@ -54,7 +54,7 @@ public class ContextTest {
   public void test() throws InterruptedException, ExecutionException {
     ContextFactory contextFactory = mContext.getService(ContextFactory.class);
     assertNotNull(contextFactory);
-    ExtendedCompletableFuture<@Nullable Void> f;
+    ExtendedCompletableFuture<Void> f;
     try (Context ctx = contextFactory.newContext(ContextTest.class, this)) {
       // ContextClass ctxClass = (ContextClass) ctx;
 

@@ -45,17 +45,17 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
 
   <U extends @Nullable Object> ExtendedCompletionStage<U> thenApplyAsync(Function1<T, U> fn, Executor executor);
 
-  ExtendedCompletionStage<@Nullable Void> thenAccept(Consumer1<T> action);
+  ExtendedCompletionStage<Void> thenAccept(Consumer1<T> action);
 
-  ExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer1<T> action);
+  ExtendedCompletionStage<Void> thenAcceptAsync(Consumer1<T> action);
 
-  ExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer1<T> action, Executor executor);
+  ExtendedCompletionStage<Void> thenAcceptAsync(Consumer1<T> action, Executor executor);
 
-  ExtendedCompletionStage<@Nullable Void> thenRun(Runnable action);
+  ExtendedCompletionStage<Void> thenRun(Runnable action);
 
-  ExtendedCompletionStage<@Nullable Void> thenRunAsync(Runnable action);
+  ExtendedCompletionStage<Void> thenRunAsync(Runnable action);
 
-  ExtendedCompletionStage<@Nullable Void> thenRunAsync(Runnable action, Executor executor);
+  ExtendedCompletionStage<Void> thenRunAsync(Runnable action, Executor executor);
 
   <U extends @Nullable Object, V extends @Nullable Object> ExtendedCompletionStage<V> thenCombine(
     ExtendedCompletionStage<U> other, Function2<T, U, V> fn);
@@ -66,21 +66,20 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
   <U extends @Nullable Object, V extends @Nullable Object> ExtendedCompletionStage<V> thenCombineAsync(
     ExtendedCompletionStage<U> other, Function2<T, U, V> fn, Executor executor);
 
-  <U extends @Nullable Object> ExtendedCompletionStage<@Nullable Void> thenAcceptBoth(ExtendedCompletionStage<U> other,
+  <U extends @Nullable Object> ExtendedCompletionStage<Void> thenAcceptBoth(ExtendedCompletionStage<U> other,
     Consumer2<T, U> action);
 
-  <U extends @Nullable Object> ExtendedCompletionStage<@Nullable Void> thenAcceptBothAsync(
-    ExtendedCompletionStage<U> other, Consumer2<T, U> action);
+  <U extends @Nullable Object> ExtendedCompletionStage<Void> thenAcceptBothAsync(ExtendedCompletionStage<U> other,
+    Consumer2<T, U> action);
 
-  <U extends @Nullable Object> ExtendedCompletionStage<@Nullable Void> thenAcceptBothAsync(
-    ExtendedCompletionStage<U> other, Consumer2<T, U> action, Executor executor);
+  <U extends @Nullable Object> ExtendedCompletionStage<Void> thenAcceptBothAsync(ExtendedCompletionStage<U> other,
+    Consumer2<T, U> action, Executor executor);
 
-  ExtendedCompletionStage<@Nullable Void> runAfterBoth(ExtendedCompletionStage<?> other, Runnable action);
+  ExtendedCompletionStage<Void> runAfterBoth(ExtendedCompletionStage<?> other, Runnable action);
 
-  ExtendedCompletionStage<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> other, Runnable action);
+  ExtendedCompletionStage<Void> runAfterBothAsync(ExtendedCompletionStage<?> other, Runnable action);
 
-  ExtendedCompletionStage<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> other, Runnable action,
-    Executor executor);
+  ExtendedCompletionStage<Void> runAfterBothAsync(ExtendedCompletionStage<?> other, Runnable action, Executor executor);
 
   <U extends @Nullable Object> ExtendedCompletionStage<U> applyToEither(ExtendedCompletionStage<T> other,
     Function1<T, U> fn);
@@ -91,18 +90,18 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
   <U extends @Nullable Object> ExtendedCompletionStage<U> applyToEitherAsync(ExtendedCompletionStage<T> other,
     Function1<T, U> fn, Executor executor);
 
-  ExtendedCompletionStage<@Nullable Void> acceptEither(ExtendedCompletionStage<T> other, Consumer1<T> action);
+  ExtendedCompletionStage<Void> acceptEither(ExtendedCompletionStage<T> other, Consumer1<T> action);
 
-  ExtendedCompletionStage<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> other, Consumer1<T> action);
+  ExtendedCompletionStage<Void> acceptEitherAsync(ExtendedCompletionStage<T> other, Consumer1<T> action);
 
-  ExtendedCompletionStage<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> other, Consumer1<T> action,
+  ExtendedCompletionStage<Void> acceptEitherAsync(ExtendedCompletionStage<T> other, Consumer1<T> action,
     Executor executor);
 
-  ExtendedCompletionStage<@Nullable Void> runAfterEither(ExtendedCompletionStage<?> other, Runnable action);
+  ExtendedCompletionStage<Void> runAfterEither(ExtendedCompletionStage<?> other, Runnable action);
 
-  ExtendedCompletionStage<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> other, Runnable action);
+  ExtendedCompletionStage<Void> runAfterEitherAsync(ExtendedCompletionStage<?> other, Runnable action);
 
-  ExtendedCompletionStage<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> other, Runnable action,
+  ExtendedCompletionStage<Void> runAfterEitherAsync(ExtendedCompletionStage<?> other, Runnable action,
     Executor executor);
 
   <U extends @Nullable Object> ExtendedCompletionStage<U> thenCompose(Function1<T, ExtendedCompletionStage<U>> fn);
@@ -191,10 +190,10 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
    * @param runnable the action to run before completing the returned CompletableFuture
    * @return the new CompletableFuture
    */
-  static ExtendedCompletionStage<@Nullable Void> runAsync(Runnable runnable) {
+  static ExtendedCompletionStage<Void> runAsync(Runnable runnable) {
     CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(runnable);
     try {
-      ExtendedCompletionStage<@Nullable Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab));
+      ExtendedCompletionStage<Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab));
       ab = null;
       return result;
     }
@@ -210,7 +209,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
    * @param runnable the action to run before completing the returned CompletableFuture
    * @return the new CompletableFuture
    */
-  ExtendedCompletionStage<@Nullable Void> relatedRunAsync(Runnable runnable);
+  ExtendedCompletionStage<Void> relatedRunAsync(Runnable runnable);
 
   /**
    * Returns a new CompletableFuture that is asynchronously completed by a task running in the given executor after it
@@ -220,12 +219,10 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
    * @param executor the executor to use for asynchronous execution
    * @return the new CompletableFuture
    */
-  static ExtendedCompletionStage<@Nullable Void> runAsync(Runnable runnable, Executor executor) {
+  static ExtendedCompletionStage<Void> runAsync(Runnable runnable, Executor executor) {
     CancelableRunnable ab = ExtendedCompletableFuture.wrapRunnable(runnable);
     try {
-      ExtendedCompletionStage<@Nullable Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab,
-        executor
-      ));
+      ExtendedCompletionStage<Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab, executor));
       ab = null;
       return result;
     }
@@ -242,7 +239,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
    * @param executor the executor to use for asynchronous execution
    * @return the new CompletableFuture
    */
-  ExtendedCompletionStage<@Nullable Void> relatedRunAsync(Runnable runnable, Executor executor);
+  ExtendedCompletionStage<Void> relatedRunAsync(Runnable runnable, Executor executor);
 
   //
   // /**
@@ -827,7 +824,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
 
     /* Get the iterable */
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V>, @Nullable Iterator<U>> pStartPreFunction = (loopState) -> {
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, V>, @Nullable Iterator<U>> pStartPreFunction = (loopState) -> {
       loopState.startPost = true;
       loopState.testPost = true;
       var iterable = pGetIterableFunction.<T, @Nullable Iterable<U>>apply(loopState.input);
@@ -837,14 +834,14 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
 
     /* Is there an initial element */
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V>, Boolean> pStartPostFunction = (loopState) -> {
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, V>, Boolean> pStartPostFunction = (loopState) -> {
       Iterator<U> startPre = loopState.startPre;
       return (startPre != null && startPre.hasNext());
     };
 
     /* Process the element */
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, @Nullable V>, ExtendedCompletionStage<V>> pActionFunction = (loopState) -> {
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, @Nullable V>, ExtendedCompletionStage<V>> pActionFunction = (loopState) -> {
       Iterator<U> startPre = loopState.startPre;
       Boolean startPost = loopState.startPost;
       Boolean testPost = loopState.testPost;
@@ -855,7 +852,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
 
     /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V>, Boolean> pTestPostFunction = (loopState) -> {
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, V>, Boolean> pTestPostFunction = (loopState) -> {
       Iterator<U> startPre = loopState.startPre;
       V actionResult = loopState.actionResult;
       if (startPre == null) return false;
@@ -866,8 +863,8 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
       return startPre.hasNext();
     };
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V>, V> pEndPostFunction = (loopState) -> loopState.actionResult;
-    return this.<@Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, V>thenDoWhileAsync(
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, V>, V> pEndPostFunction = (loopState) -> loopState.actionResult;
+    return this.<@Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, V>thenDoWhileAsync(
       pStartPreFunction,
       null,
       pStartPostFunction,
@@ -891,7 +888,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
 
     /* Get the iterable */
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, @Nullable Iterator<U>> pStartPreFunction = (loopState) -> {
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, List<V>>, @Nullable Iterator<U>> pStartPreFunction = (loopState) -> {
       loopState.startPost = true;
       loopState.testPost = true;
       loopState.endPost = new ArrayList<>();
@@ -902,7 +899,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
 
     /* Is there an initial element */
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, Boolean> pStartPostFunction = (loopState) -> {
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, List<V>>, Boolean> pStartPostFunction = (loopState) -> {
       Iterator<U> startPre = loopState.startPre;
       return (startPre != null && startPre.hasNext());
     };
@@ -910,7 +907,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
     /* Process the element */
 
     @SuppressWarnings(
-      "null") Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, ExtendedCompletionStage<V>> pActionFunction = (loopState) -> {
+      "null") Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, List<V>>, ExtendedCompletionStage<V>> pActionFunction = (loopState) -> {
       Iterator<U> startPre = loopState.startPre;
       Boolean startPost = loopState.startPost;
       Boolean testPost = loopState.testPost;
@@ -919,14 +916,14 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
       return pPerformActionFunction.apply(nextElement);
     };
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, @Nullable Void> pActionPostFunction = (loopState) -> {
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, List<V>>, Void> pActionPostFunction = (loopState) -> {
       loopState.endPost.add(loopState.actionResult);
       return null;
     };
 
     /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, Boolean> pTestPostFunction = (loopState) -> {
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, List<V>>, Boolean> pTestPostFunction = (loopState) -> {
       Iterator<U> startPre = loopState.startPre;
       V actionResult = loopState.actionResult;
       if (startPre == null) return false;
@@ -936,8 +933,8 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
       return startPre.hasNext();
     };
 
-    Function1<LoopState<T, @Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>, List<V>> pEndPostFunction = (loopState) -> loopState.endPost;
-    return this.<@Nullable Iterator<U>, @Nullable Void, Boolean, U, V, @Nullable Void, @Nullable Void, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, List<V>>thenDoWhileAsync(
+    Function1<LoopState<T, @Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, List<V>>, List<V>> pEndPostFunction = (loopState) -> loopState.endPost;
+    return this.<@Nullable Iterator<U>, Void, Boolean, U, V, Void, Void, Void, Boolean, Void, Void, List<V>>thenDoWhileAsync(
       pStartPreFunction,
       null,
       pStartPostFunction,
@@ -970,20 +967,20 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
     Function2<T, Integer, ExtendedCompletionStage<U>> pPerformFunction,
     @Nullable Function2<U, Integer, Boolean> pCheckFunction) {
 
-    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Integer> startPreFunction = (loopState) -> {
+    Function1<LoopState<T, Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>, Integer> startPreFunction = (loopState) -> {
       loopState.startPost = pEnd;
       loopState.testPre = pIncrement;
       return pStart;
     };
 
-    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, ExtendedCompletionStage<U>> actionFunction = (loopState) -> pPerformFunction.apply(
+    Function1<LoopState<T, Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>, ExtendedCompletionStage<U>> actionFunction = (loopState) -> pPerformFunction.apply(
       loopState.input,
       Objects.requireNonNull(loopState.startPre)
     );
 
     /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
 
-    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Boolean> testPostFunction = (loopState) -> {
+    Function1<LoopState<T, Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>, Boolean> testPostFunction = (loopState) -> {
       loopState.startPre += loopState.testPre;
       if (loopState.startPre >= loopState.startPost) return false;
       if (pCheckFunction != null)
@@ -992,8 +989,8 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
       return true;
     };
 
-    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, U> endPostFunction = (loopState) -> loopState.actionResult;
-    return this.<Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>thenDoWhile(
+    Function1<LoopState<T, Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>, U> endPostFunction = (loopState) -> loopState.actionResult;
+    return this.<Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>thenDoWhile(
       startPreFunction,
       null,
       null,
@@ -1026,20 +1023,20 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
     Function2<T, Integer, ExtendedCompletionStage<U>> pPerformFunction,
     @Nullable Function2<U, Integer, Boolean> pCheckFunction, Executor pExecutor) {
 
-    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Integer> pStartPreFunction = (loopState) -> {
+    Function1<LoopState<T, Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>, Integer> pStartPreFunction = (loopState) -> {
       loopState.startPost = pEnd;
       loopState.testPre = pIncrement;
       return pStart;
     };
 
-    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, ExtendedCompletionStage<U>> pActionFunction = (loopState) -> {
+    Function1<LoopState<T, Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>, ExtendedCompletionStage<U>> pActionFunction = (loopState) -> {
       ExtendedCompletionStage<U> completionStage = pPerformFunction.apply(loopState.input, loopState.startPre);
       return completionStage;
     };
 
     /* If we got an item in the action, then we're done, otherwise, check if there is there another element */
 
-    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, Boolean> pTestPostFunction = (loopState) -> {
+    Function1<LoopState<T, Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>, Boolean> pTestPostFunction = (loopState) -> {
       loopState.startPre += loopState.testPre;
       if (loopState.startPre >= loopState.startPost) return false;
       if (pCheckFunction != null)
@@ -1048,8 +1045,8 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
       return true;
     };
 
-    Function1<LoopState<T, Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>, U> pEndPostFunction = (loopState) -> loopState.actionResult;
-    return this.<Integer, @Nullable Void, Integer, @Nullable Void, U, @Nullable Void, Integer, @Nullable Void, Boolean, @Nullable Void, @Nullable Void, U>thenDoWhileAsync(
+    Function1<LoopState<T, Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>, U> pEndPostFunction = (loopState) -> loopState.actionResult;
+    return this.<Integer, Void, Integer, Void, U, Void, Integer, Void, Boolean, Void, Void, U>thenDoWhileAsync(
       pStartPreFunction,
       null,
       null,
@@ -1072,7 +1069,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
     ScheduledExecutorService pService);
 
   //
-  // public static ExtendedCompletionStage<@Nullable Void> allOf(@NotNull ExtendedCompletionStage<?>... cfs) {
+  // public static ExtendedCompletionStage<Void> allOf(@NotNull ExtendedCompletionStage<?>... cfs) {
   // @NotNull
   // CompletableFuture<?>[] args = new @NotNull CompletableFuture<?>[cfs.length];
   // for (int i = 0; i < cfs.length; i++)
@@ -1081,7 +1078,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
   // }
   //
 
-  ExtendedCompletionStage<@Nullable Void> relatedAllOf(ExtendedCompletionStage<?>... cfs);
+  ExtendedCompletionStage<Void> relatedAllOf(ExtendedCompletionStage<?>... cfs);
 
   // /**
   // * Generates an allOf future
@@ -1089,7 +1086,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
   // * @param cfs the collection of futures
   // * @return the future
   // */
-  // public static ExtendedCompletionStage<@Nullable Void> allOf(Collection<@NotNull ExtendedCompletionStage<?>> cfs) {
+  // public static ExtendedCompletionStage<Void> allOf(Collection<@NotNull ExtendedCompletionStage<?>> cfs) {
   // CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
   // int count = 0;
   // for (Iterator<@NotNull ? extends @NotNull CompletionStage<?>> i = cfs.iterator(); i.hasNext();) {
@@ -1099,7 +1096,7 @@ public interface ExtendedCompletionStage<T extends @Nullable Object> {
   // return ExtendedCompletableFuture.of(CompletableFuture.allOf(args));
   // }
 
-  ExtendedCompletionStage<@Nullable Void> relatedAllOf(Collection<? extends ExtendedCompletionStage<?>> cfs);
+  ExtendedCompletionStage<Void> relatedAllOf(Collection<? extends ExtendedCompletionStage<?>> cfs);
 
   //
   // public static ExtendedCompletionStage<@Nullable Object> anyOf(@NotNull ExtendedCompletionStage<?>... cfs) {

@@ -44,7 +44,7 @@ public interface AsyncPersistenceLayer {
    */
   void enableStructureDefinition(AsyncToolkit pToolkit, Scope pScope, StructureDefinition pValue);
 
-  ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
+  ContextExtendedCompletionStage<Void> deleteStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
     StructureDefinition pValue);
 
   ContextExtendedCompletionStage<Collection<StructureDefinitionRef>> getAllStructureDefinitionRefs(
@@ -83,8 +83,7 @@ public interface AsyncPersistenceLayer {
 
   Structure createNewTombstoneStructure(AsyncToolkit pToolkit, Scope pScope, Structure pOldStructure);
 
-  ContextExtendedCompletionStage<@Nullable Void> writeStructure(AsyncToolkit pToolkit, Scope pScope,
-    Structure pStructure);
+  ContextExtendedCompletionStage<Void> writeStructure(AsyncToolkit pToolkit, Scope pScope, Structure pStructure);
 
   ContextExtendedCompletionStage<Boolean> writeStructure(AsyncToolkit pToolkit, Scope pScope, Structure pStructure,
     @Nullable Structure pOldStructure);
@@ -132,14 +131,13 @@ public interface AsyncPersistenceLayer {
   void addMigration(AsyncToolkit pToolkit, Scope pScope, String pStructureDefinitionName, int pFromRevision,
     int pToRevision, BiFunction<Structure, Structure, Structure> pMigrationFunction);
 
-  @Nullable
-  List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(AsyncToolkit pToolkit,
-    Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
+  @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(
+    AsyncToolkit pToolkit, Scope pScope, String pStructureDefName, int pFromRevision, int pToRevision);
 
   ContextExtendedCompletionStage<@Nullable Integer> lookupLatestStructureDefinitionRevision(AsyncToolkit pToolkit,
     Scope pScope, String pDefName);
 
-  ContextExtendedCompletionStage<@Nullable Void> clearStructures(AsyncToolkit pToolkit, Scope pScope,
+  ContextExtendedCompletionStage<Void> clearStructures(AsyncToolkit pToolkit, Scope pScope,
     StructureDefinition pStructureDef);
 
   ContextExtendedCompletionStage<Integer> countByQuery(AsyncToolkit pToolkit, Scope pScope, ModelQuery pQuery,

@@ -75,13 +75,15 @@ public class ExtendedCompletionStageTest {
       f1 = new ExtendedCompletableFuture<>();
       f2 = new ExtendedCompletableFuture<>();
       f3 = new ExtendedCompletableFuture<Boolean>().applyToEither(f1.thenCombine(f2, (b1, b2) -> {
-        sLogger.info("   +++ Inside combine");
-        Assertions.assertEquals(true, b1);
-        Assertions.assertEquals(true, b2);
-        TracingAssertions.assertActiveSpan("Should have active span");
-        sLogger.info("   --- Inside combine");
-        return false;
-      }), (a) -> a);
+            sLogger.info("   +++ Inside combine");
+            Assertions.assertEquals(true, b1);
+            Assertions.assertEquals(true, b2);
+            TracingAssertions.assertActiveSpan("Should have active span");
+            sLogger.info("   --- Inside combine");
+            return false;
+          }
+        ), (a) -> a
+      );
     }
     TracingAssertions.assertNoActiveSpan("No active span after block");
     TracingAssertions.assertCompletedSpans("No spans should have completed", 0, mockTracker);
@@ -105,8 +107,9 @@ public class ExtendedCompletionStageTest {
     try (Scope scope = mockTracker.scopeManager().activate(span)) {
       try {
         ExtendedCompletionStage.runAsync(() -> {
-          Assertions.fail("Should never reach here");
-        }, null);
+            Assertions.fail("Should never reach here");
+          }, null
+        );
         Assertions.fail("An exception should have occurred");
       }
       catch (RuntimeException ex) {
@@ -122,14 +125,16 @@ public class ExtendedCompletionStageTest {
   @Test
   public void testRunAsyncExecutor() throws Exception {
     Executor executor = weld.select(Executor.class).get();
-    ExtendedCompletableFuture<@Nullable Void> f;
+    ExtendedCompletableFuture<Void> f;
     Span span = mockTracker.buildSpan("testRunAsyncExecutor").start();
     try (Scope scope = mockTracker.scopeManager().activate(span)) {
       final String threadName = Thread.currentThread().getName();
-      f = new ExtendedCompletableFuture<@Nullable Void>().applyToEither(ExtendedCompletionStage.runAsync(() -> {
-        TracingAssertions.assertActiveSpan("Should be within the span");
-        Assertions.assertNotEquals("Threads should be different", threadName, Thread.currentThread().getName());
-      }, executor), (a) -> a);
+      f = new ExtendedCompletableFuture<Void>().applyToEither(ExtendedCompletionStage.runAsync(() -> {
+            TracingAssertions.assertActiveSpan("Should be within the span");
+            Assertions.assertNotEquals("Threads should be different", threadName, Thread.currentThread().getName());
+          }, executor
+        ), (a) -> a
+      );
       TracingAssertions.assertCompletedSpans("Span should not have completed", 0, mockTracker);
     }
     finally {

@@ -48,7 +48,7 @@ public interface AsyncToolkit {
    * @param pValue the StructureDefinition to delete.
    * @return completion future
    */
-  ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(Scope pScope, StructureDefinition pValue);
+  ContextExtendedCompletionStage<Void> deleteStructureDefinition(Scope pScope, StructureDefinition pValue);
 
   /**
    * Creates a reference for a StructureDefinition
@@ -197,7 +197,7 @@ public interface AsyncToolkit {
    * @param pStructure the Structure
    * @return the completion future
    */
-  ContextExtendedCompletionStage<@Nullable Void> writeStructure(Scope pScope, Structure pStructure);
+  ContextExtendedCompletionStage<Void> writeStructure(Scope pScope, Structure pStructure);
 
   /**
    * Writes a Structure to the persistence layer if the old structure is what was previously in the persistence layer
@@ -350,8 +350,7 @@ public interface AsyncToolkit {
    * @param pToRevision the ending revision
    * @return the path or null if there is no possible path
    */
-  @Nullable
-  List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(Scope pScope,
+  @Nullable List<Pair<Integer, List<BiFunction<Structure, Structure, Structure>>>> determineMigrationPath(Scope pScope,
     String pStructureDefName, int pFromRevision, int pToRevision);
 
   /**
@@ -378,5 +377,5 @@ public interface AsyncToolkit {
    * @param pStructureDef the structure definition
    * @return the future
    */
-  ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope, StructureDefinition pStructureDef);
+  ContextExtendedCompletionStage<Void> clearStructures(Scope pScope, StructureDefinition pStructureDef);
 }

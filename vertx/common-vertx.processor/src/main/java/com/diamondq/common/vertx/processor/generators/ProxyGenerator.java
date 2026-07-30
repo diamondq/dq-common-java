@@ -876,21 +876,21 @@ public class ProxyGenerator implements Generator {
           .addStatement("String returnReplyAddress = $T.randomUUID().toString()", UUID.class)
           // message.put("__replyAddress", returnReplyAddress);
           .addStatement("message.put($S, returnReplyAddress)", "__replyAddress")
-          // ContextExtendedCompletableFuture<@Nullable Void> finalResult = FutureUtils.newCompletableFuture();
+          // ContextExtendedCompletableFuture<Void> finalResult = FutureUtils.newCompletableFuture();
           .addStatement("$T<$T> finalResult = $T.newCompletableFuture()",
             ContextExtendedCompletableFuture.class,
             actualTypeName,
             FutureUtils.class
           )
-          // MessageConsumer<@Nullable Void> replyConsumer = mVertx.eventBus().consumer(returnReplyAddress);
+          // MessageConsumer<Void> replyConsumer = mVertx.eventBus().consumer(returnReplyAddress);
           .addStatement("$T<$T> replyConsumer = mVertx.eventBus().consumer(returnReplyAddress)",
             MessageConsumer.class,
             actualTypeName
           )
-          // replyConsumer.handler(new Handler<Message<@Nullable Void>>() {
+          // replyConsumer.handler(new Handler<Message<Void>>() {
           .addStatement("replyConsumer.handler($L)", replyHandler)
         // @Override
-        // public void handle(Message<@Nullable Void> pEvent) {
+        // public void handle(Message<Void> pEvent) {
         // Void body = pEvent.body();
         // finalResult.complete(body);
         // }

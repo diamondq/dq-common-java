@@ -79,7 +79,7 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<Void> deleteStructureDefinition(AsyncToolkit pToolkit, Scope pScope,
     StructureDefinition pValue) {
     mPersistenceLayer.deleteStructureDefinition(pToolkit.getSyncToolkit(), pScope, pValue);
     return FutureUtils.completedFuture(null);
@@ -216,7 +216,7 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.Structure)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> writeStructure(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<Void> writeStructure(AsyncToolkit pToolkit, Scope pScope,
     Structure pStructure) {
     mPersistenceLayer.writeStructure(pToolkit.getSyncToolkit(), pScope, pStructure);
     return FutureUtils.completedFuture(null);
@@ -455,7 +455,7 @@ public class SyncAsyncPersistenceLayer implements AsyncPersistenceLayer {
    *   com.diamondq.common.model.interfaces.Scope, com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> clearStructures(AsyncToolkit pToolkit, Scope pScope,
+  public ContextExtendedCompletionStage<Void> clearStructures(AsyncToolkit pToolkit, Scope pScope,
     StructureDefinition pStructureDef) {
     mPersistenceLayer.clearStructures(pToolkit.getSyncToolkit(), pScope, pStructureDef);
     return FutureUtils.completedFuture(null);

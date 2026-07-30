@@ -221,7 +221,7 @@ public class ImplGenerator implements Generator {
     MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("onMessage");
 
     // @Override
-    // public void start(Future<@Nullable Void> pStartFuture) throws Exception {
+    // public void start(Future<Void> pStartFuture) throws Exception {
 
     methodBuilder = methodBuilder.addModifiers(Modifier.PRIVATE) //
       .returns(TypeName.VOID) //
@@ -1041,7 +1041,7 @@ public class ImplGenerator implements Generator {
         TypeName actualTypeName = actualReturnType.getTypeName();
 
         // @Override
-        // public @Nullable Void apply(@Nullable Void r2, @Nullable Throwable ex2, Context ctx3) {
+        // public Void apply(Void r2, @Nullable Throwable ex2, Context ctx3) {
         MethodSpec.Builder replyMethod = MethodSpec.methodBuilder("apply") //
           .addAnnotation(Override.class) //
           .addModifiers(Modifier.PUBLIC) //
@@ -1350,7 +1350,7 @@ public class ImplGenerator implements Generator {
     MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("stop");
 
     // @Override
-    // public void stop(Future<@Nullable Void> pStopFuture) throws Exception {
+    // public void stop(Future<Void> pStopFuture) throws Exception {
 
     methodBuilder = methodBuilder.addModifiers(Modifier.PUBLIC) //
       .addAnnotation(Override.class) //
@@ -1436,7 +1436,7 @@ public class ImplGenerator implements Generator {
     MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("start");
 
     // @Override
-    // public void start(Future<@Nullable Void> pStartFuture) throws Exception {
+    // public void start(Future<Void> pStartFuture) throws Exception {
 
     methodBuilder = methodBuilder.addModifiers(Modifier.PUBLIC) //
       .addAnnotation(Override.class) //
@@ -1511,7 +1511,7 @@ public class ImplGenerator implements Generator {
       .returns(ParameterizedTypeName.get(ClassName.get(ContextExtendedCompletionStage.class),
         ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
       ))
-      // return VertxUtils.<String, @Nullable Void> callReturnsNullable(pVertx::undeploy, pReg.getValue1());
+      // return VertxUtils.<String, Void> callReturnsNullable(pVertx::undeploy, pReg.getValue1());
       .addStatement("return $T.<String, @$T Void> callReturnsNullable(pVertx::undeploy, pReg.getValue1())",
         VertxUtils.class,
         Nullable.class
@@ -1552,7 +1552,7 @@ public class ImplGenerator implements Generator {
 
     MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("shutdown");
 
-    // public static ContextExtendedCompletionStage<@Nullable Void> shutdown(ContextFactory pContextFactory,
+    // public static ContextExtendedCompletionStage<Void> shutdown(ContextFactory pContextFactory,
     // ServiceDiscovery pServiceDiscovery, Vertx pVertx, Pair<String, String> pReg) {
 
     TypeName returnType = ParameterizedTypeName.get(ClassName.get(ContextExtendedCompletionStage.class),
@@ -1596,7 +1596,7 @@ public class ImplGenerator implements Generator {
       // /* First, unpublish the record */
       //
       .addCode("\n/* First, unpublish the record */\n\n")
-      // return VertxUtils.<String, @Nullable Void> callReturnsNullable(pServiceDiscovery::unpublish, pReg.getValue0())
+      // return VertxUtils.<String, Void> callReturnsNullable(pServiceDiscovery::unpublish, pReg.getValue0())
       // //
       .addCode("return $T.<String, @$T Void> callReturnsNullable(pServiceDiscovery::unpublish, pReg.getValue0())",
         VertxUtils.class,

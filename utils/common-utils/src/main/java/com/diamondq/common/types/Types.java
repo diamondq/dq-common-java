@@ -71,9 +71,9 @@ public abstract class Types {
   /**
    * Constant for void argument.
    */
-  public static final TypeReference<@Nullable Void> VOID          = new TypeReference<@Nullable Void>() {
+  public static final TypeReference<Void> VOID          = new TypeReference<Void>() {
   };
-  public static final TypeReference<@Nullable Void> NULLABLE_VOID = new TypeReference<@Nullable Void>() {
+  public static final TypeReference<Void> NULLABLE_VOID = new TypeReference<Void>() {
   };
 
   /**

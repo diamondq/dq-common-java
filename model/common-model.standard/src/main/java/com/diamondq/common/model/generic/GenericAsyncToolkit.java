@@ -101,8 +101,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> deleteStructureDefinition(Scope pScope,
-    StructureDefinition pValue) {
+  public ContextExtendedCompletionStage<Void> deleteStructureDefinition(Scope pScope, StructureDefinition pValue) {
     return getPersistenceLayer(pScope).deleteStructureDefinition(this, pScope, pValue);
   }
 
@@ -236,7 +235,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    *   com.diamondq.common.model.interfaces.Structure)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> writeStructure(Scope pScope, Structure pStructure) {
+  public ContextExtendedCompletionStage<Void> writeStructure(Scope pScope, Structure pStructure) {
     return getPersistenceLayer(pScope).writeStructure(this, pScope, pStructure);
   }
 
@@ -399,8 +398,7 @@ public class GenericAsyncToolkit implements AsyncToolkit {
    *   com.diamondq.common.model.interfaces.StructureDefinition)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> clearStructures(Scope pScope,
-    StructureDefinition pStructureDef) {
+  public ContextExtendedCompletionStage<Void> clearStructures(Scope pScope, StructureDefinition pStructureDef) {
     return getPersistenceLayer(pScope).clearStructures(this, pScope, pStructureDef);
   }
 

@@ -386,7 +386,7 @@ public class SyncEngine {
                   return pInfo.createA(aToBeCreated.stream()
                       .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_A))
                       .map(SyncEngine.bToACreation(pInfo, keyTypesEqual, bFragTypeComplete, typesEqual)))
-                    .<@Nullable Void>thenApply((ignored) -> {
+                    .<Void>thenApply((ignored) -> {
                       try (var ctx4 = ctx3.activateOnThread("")) {
                         result.aToBeCreatedElapsedTime = System.currentTimeMillis() - aCreatedStartTimer;
                         ctx4.trace("Completed A Creations after {} ms", result.aToBeCreatedElapsedTime);
@@ -424,7 +424,7 @@ public class SyncEngine {
                     long aDeletedStartTimer = System.currentTimeMillis();
                     return pInfo.deleteA(aToBeDeleted.stream()
                         .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_A)))
-                      .<@Nullable Void>thenApply((ignored) -> {
+                      .<Void>thenApply((ignored) -> {
                         try (var ctx4 = ctx3.activateOnThread("")) {
                           result.aToBeDeletedElapsedTime = System.currentTimeMillis() - aDeletedStartTimer;
                           ctx4.trace("Completed B Deletions after {} ms", result.aToBeDeletedElapsedTime);
@@ -444,16 +444,15 @@ public class SyncEngine {
             ctx2.prepareForAlternateThreads();
             long aModifiedStartTimer = System.currentTimeMillis();
             futures.add(pInfo.modifyA(aToBeModified.stream()
-                .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.MODIFY_A))
-                .map(SyncEngine.modifyA(pInfo, aFragTypeComplete, bFragTypeComplete)))
-              .<@Nullable Void>thenApply((ignored) -> {
-                try (var ctx3 = ctx2.activateOnThread("")) {
-                  result.aToBeModifiedElapsedTime = System.currentTimeMillis() - aModifiedStartTimer;
-                  ctx3.trace("Completed A Modifications after {} ms", result.aToBeModifiedElapsedTime);
-                  pInfo.reportSyncStatus(false, SyncInfo.ActionType.MODIFY_A);
-                  return null;
-                }
-              }));
+              .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.MODIFY_A))
+              .map(SyncEngine.modifyA(pInfo, aFragTypeComplete, bFragTypeComplete))).<Void>thenApply((ignored) -> {
+              try (var ctx3 = ctx2.activateOnThread("")) {
+                result.aToBeModifiedElapsedTime = System.currentTimeMillis() - aModifiedStartTimer;
+                ctx3.trace("Completed A Modifications after {} ms", result.aToBeModifiedElapsedTime);
+                pInfo.reportSyncStatus(false, SyncInfo.ActionType.MODIFY_A);
+                return null;
+              }
+            }));
 
             if (pInfo.isBDeleteBeforeCreate()) {
 
@@ -481,7 +480,7 @@ public class SyncEngine {
                   return pInfo.createB(bToBeCreated.stream()
                       .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_B))
                       .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual)))
-                    .<@Nullable Void>thenApply((ignored) -> {
+                    .<Void>thenApply((ignored) -> {
                       try (var ctx4 = ctx3.activateOnThread("")) {
                         result.bToBeCreatedElapsedTime = System.currentTimeMillis() - bCreatedStartTimer;
                         ctx4.trace("Completed B Creations after {} ms", result.bToBeCreatedElapsedTime);
@@ -503,7 +502,7 @@ public class SyncEngine {
               futures.add(pInfo.createB(bToBeCreated.stream()
                   .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.CREATE_B))
                   .map(SyncEngine.aToBCreation(pInfo, keyTypesEqual, aFragTypeComplete, typesEqual)))
-                .<@Nullable Void>thenCompose((unused) -> {
+                .<Void>thenCompose((unused) -> {
                   try (var ctx3 = ctx2.activateOnThread("")) {
                     result.bToBeCreatedElapsedTime = System.currentTimeMillis() - bCreatedStartTimer;
                     ctx3.trace("Completed B Creations after {} ms", result.bToBeCreatedElapsedTime);
@@ -518,7 +517,7 @@ public class SyncEngine {
                     long bDeletedStartTimer = System.currentTimeMillis();
                     return pInfo.deleteB(bToBeDeleted.stream()
                         .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.DELETE_B)))
-                      .<@Nullable Void>thenApply((ignored) -> {
+                      .<Void>thenApply((ignored) -> {
                         try (var ctx4 = ctx3.activateOnThread("")) {
                           result.bToBeDeletedElapsedTime = System.currentTimeMillis() - bDeletedStartTimer;
                           ctx4.trace("Completed B Deletions after {} ms", result.bToBeDeletedElapsedTime);
@@ -538,16 +537,15 @@ public class SyncEngine {
             ctx2.prepareForAlternateThreads();
             long bModifiedStartTimer = System.currentTimeMillis();
             futures.add(pInfo.modifyB(bToBeModified.stream()
-                .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.MODIFY_B))
-                .map(SyncEngine.modifyB(pInfo, aFragTypeComplete, bFragTypeComplete)))
-              .<@Nullable Void>thenApply((ignored) -> {
-                try (var ctx3 = ctx2.activateOnThread("")) {
-                  result.bToBeModifiedElapsedTime = System.currentTimeMillis() - bModifiedStartTimer;
-                  ctx3.trace("Completed B Modifications after {} ms", result.bToBeModifiedElapsedTime);
-                  pInfo.reportSyncStatus(false, SyncInfo.ActionType.MODIFY_B);
-                  return null;
-                }
-              }));
+              .peek((pair) -> pInfo.reportIncrementStatus(SyncInfo.ActionType.MODIFY_B))
+              .map(SyncEngine.modifyB(pInfo, aFragTypeComplete, bFragTypeComplete))).<Void>thenApply((ignored) -> {
+              try (var ctx3 = ctx2.activateOnThread("")) {
+                result.bToBeModifiedElapsedTime = System.currentTimeMillis() - bModifiedStartTimer;
+                ctx3.trace("Completed B Modifications after {} ms", result.bToBeModifiedElapsedTime);
+                pInfo.reportSyncStatus(false, SyncInfo.ActionType.MODIFY_B);
+                return null;
+              }
+            }));
 
             /* Now set up a future for all these */
 

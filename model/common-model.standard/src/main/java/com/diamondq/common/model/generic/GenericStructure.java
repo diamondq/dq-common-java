@@ -47,8 +47,7 @@ public class GenericStructure implements Structure, Revision<String> {
     if (pProperties == null) {
       for (PropertyDefinition pd : pDefinition.getAllProperties().values()) {
         String name = pd.getName();
-        Property<? extends @Nullable Object> p = mScope.getToolkit()
-          .<@Nullable Void>createNewProperty(mScope, pd, false, null);
+        Property<? extends @Nullable Object> p = mScope.getToolkit().<Void>createNewProperty(mScope, pd, false, null);
         b.put(name, p);
       }
     } else {

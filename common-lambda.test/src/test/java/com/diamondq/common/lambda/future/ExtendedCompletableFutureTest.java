@@ -73,13 +73,14 @@ public class ExtendedCompletableFutureTest {
       f1 = new ExtendedCompletableFuture<>();
       f2 = new ExtendedCompletableFuture<>();
       f3 = f1.thenCombine(f2, (b1, b2) -> {
-        sLogger.info("   +++ Inside combine");
-        Assertions.assertEquals(true, b1);
-        Assertions.assertEquals(true, b2);
-        TracingAssertions.assertActiveSpan("Should have active span");
-        sLogger.info("   --- Inside combine");
-        return false;
-      });
+          sLogger.info("   +++ Inside combine");
+          Assertions.assertEquals(true, b1);
+          Assertions.assertEquals(true, b2);
+          TracingAssertions.assertActiveSpan("Should have active span");
+          sLogger.info("   --- Inside combine");
+          return false;
+        }
+      );
     }
     TracingAssertions.assertNoActiveSpan("No active span after block");
     TracingAssertions.assertCompletedSpans("No spans should have completed", 0, mockTracker);
@@ -104,8 +105,9 @@ public class ExtendedCompletableFutureTest {
     try (Scope scope = mockTracker.scopeManager().activate(span)) {
       try {
         ExtendedCompletableFuture.runAsync(() -> {
-          Assertions.fail("Should never reach here");
-        }, null);
+            Assertions.fail("Should never reach here");
+          }, null
+        );
         Assertions.fail("An exception should have occurred");
       }
       catch (RuntimeException ex) {
@@ -121,14 +123,15 @@ public class ExtendedCompletableFutureTest {
   @Test
   public void testRunAsyncExecutor() throws Exception {
     Executor executor = weld.select(Executor.class).get();
-    ExtendedCompletableFuture<@Nullable Void> f;
+    ExtendedCompletableFuture<Void> f;
     Span span = mockTracker.buildSpan("testRunAsyncExecutor").start();
     try (Scope scope = mockTracker.activateSpan(span)) {
       final String threadName = Thread.currentThread().getName();
       f = ExtendedCompletableFuture.runAsync(() -> {
-        TracingAssertions.assertActiveSpan("Should be within the span");
-        Assertions.assertNotEquals("Threads should be different", threadName, Thread.currentThread().getName());
-      }, executor);
+          TracingAssertions.assertActiveSpan("Should be within the span");
+          Assertions.assertNotEquals("Threads should be different", threadName, Thread.currentThread().getName());
+        }, executor
+      );
       TracingAssertions.assertCompletedSpans("Span should not have completed", 0, mockTracker);
     }
     finally {

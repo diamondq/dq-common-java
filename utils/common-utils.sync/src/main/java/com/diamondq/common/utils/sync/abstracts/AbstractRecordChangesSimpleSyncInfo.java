@@ -17,7 +17,7 @@ public abstract class AbstractRecordChangesSimpleSyncInfo<T, T_KEY> extends Abst
   protected List<Pair<T_KEY, T>> mBToModify = new ArrayList<>();
 
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> createB(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> createB(Stream<Pair<T_KEY, T>> pStream) {
     synchronized (this) {
       pStream.forEach((p) -> mBToCreate.add(p));
       return ExtendedCompletableFuture.completedFuture(null);
@@ -25,7 +25,7 @@ public abstract class AbstractRecordChangesSimpleSyncInfo<T, T_KEY> extends Abst
   }
 
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> deleteB(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> deleteB(Stream<Pair<T_KEY, T>> pStream) {
     synchronized (this) {
       pStream.forEach((p) -> mBToDelete.add(p));
       return ExtendedCompletableFuture.completedFuture(null);
@@ -33,7 +33,7 @@ public abstract class AbstractRecordChangesSimpleSyncInfo<T, T_KEY> extends Abst
   }
 
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> modifyB(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> modifyB(Stream<Pair<T_KEY, T>> pStream) {
     synchronized (this) {
       pStream.forEach((p) -> mBToModify.add(p));
       return ExtendedCompletableFuture.completedFuture(null);

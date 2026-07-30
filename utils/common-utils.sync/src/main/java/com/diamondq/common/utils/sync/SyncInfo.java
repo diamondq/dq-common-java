@@ -232,7 +232,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of A_KEY/A's to create
    * @return future to indicate success or failure
    */
-  ExtendedCompletionStage<@Nullable Void> createA(Stream<Pair<A_KEY, A>> pStream);
+  ExtendedCompletionStage<Void> createA(Stream<Pair<A_KEY, A>> pStream);
 
   /**
    * Deletes a set of A_KEY/A_FRAG's
@@ -240,7 +240,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of A_KEY/A_FRAG's to delete
    * @return future to indicate success or failure
    */
-  ExtendedCompletionStage<@Nullable Void> deleteA(Stream<Pair<A_KEY, A_FRAG>> pStream);
+  ExtendedCompletionStage<Void> deleteA(Stream<Pair<A_KEY, A_FRAG>> pStream);
 
   /**
    * Updates a set of A_KEY/A's
@@ -248,7 +248,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of A_KEY's/A's to update
    * @return future to indicate success or failure
    */
-  ExtendedCompletionStage<@Nullable Void> modifyA(Stream<Pair<A_KEY, A>> pStream);
+  ExtendedCompletionStage<Void> modifyA(Stream<Pair<A_KEY, A>> pStream);
 
   /**
    * Creates a new set of B_KEY/B's
@@ -256,7 +256,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of B_KEY/B's to create
    * @return future to indicate success or failure
    */
-  ExtendedCompletionStage<@Nullable Void> createB(Stream<Pair<B_KEY, B>> pStream);
+  ExtendedCompletionStage<Void> createB(Stream<Pair<B_KEY, B>> pStream);
 
   /**
    * Deletes a set of B_KEY/B_FRAG's
@@ -264,7 +264,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of B_KEY/B_FRAG's to delete
    * @return future to indicate success or failure
    */
-  ExtendedCompletionStage<@Nullable Void> deleteB(Stream<Pair<B_KEY, B_FRAG>> pStream);
+  ExtendedCompletionStage<Void> deleteB(Stream<Pair<B_KEY, B_FRAG>> pStream);
 
   /**
    * Updates a set of B_KEY/B's
@@ -272,7 +272,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pStream the stream of B_KEY's/B's to update
    * @return future to indicate success or failure
    */
-  ExtendedCompletionStage<@Nullable Void> modifyB(Stream<Pair<B_KEY, B>> pStream);
+  ExtendedCompletionStage<Void> modifyB(Stream<Pair<B_KEY, B>> pStream);
 
   /**
    * Called after all the creation/modify/deletes are complete.
@@ -280,7 +280,7 @@ public interface SyncInfo<A, B, A_KEY, B_KEY, A_FRAG, B_FRAG> {
    * @param pThrowable the optional throwable if there was an error during processing
    * @return future to indicate success or failure
    */
-  ExtendedCompletionStage<@Nullable Void> complete(@Nullable Throwable pThrowable);
+  ExtendedCompletionStage<Void> complete(@Nullable Throwable pThrowable);
 
   enum ActionType {
     /**

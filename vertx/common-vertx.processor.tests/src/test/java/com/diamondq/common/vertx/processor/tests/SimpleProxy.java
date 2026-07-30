@@ -9,14 +9,14 @@ public interface SimpleProxy {
 
   ContextExtendedCompletionStage<String> getName();
 
-  ContextExtendedCompletionStage<@Nullable Void> setName(String pValue);
+  ContextExtendedCompletionStage<Void> setName(String pValue);
 
-  ContextExtendedCompletionStage<@Nullable Void> setTitle(@Nullable String pValue);
+  ContextExtendedCompletionStage<Void> setTitle(@Nullable String pValue);
 
-  ContextExtendedCompletionStage<@Nullable Void> setWidth(int pWidth);
+  ContextExtendedCompletionStage<Void> setWidth(int pWidth);
 
-  ContextExtendedCompletionStage<@Nullable Void> setHeight(short pWidth);
+  ContextExtendedCompletionStage<Void> setHeight(short pWidth);
 
-  ContextExtendedCompletionStage<@Nullable Void> save();
+  ContextExtendedCompletionStage<Void> save();
 
 }

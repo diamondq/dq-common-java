@@ -147,7 +147,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.context.ContextExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer1<T> pAction) {
+  public ContextExtendedCompletableFuture<Void> thenAccept(Consumer1<T> pAction) {
     return super.thenAcceptAsync(pAction, mExecutor);
   }
 
@@ -155,7 +155,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.context.ContextExtendedCompletableFuture#thenAccept(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAccept(Consumer2<T, Context> pAction) {
+  public ContextExtendedCompletionStage<Void> thenAccept(Consumer2<T, Context> pAction) {
     return super.thenAcceptAsync(pAction, mExecutor);
   }
 
@@ -163,7 +163,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.context.ContextExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ContextExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction) {
+  public ContextExtendedCompletableFuture<Void> thenAcceptAsync(Consumer1<T> pAction) {
     return super.thenAcceptAsync(pAction, mExecutor);
   }
 
@@ -171,7 +171,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.context.ContextExtendedCompletableFuture#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public ContextExtendedCompletionStage<@Nullable Void> thenAcceptAsync(Consumer2<T, Context> pAction) {
+  public ContextExtendedCompletionStage<Void> thenAcceptAsync(Consumer2<T, Context> pAction) {
     return super.thenAcceptAsync(pAction, mExecutor);
   }
 
@@ -270,8 +270,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    *   com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> acceptEither(ExtendedCompletionStage<T> pOther,
-    Consumer1<T> pAction) {
+  public ExtendedCompletableFuture<Void> acceptEither(ExtendedCompletionStage<T> pOther, Consumer1<T> pAction) {
     return super.acceptEitherAsync(pOther, pAction, mExecutor);
   }
 
@@ -280,8 +279,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    *   com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther,
-    Consumer1<T> pAction) {
+  public ExtendedCompletableFuture<Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther, Consumer1<T> pAction) {
     return super.acceptEitherAsync(pOther, pAction, mExecutor);
   }
 
@@ -308,7 +306,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    *   java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(ExtendedCompletionStage<?> pOther, Runnable pAction) {
+  public ExtendedCompletableFuture<Void> runAfterBoth(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return super.runAfterBothAsync(pOther, pAction, mExecutor);
   }
 
@@ -317,8 +315,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    *   java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther,
-    Runnable pAction) {
+  public ExtendedCompletableFuture<Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return super.runAfterBothAsync(pOther, pAction, mExecutor);
   }
 
@@ -327,7 +324,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    *   java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterEither(ExtendedCompletionStage<?> pOther, Runnable pAction) {
+  public ExtendedCompletableFuture<Void> runAfterEither(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return super.runAfterEitherAsync(pOther, pAction, mExecutor);
   }
 
@@ -336,8 +333,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    *   java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther,
-    Runnable pAction) {
+  public ExtendedCompletableFuture<Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return super.runAfterEitherAsync(pOther, pAction, mExecutor);
   }
 
@@ -346,7 +342,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    *   com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(ExtendedCompletionStage<U> pOther,
+  public <U> ExtendedCompletableFuture<Void> thenAcceptBoth(ExtendedCompletionStage<U> pOther,
     Consumer2<T, U> pAction) {
     return super.thenAcceptBothAsync(pOther, pAction, mExecutor);
   }
@@ -356,7 +352,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    *   com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public <U> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(ExtendedCompletionStage<U> pOther,
+  public <U> ExtendedCompletableFuture<Void> thenAcceptBothAsync(ExtendedCompletionStage<U> pOther,
     Consumer2<T, U> pAction) {
     return super.thenAcceptBothAsync(pOther, pAction, mExecutor);
   }
@@ -365,7 +361,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenRun(java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> thenRun(Runnable pAction) {
+  public ExtendedCompletableFuture<Void> thenRun(Runnable pAction) {
     return super.thenRunAsync(pAction, mExecutor);
   }
 
@@ -373,7 +369,7 @@ public class VertxContextExtendedCompletableFuture<T> extends ContextExtendedCom
    * @see com.diamondq.common.lambda.future.ExtendedCompletableFuture#thenRunAsync(java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> thenRunAsync(Runnable pAction) {
+  public ExtendedCompletableFuture<Void> thenRunAsync(Runnable pAction) {
     return super.thenRunAsync(pAction, mExecutor);
   }
 }

@@ -5,6 +5,6 @@ import org.jspecify.annotations.Nullable;
 
 public interface SmallSample {
 
-  ContextExtendedCompletionStage<@Nullable Void> withDouble(double pDouble);
+  ContextExtendedCompletionStage<Void> withDouble(double pDouble);
 
 }

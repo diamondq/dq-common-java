@@ -1,13 +1,14 @@
 package com.diamondq.common.context.spi;
 
 import com.diamondq.common.context.ContextFactory;
+import com.diamondq.common.errors.DQRuntimeException;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 import java.util.function.Function;
 
 /**
- * This extended ContextFactory interface defines additional methods that can be used by consumers of the SPI (i.e.
+ * This extended ContextFactory interface defines additional methods that can be used by consumers of the SPI (i.e.,
  * ContextHandler's)
  */
 public interface SPIContextFactory extends ContextFactory {
@@ -51,7 +52,7 @@ public interface SPIContextFactory extends ContextFactory {
 
   boolean internalIsErrorEnabled(ContextClass pContext);
 
-  RuntimeException internalReportThrowable(ContextClass pContext, Throwable pThrowable);
+  DQRuntimeException internalReportThrowable(ContextClass pContext, Throwable pThrowable);
 
   Set<String> getStackMethodIgnores();
 

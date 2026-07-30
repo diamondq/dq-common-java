@@ -314,11 +314,11 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenAccept(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> thenAccept(Consumer1<T> pAction) {
+  public ExtendedCompletableFuture<Void> thenAccept(Consumer1<T> pAction) {
     CancelableConsumer1<T> ab = wrapConsumer1(pAction);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.thenAccept(ab));
+      ExtendedCompletableFuture<Void> result = relatedOf(mDelegate.thenAccept(ab));
       cleanupFlag = false;
       result = result.internalExceptionally(ab);
       return result;
@@ -333,11 +333,11 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenAcceptAsync(com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction) {
+  public ExtendedCompletableFuture<Void> thenAcceptAsync(Consumer1<T> pAction) {
     CancelableConsumer1<T> ab = wrapConsumer1(pAction);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.thenAcceptAsync(ab));
+      ExtendedCompletableFuture<Void> result = relatedOf(mDelegate.thenAcceptAsync(ab));
       cleanupFlag = false;
       result = result.internalExceptionally(ab);
       return result;
@@ -352,11 +352,11 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.util.concurrent.Executor)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor) {
+  public ExtendedCompletableFuture<Void> thenAcceptAsync(Consumer1<T> pAction, Executor pExecutor) {
     CancelableConsumer1<T> ab = wrapConsumer1(pAction);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.thenAcceptAsync(ab, pExecutor));
+      ExtendedCompletableFuture<Void> result = relatedOf(mDelegate.thenAcceptAsync(ab, pExecutor));
       cleanupFlag = false;
       result = result.internalExceptionally(ab);
       return result;
@@ -370,7 +370,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenRun(java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> thenRun(Runnable pAction) {
+  public ExtendedCompletableFuture<Void> thenRun(Runnable pAction) {
     return handle((t, ex) -> {
       if (ex != null) {
         if (ex instanceof RuntimeException) throw (RuntimeException) ex;
@@ -385,7 +385,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#thenRunAsync(java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> thenRunAsync(Runnable pAction) {
+  public ExtendedCompletableFuture<Void> thenRunAsync(Runnable pAction) {
     return handleAsync((t, ex) -> {
       if (ex != null) {
         if (ex instanceof RuntimeException) throw (RuntimeException) ex;
@@ -401,7 +401,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.util.concurrent.Executor)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> thenRunAsync(Runnable pAction, Executor pExecutor) {
+  public ExtendedCompletableFuture<Void> thenRunAsync(Runnable pAction, Executor pExecutor) {
     return handleAsync((t, ex) -> {
         if (ex != null) {
           if (ex instanceof RuntimeException) throw (RuntimeException) ex;
@@ -483,8 +483,8 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public <U extends @Nullable Object> ExtendedCompletableFuture<@Nullable Void> thenAcceptBoth(
-    ExtendedCompletionStage<U> pOther, Consumer2<T, U> pAction) {
+  public <U extends @Nullable Object> ExtendedCompletableFuture<Void> thenAcceptBoth(ExtendedCompletionStage<U> pOther,
+    Consumer2<T, U> pAction) {
     return thenCombine(pOther, (a, b) -> {
         pAction.accept(a, b);
         return null;
@@ -497,7 +497,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   com.diamondq.common.lambda.interfaces.Consumer2)
    */
   @Override
-  public <U extends @Nullable Object> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(
+  public <U extends @Nullable Object> ExtendedCompletableFuture<Void> thenAcceptBothAsync(
     ExtendedCompletionStage<U> pOther, Consumer2<T, U> pAction) {
     return thenCombineAsync(pOther, (a, b) -> {
         pAction.accept(a, b);
@@ -511,7 +511,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   com.diamondq.common.lambda.interfaces.Consumer2, java.util.concurrent.Executor)
    */
   @Override
-  public <U extends @Nullable Object> ExtendedCompletableFuture<@Nullable Void> thenAcceptBothAsync(
+  public <U extends @Nullable Object> ExtendedCompletableFuture<Void> thenAcceptBothAsync(
     ExtendedCompletionStage<U> pOther, Consumer2<T, U> pAction, Executor pExecutor) {
     return thenCombineAsync(pOther, (a, b) -> {
         pAction.accept(a, b);
@@ -525,7 +525,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterBoth(ExtendedCompletionStage<?> pOther, Runnable pAction) {
+  public ExtendedCompletableFuture<Void> runAfterBoth(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return thenCombine(pOther, (a, b) -> {
         pAction.run();
         return null;
@@ -538,8 +538,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther,
-    Runnable pAction) {
+  public ExtendedCompletableFuture<Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     return thenCombineAsync(pOther, (a, b) -> {
         pAction.run();
         return null;
@@ -552,8 +551,8 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.lang.Runnable, java.util.concurrent.Executor)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther,
-    Runnable pAction, Executor pExecutor) {
+  public ExtendedCompletableFuture<Void> runAfterBothAsync(ExtendedCompletionStage<?> pOther, Runnable pAction,
+    Executor pExecutor) {
     return thenCombineAsync(pOther, (a, b) -> {
         pAction.run();
         return null;
@@ -631,8 +630,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> acceptEither(ExtendedCompletionStage<T> pOther,
-    Consumer1<T> pAction) {
+  public ExtendedCompletableFuture<Void> acceptEither(ExtendedCompletionStage<T> pOther, Consumer1<T> pAction) {
     return applyToEither(pOther, (t) -> {
         pAction.accept(t);
         return null;
@@ -645,8 +643,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   com.diamondq.common.lambda.interfaces.Consumer1)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther,
-    Consumer1<T> pAction) {
+  public ExtendedCompletableFuture<Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther, Consumer1<T> pAction) {
     return applyToEitherAsync(pOther, (t) -> {
         pAction.accept(t);
         return null;
@@ -659,8 +656,8 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   com.diamondq.common.lambda.interfaces.Consumer1, java.util.concurrent.Executor)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther,
-    Consumer1<T> pAction, Executor pExecutor) {
+  public ExtendedCompletableFuture<Void> acceptEitherAsync(ExtendedCompletionStage<T> pOther, Consumer1<T> pAction,
+    Executor pExecutor) {
     return applyToEitherAsync(pOther, (t) -> {
         pAction.accept(t);
         return null;
@@ -673,12 +670,12 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterEither(ExtendedCompletionStage<?> pOther, Runnable pAction) {
+  public ExtendedCompletableFuture<Void> runAfterEither(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     CancelableRunnable ab = wrapRunnable(pAction);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.runAfterEither(decomposeToCompletionStage(
-        pOther), ab
+      ExtendedCompletableFuture<Void> result = relatedOf(mDelegate.runAfterEither(decomposeToCompletionStage(pOther),
+        ab
       ));
       cleanupFlag = false;
       result = result.internalExceptionally(ab);
@@ -694,13 +691,11 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther,
-    Runnable pAction) {
+  public ExtendedCompletableFuture<Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther, Runnable pAction) {
     CancelableRunnable ab = wrapRunnable(pAction);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.runAfterEitherAsync(
-        decomposeToCompletionStage(pOther),
+      ExtendedCompletableFuture<Void> result = relatedOf(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther),
         ab
       ));
       cleanupFlag = false;
@@ -717,13 +712,12 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.lang.Runnable, java.util.concurrent.Executor)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther,
-    Runnable pAction, Executor pExecutor) {
+  public ExtendedCompletableFuture<Void> runAfterEitherAsync(ExtendedCompletionStage<?> pOther, Runnable pAction,
+    Executor pExecutor) {
     CancelableRunnable ab = wrapRunnable(pAction);
     boolean cleanupFlag = true;
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(mDelegate.runAfterEitherAsync(
-        decomposeToCompletionStage(pOther),
+      ExtendedCompletableFuture<Void> result = relatedOf(mDelegate.runAfterEitherAsync(decomposeToCompletionStage(pOther),
         ab,
         pExecutor
       ));
@@ -1061,10 +1055,10 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @param runnable the action to run before completing the returned CompletableFuture
    * @return the new CompletableFuture
    */
-  public static ExtendedCompletableFuture<@Nullable Void> runAsync(Runnable runnable) {
+  public static ExtendedCompletableFuture<Void> runAsync(Runnable runnable) {
     CancelableRunnable ab = wrapRunnable(runnable);
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab));
+      ExtendedCompletableFuture<Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab));
       ab = null;
       return result;
     }
@@ -1077,10 +1071,10 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedRunAsync(java.lang.Runnable)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Runnable pRunnable) {
+  public ExtendedCompletableFuture<Void> relatedRunAsync(Runnable pRunnable) {
     CancelableRunnable ab = wrapRunnable(pRunnable);
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(CompletableFuture.runAsync(ab));
+      ExtendedCompletableFuture<Void> result = relatedOf(CompletableFuture.runAsync(ab));
       ab = null;
       return result;
     }
@@ -1097,12 +1091,10 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @param executor the executor to use for asynchronous execution
    * @return the new CompletableFuture
    */
-  public static ExtendedCompletableFuture<@Nullable Void> runAsync(Runnable runnable, Executor executor) {
+  public static ExtendedCompletableFuture<Void> runAsync(Runnable runnable, Executor executor) {
     CancelableRunnable ab = wrapRunnable(runnable);
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab,
-        executor
-      ));
+      ExtendedCompletableFuture<Void> result = ExtendedCompletableFuture.of(CompletableFuture.runAsync(ab, executor));
       ab = null;
       return result;
     }
@@ -1116,10 +1108,10 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    *   java.util.concurrent.Executor)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor) {
+  public ExtendedCompletableFuture<Void> relatedRunAsync(Runnable pRunnable, Executor pExecutor) {
     CancelableRunnable ab = wrapRunnable(pRunnable);
     try {
-      ExtendedCompletableFuture<@Nullable Void> result = relatedOf(CompletableFuture.runAsync(ab, pExecutor));
+      ExtendedCompletableFuture<Void> result = relatedOf(CompletableFuture.runAsync(ab, pExecutor));
       ab = null;
       return result;
     }
@@ -1128,7 +1120,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
     }
   }
 
-  public static ExtendedCompletableFuture<@Nullable Void> allOf(ExtendedCompletableFuture<?>... cfs) {
+  public static ExtendedCompletableFuture<Void> allOf(ExtendedCompletableFuture<?>... cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
     for (int i = 0; i < cfs.length; i++)
       args[i] = decomposeToCompletableFuture(cfs[i]);
@@ -1141,7 +1133,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @param cfs the collection of futures
    * @return the future
    */
-  public static ExtendedCompletableFuture<@Nullable Void> allOf(Collection<ExtendedCompletableFuture<?>> cfs) {
+  public static ExtendedCompletableFuture<Void> allOf(Collection<ExtendedCompletableFuture<?>> cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
     int count = 0;
     for (Iterator<ExtendedCompletableFuture<?>> i = cfs.iterator(); i.hasNext(); ) {
@@ -1381,7 +1373,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
    * @see com.diamondq.common.lambda.future.ExtendedCompletionStage#relatedAllOf(com.diamondq.common.lambda.future.ExtendedCompletionStage[])
    */
   @Override
-  public ExtendedCompletionStage<@Nullable Void> relatedAllOf(ExtendedCompletionStage<?>... cfs) {
+  public ExtendedCompletionStage<Void> relatedAllOf(ExtendedCompletionStage<?>... cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.length];
     for (int i = 0; i < cfs.length; i++)
       args[i] = decomposeToCompletableFuture(cfs[i]);
@@ -1389,7 +1381,7 @@ public class ExtendedCompletableFuture<T extends @Nullable Object> implements Ex
   }
 
   @Override
-  public ExtendedCompletionStage<@Nullable Void> relatedAllOf(Collection<? extends ExtendedCompletionStage<?>> cfs) {
+  public ExtendedCompletionStage<Void> relatedAllOf(Collection<? extends ExtendedCompletionStage<?>> cfs) {
     CompletableFuture<?>[] args = new CompletableFuture<?>[cfs.size()];
     int count = 0;
     for (Iterator<? extends ExtendedCompletionStage<?>> i = cfs.iterator(); i.hasNext(); ) {

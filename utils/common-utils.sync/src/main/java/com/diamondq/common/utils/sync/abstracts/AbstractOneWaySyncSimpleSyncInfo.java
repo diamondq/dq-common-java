@@ -56,7 +56,7 @@ public abstract class AbstractOneWaySyncSimpleSyncInfo<T, T_KEY>
    * @see com.diamondq.common.utils.sync.SyncInfo#createA(java.util.stream.Stream)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> createA(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> createA(Stream<Pair<T_KEY, T>> pStream) {
     if (pStream.findAny().isPresent()) throw new IllegalStateException();
     return ExtendedCompletableFuture.completedFuture(null);
   }
@@ -65,7 +65,7 @@ public abstract class AbstractOneWaySyncSimpleSyncInfo<T, T_KEY>
    * @see com.diamondq.common.utils.sync.SyncInfo#deleteA(java.util.stream.Stream)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> deleteA(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> deleteA(Stream<Pair<T_KEY, T>> pStream) {
     if (pStream.findAny().isPresent()) throw new IllegalStateException();
     return ExtendedCompletableFuture.completedFuture(null);
   }
@@ -74,7 +74,7 @@ public abstract class AbstractOneWaySyncSimpleSyncInfo<T, T_KEY>
    * @see com.diamondq.common.utils.sync.SyncInfo#modifyA(java.util.stream.Stream)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> modifyA(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> modifyA(Stream<Pair<T_KEY, T>> pStream) {
     if (pStream.findAny().isPresent()) throw new IllegalStateException();
     return ExtendedCompletableFuture.completedFuture(null);
   }

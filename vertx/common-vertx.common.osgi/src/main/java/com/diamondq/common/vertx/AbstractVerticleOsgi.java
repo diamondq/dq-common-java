@@ -146,7 +146,7 @@ public abstract class AbstractVerticleOsgi {
         Pair<String, String> registration = mRegistration;
         if (registration != null) {
           @SuppressWarnings(
-            "unchecked") ContextExtendedCompletionStage<@Nullable Void> result = (ContextExtendedCompletionStage<@Nullable Void>) mShutdownMethod.invoke(
+            "unchecked") ContextExtendedCompletionStage<Void> result = (ContextExtendedCompletionStage<Void>) mShutdownMethod.invoke(
             null,
             mContextFactory,
             mServiceDiscovery,

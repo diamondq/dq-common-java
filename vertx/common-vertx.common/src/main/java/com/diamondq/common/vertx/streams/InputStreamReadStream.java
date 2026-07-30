@@ -22,7 +22,7 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
 
   private volatile @Nullable Context mEndContext;
 
-  private volatile @Nullable Handler<@Nullable Void> mEndHandler;
+  private volatile @Nullable Handler<Void> mEndHandler;
 
   private volatile @Nullable Context mHandlerContext;
 
@@ -52,7 +52,7 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
 
   @SuppressWarnings("null")
   @Override
-  public ReadStream<Buffer> endHandler(@Nullable Handler<@Nullable Void> pEndHandler) {
+  public ReadStream<Buffer> endHandler(@Nullable Handler<Void> pEndHandler) {
     mEndContext = mVertx.getOrCreateContext();
     mEndHandler = pEndHandler;
 
@@ -60,7 +60,7 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
 
     if (mIsFinished) {
       Context context = mEndContext;
-      Handler<@Nullable Void> endHandler = mEndHandler;
+      Handler<Void> endHandler = mEndHandler;
       if ((context != null) && (endHandler != null)) {
         context.runOnContext((v) -> endHandler.handle(null));
       }
@@ -80,7 +80,7 @@ public class InputStreamReadStream implements ReadStream<Buffer> {
               /* We've reached the end of the stream, so inform the ReadStream endHandler */
 
               Context context = mEndContext;
-              Handler<@Nullable Void> endHandler = mEndHandler;
+              Handler<Void> endHandler = mEndHandler;
               mIsFinished = true;
               if ((context != null) && (endHandler != null)) {
                 context.runOnContext((v) -> endHandler.handle(null));

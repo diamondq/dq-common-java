@@ -146,8 +146,7 @@ public class EventBusRecordRegistrator implements ServiceExporter {
    *   io.vertx.servicediscovery.spi.ServicePublisher, io.vertx.core.json.JsonObject, io.vertx.core.Promise)
    */
   @Override
-  public void init(Vertx pVertx, ServicePublisher pPublisher, JsonObject pConfiguration,
-    Promise<@Nullable Void> pFuture) {
+  public void init(Vertx pVertx, ServicePublisher pPublisher, JsonObject pConfiguration, Promise<Void> pFuture) {
     try (Context ctx = mContextFactory.newContext(EventBusRecordRegistrator.class,
       this,
       pVertx,
@@ -215,7 +214,7 @@ public class EventBusRecordRegistrator implements ServiceExporter {
    * @see io.vertx.servicediscovery.spi.ServiceExporter#close(io.vertx.core.Handler)
    */
   @Override
-  public void close(@Nullable Handler<@Nullable Void> pCloseHandler) {
+  public void close(@Nullable Handler<Void> pCloseHandler) {
 
     /* Unregister all the registrations */
 

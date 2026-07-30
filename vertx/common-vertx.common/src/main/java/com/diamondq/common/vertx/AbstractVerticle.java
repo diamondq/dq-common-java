@@ -9,7 +9,7 @@ public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
 
   protected boolean mVerticleRunning = false;
 
-  protected final ExtendedCompletableFuture<@Nullable Void> mRunningFuture = new ExtendedCompletableFuture<>();
+  protected final ExtendedCompletableFuture<Void> mRunningFuture = new ExtendedCompletableFuture<>();
 
   protected void setRunning(boolean pValue) {
     synchronized (this) {
@@ -22,7 +22,7 @@ public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
    * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Promise)
    */
   @Override
-  public void start(Promise<@Nullable Void> startFuture) throws Exception {
+  public void start(Promise<Void> startFuture) throws Exception {
     start();
     setRunning(true);
     startFuture.complete();
@@ -32,13 +32,13 @@ public class AbstractVerticle extends io.vertx.core.AbstractVerticle {
    * @see io.vertx.core.AbstractVerticle#stop(io.vertx.core.Promise)
    */
   @Override
-  public void stop(Promise<@Nullable Void> stopFuture) throws Exception {
+  public void stop(Promise<Void> stopFuture) throws Exception {
     stop();
     setRunning(false);
     stopFuture.complete();
   }
 
-  public ExtendedCompletionStage<@Nullable Void> waitUntilRunning() {
+  public ExtendedCompletionStage<Void> waitUntilRunning() {
     return mRunningFuture;
   }
 }

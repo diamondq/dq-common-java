@@ -62,7 +62,7 @@ public class ComparableSyncInfo<T extends Comparable<T>, T_KEY> extends Abstract
    * @see com.diamondq.common.utils.sync.SyncInfo#createB(java.util.stream.Stream)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> createB(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> createB(Stream<Pair<T_KEY, T>> pStream) {
     return ExtendedCompletableFuture.completedFuture(null);
   }
 
@@ -70,7 +70,7 @@ public class ComparableSyncInfo<T extends Comparable<T>, T_KEY> extends Abstract
    * @see com.diamondq.common.utils.sync.SyncInfo#deleteB(java.util.stream.Stream)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> deleteB(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> deleteB(Stream<Pair<T_KEY, T>> pStream) {
     return ExtendedCompletableFuture.completedFuture(null);
   }
 
@@ -78,7 +78,7 @@ public class ComparableSyncInfo<T extends Comparable<T>, T_KEY> extends Abstract
    * @see com.diamondq.common.utils.sync.SyncInfo#modifyB(java.util.stream.Stream)
    */
   @Override
-  public ExtendedCompletableFuture<@Nullable Void> modifyB(Stream<Pair<T_KEY, T>> pStream) {
+  public ExtendedCompletableFuture<Void> modifyB(Stream<Pair<T_KEY, T>> pStream) {
     return ExtendedCompletableFuture.completedFuture(null);
   }
 

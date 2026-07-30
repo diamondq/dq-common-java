@@ -95,7 +95,7 @@ public class VertxUtils {
 
       }
       ContextExtendedCompletableFuture<Object> holderFuture = FutureUtils.newCompletableFuture();
-      ContextExtendedCompletionStage<@Nullable Void> deploymentFuture = holderFuture.relatedAllOf(futures);
+      ContextExtendedCompletionStage<Void> deploymentFuture = holderFuture.relatedAllOf(futures);
 
       return deploymentFuture.thenApply((v, ctx2) -> new Undeployer(pVertx, deploymentIds));
     }
@@ -110,7 +110,7 @@ public class VertxUtils {
     }
   }
 
-  public static @Nullable Void reportThrowable(Throwable pThrowable, Context pContext) {
+  public static Void reportThrowable(Throwable pThrowable, Context pContext) {
     pContext.reportThrowable(pThrowable);
     return null;
   }
@@ -448,12 +448,12 @@ public class VertxUtils {
 
   /* **************************************** VERTX DATASTREAM ************************************************** */
 
-  public static ContextExtendedCompletionStage<@Nullable Void> readStream(ReadStream<Buffer> pStream,
-    Function2<Buffer, Context, ContextExtendedCompletionStage<@Nullable Void>> pHandler) {
+  public static ContextExtendedCompletionStage<Void> readStream(ReadStream<Buffer> pStream,
+    Function2<Buffer, Context, ContextExtendedCompletionStage<Void>> pHandler) {
     Context currentContext = ContextFactory.currentContext();
     currentContext.prepareForAlternateThreads();
     AtomicBoolean closed = new AtomicBoolean(false);
-    ContextExtendedCompletableFuture<@Nullable Void> finished = FutureUtils.newCompletableFuture();
+    ContextExtendedCompletableFuture<Void> finished = FutureUtils.newCompletableFuture();
 
     Holder<@Nullable Throwable> pendingError = new Holder<>(null);
 
@@ -489,10 +489,10 @@ public class VertxUtils {
       }
       currentContext.prepareForAlternateThreads();
       try (Context ctx = currentContext.activateOnThread("")) {
-        ContextExtendedCompletionStage<@Nullable Void> result = pHandler.apply(buffer, ctx);
+        ContextExtendedCompletionStage<Void> result = pHandler.apply(buffer, ctx);
         boolean isDone;
         if (result instanceof ContextExtendedCompletableFuture)
-          isDone = ((ContextExtendedCompletableFuture<@Nullable Void>) result).isDone();
+          isDone = ((ContextExtendedCompletableFuture<Void>) result).isDone();
         else isDone = false;
         if (isDone == false) {
           pStream.pause();
