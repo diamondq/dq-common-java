@@ -499,7 +499,7 @@ public class ProxyGenerator implements Generator {
         // ctx.prepareForAlternateThreads();
         .addStatement("ctx.prepareForAlternateThreads()")
         // listener.unregister(
-        .addStatement("listener.unregister($L)", unregisterHandler)
+        .addStatement("listener.unregister().onComplete($L)", unregisterHandler)
         // }
         .endControlFlow()
         // }
@@ -1366,7 +1366,7 @@ public class ProxyGenerator implements Generator {
         .addCode("\n/* Send the message */\n\n")
 
         // mVertx.eventBus().<String> send(mAddress, message, options,
-        .addStatement("$N.eventBus().<$T>request($N, $N, $N, $L)",
+        .addStatement("$N.eventBus().<$T>request($N, $N, $N).onComplete($L)",
           "mVertx",
           replyReturnType,
           "mAddress",

@@ -2,6 +2,7 @@ package com.diamondq.common.injection.osgi;
 
 import com.diamondq.common.context.impl.ContextFactoryImpl;
 import com.diamondq.common.context.impl.logging.LoggingContextHandler;
+import com.diamondq.common.errors.DQRuntimeException;
 import com.diamondq.common.errors.ExtendedIllegalArgumentException;
 import com.diamondq.common.injection.osgi.i18n.Messages;
 import com.diamondq.common.injection.osgi.testmodel.TestClassWithObjConstructor;
@@ -46,6 +47,7 @@ public class Test1 {
     }
     catch (RuntimeException ex) {
       Throwable cause = ex.getCause();
+      if (cause instanceof DQRuntimeException dq) cause = dq.getCause();
       if (cause instanceof ExtendedIllegalArgumentException) {
         ExtendedIllegalArgumentException actualEx = (ExtendedIllegalArgumentException) cause;
         Assert.assertEquals(Messages.NO_PROP_MATCHING_FILTER, actualEx.getCode());

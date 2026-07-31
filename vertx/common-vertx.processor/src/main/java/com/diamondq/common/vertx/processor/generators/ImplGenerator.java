@@ -1382,7 +1382,7 @@ public class ImplGenerator implements Generator {
       // ctx.prepareForAlternateThreads();
       .addStatement("ctx.prepareForAlternateThreads()")
       // consumer.unregister(
-      .addStatement("consumer.unregister($L)", completionHandler)
+      .addStatement("consumer.unregister().onComplete($L)", completionHandler)
       // }
       .endControlFlow()
       // }
@@ -1397,39 +1397,24 @@ public class ImplGenerator implements Generator {
     MethodSpec.Builder completionMethod = MethodSpec.methodBuilder("handle")
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(Override.class)
-      .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-        ), "ar"
-      ).build())
+      .addParameter(ParameterSpec.builder(
+//        ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
+//          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
+//        ),
+        ClassName.get(Void.class), "ar").build())
       .beginControlFlow("try ($T ctx2 = ctx.activateOnThread($S))", Context.class, "")
       // /* The registration of the consumer is complete */
       //
       .addCode("\n/* The registration of the consumer is complete */\n\n")
-      // if (ar.succeeded() == true)
-      .beginControlFlow("if (ar.succeeded() == true)")
       // mConsumer = consumer;
       .addStatement("mConsumer = consumer")
       // pStartFuture.complete();
       .addStatement("pStartFuture.complete()")
-      // } else {
-      .nextControlFlow("else")
-      //
-      // /* Indicate that there was a problem */
-      //
-      .addCode("\n/* Indicate that there was a problem */\n\n")
-      // pStartFuture.fail(Verify.notNull(ar.cause()));
-      .addStatement("pStartFuture.fail($T.notNull(ar.cause()))", Verify.class)
-      // }
-      .endControlFlow()
       // }
       .endControlFlow();
 
     TypeSpec completionHandler = TypeSpec.anonymousClassBuilder("")
-      .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class),
-        ParameterizedTypeName.get(ClassName.get(AsyncResult.class),
-          ClassName.get(Void.class).annotated(AnnotationSpec.builder(Nullable.class).build())
-        )
-      ))
+      .addSuperinterface(ParameterizedTypeName.get(ClassName.get(Handler.class), ClassName.get(Void.class)))
       .addMethod(completionMethod.build()) //
       .build();
 
@@ -1487,7 +1472,7 @@ public class ImplGenerator implements Generator {
       // ctx.prepareForAlternateThreads()
       .addStatement("ctx.prepareForAlternateThreads()")
       // consumer.completionHandler((ar) -> {
-      .addStatement("consumer.completionHandler($L)", completionHandler)
+      .addStatement("consumer.endHandler($L)", completionHandler)
       //
       // /* Register a handler to callback on each message from the EventBus */
       //
@@ -1765,7 +1750,7 @@ public class ImplGenerator implements Generator {
       // ctx3.prepareForAlternateThreads();
       .addStatement("ctx3.prepareForAlternateThreads()")
       // pVertx.undeploy(wasDeployedId,
-      .addStatement("pVertx.undeploy(wasDeployedId, $L)", secondUndeployHandler)
+      .addStatement("pVertx.undeploy(wasDeployedId).onComplete($L)", secondUndeployHandler)
 
       // }
       .endControlFlow()
@@ -1833,7 +1818,7 @@ public class ImplGenerator implements Generator {
       // ctx2.prepareForAlternateThreads();
       .addStatement("ctx2.prepareForAlternateThreads()")
       // pServiceDiscovery.publish(record,
-      .addStatement("pServiceDiscovery.publish(record, $L)", publishHandler)
+      .addStatement("pServiceDiscovery.publish(record).onComplete($L)", publishHandler)
       // } else {
       .nextControlFlow("else")
       // Verify.throwRuntimeException(ar.cause());
@@ -1853,7 +1838,7 @@ public class ImplGenerator implements Generator {
       // ctx2.prepareForAlternateThreads();
       .addStatement("ctx2.prepareForAlternateThreads()")
       // pVertx.undeploy(deploymentId,
-      .addStatement("pVertx.undeploy(deploymentId, $L)", undeployHandler)
+      .addStatement("pVertx.undeploy(deploymentId).onComplete($L)", undeployHandler)
 
       // } else {
       .nextControlFlow("else")
@@ -2005,7 +1990,7 @@ public class ImplGenerator implements Generator {
       // ctx.prepareForAlternateThreads();
       .addStatement("ctx.prepareForAlternateThreads()")
       // pVertx.deployVerticle(pSupplier, options, (ar) -> {
-      .addStatement("pVertx.deployVerticle(pSupplier, options, $L)", deployHandler)
+      .addStatement("pVertx.deployVerticle(pSupplier, options).onComplete($L)", deployHandler)
       // return result;
       .addStatement("return result")
       // }
