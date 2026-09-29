@@ -771,7 +771,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.12.1/value-2.12.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.12.2/value-2.12.2.jar" />
         </processorPath>
         <module name="common-jaxrs.common" />
       </profile>
@@ -873,7 +873,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.12.1/value-2.12.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/immutables/value/2.12.2/value-2.12.2.jar" />
         </processorPath>
         <module name="common-security.jwt" />
       </profile>

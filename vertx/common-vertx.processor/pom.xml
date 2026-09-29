@@ -10,6 +10,20 @@
   <artifactId>common-vertx.processor</artifactId>
   <packaging>jar</packaging>
   <name>DiamondQ Common: Vert.x: Annotation Processor</name>
+  <dependencyManagement>
+    <dependencies>
+      <!-- This module has no vertx-annotations profile (it IS the processor), so master-parent's vertx-netty profile doesn't apply.
+           common-thirdparty.micrometer.core brings netty 4.1.x, but vertx-core 5.0.8 needs 4.2.x. Keep in sync with the netty-bom
+           version in master-parent's vertx-netty profile. -->
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>4.2.18.Final</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
