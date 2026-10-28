@@ -19,8 +19,23 @@ public interface MessagesEnum extends Serializable {
    */
   String getCode();
 
+  /**
+   * Returns the bundle that holds the text for this enum's messages. Generated enums implement this by calling
+   * {@link I18N#getBundle(Class, String, Locale)}, which also applies any registered {@link ResourceBundleResolver}s.
+   *
+   * @param pLocale the locale
+   * @return the bundle, which contains this message's code as a key
+   * @throws java.util.MissingResourceException if there is no bundle
+   */
   ResourceBundle getBundle(Locale pLocale);
 
+  /**
+   * Creates a message that has not yet been localized, using this enum entry as the message and the given values as
+   * the arguments to its format.
+   *
+   * @param pParams the values for the placeholders in the message's format, if any
+   * @return the message. Call {@link I18NString#format(Locale)} or toString() to localize it
+   */
   default I18NString with(@Nullable Object @Nullable ... pParams) {
     return new I18NString(this, pParams);
   }

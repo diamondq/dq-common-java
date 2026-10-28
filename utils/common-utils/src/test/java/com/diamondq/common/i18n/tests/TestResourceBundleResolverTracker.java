@@ -23,7 +23,7 @@ public class TestResourceBundleResolverTracker {
         return new Object[][] {{"greeting", "Overridden"}};
       }
     };
-    ResourceBundleResolver resolver = (pBasename, pLocale, pClassLoader) -> override;
+    ResourceBundleResolver resolver = (pBasename, pLocale, pClassLoader, pCurrent) -> override;
     ResourceBundleResolverTracker tracker = new ResourceBundleResolverTracker();
 
     tracker.addResolver(resolver);

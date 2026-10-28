@@ -2,6 +2,7 @@ package com.diamondq.common.i18n;
 
 import org.jspecify.annotations.Nullable;
 
+import java.lang.ref.SoftReference;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,13 +11,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.spi.ResourceBundleControlProvider;
 
 /**
@@ -38,6 +42,21 @@ public class I18N {
   private static final Control INSTANCE;
 
   private static final List<ResourceBundleResolver> sResourceBundleResolvers = new CopyOnWriteArrayList<>();
+
+  private record BundleKey(String basename, Locale locale) {
+  }
+
+  /**
+   * The bundles that were built by running the resolvers, by ClassLoader. The ClassLoader is held weakly and the
+   * bundles softly, since a bundle refers to the ClassLoader that loaded it.
+   */
+  private static final Map<ClassLoader, ConcurrentMap<BundleKey, SoftReference<ResourceBundle>>> sComposedBundles = Collections.synchronizedMap(
+    new WeakHashMap<>());
+
+  /**
+   * Incremented whenever a resolver is added or removed
+   */
+  private static final AtomicLong sResolverVersion = new AtomicLong();
 
   static {
     try {
@@ -156,6 +175,7 @@ public class I18N {
    */
   public static void addResourceBundleResolver(ResourceBundleResolver pResolver) {
     sResourceBundleResolvers.add(pResolver);
+    resolversChanged();
   }
 
   /**
@@ -165,15 +185,27 @@ public class I18N {
    * @return true if it was registered
    */
   public static boolean removeResourceBundleResolver(ResourceBundleResolver pResolver) {
-    return sResourceBundleResolvers.remove(pResolver);
+    boolean removed = sResourceBundleResolvers.remove(pResolver);
+    if (removed) resolversChanged();
+    return removed;
+  }
+
+  private static void resolversChanged() {
+    sResolverVersion.incrementAndGet();
+    sComposedBundles.clear();
   }
 
   /**
    * Looks up the bundle for a MessagesEnum. Generated MessagesEnum classes should call this from their getBundle
-   * method. The registered {@link ResourceBundleResolver}s are asked in order and the first one to return a bundle wins. If
-   * none do, the standard ResourceBundle lookup is used with the ClassLoader from
-   * {@link #getClassLoader(Class, String)}. No ResourceBundle.Control is used, so this works in named modules and in
-   * OSGi (where resources can be supplied by fragment bundles attached to the bundle that contains the enum).
+   * method. It starts with the standard ResourceBundle lookup, using the ClassLoader from
+   * {@link #getClassLoader(Class, String)}, and then passes the result through each registered
+   * {@link ResourceBundleResolver} in registration order, so resolvers can layer their own messages on top of each
+   * other. No ResourceBundle.Control is used, so this works in named modules and in OSGi (where resources can be
+   * supplied by fragment bundles attached to the bundle that contains the enum).
+   * <p>
+   * When there are resolvers, the result is cached until a resolver is added or removed, so the same bundle instance is
+   * returned for repeated lookups. The cache holds its bundles softly, so it doesn't keep the class loader of an
+   * uninstalled OSGi bundle alive.
    *
    * @param pClass the MessagesEnum class
    * @param pBasename the base name of the bundle
@@ -183,11 +215,41 @@ public class I18N {
    */
   public static ResourceBundle getBundle(Class<? extends MessagesEnum> pClass, String pBasename, Locale pLocale) {
     ClassLoader classLoader = getClassLoader(pClass, pBasename);
-    for (ResourceBundleResolver resolver : sResourceBundleResolvers) {
-      ResourceBundle bundle = resolver.getBundle(pBasename, pLocale, classLoader);
-      if (bundle != null) return bundle;
+    if (sResourceBundleResolvers.isEmpty()) return ResourceBundle.getBundle(pBasename, pLocale, classLoader);
+
+    BundleKey key = new BundleKey(pBasename, pLocale);
+    ConcurrentMap<BundleKey, SoftReference<ResourceBundle>> perLoader = sComposedBundles.computeIfAbsent(classLoader,
+      k -> new ConcurrentHashMap<>());
+    SoftReference<ResourceBundle> ref = perLoader.get(key);
+    ResourceBundle cached = (ref == null ? null : ref.get());
+    if (cached != null) return cached;
+
+    /* Only cache the result if no resolver was added or removed while it was being built */
+
+    long version = sResolverVersion.get();
+    ResourceBundle composed = composeBundle(pBasename, pLocale, classLoader);
+    if (version == sResolverVersion.get()) perLoader.put(key, new SoftReference<>(composed));
+    return composed;
+  }
+
+  private static ResourceBundle composeBundle(String pBasename, Locale pLocale, ClassLoader pClassLoader) {
+    ResourceBundle current;
+    MissingResourceException missing;
+    try {
+      current = ResourceBundle.getBundle(pBasename, pLocale, pClassLoader);
+      missing = null;
     }
-    return ResourceBundle.getBundle(pBasename, pLocale, classLoader);
+    catch (MissingResourceException ex) {
+      /* A resolver might still supply the bundle */
+      current = null;
+      missing = ex;
+    }
+    for (ResourceBundleResolver resolver : sResourceBundleResolvers) {
+      ResourceBundle next = resolver.getBundle(pBasename, pLocale, pClassLoader, current);
+      if (next != null) current = next;
+    }
+    if (current == null) throw Objects.requireNonNull(missing);
+    return current;
   }
 
   /**
