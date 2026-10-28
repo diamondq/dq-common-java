@@ -57,6 +57,46 @@ public interface ContextFactory {
     getInstance().reportTrace(pClass, pThis, pMessage, pArgs);
   }
 
+  static void staticReportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    getInstance().reportDebug(pClass, pThis, pMessage, pArgs);
+  }
+
+  static void staticReportDebug(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable,
+    String pMessage, @Nullable Object @Nullable ... pArgs) {
+    getInstance().reportDebug(pClass, pThis, pThrowable, pMessage, pArgs);
+  }
+
+  static void staticReportInfo(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    getInstance().reportInfo(pClass, pThis, pMessage, pArgs);
+  }
+
+  static void staticReportInfo(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    getInstance().reportInfo(pClass, pThis, pThrowable, pMessage, pArgs);
+  }
+
+  static void staticReportWarn(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    getInstance().reportWarn(pClass, pThis, pMessage, pArgs);
+  }
+
+  static void staticReportWarn(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    getInstance().reportWarn(pClass, pThis, pThrowable, pMessage, pArgs);
+  }
+
+  static void staticReportError(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    getInstance().reportError(pClass, pThis, pMessage, pArgs);
+  }
+
+  static void staticReportError(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable,
+    String pMessage, @Nullable Object @Nullable ... pArgs) {
+    getInstance().reportError(pClass, pThis, pThrowable, pMessage, pArgs);
+  }
+
   static DQRuntimeException staticReportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
     return getInstance().reportThrowable(pClass, pThis, pThrowable);
   }
@@ -144,6 +184,19 @@ public interface ContextFactory {
   void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
+   * Report a "debug" with an associated exception and a message with parameters outside a context. It will
+   * automatically create a context, report the "debug" and then end the context.
+   *
+   * @param pClass the class
+   * @param pThis the caller object
+   * @param pThrowable the exception (may be null)
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
+  void reportDebug(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs);
+
+  /**
    * Report an info message outside a context. It will automatically create a context, report the info, and then end the
    * context.
    *
@@ -155,6 +208,19 @@ public interface ContextFactory {
   void reportInfo(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
+   * Report a "info" with an associated exception and a message with parameters outside a context. It will automatically
+   * create a context, report the "info" and then end the context.
+   *
+   * @param pClass the class
+   * @param pThis the caller object
+   * @param pThrowable the exception (may be null)
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
+  void reportInfo(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs);
+
+  /**
    * Report a "warn" outside a context. It will automatically create a context, report the "warn" and then end the
    * context.
    *
@@ -164,6 +230,56 @@ public interface ContextFactory {
    * @param pArgs the arguments
    */
   void reportWarn(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
+
+  /**
+   * Report a "warn" with an associated exception and a message with parameters outside a context. It will automatically
+   * create a context, report the "warn" and then end the context.
+   *
+   * @param pClass the class
+   * @param pThis the caller object
+   * @param pThrowable the exception (may be null)
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
+  void reportWarn(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs);
+
+  /**
+   * Report an "error" outside a context. It will automatically create a context, report the "error" and then end the
+   * context.
+   *
+   * @param pClass the class
+   * @param pThis the caller object
+   * @param pMessage the message
+   * @param pArgs the arguments
+   */
+  void reportError(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Object @Nullable ... pArgs);
+
+  /**
+   * Report an "error" with an associated exception outside a context. It will automatically create a context, report
+   * the "error" and then end the context. Unlike reportThrowable, this only logs and does not return an exception.
+   *
+   * @param pClass the class
+   * @param pThis the caller object
+   * @param pMessage the message
+   * @param pThrowable the exception
+   * @deprecated use {@link #reportError(Class, Object, Throwable, String, Object...)}
+   */
+  @Deprecated
+  void reportError(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Throwable pThrowable);
+
+  /**
+   * Report an "error" with an associated exception and a message with parameters outside a context. It will
+   * automatically create a context, report the "error" and then end the context.
+   *
+   * @param pClass the class
+   * @param pThis the caller object
+   * @param pThrowable the exception (may be null)
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
+  void reportError(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs);
 
   /**
    * Register a new context propagator used to retrieve the Context stack for a given thread. NOTE: This registration is

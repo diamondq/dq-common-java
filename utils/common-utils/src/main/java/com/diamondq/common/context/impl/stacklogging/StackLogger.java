@@ -48,8 +48,7 @@ public class StackLogger implements ContextHandler {
   @Override
   public void executeOnContextStart(ContextClass pContext) {
     Long startTime = pContext.getHandlerData("start-stack-logger", false, Long.class);
-    if (startTime != null) System.out.println("here");
-    startTime = System.currentTimeMillis();
+    if (startTime == null) startTime = System.currentTimeMillis();
     pContext.setHandlerData("start-stack-logger", startTime);
     ContextClass parentContextClass = pContext.getParentContextClass();
     if (parentContextClass != null) {

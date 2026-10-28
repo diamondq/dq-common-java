@@ -36,8 +36,20 @@ public interface Context extends AutoCloseable {
   <T extends @Nullable Object> T exit(@Nullable T pResult,
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc);
 
+  /**
+   * Report a trace level message using an internationalized string and exception
+   *
+   * @param pEx the internationalized string and exception
+   * @return the same pEx, so that it can be used inline
+   */
   I18NStringAndException trace(I18NStringAndException pEx);
 
+  /**
+   * Report a trace level message
+   *
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
   void trace(String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
@@ -47,6 +59,13 @@ public interface Context extends AutoCloseable {
    */
   void trace(@Nullable Object @Nullable ... pArgs);
 
+  /**
+   * Report a trace level message where each argument is followed by a conversion Function used to convert the argument
+   * into what is displayed (see ContextPrinters). Provide a null function if conversion is not necessary
+   *
+   * @param pMessage the message
+   * @param pArgs the arguments, each followed by its conversion function
+   */
   void traceWithMeta(String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
@@ -56,8 +75,30 @@ public interface Context extends AutoCloseable {
    */
   boolean isTraceEnabled();
 
+  /**
+   * Report a debug level message
+   *
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
   void debug(String pMessage, @Nullable Object @Nullable ... pArgs);
 
+  /**
+   * Report a debug level message with an associated exception
+   *
+   * @param pThrowable the exception (may be null)
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
+  void debug(@Nullable Throwable pThrowable, String pMessage, @Nullable Object @Nullable ... pArgs);
+
+  /**
+   * Report a debug level message where each argument is followed by a conversion Function used to convert the argument
+   * into what is displayed (see ContextPrinters). Provide a null function if conversion is not necessary
+   *
+   * @param pMessage the message
+   * @param pArgs the arguments, each followed by its conversion function
+   */
   void debugWithMeta(String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
@@ -67,7 +108,22 @@ public interface Context extends AutoCloseable {
    */
   boolean isDebugEnabled();
 
+  /**
+   * Report an info level message
+   *
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
   void info(String pMessage, @Nullable Object @Nullable ... pArgs);
+
+  /**
+   * Report a info level message with an associated exception
+   *
+   * @param pThrowable the exception (may be null)
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
+  void info(@Nullable Throwable pThrowable, String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
    * Returns whether info is enabled
@@ -76,7 +132,22 @@ public interface Context extends AutoCloseable {
    */
   boolean isInfoEnabled();
 
+  /**
+   * Report a warn level message
+   *
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
   void warn(String pMessage, @Nullable Object @Nullable ... pArgs);
+
+  /**
+   * Report a warn level message with an associated exception
+   *
+   * @param pThrowable the exception (may be null)
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
+  void warn(@Nullable Throwable pThrowable, String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
    * Returns whether warn is enabled
@@ -85,9 +156,32 @@ public interface Context extends AutoCloseable {
    */
   boolean isWarnEnabled();
 
+  /**
+   * Report an error level message
+   *
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
   void error(String pMessage, @Nullable Object @Nullable ... pArgs);
 
+  /**
+   * Report an error level message with an associated exception
+   *
+   * @param pMessage the message
+   * @param pThrowable the exception (may be null)
+   * @deprecated use {@link #error(Throwable, String, Object...)}
+   */
+  @Deprecated
   void error(String pMessage, @Nullable Throwable pThrowable);
+
+  /**
+   * Reports an error with both an exception and a message with parameters.
+   *
+   * @param pThrowable the exception (may be null)
+   * @param pMessage the message
+   * @param pArgs the message arguments
+   */
+  void error(@Nullable Throwable pThrowable, String pMessage, @Nullable Object @Nullable ... pArgs);
 
   /**
    * Returns whether error is enabled

@@ -92,7 +92,7 @@ public class ContextClass implements Context {
    * @see com.diamondq.common.context.Context#setData(java.lang.String, java.lang.Object)
    */
   @Override
-  public <T> void setData(String pKey, T pValue) {
+  public <T extends @Nullable Object> void setData(String pKey, T pValue) {
 
     /* Make sure the context is open */
 
@@ -137,7 +137,7 @@ public class ContextClass implements Context {
    * @see com.diamondq.common.context.Context#getData(java.lang.String, boolean, java.lang.Class)
    */
   @Override
-  public <T> @Nullable T getData(String pKey, boolean pSearchParents, Class<T> pDataClass) {
+  public <T extends @Nullable Object> @Nullable T getData(String pKey, boolean pSearchParents, Class<T> pDataClass) {
 
     /* Make sure the context is open */
 
@@ -159,7 +159,8 @@ public class ContextClass implements Context {
    * @param pDataClass the expected class of the result
    * @return the result or null
    */
-  public <T> @Nullable T getHandlerData(String pKey, boolean pSearchParents, Class<T> pDataClass) {
+  public <T extends @Nullable Object> @Nullable T getHandlerData(String pKey, boolean pSearchParents,
+    Class<T> pDataClass) {
 
     /* NOTE: The context is NOT verified to be open, since this may be called during the closing of the context */
 
@@ -244,7 +245,6 @@ public class ContextClass implements Context {
   public <T extends @Nullable Object> T exit(@Nullable T pResult) {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.exit() called on an already closed Context", null);
-    //noinspection DataFlowIssue
     return mFactory.internalExitValue(this, pResult);
   }
 
@@ -256,7 +256,6 @@ public class ContextClass implements Context {
     @Nullable Function<@Nullable Object, @Nullable Object> pFunc) {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.exit() called on an already closed Context", null);
-    //noinspection DataFlowIssue
     return mFactory.internalExitValueWithMeta(this, pResult, pFunc);
   }
 
@@ -324,6 +323,16 @@ public class ContextClass implements Context {
   }
 
   /**
+   * @see com.diamondq.common.context.Context#debug(java.lang.Throwable, java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void debug(@Nullable Throwable pThrowable, String pMessage, @Nullable Object @Nullable ... pArgs) {
+    if (mOpenCount.get() <= 0)
+      mFactory.internalReportWarn(this, "Context.debug() called on an already closed Context", null);
+    mFactory.internalReportDebug(this, pMessage, appendThrowable(pThrowable, pArgs));
+  }
+
+  /**
    * @see com.diamondq.common.context.Context#debugWithMeta(java.lang.String, java.lang.Object[])
    */
   @Override
@@ -354,6 +363,16 @@ public class ContextClass implements Context {
   }
 
   /**
+   * @see com.diamondq.common.context.Context#info(java.lang.Throwable, java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void info(@Nullable Throwable pThrowable, String pMessage, @Nullable Object @Nullable ... pArgs) {
+    if (mOpenCount.get() <= 0)
+      mFactory.internalReportWarn(this, "Context.info() called on an already closed Context", null);
+    mFactory.internalReportInfo(this, pMessage, appendThrowable(pThrowable, pArgs));
+  }
+
+  /**
    * @see com.diamondq.common.context.Context#isInfoEnabled()
    */
   @Override
@@ -371,6 +390,16 @@ public class ContextClass implements Context {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.warn() called on an already closed Context", null);
     mFactory.internalReportWarn(this, pMessage, pArgs);
+  }
+
+  /**
+   * @see com.diamondq.common.context.Context#warn(java.lang.Throwable, java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void warn(@Nullable Throwable pThrowable, String pMessage, @Nullable Object @Nullable ... pArgs) {
+    if (mOpenCount.get() <= 0)
+      mFactory.internalReportWarn(this, "Context.warn() called on an already closed Context", null);
+    mFactory.internalReportWarn(this, pMessage, appendThrowable(pThrowable, pArgs));
   }
 
   /**
@@ -395,12 +424,37 @@ public class ContextClass implements Context {
 
   /**
    * @see com.diamondq.common.context.Context#error(java.lang.String, java.lang.Throwable)
+   * @deprecated use {@link #error(Throwable, String, Object...)}
    */
+  @Deprecated
   @Override
   public void error(String pMessage, @Nullable Throwable pThrowable) {
     if (mOpenCount.get() <= 0)
       mFactory.internalReportWarn(this, "Context.error() called on an already closed Context", null);
     mFactory.internalReportError(this, pMessage, pThrowable);
+  }
+
+  /**
+   * @see com.diamondq.common.context.Context#error(java.lang.Throwable, java.lang.String, java.lang.Object[])
+   */
+  @Override
+  public void error(@Nullable Throwable pThrowable, String pMessage, @Nullable Object @Nullable ... pArgs) {
+    if (mOpenCount.get() <= 0)
+      mFactory.internalReportWarn(this, "Context.error() called on an already closed Context", null);
+    mFactory.internalReportError(this, pMessage, appendThrowable(pThrowable, pArgs));
+  }
+
+  /**
+   * SLF4J treats a trailing Throwable in the argument array as the exception, so append it there.
+   */
+  private static @Nullable Object @Nullable [] appendThrowable(@Nullable Throwable pThrowable,
+    @Nullable Object @Nullable [] pArgs) {
+    if (pThrowable == null) return pArgs;
+    int len = (pArgs == null ? 0 : pArgs.length);
+    @Nullable Object[] result = new Object[len + 1];
+    if (pArgs != null) System.arraycopy(pArgs, 0, result, 0, len);
+    result[len] = pThrowable;
+    return result;
   }
 
   /**

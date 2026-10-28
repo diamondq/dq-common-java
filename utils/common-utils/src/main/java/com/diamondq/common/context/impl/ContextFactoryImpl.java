@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Secondary
@@ -95,6 +96,24 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public Context newContextWithMeta(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
 
+    return startContext(true, pClass, pThis, pArgs);
+  }
+
+  /**
+   * @see com.diamondq.common.context.ContextFactory#newContext(java.lang.Class, java.lang.Object, java.lang.Object[])
+   */
+  @Override
+  public Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
+
+    return startContext(false, pClass, pThis, pArgs);
+  }
+
+  /**
+   * Creates a new context, pushes it on to the current thread's stack and notifies the handlers
+   */
+  private Context startContext(boolean pArgsHaveMeta, Class<?> pClass, @Nullable Object pThis,
+    @Nullable Object @Nullable [] pArgs) {
+
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
@@ -102,7 +121,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
 
     /* Create a new context */
 
-    ContextClass context = new ContextClass(this, parentContext, pClass, pThis, true, pArgs);
+    ContextClass context = new ContextClass(this, parentContext, pClass, pThis, pArgsHaveMeta, pArgs);
 
     contextStack.add(context);
 
@@ -128,41 +147,28 @@ public class ContextFactoryImpl implements SPIContextFactory {
   }
 
   /**
-   * @see com.diamondq.common.context.ContextFactory#newContext(java.lang.Class, java.lang.Object, java.lang.Object[])
+   * Runs the function within a temporary 'simple' context that is closed when the function completes
    */
-  @Override
-  public Context newContext(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
-
+  private <R> R inSimpleContext(Class<?> pClass, @Nullable Object pThis, Function<ContextClass, R> pFunc) {
     Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
     ContextClass parentContext;
     if (contextStack.isEmpty()) parentContext = null;
     else parentContext = contextStack.peek();
-
-    /* Create a new context */
-
-    ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, pArgs);
-
-    contextStack.add(context);
-
-    /* Execute the start */
-
-    context.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, true);
-    try {
+    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
+      contextStack.add(context);
+      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
       for (ContextHandler handler : mHandlers)
         handler.executeOnContextStart(context);
+      return pFunc.apply(context);
     }
-    catch (Throwable ex) {
-      /* Something has gone badly wrong.
-         It's unclear what the state of the logging system is at this point, thus, we'll write to the console
-         as well as try to log it.
-       */
-      //noinspection CallToPrintStackTrace
-      ex.printStackTrace();
-      throw reportThrowable(ContextFactoryImpl.class, this, ex);
-    }
-    context.setHandlerData(ContextClass.sDURING_CONTEXT_CONTROL, null);
+  }
 
-    return context;
+  private void runInSimpleContext(Class<?> pClass, @Nullable Object pThis, Consumer<ContextClass> pConsumer) {
+    inSimpleContext(pClass, pThis, context -> {
+        pConsumer.accept(context);
+        return Boolean.TRUE;
+      }
+    );
   }
 
   /**
@@ -274,32 +280,12 @@ public class ContextFactoryImpl implements SPIContextFactory {
    */
   @Override
   public DQRuntimeException reportThrowable(Class<?> pClass, @Nullable Object pThis, Throwable pThrowable) {
-    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    ContextClass parentContext;
-    if (contextStack.isEmpty()) parentContext = null;
-    else parentContext = contextStack.peek();
-    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
-      contextStack.add(context);
-      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
-      for (ContextHandler handler : mHandlers)
-        handler.executeOnContextStart(context);
-      return context.reportThrowable(pThrowable);
-    }
+    return inSimpleContext(pClass, pThis, context -> context.reportThrowable(pThrowable));
   }
 
   @Override
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    ContextClass parentContext;
-    if (contextStack.isEmpty()) parentContext = null;
-    else parentContext = contextStack.peek();
-    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
-      contextStack.add(context);
-      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
-      for (ContextHandler handler : mHandlers)
-        handler.executeOnContextStart(context);
-      context.trace(pArgs);
-    }
+    runInSimpleContext(pClass, pThis, context -> context.trace(pArgs));
   }
 
   /**
@@ -309,17 +295,7 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void reportTrace(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    ContextClass parentContext;
-    if (contextStack.isEmpty()) parentContext = null;
-    else parentContext = contextStack.peek();
-    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
-      contextStack.add(context);
-      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
-      for (ContextHandler handler : mHandlers)
-        handler.executeOnContextStart(context);
-      context.trace(pMessage, pArgs);
-    }
+    runInSimpleContext(pClass, pThis, context -> context.trace(pMessage, pArgs));
   }
 
   /**
@@ -329,49 +305,55 @@ public class ContextFactoryImpl implements SPIContextFactory {
   @Override
   public void reportDebug(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    ContextClass parentContext;
-    if (contextStack.isEmpty()) parentContext = null;
-    else parentContext = contextStack.peek();
-    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
-      contextStack.add(context);
-      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
-      for (ContextHandler handler : mHandlers)
-        handler.executeOnContextStart(context);
-      context.debug(pMessage, pArgs);
-    }
+    runInSimpleContext(pClass, pThis, context -> context.debug(pMessage, pArgs));
   }
 
   @Override
   public void reportInfo(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    ContextClass parentContext;
-    if (contextStack.isEmpty()) parentContext = null;
-    else parentContext = contextStack.peek();
-    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
-      contextStack.add(context);
-      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
-      for (ContextHandler handler : mHandlers)
-        handler.executeOnContextStart(context);
-      context.info(pMessage, pArgs);
-    }
+    runInSimpleContext(pClass, pThis, context -> context.info(pMessage, pArgs));
   }
 
   @Override
   public void reportWarn(Class<?> pClass, @Nullable Object pThis, String pMessage,
     @Nullable Object @Nullable ... pArgs) {
-    Stack<ContextClass> contextStack = sPROPAGATOR.apply(this);
-    ContextClass parentContext;
-    if (contextStack.isEmpty()) parentContext = null;
-    else parentContext = contextStack.peek();
-    try (ContextClass context = new ContextClass(this, parentContext, pClass, pThis, false, null)) {
-      contextStack.add(context);
-      context.setHandlerData(ContextHandler.sSIMPLE_CONTEXT, Boolean.TRUE);
-      for (ContextHandler handler : mHandlers)
-        handler.executeOnContextStart(context);
-      context.warn(pMessage, pArgs);
-    }
+    runInSimpleContext(pClass, pThis, context -> context.warn(pMessage, pArgs));
+  }
+
+  @Override
+  public void reportError(Class<?> pClass, @Nullable Object pThis, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    runInSimpleContext(pClass, pThis, context -> context.error(pMessage, pArgs));
+  }
+
+  @Deprecated
+  @Override
+  public void reportError(Class<?> pClass, @Nullable Object pThis, String pMessage, @Nullable Throwable pThrowable) {
+    runInSimpleContext(pClass, pThis, context -> context.error(pThrowable, pMessage));
+  }
+
+  @Override
+  public void reportDebug(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    runInSimpleContext(pClass, pThis, context -> context.debug(pThrowable, pMessage, pArgs));
+  }
+
+  @Override
+  public void reportInfo(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    runInSimpleContext(pClass, pThis, context -> context.info(pThrowable, pMessage, pArgs));
+  }
+
+  @Override
+  public void reportWarn(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    runInSimpleContext(pClass, pThis, context -> context.warn(pThrowable, pMessage, pArgs));
+  }
+
+  @Override
+  public void reportError(Class<?> pClass, @Nullable Object pThis, @Nullable Throwable pThrowable, String pMessage,
+    @Nullable Object @Nullable ... pArgs) {
+    runInSimpleContext(pClass, pThis, context -> context.error(pThrowable, pMessage, pArgs));
   }
   /* ************************************************************ */
   /* ContextFactoryImpl methods */
