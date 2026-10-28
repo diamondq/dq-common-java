@@ -4,6 +4,7 @@ import com.diamondq.common.errors.I18NStringAndException;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Objects;
 
@@ -27,6 +28,16 @@ public class I18NString {
 
   public I18NStringAndException noException() {
     return new I18NStringAndException(this, null);
+  }
+
+  /**
+   * Localizes this string for the given locale. Any nested I18NString params are localized to the same locale.
+   *
+   * @param pLocale the locale
+   * @return the localized text
+   */
+  public String format(Locale pLocale) {
+    return I18N.getFormat(pLocale, message, params);
   }
 
   @Override

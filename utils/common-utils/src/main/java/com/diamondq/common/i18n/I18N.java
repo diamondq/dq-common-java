@@ -55,7 +55,27 @@ public class I18N {
     ResourceBundle bundle = pFormatKey.getBundle(pLocale);
     String format = bundle.getString(pFormatKey.getCode());
     MessageFormat messageFormat = new MessageFormat(format, pLocale);
-    return messageFormat.format(pArgs);
+    return messageFormat.format(resolveArgs(pLocale, pArgs));
+  }
+
+  /**
+   * Replaces any nested I18NString arguments with their text in the given locale. Otherwise MessageFormat would call
+   * their toString(), which always uses the default locale.
+   *
+   * @param pLocale the locale
+   * @param pArgs the arguments
+   * @return the original array if nothing needed replacing, otherwise a copy with the replacements
+   */
+  private static @Nullable Object @Nullable [] resolveArgs(Locale pLocale, @Nullable Object @Nullable [] pArgs) {
+    if (pArgs == null) return null;
+    @Nullable Object[] result = pArgs;
+    for (int i = 0; i < pArgs.length; i++) {
+      if (pArgs[i] instanceof I18NString nested) {
+        if (result == pArgs) result = pArgs.clone();
+        result[i] = getFormat(pLocale, nested.message, nested.params);
+      }
+    }
+    return result;
   }
 
   public static Map<Locale, String> getAllFormats(MessagesEnum pFormatKey, @Nullable Object @Nullable ... pArgs) {
@@ -88,7 +108,7 @@ public class I18N {
     Map<Locale, String> resultMap = new HashMap<>();
     for (Map.Entry<Locale, String> pair : map.entrySet()) {
       MessageFormat messageFormat = new MessageFormat(pair.getValue(), pair.getKey());
-      resultMap.put(pair.getKey(), messageFormat.format(pArgs));
+      resultMap.put(pair.getKey(), messageFormat.format(resolveArgs(pair.getKey(), pArgs)));
     }
     return resultMap;
   }
