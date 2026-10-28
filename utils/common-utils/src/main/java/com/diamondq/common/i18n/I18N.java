@@ -12,9 +12,11 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.spi.ResourceBundleControlProvider;
 
 /**
@@ -35,7 +37,18 @@ public class I18N {
 
   private static final Control INSTANCE;
 
+  private static final List<ResourceBundleResolver> sResourceBundleResolvers = new CopyOnWriteArrayList<>();
+
   static {
+    try {
+      for (ResourceBundleResolver resolver : ServiceLoader.load(ResourceBundleResolver.class, I18N.class.getClassLoader())) {
+        sResourceBundleResolvers.add(resolver);
+      }
+    }
+    catch (ServiceConfigurationError ex) {
+      /* A broken provider entry must not prevent I18N from loading. Resolvers can still be added explicitly */
+    }
+
     List<ResourceBundleControlProvider> list = null;
     ServiceLoader<ResourceBundleControlProvider> serviceLoaders = ServiceLoader.loadInstalled(
       ResourceBundleControlProvider.class);
@@ -132,6 +145,49 @@ public class I18N {
 
   public static Locale getDefaultLocale() {
     return Locale.getDefault();
+  }
+
+  /**
+   * Registers a resolver that can customize the lookup of message bundles. Resolvers are asked in the order they were
+   * added. Resolvers found by the ServiceLoader are registered automatically, so this is only needed for resolvers
+   * that come from somewhere else (for example, OSGi services).
+   *
+   * @param pResolver the resolver
+   */
+  public static void addResourceBundleResolver(ResourceBundleResolver pResolver) {
+    sResourceBundleResolvers.add(pResolver);
+  }
+
+  /**
+   * Removes a resolver that was previously added.
+   *
+   * @param pResolver the resolver
+   * @return true if it was registered
+   */
+  public static boolean removeResourceBundleResolver(ResourceBundleResolver pResolver) {
+    return sResourceBundleResolvers.remove(pResolver);
+  }
+
+  /**
+   * Looks up the bundle for a MessagesEnum. Generated MessagesEnum classes should call this from their getBundle
+   * method. The registered {@link ResourceBundleResolver}s are asked in order and the first one to return a bundle wins. If
+   * none do, the standard ResourceBundle lookup is used with the ClassLoader from
+   * {@link #getClassLoader(Class, String)}. No ResourceBundle.Control is used, so this works in named modules and in
+   * OSGi (where resources can be supplied by fragment bundles attached to the bundle that contains the enum).
+   *
+   * @param pClass the MessagesEnum class
+   * @param pBasename the base name of the bundle
+   * @param pLocale the locale
+   * @return the bundle
+   * @throws MissingResourceException if no bundle can be found
+   */
+  public static ResourceBundle getBundle(Class<? extends MessagesEnum> pClass, String pBasename, Locale pLocale) {
+    ClassLoader classLoader = getClassLoader(pClass, pBasename);
+    for (ResourceBundleResolver resolver : sResourceBundleResolvers) {
+      ResourceBundle bundle = resolver.getBundle(pBasename, pLocale, classLoader);
+      if (bundle != null) return bundle;
+    }
+    return ResourceBundle.getBundle(pBasename, pLocale, classLoader);
   }
 
   /**
