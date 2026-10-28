@@ -1,5 +1,6 @@
 package com.diamondq.common.i18n.tests;
 
+import com.diamondq.common.errors.I18NStringAndException;
 import com.diamondq.common.i18n.I18N;
 import com.diamondq.common.i18n.I18NString;
 import com.diamondq.common.i18n.MessagesEnum;
@@ -7,14 +8,21 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ListResourceBundle;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class TestI18N {
@@ -235,6 +243,60 @@ public class TestI18N {
     I18N.getFormat(Locale.GERMANY, TestMessages.OUTER, args);
 
     assertEquals(inner, args[0]);
+  }
+
+  /* Params copying and equality */
+
+  @Test
+  public void paramsAreCopiedFromCallersArray() {
+    Object[] args = new Object[] {"a"};
+    I18NString str = new I18NString(TestMessages.GREETING, args);
+    int hash = str.hashCode();
+
+    args[0] = "b";
+
+    assertArrayEquals(new Object[] {"a"}, str.params);
+    assertEquals(hash, str.hashCode());
+  }
+
+  @Test
+  public void equalsComparesNestedArraysByContent() {
+    I18NString first = TestMessages.GREETING.with((Object) new String[] {"x", "y"});
+    I18NString second = TestMessages.GREETING.with((Object) new String[] {"x", "y"});
+
+    assertEquals(first, second);
+    assertEquals(first.hashCode(), second.hashCode());
+    assertNotEquals(first, TestMessages.GREETING.with((Object) new String[] {"x", "z"}));
+  }
+
+  /* Serialization */
+
+  @SuppressWarnings("unchecked")
+  private static <T> T roundTrip(T pValue) throws IOException, ClassNotFoundException {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+      oos.writeObject(pValue);
+    }
+    try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()))) {
+      return (T) ois.readObject();
+    }
+  }
+
+  @Test
+  public void i18nStringSurvivesSerialization() throws IOException, ClassNotFoundException {
+    I18NString str = TestMessages.OUTER.with("a", 2);
+    assertEquals(str, roundTrip(str));
+  }
+
+  @Test
+  public void i18nStringAndExceptionSurvivesSerialization() throws IOException, ClassNotFoundException {
+    I18NStringAndException str = TestMessages.OUTER.with("a").and(new IllegalStateException("boom"));
+    I18NStringAndException copy = roundTrip(str);
+
+    assertEquals(str.message, copy.message);
+    Throwable copiedThrowable = copy.getThrowable();
+    assertNotNull(copiedThrowable);
+    assertEquals("boom", copiedThrowable.getMessage());
   }
 
   @Test

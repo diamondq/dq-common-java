@@ -5,11 +5,15 @@ import com.diamondq.common.i18n.MessagesEnum;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Objects;
 
 public class I18NStringAndException extends I18NString {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   private final @Nullable Throwable mThrowable;
 

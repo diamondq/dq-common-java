@@ -3,23 +3,30 @@ package com.diamondq.common.i18n;
 import com.diamondq.common.errors.I18NStringAndException;
 import org.jspecify.annotations.Nullable;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.Objects;
 
 /**
- * This represents a String that has not yet been localized
+ * This represents a String that has not yet been localized. It is only serializable if all of its params are.
  */
-public class I18NString {
+public class I18NString implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   public final MessagesEnum message;
 
+  /**
+   * The params. This is a private copy of the array passed to the constructor, so it should be treated as read-only.
+   */
   public final @Nullable Object @Nullable [] params;
 
   public I18NString(MessagesEnum pMessage, @Nullable Object @Nullable ... pParams) {
     message = pMessage;
-    params = pParams;
+    params = (pParams == null ? null : pParams.clone());
   }
 
   public I18NStringAndException and(@Nullable Throwable ex) {
@@ -56,13 +63,11 @@ public class I18NString {
     if (this == pO) return true;
     if (pO == null || getClass() != pO.getClass()) return false;
     final I18NString that = (I18NString) pO;
-    return message.equals(that.message) && Arrays.equals(params, that.params);
+    return message.equals(that.message) && Arrays.deepEquals(params, that.params);
   }
 
   @Override
   public int hashCode() {
-    int result = Objects.hash(message);
-    result = 31 * result + Arrays.hashCode(params);
-    return result;
+    return 31 * message.hashCode() + Arrays.deepHashCode(params);
   }
 }
