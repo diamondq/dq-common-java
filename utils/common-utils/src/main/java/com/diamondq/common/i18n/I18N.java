@@ -4,6 +4,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +22,14 @@ import java.util.spi.ResourceBundleControlProvider;
  */
 public class I18N {
 
-  private static final ConcurrentMap<MessagesEnum, Map<Locale, String>> sCachedStrings = new ConcurrentHashMap<>();
+  /**
+   * The cached formats depend on the default locale (locales that resolve to the same bundle as the default are left
+   * out), so the default locale is part of the key
+   */
+  private record CacheKey(MessagesEnum key, Locale defaultLocale) {
+  }
+
+  private static final ConcurrentMap<CacheKey, Map<Locale, String>> sCachedStrings = new ConcurrentHashMap<>();
 
   private static final @Nullable List<ResourceBundleControlProvider> providers;
 
@@ -82,13 +90,21 @@ public class I18N {
 
     /* This is a really expensive lookup, so the getString will be cached */
 
-    Map<Locale, String> map = sCachedStrings.get(pFormatKey);
+    Locale defaultLocale = Locale.getDefault();
+    CacheKey cacheKey = new CacheKey(pFormatKey, defaultLocale);
+    Map<Locale, String> map = sCachedStrings.get(cacheKey);
     if (map == null) {
 
       /* Perform the expensive iteration over all possible locales */
 
-      Locale defaultLocale = Locale.getDefault();
-      ResourceBundle defaultBundle = pFormatKey.getBundle(defaultLocale);
+      ResourceBundle defaultBundle;
+      try {
+        defaultBundle = pFormatKey.getBundle(defaultLocale);
+      }
+      catch (MissingResourceException ex) {
+        /* No bundle for the default locale, so there is nothing to de-duplicate against */
+        defaultBundle = null;
+      }
 
       Map<Locale, String> newMap = new HashMap<>();
       for (Locale locale : Locale.getAvailableLocales()) {
@@ -102,7 +118,8 @@ public class I18N {
           // Quietly ignore the exception
         }
       }
-      if ((map = sCachedStrings.putIfAbsent(pFormatKey, newMap)) == null) map = newMap;
+      Map<Locale, String> immutableMap = Collections.unmodifiableMap(newMap);
+      if ((map = sCachedStrings.putIfAbsent(cacheKey, immutableMap)) == null) map = immutableMap;
     }
 
     Map<Locale, String> resultMap = new HashMap<>();

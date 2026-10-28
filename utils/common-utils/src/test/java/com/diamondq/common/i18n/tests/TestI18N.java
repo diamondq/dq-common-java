@@ -10,10 +10,12 @@ import org.junit.Test;
 import java.util.ListResourceBundle;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestI18N {
 
@@ -99,6 +101,24 @@ public class TestI18N {
     }
   }
 
+  /**
+   * Only has a German bundle, so there is no bundle for the (US) default locale
+   */
+  public enum GermanOnlyMessages implements MessagesEnum {
+    GREETING;
+
+    @Override
+    public String getCode() {
+      return "greeting";
+    }
+
+    @Override
+    public ResourceBundle getBundle(Locale pLocale) {
+      if ("de".equals(pLocale.getLanguage())) return sGerman;
+      throw new MissingResourceException("No bundle", "GermanOnlyMessages", "");
+    }
+  }
+
   private Locale mOriginalDefault;
 
   @Before
@@ -138,6 +158,25 @@ public class TestI18N {
     assertEquals("Deutsch aus TestMessages", first.get(Locale.GERMANY));
     assertEquals("English from OtherMessages", second.get(Locale.US));
     assertEquals("Deutsch aus OtherMessages", second.get(Locale.GERMANY));
+  }
+
+  @Test
+  public void getAllFormatsFollowsChangesToDefaultLocale() {
+    /* Locales that resolve to the same bundle as the default are left out, unless they are the default itself */
+    I18N.getAllFormats(TestMessages.GREETING);
+    Locale.setDefault(Locale.UK);
+
+    Map<Locale, String> all = I18N.getAllFormats(TestMessages.GREETING);
+
+    assertEquals("Hello", all.get(Locale.UK));
+  }
+
+  @Test
+  public void getAllFormatsToleratesMissingDefaultLocaleBundle() {
+    Map<Locale, String> all = I18N.getAllFormats(GermanOnlyMessages.GREETING);
+
+    assertEquals("Hallo", all.get(Locale.GERMANY));
+    assertNull(all.get(Locale.US));
   }
 
   @Test
