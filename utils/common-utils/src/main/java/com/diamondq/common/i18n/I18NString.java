@@ -4,6 +4,7 @@ import com.diamondq.common.errors.I18NStringAndException;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.MissingResourceException;
 import java.util.Objects;
 
 /**
@@ -30,7 +31,13 @@ public class I18NString {
 
   @Override
   public String toString() {
-    return I18N.getFormat(I18N.getDefaultLocale(), message, params);
+    try {
+      return I18N.getFormat(I18N.getDefaultLocale(), message, params);
+    }
+    catch (MissingResourceException | IllegalArgumentException ex) {
+      /* toString must never throw, so fall back to the code and raw params */
+      return message.getCode() + (params == null ? "" : Arrays.toString(params));
+    }
   }
 
   @Override

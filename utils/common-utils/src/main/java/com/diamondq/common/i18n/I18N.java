@@ -21,7 +21,7 @@ import java.util.spi.ResourceBundleControlProvider;
  */
 public class I18N {
 
-  private static final ConcurrentMap<String, Map<Locale, String>> sCachedStrings = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<MessagesEnum, Map<Locale, String>> sCachedStrings = new ConcurrentHashMap<>();
 
   private static final @Nullable List<ResourceBundleControlProvider> providers;
 
@@ -54,8 +54,7 @@ public class I18N {
 
     ResourceBundle bundle = pFormatKey.getBundle(pLocale);
     String format = bundle.getString(pFormatKey.getCode());
-    MessageFormat messageFormat = new MessageFormat(format);
-    messageFormat.setLocale(pLocale);
+    MessageFormat messageFormat = new MessageFormat(format, pLocale);
     return messageFormat.format(pArgs);
   }
 
@@ -63,7 +62,7 @@ public class I18N {
 
     /* This is a really expensive lookup, so the getString will be cached */
 
-    Map<Locale, String> map = sCachedStrings.get(pFormatKey.getCode());
+    Map<Locale, String> map = sCachedStrings.get(pFormatKey);
     if (map == null) {
 
       /* Perform the expensive iteration over all possible locales */
@@ -83,13 +82,12 @@ public class I18N {
           // Quietly ignore the exception
         }
       }
-      if ((map = sCachedStrings.putIfAbsent(pFormatKey.getCode(), newMap)) == null) map = newMap;
+      if ((map = sCachedStrings.putIfAbsent(pFormatKey, newMap)) == null) map = newMap;
     }
 
     Map<Locale, String> resultMap = new HashMap<>();
     for (Map.Entry<Locale, String> pair : map.entrySet()) {
-      MessageFormat messageFormat = new MessageFormat(pair.getValue());
-      messageFormat.setLocale(pair.getKey());
+      MessageFormat messageFormat = new MessageFormat(pair.getValue(), pair.getKey());
       resultMap.put(pair.getKey(), messageFormat.format(pArgs));
     }
     return resultMap;
